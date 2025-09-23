@@ -5,7 +5,7 @@ var { authJwt } = require("../middleware");
 
 
 /*addRole*/
-router.post("/role/addRole",[authJwt.verifyToken], [controller.validate("addRole")], controller.addRole);
+router.post("/role/addRole",[authJwt.verifyToken],  controller.addRole);
 
 /*getAllRoles*/
 router.get("/role/getAllRoles",[authJwt.verifyToken],  controller.getAllRoles);

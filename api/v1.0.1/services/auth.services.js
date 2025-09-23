@@ -69,8 +69,36 @@ module.exports = {
 
       let queryOptions = {
         where: whereCondition,
-        attributes: { exclude: ["password"] },
         order: [["id", "DESC"]],
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: db.departmentObj,
+            as: "department", let queryOptions = {
+              where: whereCondition,
+              order: [["id", "DESC"]],
+              attributes: { exclude: ["password"] },
+              include: [
+                {
+                  model: db.departmentObj,
+                  as: "department",
+                  attributes: ["id", "name"],
+                },
+                {
+                  model: db.rolesObj,
+                  as: "roles",
+                  attributes: ["id", "name"],
+                },
+              ],
+            };
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.rolesObj,
+            as: "roles",
+            attributes: ["id", "name"],
+          },
+        ],
       };
 
       // total count

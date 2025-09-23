@@ -41,32 +41,6 @@ module.exports = {
     }
   },
 
-  /*getAllUsers*/
-  // async getAllUsers(page, length, role) {
-  //     try {
-  //         let whereCondition = {};
-  //         if(role){
-  //             whereCondition.role =  role
-  //         }
-  //         limit = length || 10;
-  //         offset = (page - 1) * limit || 0;
-  //         let users = await db.userObj.findAll({
-  //             where: {...whereCondition},
-  //             attributes: {
-  //                 exclude: ['password']
-  //             },
-  //             limit,
-  //             offset,
-  //             order: [["id", "DESC"]],
-  //         }
-  //         );
-  //         return users;
-  //     } catch (e) {
-  //         logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //         throw e;
-  //     }
-  // },
-
   async getAllUsers(page, length, role, search, date, id, take_all, limit) {
     try {
       let whereCondition = {};

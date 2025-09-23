@@ -22,8 +22,4 @@ router.put("/updateUser", upload.single("avatar"),[authJwt.verifyToken], control
 /*deleteUser*/
 router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
 
-// /*tic-tac-toe*/
-// router.post("/auth/ticTacToe", controller.ticTacToe);
-
-
 module.exports = router;

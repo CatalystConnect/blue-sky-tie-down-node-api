@@ -4,90 +4,99 @@ const db = require("../models");
 const { Op } = require("sequelize");
 
 module.exports = {
-    /*addDepartments*/
-    async addDepartments(postData) {
-        try {
-            let departments = await db.departmentObj.create(postData);
-            return departments;
-        } catch (e) {
-            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-            throw e;
-        }
-    },
-    /* getAllDepartments */
-    async getAllDepartments({ page, limit, search }) {
-        try {
-            const offset = (page - 1) * limit;
+  /*addDepartments*/
+  async addDepartments(postData) {
+    try {
+      let departments = await db.departmentObj.create(postData);
+      return departments;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+  /* getAllDepartments */
+  async getAllDepartments({
+    page = 1,
+    limit = 10,
+    search = "",
+    take_all = false,
+  }) {
+    try {
+      const offset = (page - 1) * limit;
 
-            const whereCondition = {};
-            if (search) {
-                whereCondition.name = { [Op.like]: `%${search}%` };
-            }
+      const whereCondition = {};
+      if (search) {
+        whereCondition.name = { [Op.like]: `%${search}%` };
+      }
 
-            const { count, rows } = await db.departmentObj.findAndCountAll({
-                where: whereCondition,
-                limit,
-                offset,
-                order: [["id", "DESC"]],
-            });
+      let queryOptions = {
+        where: whereCondition,
+        order: [["id", "DESC"]],
+      };
 
-            return {
-                total: count,
-                page,
-                limit,
-                data: rows,
-            };
-        } catch (e) {
-            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-            throw e;
-        }
-    },
-    /* getDepartmentById */
-    async getDepartmentById(id) {
-        try {
-            const department = await db.departmentObj.findOne({
-                where: { id: id },
-            });
-            return department;
-        } catch (e) {
-            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-            throw e;
-        }
-    },
-    /* deleteDepartment */
-    async deleteDepartment(id) {
-        try {
-            const deleted = await db.departmentObj.destroy({
-                where: { id: id },
-            });
+      if (!take_all) {
+        queryOptions.limit = limit;
+        queryOptions.offset = offset;
+      }
 
+      const { count, rows } = await db.departmentObj.findAndCountAll(
+        queryOptions
+      );
 
-            return deleted > 0;
-        } catch (e) {
-            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-            throw e;
-        }
-    },
-    /* updateDepartment */
-    async updateDepartment(postData) {
-        try {
-            let department = await db.departmentObj.findByPk(postData.id);
+      return {
+        departments: rows,
+        total: count,
+      };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 
-            if (!department) {
-                throw new Error("Department not found");
-            }
+  /* getDepartmentById */
+  async getDepartmentById(id) {
+    try {
+      const department = await db.departmentObj.findOne({
+        where: { id: id },
+      });
+      return department;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+  /* deleteDepartment */
+  async deleteDepartment(id) {
+    try {
+      const deleted = await db.departmentObj.destroy({
+        where: { id: id },
+      });
 
-            
-            if (postData.name) {
-                department.name = postData.name;
-            }
+      return deleted > 0;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+  /* updateDepartment */
+  async updateDepartment(postData) {
+    try {
+      let department = await db.departmentObj.findByPk(postData.id);
 
-            await department.save();
+      if (!department) {
+        throw new Error("Department not found");
+      }
 
-            return department;
-        } catch (e) {
-            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-            throw e;
-        }
-    },
-}
+      if (postData.name) {
+        department.name = postData.name;
+      }
+
+      await department.save();
+
+      return department;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+};

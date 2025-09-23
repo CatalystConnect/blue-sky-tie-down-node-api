@@ -19,31 +19,36 @@ module.exports = {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
         return res
-          .status(200)
+          .status(400)
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
-      let data = req.body;
+
+      const data = req.body;
       let postData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        userName: data.userName,
+        name: data.name,
         email: data.email,
         password: bcrypt.hashSync(data.password, 8),
-        role: data.role,
-        phoneNumber: data.phoneNumber,
+        role: data.role_id,
+        phoneNumber: data.phone,
         department_id: data.department_id ? Number(data.department_id) : null,
-        status: data.status,
-        userType: data.userType,
+        status: data.status || "active",
+        address: data.address,
+        userHourlyRate: data.userHourlyRate,
+        userType: data.userType || "internal",
         avatar: req.file ? `files/${req.file.filename}` : null,
       };
+
+      commonHelper.removeFalsyKeys(postData);
+
       await authServices.register(postData);
+
       return res
-        .status(200)
+        .status(201)
         .send(
-          commonHelper.parseSuccessRespose("", "User register successfully")
+          commonHelper.parseSuccessRespose(null, "User registered successfully")
         );
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message:
           error.response?.data?.error || error.message || "Register failed",
@@ -133,26 +138,23 @@ module.exports = {
       );
 
       if (!users || users.length === 0) throw new Error("Users not found");
-      let response = {
-        ...(take_all
-          ? { total, page, per_page: total, totalPages: 1 }
-          : {
-              total,
-              page,
-              per_page: length,
-              totalPages: Math.ceil(total / length),
-            }),
-        data: users,
-      };
+
+      const lastPage = take_all ? 1 : Math.ceil(total / length);
+      const from = total > 0 ? (page - 1) * length + 1 : null;
+      const to = total > 0 ? Math.min(page * length, total) : null;
 
       return res.status(200).send({
         status: true,
         message: "Users displayed successfully",
-        data: response.data,
-        total: response.total,
-        page: response.page,
-        per_page: response.per_page,
-        totalPages: response.totalPages,
+        data: users,
+        meta: {
+          current_page: page,
+          from,
+          last_page: lastPage,
+          per_page: take_all ? total : length,
+          to,
+          total,
+        },
       });
     } catch (error) {
       return res.status(400).json({
@@ -201,7 +203,7 @@ module.exports = {
     }
   },
 
-  /*getUserById*/
+  /*updateUser*/
   async updateUser(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -213,6 +215,7 @@ module.exports = {
 
       const userId = Number(req.query.userId);
       const user = await authServices.getUserById(userId);
+
       if (!user) {
         return res
           .status(404)
@@ -220,36 +223,32 @@ module.exports = {
       }
 
       const data = req.body;
-
-      const postData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        userName: data.userName,
+      let postData = {
+        name: data.name,
         email: data.email,
-        role: data.role,
-        phoneNumber: data.phoneNumber,
+        password: bcrypt.hashSync(data.password, 8),
+        role: data.role_id,
+        phoneNumber: data.phone,
         department_id: data.department_id ? Number(data.department_id) : null,
-        status: data.status,
-        userType: data.userType,
-        avatar: req.file ? `files/${req.file.filename}` : null,
+        status: data.status || "active",
+        address: data.address,
+        userHourlyRate: data.userHourlyRate,
+        userType: data.userType || "internal",
       };
-
-      // only update avatar if file is uploaded
-      if (req.file) postData.avatar = `files/${req.file.filename}`;
-
-      // update password if provided
-      if (data.password) {
-        postData.password = bcrypt.hashSync(data.password, 8);
+      if (req.file) {
+        postData.avatar = `files/${req.file.filename}`;
       }
 
       commonHelper.removeFalsyKeys(postData);
-
       const updatedUser = await authServices.updateUser(postData, userId);
 
       return res
         .status(200)
         .send(
-          commonHelper.parseSuccessRespose("", "User updated successfully")
+          commonHelper.parseSuccessRespose(
+            updatedUser,
+            "User updated successfully"
+          )
         );
     } catch (error) {
       return res.status(500).json({

@@ -93,6 +93,7 @@ module.exports = {
     }
   },
 
+  /*getAllUsers*/
   async getAllUsers(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -149,7 +150,7 @@ module.exports = {
               per_page: length,
               totalPages: Math.ceil(total / length),
             }),
-        data: users, 
+        data: users,
       };
 
       return res.status(200).send({
@@ -170,6 +171,7 @@ module.exports = {
       });
     }
   },
+
   /*getUserById*/
   async getUserById(req, res) {
     try {
@@ -180,8 +182,8 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
       let userId = req.query.userId;
-      console.log('userIduserId',userId);
-      
+      console.log("userIduserId", userId);
+
       const user = await authServices.getUserById(userId);
       if (!user) throw new Error("User not found");
       return res
@@ -198,21 +200,28 @@ module.exports = {
       });
     }
   },
+
   /*getUserById*/
   async updateUser(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
         return res
-          .status(200)
+          .status(400)
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
-      let userId = req.query.userId;
-      const user = await authServices.getUserById(userId);
-      if (!user) throw new Error("User not found");
-      let data = req.body;
 
-      let postData = {
+      const userId = Number(req.query.userId);
+      const user = await authServices.getUserById(userId);
+      if (!user) {
+        return res
+          .status(404)
+          .send(commonHelper.parseErrorRespose({ userId: "User not found" }));
+      }
+
+      const data = req.body;
+
+      const postData = {
         firstName: data.firstName,
         lastName: data.lastName,
         userName: data.userName,
@@ -224,28 +233,37 @@ module.exports = {
         userType: data.userType,
         avatar: req.file ? `files/${req.file.filename}` : null,
       };
-      if (data?.password) {
+
+      // only update avatar if file is uploaded
+      if (req.file) postData.avatar = `files/${req.file.filename}`;
+
+      // update password if provided
+      if (data.password) {
         postData.password = bcrypt.hashSync(data.password, 8);
       }
+
       commonHelper.removeFalsyKeys(postData);
-      const updateUser = await authServices.updateUser(postData, userId);
+    
+     
+      const updatedUser = await authServices.updateUser(postData, userId);
+
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
-            updateUser,
+            "",
             "User updated successfully"
           )
         );
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
-        message:
-          error.response?.data?.error || error.message || "User updated failed",
-        data: error.response?.data || {},
+        message: error.message || "User update failed",
+        data: {},
       });
     }
   },
+
   /*delete user*/
   async deleteUser(req, res) {
     try {
@@ -276,58 +294,7 @@ module.exports = {
       });
     }
   },
-  /*ticTacToe*/
-  // async ticTacToe(req, res) {
-  //     try {
-  //         let { user1Input, user2Input } = req.body;
-  //         const columnSequence = [
-  //             ['a', 'd', 'g'],
-  //             ['g', 'h', 'i'],
-  //             ['c', 'f', 'i'],
-  //             ['a', 'b', 'c'],
-  //             ['b', 'e', 'h'],
-  //             ['d', 'e', 'f'],
-  //             ['c', 'e', 'g'],
-  //             ['a', 'e', 'i']
-  //           ];
 
-  //           const isMatch = (input, sequence) => {
-  //             return sequence.every(item => input.includes(item));
-  //           };
-
-  //           let user = null;
-
-  //           // Loop through sequences
-  //           for (const seq of columnSequence) {
-  //             if (isMatch(user1Input, seq)) {
-  //               user = "User1 is winner";
-  //               break;
-  //             } else if (isMatch(user2Input, seq)) {
-  //                 user = "User2 is winner";
-  //                 break;
-  //             }
-  //           }
-  //           if (!user) {
-  //             user = "The match is a tie. Restart the game."
-  //           }
-
-  //         return res
-  //             .status(200)
-  //             .send(
-  //                 commonHelper.parseSuccessRespose(
-  //                     "",
-  //                     `${user}`
-  //                 )
-  //             );
-  //     } catch (error) {
-  //         return res.status(400).json({
-  //             status: false,
-  //             message: error.response?.data?.error || error.message || "User updated failed",
-  //             data: error.response?.data || {}
-  //         });
-  //     }
-
-  // },
   validate(method) {
     switch (method) {
       case "register": {

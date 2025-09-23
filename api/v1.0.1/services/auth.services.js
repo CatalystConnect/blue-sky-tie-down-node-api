@@ -119,7 +119,6 @@ module.exports = {
   /*getUserById*/
   async getUserById(userId) {
     try {
-      console.log('userIdusersssssId',userId);
       let users = await db.userObj.findAll({
         where: { id: userId },
         // include: [{ model: db.departmentObj, as: "department" }],
@@ -137,18 +136,20 @@ module.exports = {
       throw e;
     }
   },
+
   /*updateUser*/
   async updateUser(data, userId) {
     try {
-      let updateUser = await db.userObj.update(data, {
-        where: { id: userId },
-      });
-      return updateUser;
+      await db.userObj.update(data, { where: { id: userId } });
+      // fetch updated user
+      const updatedUser = await db.userObj.findByPk(userId);
+      return updatedUser;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
+  
   /*getUserById*/
   async deleteUser(userId) {
     try {

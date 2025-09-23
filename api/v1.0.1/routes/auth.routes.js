@@ -14,13 +14,13 @@ router.post("/auth/login", [controller.validate("login")], controller.login);
 router.get("/users", [authJwt.verifyToken], controller.getAllUsers);
 
 /*getUserById*/
-router.get("/auth/getUserById", [authJwt.verifyToken],[controller.validate("getUserById")], controller.getUserById);
+router.get("/getUserById", [authJwt.verifyToken],[controller.validate("getUserById")], controller.getUserById);
 
 /*updateUser*/
-router.put("/auth/updateUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.updateUser);
+router.put("/updateUser", upload.single("avatar"),[authJwt.verifyToken], controller.updateUser);
 
 /*deleteUser*/
-router.delete("/auth/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
+router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
 
 // /*tic-tac-toe*/
 // router.post("/auth/ticTacToe", controller.ticTacToe);

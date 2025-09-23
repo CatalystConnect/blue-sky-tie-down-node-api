@@ -48,9 +48,12 @@ module.exports = {
 
             let result = await roleServices.getAllRoles(page, perPage);
 
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose(result, "Roles displayed successfully"));
+            return res.status(200).json({
+                status: true,
+                message: "Roles displayed successfully",
+                data: result.data,
+                meta: result.meta
+            });
         } catch (error) {
             return res.status(400).json({
                 status: false,

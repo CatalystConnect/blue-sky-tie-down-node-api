@@ -3,154 +3,202 @@ var commonHelper = require("../helper/common.helper");
 const { check, validationResult } = require("express-validator"); // Updated import
 const departmentsServices = require("../services/departments.services");
 const myValidationResult = validationResult.withDefaults({
-    formatter: (error) => {
-        return error.msg;
-    },
+  formatter: (error) => {
+    return error.msg;
+  },
 });
 
 module.exports = {
-    /*addDepartments*/
-    async addDepartments(req, res) {
-        try {
-            const errors = myValidationResult(req);
-            if (!errors.isEmpty()) {
-                return res
-                    .status(200)
-                    .send(commonHelper.parseErrorRespose(errors.mapped()));
-            }
-            let data = req.body;
+  /*addDepartments*/
+  async addDepartments(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let data = req.body;
+      let postData = {
+        name: data.name,
+        status: data.status || "active",
+      };
+      await departmentsServices.addDepartments(postData);
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose("", "Add department successfully")
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Add Departments failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /* getAllDepartments */
+  async getAllDepartments(req, res) {
+    try {
+      let { page = 1, limit = 10, search = "", take_all = false } = req.query;
+      page = parseInt(page);
+      limit = parseInt(limit);
+      take_all = take_all === "true" || take_all === true;
 
-            let postData = {
-                name: data.name,
-                status: data.status || "active",
-            }
-            await departmentsServices.addDepartments(postData);
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose("", "add Departments  successfully"));
-        } catch (error) {
-            return res.status(400).json({
-                status: false,
-                message: error.response?.data?.error || error.message || "Add Departments failed",
-                data: error.response?.data || {}
-            });
-        }
+      const { departments, total } =
+        await departmentsServices.getAllDepartments({
+          page,
+          limit,
+          search,
+          take_all,
+        });
 
-    },
-    /* getAllDepartments */
-    async getAllDepartments(req, res) {
-        try {
-            let { page = 1, limit = 10, search = "" } = req.query;
-            page = parseInt(page);
-            limit = parseInt(limit);
+      if (!departments || departments.length === 0)
+        throw new Error("Departments not found");
 
-            const result = await departmentsServices.getAllDepartments({
-                page,
-                limit,
-                search,
-            });
+      const lastPage = take_all ? 1 : Math.ceil(total / limit);
+      const from = total > 0 ? (page - 1) * limit + 1 : 0;
+      const to = total > 0 ? Math.min(page * limit, total) : 0;
 
-            return res.status(200).send(
-                commonHelper.parseSuccessRespose(result, "Departments fetched successfully")
-            );
-        } catch (error) {
-            return res.status(400).json({
-                status: false,
-                message:
-                    error.response?.data?.error ||
-                    error.message ||
-                    "Get Departments failed",
-                data: error.response?.data || {},
-            });
-        }
-    },
-    /* getDepartmentById */
-    async getDepartmentById(req, res) {
-        try {
-            let { id } = req.query;
+      return res.status(200).send({
+        status: true,
+        message: "Departments displayed successfully",
+        data: departments,
+        meta: {
+          current_page: page,
+          from,
+          to,
+          per_page: take_all ? total : limit,
+          last_page: lastPage,
+          total,
+        },
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Get Departments failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
 
-            if (!id) {
-                return res
-                    .status(200)
-                    .send(commonHelper.parseErrorRespose({ id: "Department ID is required" }));
-            }
+  /* getDepartmentById */
+  async getDepartmentById(req, res) {
+    try {
+      let { id } = req.query;
 
-            const department = await departmentsServices.getDepartmentById(id);
+      if (!id) {
+        return res
+          .status(200)
+          .send(
+            commonHelper.parseErrorRespose({ id: "Department ID is required" })
+          );
+      }
 
-            if (!department) {
-                return res
-                    .status(404)
-                    .send(commonHelper.parseErrorRespose({ id: "Department not found" }));
-            }
+      const department = await departmentsServices.getDepartmentById(id);
 
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose(department, "Department fetched successfully"));
-        } catch (error) {
-            return res.status(400).json({
-                status: false,
-                message:
-                    error.response?.data?.error ||
-                    error.message ||
-                    "Get Department failed",
-                data: error.response?.data || {},
-            });
-        }
-    },
-    /* deleteDepartment */
-    async deleteDepartment(req, res) {
-        try {
-            let { id } = req.query;
+      if (!department) {
+        return res
+          .status(404)
+          .send(commonHelper.parseErrorRespose({ id: "Department not found" }));
+      }
 
-            if (!id) {
-                return res
-                    .status(200)
-                    .send(commonHelper.parseErrorRespose({ id: "Department ID is required" }));
-            }
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            department,
+            "Department fetched successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Get Department failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /* deleteDepartment */
+  async deleteDepartment(req, res) {
+    try {
+      let { id } = req.query;
 
-            const deleted = await departmentsServices.deleteDepartment(id);
+      if (!id) {
+        return res
+          .status(200)
+          .send(
+            commonHelper.parseErrorRespose({ id: "Department ID is required" })
+          );
+      }
 
-            if (!deleted) {
-                return res
-                    .status(404)
-                    .send(commonHelper.parseErrorRespose({ id: "Department not found or already deleted" }));
-            }
+      const deleted = await departmentsServices.deleteDepartment(id);
 
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose("", "Department deleted successfully"));
-        } catch (error) {
-            return res.status(400).json({
-                status: false,
-                message:
-                    error.response?.data?.error ||
-                    error.message ||
-                    "Delete Department failed",
-                data: error.response?.data || {},
-            });
-        }
-    },
-    /* updateDepartment */
-    async updateDepartment(req, res) {
-        try {
-            let data = req.body;
+      if (!deleted) {
+        return res.status(404).send(
+          commonHelper.parseErrorRespose({
+            id: "Department not found or already deleted",
+          })
+        );
+      }
 
-            let postData = {
-                id: req.query.id,
-                name: data.name
-            };
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            "",
+            "Department deleted successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Delete Department failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /* updateDepartment */
+  async updateDepartment(req, res) {
+    try {
+      let data = req.body;
 
-            let result = await departmentsServices.updateDepartment(postData);
+      let postData = {
+        id: req.query.id,
+        name: data.name,
+      };
 
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose(result, "Department updated successfully"));
-        } catch (error) {
-            return res.status(400).json({
-                status: false,
-                message: error.response?.data?.error || error.message || "Update Department failed",
-                data: error.response?.data || {}
-            });
-        }
-    },
-}
+      let result = await departmentsServices.updateDepartment(postData);
+
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            result,
+            "Department updated successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Update Department failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+};

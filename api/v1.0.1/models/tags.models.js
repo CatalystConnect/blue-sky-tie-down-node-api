@@ -3,12 +3,12 @@ module.exports = (sequelize, Sequelize) => {
       "tags",
       {
         id: {
-          type: Sequelize.BIGINT,
+          type: Sequelize.INTEGER,
           autoIncrement: true,
           primaryKey: true,
         },
         user_id: {
-          type: Sequelize.BIGINT,
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         title: {                

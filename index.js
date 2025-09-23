@@ -29,7 +29,7 @@ app.use(
     let user = auths(req);
     if (
       user === undefined ||
-      user["name"] !== "rooftop" ||
+      user["name"] !== "blue-sky" ||
       user["pass"] !== "X7bG9mT2"
     ) {
       res.statusCode = 401;

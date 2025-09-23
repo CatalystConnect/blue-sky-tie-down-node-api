@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "version": "1.0.1",
-    "title": "Rooftop App Database",
+    "title": "Blue-sky App Database",
     "description": "Nodejs Based API",
     "termsOfService": ""
   },

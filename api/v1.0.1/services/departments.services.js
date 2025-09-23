@@ -1,0 +1,93 @@
+var commonHelper = require("../helper/common.helper");
+const logger = require("../../../config/winston");
+const db = require("../models");
+const { Op } = require("sequelize");
+
+module.exports = {
+    /*addDepartments*/
+    async addDepartments(postData) {
+        try {
+            let departments = await db.departmentObj.create(postData);
+            return departments;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+    /* getAllDepartments */
+    async getAllDepartments({ page, limit, search }) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const whereCondition = {};
+            if (search) {
+                whereCondition.name = { [Op.like]: `%${search}%` };
+            }
+
+            const { count, rows } = await db.departmentObj.findAndCountAll({
+                where: whereCondition,
+                limit,
+                offset,
+                order: [["id", "DESC"]],
+            });
+
+            return {
+                total: count,
+                page,
+                limit,
+                data: rows,
+            };
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+    /* getDepartmentById */
+    async getDepartmentById(id) {
+        try {
+            const department = await db.departmentObj.findOne({
+                where: { id: id },
+            });
+            return department;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+    /* deleteDepartment */
+    async deleteDepartment(id) {
+        try {
+            const deleted = await db.departmentObj.destroy({
+                where: { id: id },
+            });
+
+
+            return deleted > 0;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+    /* updateDepartment */
+    async updateDepartment(postData) {
+        try {
+            let department = await db.departmentObj.findByPk(postData.id);
+
+            if (!department) {
+                throw new Error("Department not found");
+            }
+
+            
+            if (postData.name) {
+                department.name = postData.name;
+            }
+
+            await department.save();
+
+            return department;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+}

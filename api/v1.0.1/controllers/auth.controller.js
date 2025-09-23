@@ -1,0 +1,375 @@
+require("dotenv").config();
+var commonHelper = require("../helper/common.helper");
+var bcrypt = require("bcryptjs");
+const config = require("../../../config/db.config");
+var jwt = require("jsonwebtoken");
+const authServices = require("../services/auth.services");
+const { check, validationResult } = require("express-validator"); // Updated import
+const myValidationResult = validationResult.withDefaults({
+  formatter: (error) => {
+    return error.msg;
+  },
+});
+
+module.exports = {
+  /*user register*/
+  async register(req, res) {
+    try {
+      console.log("datadatadata", req.body);
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let data = req.body;
+      let postData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userName: data.userName,
+        email: data.email,
+        password: bcrypt.hashSync(data.password, 8),
+        role: data.role,
+        phoneNumber: data.phoneNumber,
+        department_id: data.department_id ? Number(data.department_id) : null,
+        status: data.status,
+        userType: data.userType,
+        avatar: req.file ? `files/${req.file.filename}` : null,
+      };
+      await authServices.register(postData);
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose("", "User register successfully")
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "Register failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+
+  /*user login*/
+  async login(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let { email, password } = req.body;
+      const getUserInfo = await authServices.getUserByEmail(email);
+      if (!getUserInfo) throw new Error("User not found");
+      let dbPassword = getUserInfo.password;
+      var passwordIsValid = bcrypt.compareSync(password, dbPassword);
+      if (!passwordIsValid) throw new Error("Invalid Password!");
+      const payload = {
+        id: getUserInfo.id,
+        name: getUserInfo.firstName,
+        role: getUserInfo.role,
+      };
+      var accessToken = jwt.sign(payload, config.secret, {
+        expiresIn: "1d", // 24x7 hours
+      });
+      const { password: usesPass, ...userInfo } = getUserInfo;
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            { ...userInfo, accessToken },
+            "User logged in successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.response?.data?.error || error.message || "Login failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+
+  async getAllUsers(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      let {
+        page = 1,
+        length = 10,
+        role,
+        search,
+        date,
+        id,
+        take_all,
+        limit,
+      } = req.query;
+
+      page = parseInt(page);
+      length = parseInt(length);
+
+      if (!take_all && (page <= 0 || length <= 0)) {
+        throw new Error("Page and length must be greater than 0");
+      }
+
+      const { users, total } = await authServices.getAllUsers(
+        page,
+        length,
+        role,
+        search,
+        date,
+        id,
+        take_all,
+        limit
+      );
+
+      if (!users || users.length === 0) throw new Error("Users not found");
+
+      // let response = {
+      //   users,
+      //   total,
+      //   page,
+      //   per_page: take_all ? total : length,
+      //   totalPages: take_all ? 1 : Math.ceil(total / length),
+      // };
+      let response = {
+        ...(take_all
+          ? { total, page, per_page: total, totalPages: 1 }
+          : {
+              total,
+              page,
+              per_page: length,
+              totalPages: Math.ceil(total / length),
+            }),
+        data: users, 
+      };
+
+      return res.status(200).send({
+        status: true,
+        message: "Users displayed successfully",
+        data: response.data, // direct array
+        total: response.total,
+        page: response.page,
+        per_page: response.per_page,
+        totalPages: response.totalPages,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "User fetch failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /*getUserById*/
+  async getUserById(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let userId = req.query.userId;
+      console.log('userIduserId',userId);
+      
+      const user = await authServices.getUserById(userId);
+      if (!user) throw new Error("User not found");
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(user, "User displayed successfully")
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "User fetch failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /*getUserById*/
+  async updateUser(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let userId = req.query.userId;
+      const user = await authServices.getUserById(userId);
+      if (!user) throw new Error("User not found");
+      let data = req.body;
+
+      let postData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userName: data.userName,
+        email: data.email,
+        role: data.role,
+        phoneNumber: data.phoneNumber,
+        department_id: data.department_id ? Number(data.department_id) : null,
+        status: data.status,
+        userType: data.userType,
+        avatar: req.file ? `files/${req.file.filename}` : null,
+      };
+      if (data?.password) {
+        postData.password = bcrypt.hashSync(data.password, 8);
+      }
+      commonHelper.removeFalsyKeys(postData);
+      const updateUser = await authServices.updateUser(postData, userId);
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            updateUser,
+            "User updated successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "User updated failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /*delete user*/
+  async deleteUser(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let userId = req.query.userId;
+      const user = await authServices.getUserById(userId);
+      if (!user) throw new Error("User not found");
+      const deleteUser = await authServices.deleteUser(userId);
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            deleteUser,
+            "User deleted successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "User updated failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+  /*ticTacToe*/
+  // async ticTacToe(req, res) {
+  //     try {
+  //         let { user1Input, user2Input } = req.body;
+  //         const columnSequence = [
+  //             ['a', 'd', 'g'],
+  //             ['g', 'h', 'i'],
+  //             ['c', 'f', 'i'],
+  //             ['a', 'b', 'c'],
+  //             ['b', 'e', 'h'],
+  //             ['d', 'e', 'f'],
+  //             ['c', 'e', 'g'],
+  //             ['a', 'e', 'i']
+  //           ];
+
+  //           const isMatch = (input, sequence) => {
+  //             return sequence.every(item => input.includes(item));
+  //           };
+
+  //           let user = null;
+
+  //           // Loop through sequences
+  //           for (const seq of columnSequence) {
+  //             if (isMatch(user1Input, seq)) {
+  //               user = "User1 is winner";
+  //               break;
+  //             } else if (isMatch(user2Input, seq)) {
+  //                 user = "User2 is winner";
+  //                 break;
+  //             }
+  //           }
+  //           if (!user) {
+  //             user = "The match is a tie. Restart the game."
+  //           }
+
+  //         return res
+  //             .status(200)
+  //             .send(
+  //                 commonHelper.parseSuccessRespose(
+  //                     "",
+  //                     `${user}`
+  //                 )
+  //             );
+  //     } catch (error) {
+  //         return res.status(400).json({
+  //             status: false,
+  //             message: error.response?.data?.error || error.message || "User updated failed",
+  //             data: error.response?.data || {}
+  //         });
+  //     }
+
+  // },
+  validate(method) {
+    switch (method) {
+      case "register": {
+        return [
+          check("email").not().isEmpty().withMessage("Email is Required"),
+          check("password").not().isEmpty().withMessage("Password is Required"),
+        ];
+      }
+      case "login": {
+        return [
+          check("email").not().isEmpty().withMessage("Email is Required"),
+          check("password").not().isEmpty().withMessage("Password is Required"),
+        ];
+      }
+      case "getUserById": {
+        return [
+          check("userId").not().isEmpty().withMessage("User Id is Required"),
+        ];
+      }
+      case "forgotPassword": {
+        return [
+          check("email").not().isEmpty().withMessage("Email is Required"),
+        ];
+      }
+      case "getAllUsers": {
+        return [
+          check("role")
+            .not()
+            .isEmpty()
+            .withMessage("Role is Required")
+            .isIn([
+              "sales",
+              "administrator",
+              "super_admin",
+              "qualified_contractor",
+              "quality_assurance_manager, customer",
+            ])
+            .withMessage(
+              "Invalid role! Please send these roles only sales, administrator, super_admin, qualified_contractor, quality_assurance_manager, customer"
+            ),
+        ];
+      }
+    }
+  },
+};

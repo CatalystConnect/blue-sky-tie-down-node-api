@@ -1,0 +1,29 @@
+var express = require("express");
+var router = express.Router();
+const controller = require("../controllers/auth.controller");
+var { authJwt } = require("../middleware");
+let { upload } = require("../../../config/multer.config");
+
+/*register*/
+router.post("/auth/register",  upload.single("avatar"), [controller.validate("register")], controller.register);
+
+/*login*/
+router.post("/auth/login", [controller.validate("login")], controller.login);
+
+/*getAllUsers*/
+router.get("/auth/getAllUsers", [authJwt.verifyToken], controller.getAllUsers);
+
+/*getUserById*/
+router.get("/auth/getUserById", [authJwt.verifyToken],[controller.validate("getUserById")], controller.getUserById);
+
+/*updateUser*/
+router.put("/auth/updateUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.updateUser);
+
+/*deleteUser*/
+router.delete("/auth/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
+
+// /*tic-tac-toe*/
+// router.post("/auth/ticTacToe", controller.ticTacToe);
+
+
+module.exports = router;

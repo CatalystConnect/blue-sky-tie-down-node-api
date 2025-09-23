@@ -598,6 +598,17 @@ db.departmentObj.hasMany(db.userObj, {
   as: "users",
 });
 
+
+db.userObj.belongsTo(db.rolesObj, {
+  foreignKey: "role",
+  as: "roles",
+});
+
+db.rolesObj.hasMany(db.userObj, {
+  foreignKey: "role",
+  as: "usersData",
+});
+
 db.leadTagsObj.belongsTo(db.leadsObj, { foreignKey: "lead_id", as: "lead" });
 db.leadsObj.hasMany(db.leadTagsObj, { foreignKey: "lead_id", as: "lead_tags" });
 

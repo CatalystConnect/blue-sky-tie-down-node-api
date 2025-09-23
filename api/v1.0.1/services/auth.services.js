@@ -53,8 +53,7 @@ module.exports = {
       }
       if (search) {
         whereCondition[Op.or] = [
-          { firstName: { [Op.like]: `%${search}%` } },
-          { lastName: { [Op.like]: `%${search}%` } },
+          { name: { [Op.like]: `%${search}%` } },
           { email: { [Op.like]: `%${search}%` } },
         ];
       }
@@ -95,12 +94,22 @@ module.exports = {
     try {
       let users = await db.userObj.findAll({
         where: { id: userId },
-        // include: [{ model: db.departmentObj, as: "department" }],
+        include: [
+          {
+            model: db.departmentObj,
+            as: "department",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.rolesObj,
+            as: "roles",
+            attributes: ["id", "name"],
+          },
+        ],
         attributes: {
           exclude: ["password"],
         },
       });
-      console.log('userIduserId',users);
       if (users.length === 0) {
         users = null;
       }
@@ -123,7 +132,7 @@ module.exports = {
       throw e;
     }
   },
-  
+
   /*getUserById*/
   async deleteUser(userId) {
     try {

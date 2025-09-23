@@ -43,13 +43,14 @@ module.exports = {
     /*getAllRoles*/
     async getAllRoles(req, res) {
         try {
-            let roles = await roleServices.getAllRoles();
-            if (!roles) {
-                throw new Error("Role not found");
-            }
+            let page = parseInt(req.query.page) || 1;
+            let perPage = parseInt(req.query.per_page) || 10;
+
+            let result = await roleServices.getAllRoles(page, perPage);
+
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(roles, "Roles displayed successfully"));
+                .send(commonHelper.parseSuccessRespose(result, "Roles displayed successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
@@ -57,7 +58,8 @@ module.exports = {
                 data: error.response?.data || {}
             });
         }
-    },
+    }
+    ,
     /*getRoleById*/
     async getRoleById(req, res) {
         try {

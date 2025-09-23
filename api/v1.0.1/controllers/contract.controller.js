@@ -99,7 +99,7 @@ module.exports = {
     //             const data = JSON.parse(req.body.data);
     // zzz
     //             const files = req.files;
-    //             const baseUrl = "https://crm-roofing-973d4725fb82.herokuapp.com/public/files/";
+    //             const baseUrl = "https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/";
 
     //             const updatedData = data.map((item, index) => ({
     //                 ...item,
@@ -842,7 +842,7 @@ module.exports = {
                 throw new Error("Document not found");
             }
             const { id, contractorId, ...docs } = contracts; // Extract common fields
-            const baseUrl = "https://crm-roofing-973d4725fb82.herokuapp.com";
+            const baseUrl = "https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com";
 
             const transformedContracts = Object.entries(docs).reduce((acc, [key, value]) => {
                 const match = key.match(/(doc\d+)(Name|File|Status|Note)/);

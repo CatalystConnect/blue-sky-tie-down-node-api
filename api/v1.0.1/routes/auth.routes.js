@@ -5,13 +5,13 @@ var { authJwt } = require("../middleware");
 let { upload } = require("../../../config/multer.config");
 
 /*register*/
-router.post("/auth/register",  upload.single("avatar"), [controller.validate("register")], controller.register);
+router.post("/users",  upload.single("avatar"), [controller.validate("register")], controller.register);
 
 /*login*/
 router.post("/auth/login", [controller.validate("login")], controller.login);
 
 /*getAllUsers*/
-router.get("/auth/getAllUsers", [authJwt.verifyToken], controller.getAllUsers);
+router.get("/users", [authJwt.verifyToken], controller.getAllUsers);
 
 /*getUserById*/
 router.get("/auth/getUserById", [authJwt.verifyToken],[controller.validate("getUserById")], controller.getUserById);

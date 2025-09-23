@@ -188,7 +188,7 @@ module.exports = {
             commonHelper.removeFalsyKeys(postData);
 
             if(req.files){
-                const baseUrl = "https://crm-roofing-973d4725fb82.herokuapp.com/public/files/";
+                const baseUrl = "https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/";
                 let files = req.files.map(file => ({
                     workOrderId: workOrderId,
                     image: `${baseUrl}${file.filename}`

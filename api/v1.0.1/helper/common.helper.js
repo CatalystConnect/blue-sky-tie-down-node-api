@@ -154,7 +154,7 @@ module.exports = {
       html: `<table cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; width: 100%;background: #f9f9f9; padding: 20px;">
       <tr>
         <td style="text-align: center;"><a href="#" style="display: block;">
-        <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+        <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
       </tr>
       <tr>
         <td style="text-align:center; font-size: 28px; font-weight: 600;padding: 20px 0;color: #231F20;">Complete Your KYC Process</td>
@@ -201,7 +201,7 @@ module.exports = {
       html: `<table cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; width: 100%;background: #f9f9f9; padding: 20px;">
       <tr>
         <td style="text-align: center;"><a href="#" style="display: block;">
-        <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+        <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
       </tr>
       <tr>
         <td style="text-align:center; font-size: 28px; font-weight: 600;padding: 20px 0;color: #231F20;">Document Approval</td>
@@ -254,7 +254,7 @@ module.exports = {
       html: `<table cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; width: 100%;background: #f9f9f9; padding: 20px;">
       <tr>
         <td style="text-align: center;"><a href="#" style="display: block;">
-        <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+        <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
         </tr>
       <tr>
         <td style="text-align:center; font-size: 28px; font-weight: 600;padding: 20px 0;color: #231F20;">Password Reset OTP</td>
@@ -300,7 +300,7 @@ module.exports = {
     <table cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; width: 100%;background: #f9f9f9; padding: 20px;">
 		<tr>
 			<td style="text-align: center;"><a href="#" style="display: block;">
-      <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+      <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
       </tr>
 		<tr>
 			<td style="text-align:center; font-size: 28px; font-weight: 600;padding: 20px 0;color: #231F20;">Material Quote</td>
@@ -353,7 +353,7 @@ module.exports = {
     //   <table cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; width: 100%;background: #f9f9f9; padding: 20px;">
     // 	<tr>
     // 		<td style="text-align: center;"><a href="#" style="display: block;">
-    //     <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+    //     <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
     //     </tr>
     // 	<tr>
     // 		<td style="text-align:center; font-size: 28px; font-weight: 600;padding: 20px 0;color: #231F20;">Material Quote</td>
@@ -392,7 +392,7 @@ module.exports = {
       <tr>
         <td style="text-align: center;">
           <a href="#" style="display: block;">
-            <img src="https://crm-roofing-973d4725fb82.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
+            <img src="https://blue-sky-tie-down-9dc714fbf6f8.herokuapp.com/public/files/fortress-black-logo.png" alt="Logo" style="max-width: 160px; height: auto;" />
           </a>
         </td>
       </tr>

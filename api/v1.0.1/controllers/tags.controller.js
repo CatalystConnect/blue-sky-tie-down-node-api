@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { col } = require("sequelize");
 var commonHelper = require("../helper/common.helper");
-const { check, validationResult } = require("express-validator"); 
+const { check, validationResult } = require("express-validator");
 const tagsServices = require("../services/tags.services");
 const myValidationResult = validationResult.withDefaults({
     formatter: (error) => {
@@ -25,9 +25,9 @@ module.exports = {
                 title: req.body.title,
                 color: req.body.color,
                 type: req.body.type,
-              };
-           
-            
+            };
+
+
             const tag = await tagsServices.addTags(postData);
 
             return res
@@ -41,27 +41,35 @@ module.exports = {
             });
         }
     },
-     /*getAllTags*/
-     async getAllTags(req, res) {
+    /*getAllTags*/
+    async getAllTags(req, res) {
         try {
-            const { page = 1, per_page = 10, search = ""  } = req.query;
-            let tags = await tagsServices.getAllTags({ page, per_page, search });
-            if (!tags) {
-                throw new Error("Tags Categories not found");
-            }
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose(tags, "Tags  displayed successfully"));
+            const { page = 1, per_page = 10, search = "" } = req.query;
+
+
+            let tags = await tagsServices.getAllTags({
+                page: parseInt(page),
+                per_page: parseInt(per_page),
+                search,
+              
+            });
+
+            return res.status(200).send({
+                status: true,
+                message: "Record Found",
+                data: tags.data,
+                meta: tags.meta
+            });
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Getting Tags failed",
-                data: error.response?.data || {}
+                message: error.message || "Getting Tags failed",
+                data: {}
             });
         }
     },
-     /*getTagsById*/
-     async getTagsById(req, res) {
+    /*getTagsById*/
+    async getTagsById(req, res) {
         try {
             const errors = myValidationResult(req);
             if (!errors.isEmpty()) {
@@ -85,8 +93,8 @@ module.exports = {
             });
         }
     },
-     /*deleteTags*/
-     async deleteTags(req, res) {
+    /*deleteTags*/
+    async deleteTags(req, res) {
         try {
             const errors = myValidationResult(req);
             if (!errors.isEmpty()) {
@@ -111,8 +119,8 @@ module.exports = {
             });
         }
     },
-     /*updateTags*/
-     async updateTags(req, res) {
+    /*updateTags*/
+    async updateTags(req, res) {
         try {
             const errors = myValidationResult(req);
             if (!errors.isEmpty()) {
@@ -127,12 +135,12 @@ module.exports = {
             }
             let data = req.body;
             let postData = {
-               
+
                 title: data.title,
                 color: data.color,
-                type:  data.type,
+                type: data.type,
             }
-            
+
             let tags = await tagsServices.updateTags(postData, tagId);
             return res
                 .status(200)

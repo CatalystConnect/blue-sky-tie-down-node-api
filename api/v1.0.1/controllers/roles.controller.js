@@ -19,13 +19,14 @@ module.exports = {
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
             let data = req.body;
-            let getRole = await roleServices.getRoleByName(data.name);
-            if (getRole?.role == data.role) {
-                throw new Error("You can't choose another role if one is already selected");
+            const existingRole = await roleServices.getRoleByName(data.name);
+            if (existingRole) {
+                throw new Error("This role name already exists");
             }
             let postData = {
-                role: data.role,
-                name: data.name
+                name: data.name,
+                guard_name: data.guard_name || null,
+                is_hidden: data.is_hidden ?? false
             }
             await roleServices.addRole(postData);
             return res

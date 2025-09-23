@@ -133,14 +133,6 @@ module.exports = {
       );
 
       if (!users || users.length === 0) throw new Error("Users not found");
-
-      // let response = {
-      //   users,
-      //   total,
-      //   page,
-      //   per_page: take_all ? total : length,
-      //   totalPages: take_all ? 1 : Math.ceil(total / length),
-      // };
       let response = {
         ...(take_all
           ? { total, page, per_page: total, totalPages: 1 }
@@ -156,7 +148,7 @@ module.exports = {
       return res.status(200).send({
         status: true,
         message: "Users displayed successfully",
-        data: response.data, // direct array
+        data: response.data,
         total: response.total,
         page: response.page,
         per_page: response.per_page,
@@ -181,11 +173,19 @@ module.exports = {
           .status(200)
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
+
       let userId = req.query.userId;
       console.log("userIduserId", userId);
 
-      const user = await authServices.getUserById(userId);
+      let user = await authServices.getUserById(userId);
+
+      // 👉 If service returns array, pick first record
+      if (Array.isArray(user)) {
+        user = user[0] || null;
+      }
+
       if (!user) throw new Error("User not found");
+
       return res
         .status(200)
         .send(
@@ -243,17 +243,13 @@ module.exports = {
       }
 
       commonHelper.removeFalsyKeys(postData);
-    
-     
+
       const updatedUser = await authServices.updateUser(postData, userId);
 
       return res
         .status(200)
         .send(
-          commonHelper.parseSuccessRespose(
-            "",
-            "User updated successfully"
-          )
+          commonHelper.parseSuccessRespose("", "User updated successfully")
         );
     } catch (error) {
       return res.status(500).json({

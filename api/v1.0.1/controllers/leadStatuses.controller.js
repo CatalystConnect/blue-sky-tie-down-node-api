@@ -55,7 +55,12 @@ module.exports = {
 
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(result, "Lead Statuses fetched successfully"));
+                .send({
+                    status: true,
+                    message: "Lead Statuses fetched successfully",
+                    data: result.data,
+                    meta: result.meta
+                });
         } catch (error) {
             return res.status(400).json({
                 status: false,
@@ -63,7 +68,8 @@ module.exports = {
                 data: error.response?.data || {}
             });
         }
-    },
+    }
+    ,
     /* Get Lead Status by ID */
     async getleadStatusesById(req, res) {
         try {
@@ -127,45 +133,45 @@ module.exports = {
         }
     },
     /* Update Lead Status */
-   async updateleadStatuses(req, res) {
-    try {
-        const errors = myValidationResult(req);
-        if (!errors.isEmpty()) {
+    async updateleadStatuses(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
+
+            const { id } = req.query;
+            if (!id) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+            }
+
+            const data = req.body;
+
+            const postData = {
+                title: data.title,
+                color: data.color,
+                user_id: req.userId,
+            };
+
+
+            const result = await leadStatusesServices.updateleadStatuses(id, postData);
+
             return res
                 .status(200)
-                .send(commonHelper.parseErrorRespose(errors.mapped()));
+                .send(
+                    commonHelper.parseSuccessRespose(result, "Lead Status updated successfully")
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.response?.data?.error || error.message || "Update Lead Status failed",
+                data: error.response?.data || {},
+            });
         }
-
-        const { id } = req.query; 
-        if (!id) {
-            return res
-                .status(200)
-                .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
-        }
-
-        const data = req.body;
-
-        const postData = {
-            title: data.title,
-            color: data.color,
-            user_id: req.userId, 
-        };
-      
-
-        const result = await leadStatusesServices.updateleadStatuses(id, postData);
-
-        return res
-            .status(200)
-            .send(
-                commonHelper.parseSuccessRespose(result, "Lead Status updated successfully")
-            );
-    } catch (error) {
-        return res.status(400).json({
-            status: false,
-            message: error.response?.data?.error || error.message || "Update Lead Status failed",
-            data: error.response?.data || {},
-        });
-    }
-},
+    },
 
 }

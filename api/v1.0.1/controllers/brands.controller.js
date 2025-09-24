@@ -21,8 +21,7 @@ module.exports = {
 
       let postData = {
         name: req.body.name,
-        status: req.body.status ?? true,
-        user_id: req.userId, // comes from auth middleware
+        user_id: req.userId, 
       };
 
       const brand = await brandsServices.addBrand(postData);
@@ -48,10 +47,11 @@ module.exports = {
     try {
       const brands = await brandsServices.findAllBrands(req.query);
       res.status(200).json({
-        status: true,
-        message: "Brands fetched successfully",
-        data: brands,
-      });
+      status: true,
+      message: "Brands fetched successfully",
+      data: brands.data,
+      meta: brands.meta,
+    });
     } catch (err) {
       res.status(500).json({
         status: false,

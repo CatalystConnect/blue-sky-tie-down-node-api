@@ -77,14 +77,12 @@ module.exports = {
         throw new Error("get all ware house not found");
       }
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            getAllWareHouse,
-            "All ware house displayed successfully"
-          )
-        );
+      return res.status(200).send({
+        status: true,
+        message: "All warehouses displayed successfully",
+        data: getAllWareHouse.data,
+        meta: getAllWareHouse.meta,
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -100,13 +98,13 @@ module.exports = {
   // /*updateContract*/
   async updateWareHouse(req, res) {
     try {
-        const errors = myValidationResult(req);
-        if (!errors.isEmpty()) {
-          return res
-            .status(200)
-            .send(commonHelper.parseErrorRespose(errors.mapped()));
-        }
-        
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
       const wareHouseId = req.query.id || req.params.id; // support both query & params
       const updatedData = req.body;
 

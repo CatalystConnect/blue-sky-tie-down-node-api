@@ -58,74 +58,74 @@ module.exports = {
   //         throw e;
   //     }
   // },
-//   async getAllVendors({ page, per_page, search, id, limit, take_all }) {
-//     try {
-//       page = parseInt(page) || 1;
-//       per_page = parseInt(per_page) || 10;
+  //   async getAllVendors({ page, per_page, search, id, limit, take_all }) {
+  //     try {
+  //       page = parseInt(page) || 1;
+  //       per_page = parseInt(per_page) || 10;
 
-//       let finalLimit = per_page;
-//       let offset = (page - 1) * finalLimit;
+  //       let finalLimit = per_page;
+  //       let offset = (page - 1) * finalLimit;
 
-//       // If take_all=all → return all vendors without pagination
-//       if (take_all === "all") {
-//         finalLimit = limit ? parseInt(limit) : null; // if limit provided use it, else no limit
-//         offset = 0;
-//       }
+  //       // If take_all=all → return all vendors without pagination
+  //       if (take_all === "all") {
+  //         finalLimit = limit ? parseInt(limit) : null; // if limit provided use it, else no limit
+  //         offset = 0;
+  //       }
 
-//       let whereCondition = {};
-//       if (search) {
-//         whereCondition = {
-//           ...whereCondition,
-//           name: { [Op.like]: `%${search}%` },
-//         };
-//       }
+  //       let whereCondition = {};
+  //       if (search) {
+  //         whereCondition = {
+  //           ...whereCondition,
+  //           name: { [Op.like]: `%${search}%` },
+  //         };
+  //       }
 
-//       let prioritizedVendors = [];
-//       if (id && Array.isArray(id)) {
-//         prioritizedVendors = await db.vendorsObj.findAll({
-//           where: { id: { [Op.in]: id } },
-//         });
+  //       let prioritizedVendors = [];
+  //       if (id && Array.isArray(id)) {
+  //         prioritizedVendors = await db.vendorsObj.findAll({
+  //           where: { id: { [Op.in]: id } },
+  //         });
 
-//         // Exclude prioritized IDs from main query
-//         whereCondition = {
-//           ...whereCondition,
-//           id: { [Op.notIn]: id },
-//         };
-//       }
+  //         // Exclude prioritized IDs from main query
+  //         whereCondition = {
+  //           ...whereCondition,
+  //           id: { [Op.notIn]: id },
+  //         };
+  //       }
 
-//       const { rows, count } = await db.vendorsObj.findAndCountAll({
-//         where: whereCondition,
-//         limit: finalLimit,
-//         offset,
-//         order: [["id", "DESC"]],
-//       });
+  //       const { rows, count } = await db.vendorsObj.findAndCountAll({
+  //         where: whereCondition,
+  //         limit: finalLimit,
+  //         offset,
+  //         order: [["id", "DESC"]],
+  //       });
 
-//       // Merge prioritized vendors first
-//       const finalVendors = [...prioritizedVendors, ...rows];
+  //       // Merge prioritized vendors first
+  //       const finalVendors = [...prioritizedVendors, ...rows];
 
-//       return {
-//         total: count + prioritizedVendors.length,
-//         page,
-//         per_page: finalLimit,
-//         totalPages: finalLimit
-//           ? Math.ceil((count + prioritizedVendors.length) / finalLimit)
-//           : 1,
-//         vendors: finalVendors,
-//       };
-//     } catch (e) {
-//       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-//       throw e;
-//     }
-//   },
+  //       return {
+  //         total: count + prioritizedVendors.length,
+  //         page,
+  //         per_page: finalLimit,
+  //         totalPages: finalLimit
+  //           ? Math.ceil((count + prioritizedVendors.length) / finalLimit)
+  //           : 1,
+  //         vendors: finalVendors,
+  //       };
+  //     } catch (e) {
+  //       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //       throw e;
+  //     }
+  //   },
 
-async getAllVendors({ page, per_page, search, id, limit, take_all }) {
+  async getAllVendors({ page, per_page, search, id, limit, take_all }) {
     try {
       page = parseInt(page) || 1;
-      per_page = parseInt(per_page) || "10";
-  
+      per_page = parseInt(per_page) || 10;
+
       let finalLimit = per_page;
       let offset = (page - 1) * finalLimit;
-  
+
       let whereCondition = {};
       if (search) {
         whereCondition = {
@@ -133,34 +133,32 @@ async getAllVendors({ page, per_page, search, id, limit, take_all }) {
           name: { [Op.like]: `%${search}%` },
         };
       }
-  
-      // ✅ Handle prioritized vendors
+
+      // ✅ Prioritized vendors
       let prioritizedVendors = [];
       if (id && Array.isArray(id)) {
         prioritizedVendors = await db.vendorsObj.findAll({
           where: { id: { [Op.in]: id } },
           order: [["id", "DESC"]],
         });
-  
+
         whereCondition = {
           ...whereCondition,
           id: { [Op.notIn]: id },
         };
       }
-  
+
       let rows = [];
       let count = 0;
-  
+
       if (take_all === "all") {
-        // ✅ fetch all vendors (optional limit)
         rows = await db.vendorsObj.findAll({
           where: whereCondition,
           order: [["id", "DESC"]],
-          ...(limit ? { limit: parseInt(limit) } : {}), // apply limit if provided
+          ...(limit ? { limit: parseInt(limit) } : {}),
         });
         count = rows.length;
       } else {
-        // ✅ normal paginated query
         const result = await db.vendorsObj.findAndCountAll({
           where: whereCondition,
           limit: finalLimit,
@@ -170,24 +168,26 @@ async getAllVendors({ page, per_page, search, id, limit, take_all }) {
         rows = result.rows;
         count = result.count;
       }
-  
-      // ✅ Merge prioritized vendors first
+
+      // Merge prioritized vendors first
       const finalVendors = [...prioritizedVendors, ...rows];
-  
+
       return {
-        total: count + prioritizedVendors.length,
-        page: take_all === "all" ? 1 : page,
-        per_page: take_all === "all" ? (limit ? parseInt(limit) : count) : finalLimit,
-        totalPages: take_all === "all"
-          ? 1
-          : Math.ceil((count + prioritizedVendors.length) / finalLimit),
-        vendors: finalVendors,
+        data: finalVendors,
+        meta: {
+          current_page: take_all === "all" ? 1 : page,
+          from: take_all === "all" ? 1 : offset + 1,
+          to: take_all === "all" ? finalVendors.length : offset + rows.length,
+          per_page: take_all === "all" ? (limit ? parseInt(limit) : finalVendors.length) : finalLimit,
+          total: count + prioritizedVendors.length,
+          last_page: take_all === "all" ? 1 : Math.ceil((count + prioritizedVendors.length) / finalLimit)
+        }
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
-  },  
+  },
   /*deleteVendors*/
   async deleteVendors(vendorId) {
     try {

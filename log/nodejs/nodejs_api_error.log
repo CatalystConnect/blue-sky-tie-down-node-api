@@ -1,0 +1,11 @@
+2025-09-24T11:10:50.933Z [error] : Error : WHERE parameter "id" has invalid "undefined" value Error: WHERE parameter "id" has invalid "undefined" value
+    at PostgresQueryGenerator.whereItemQuery (/home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1746:13)
+    at /home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1737:25
+    at Array.forEach (<anonymous>)
+    at PostgresQueryGenerator.whereItemsQuery (/home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1735:35)
+    at /home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1843:30
+    at Array.map (<anonymous>)
+    at PostgresQueryGenerator._whereGroupBind (/home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1842:21)
+    at PostgresQueryGenerator.whereItemQuery (/home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1793:19)
+    at /home/acewebx/Documents/GitLab/blue-sky-node-api/blue-sky-tie-down-node-api/node_modules/sequelize/lib/dialects/abstract/query-generator.js:1737:25
+    at Array.forEach (<anonymous>) 

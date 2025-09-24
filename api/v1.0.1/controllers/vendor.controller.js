@@ -95,14 +95,14 @@ module.exports = {
       if (!vendors) {
         throw new Error("Vendor not found");
       }
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            vendors,
-            "Vendors displayed successfully"
-          )
-        );
+     return res
+      .status(200)
+      .send({
+        status: true,
+        message: "Vendors displayed successfully",
+        data: vendors.data,
+        meta: vendors.meta
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,

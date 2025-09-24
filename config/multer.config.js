@@ -21,14 +21,14 @@ const storage = multer.diskStorage({
 // };
 const imageFileFilter = (req, file, cb) => {
   // Allowed file extensions
-  const allowedExtensions = /\.(png|jpg|jpeg|jpegh|heic|gif|csv|xlsx)$/i;
+  const allowedExtensions = /\.(png|jpg|jpeg|webp|jpegh|heic|gif|csv|xlsx)$/i;
   // Check for invalid file extension
   if (!allowedExtensions.test(file.originalname)) {
     cb(new Error("Invalid file extensions"), false);
     return req.res.status(400).json({
       status: false,
       message:
-        "Invalid file extension! You can only upload PNG, JPG, JPEG, HEIC, GIF",
+        "Invalid file extension! You can only upload PNG, JPG, JPEG, HEIC, GIF,WEBP",
       errorCode: 422,
       data: {},
     });
@@ -58,6 +58,7 @@ const upload = multer({
 const multiUpload = multer({
   storage,
 }).fields([
+  { name: "avatar", maxCount: 1 },
   { name: "doc1File", maxCount: 1 },
   { name: "doc2File", maxCount: 1 },
   { name: "doc3File", maxCount: 1 },

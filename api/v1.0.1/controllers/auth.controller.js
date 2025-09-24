@@ -167,6 +167,42 @@ module.exports = {
   },
 
   /*getUserById*/
+  // async getUserById(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     let userId = req.query.userId;
+  //     console.log("userIduserId", userId);
+
+  //     let user = await authServices.getUserById(userId);
+
+  //     // 👉 If service returns array, pick first record
+  //     if (Array.isArray(user)) {
+  //       user = user[0] || null;
+  //     }
+
+  //     if (!user) throw new Error("User not found");
+
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose(user, "User displayed successfully")
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error || error.message || "User fetch failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+
   async getUserById(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -181,18 +217,41 @@ module.exports = {
 
       let user = await authServices.getUserById(userId);
 
-      // 👉 If service returns array, pick first record
       if (Array.isArray(user)) {
         user = user[0] || null;
       }
 
       if (!user) throw new Error("User not found");
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(user, "User displayed successfully")
-        );
+      const formattedUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        status: user.status,
+        role: user.roles?.name || null,
+        roleId: user.roles?.id || null,
+        avatar: user.avatar,
+        departments: user.department
+          ? {
+              id: user.department.id,
+              name: user.department.name,
+              status: user.department.status || "active",
+              created_at: user.department.created_at || null,
+              updated_at: user.department.updated_at || null,
+              deleted_at: user.department.deleted_at || null,
+            }
+          : null,
+        userType: user.userType,
+        userHourlyRate: user.userHourlyRate,
+      };
+
+      return res.status(200).send({
+        status: true,
+        message: "Record found successfully",
+        data: formattedUser,
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,

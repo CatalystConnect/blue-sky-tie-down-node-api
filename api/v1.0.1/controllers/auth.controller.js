@@ -15,7 +15,6 @@ module.exports = {
   /*user register*/
   async register(req, res) {
     try {
-      console.log("datadatadata", req.body);
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
         return res
@@ -35,13 +34,12 @@ module.exports = {
         address: data.address,
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
+        avatar: req.files.avatar
+          ? `files/${req.files.avatar[0].filename}`
+          : null,
       };
-      if (req.file) {
-        postData.avatar = `files/${req.file.filename}`;
-      }
 
       commonHelper.removeFalsyKeys(postData);
-
       await authServices.register(postData);
 
       return res
@@ -169,42 +167,6 @@ module.exports = {
   },
 
   /*getUserById*/
-  // async getUserById(req, res) {
-  //   try {
-  //     const errors = myValidationResult(req);
-  //     if (!errors.isEmpty()) {
-  //       return res
-  //         .status(200)
-  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
-  //     }
-
-  //     let userId = req.query.userId;
-  //     console.log("userIduserId", userId);
-
-  //     let user = await authServices.getUserById(userId);
-
-  //     // 👉 If service returns array, pick first record
-  //     if (Array.isArray(user)) {
-  //       user = user[0] || null;
-  //     }
-
-  //     if (!user) throw new Error("User not found");
-
-  //     return res
-  //       .status(200)
-  //       .send(
-  //         commonHelper.parseSuccessRespose(user, "User displayed successfully")
-  //       );
-  //   } catch (error) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message:
-  //         error.response?.data?.error || error.message || "User fetch failed",
-  //       data: error.response?.data || {},
-  //     });
-  //   }
-  // },
-
   async getUserById(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -296,8 +258,8 @@ module.exports = {
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
       };
-      if (req.file) {
-        postData.avatar = `files/${req.file.filename}`;
+      if (req.files && req.files.avatar) {
+        postData.avatar = `files/${req.files.avatar[0].filename}`;
       }
 
       commonHelper.removeFalsyKeys(postData);

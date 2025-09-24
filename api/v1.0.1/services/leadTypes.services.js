@@ -5,16 +5,16 @@ const { Op } = require("sequelize");
 
 module.exports = {
     /*addleadStatuses*/
-    async addleadStatuses(postData) {
+    async addleadType(postData) {
         try {
-            let leadStatuses = await db.leadStatusesObj.create(postData);
-            return leadStatuses;
+            let leadTypes = await db.leadTypesObj.create(postData);
+            return leadTypes;
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
     },
-    async getAllleadStatuses({ page, limit, search }) {
+    async getAllleadTypes({ page, limit, search }) {
         try {
             const offset = (page - 1) * limit;
 
@@ -27,7 +27,7 @@ module.exports = {
                 ];
             }
 
-            const { rows, count } = await db.leadStatusesObj.findAndCountAll({
+            const { rows, count } = await db.leadTypesObj.findAndCountAll({
                 where: whereCondition,
                 order: [["id", "DESC"]],
                 limit,
@@ -50,31 +50,31 @@ module.exports = {
             throw e;
         }
     },
-    async getleadStatusesById(id) {
+    async getleadTypesById(id) {
         try {
-            const leadStatus = await db.leadStatusesObj.findOne({
+            const leadType = await db.leadTypesObj.findOne({
                 where: { id },
             });
 
-            if (!leadStatus) {
-                throw new Error("Lead Status not found");
+            if (!leadType) {
+                throw new Error("Lead Type not found");
             }
 
-            return leadStatus;
+            return leadType;
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
     },
-    async deleteleadStatuses(id) {
+    async deleteleadTypes(id) {
         try {
-            const leadStatus = await db.leadStatusesObj.findOne({ where: { id } });
-            if (!leadStatus) {
-                throw new Error("Lead Status not found");
+            const leadType = await db.leadTypesObj.findOne({ where: { id } });
+            if (!leadType) {
+                throw new Error("Lead Type not found");
             }
 
             // Soft delete
-            await leadStatus.destroy();
+            await leadType.destroy();
 
             return true;
         } catch (e) {
@@ -83,13 +83,13 @@ module.exports = {
         }
     },
     /* Update Lead Status by ID */
-    async updateleadStatuses(id, postData) {
+    async updateleadTypes(id, postData) {
         try {
 
-            const leadStatus = await db.leadStatusesObj.findOne({ where: { id: parseInt(id) } });
-            if (!leadStatus) throw new Error("Lead Status not found");
+            const leadType = await db.leadTypesObj.findOne({ where: { id: parseInt(id) } });
+            if (!leadType) throw new Error("Lead Status not found");
 
-            const updated = await leadStatus.update(postData);
+            const updated = await leadType.update(postData);
             return updated;
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

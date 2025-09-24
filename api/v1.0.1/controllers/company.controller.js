@@ -72,7 +72,7 @@ module.exports = {
 
   async getCompanyById(req, res) {
     try {
-      const companyId = req.query.company; // get id from query ?company=4
+      const companyId = req.query.id;
       if (!companyId) {
         return res.status(400).json({
           status: false,
@@ -105,7 +105,7 @@ module.exports = {
 
   async updateCompany(req, res) {
     try {
-      const companyId = req.query.company; // get id from query
+      const companyId = req.query.id;
       const updatedData = req.body;
 
       const company = await companyServices.updateCompany(
@@ -126,7 +126,7 @@ module.exports = {
         data: company,
       });
     } catch (err) {
-      console.error("Update Company Error:", err.message); // fixed logger
+      console.error("Update Company Error:", err.message); 
       res.status(500).json({
         status: false,
         message: "Failed to update company",
@@ -137,7 +137,7 @@ module.exports = {
 
   async deleteCompany(req, res) {
     try {
-      const companyId = req.query.company;
+      const companyId = req.query.id;
 
       if (!companyId) {
         return res.status(400).json({

@@ -37,9 +37,11 @@ router.use(require("./serviceTypeItem.routes"));
 router.use(require("./warehouseItems.routes"));
 router.use(require("./departments.routes"));
 router.use(require("./leadStatuses.routes"));
+router.use(require("./leadTypes.routes"));
 router.use(require("./leadTags.routes"));
 router.use(require("./projectTypes.routes"));
 router.use(require("./tickets.routes"));
 router.use(require("./leadTeams.routes"));
+
 
 module.exports = router;

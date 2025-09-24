@@ -43,6 +43,7 @@ router.use(require("./projectTypes.routes"));
 router.use(require("./tickets.routes"));
 router.use(require("./leadTeams.routes"));
 router.use(require("./termsCodes.routes"));
+router.use(require("./interactionTypes.routes"));
 
 
 module.exports = router;

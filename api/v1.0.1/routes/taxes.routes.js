@@ -4,10 +4,10 @@ const taxesController = require("../controllers/taxes.controller");
 var { authJwt } = require("../middleware");
 
 // Create a new taxes
-router.post("/taxes/addtaxes", [authJwt.verifyToken], [taxesController.validate("addtaxes")], taxesController.addtaxes);
-router.get("/taxes/getAllTaxes",[authJwt.verifyToken],  taxesController.getAllTaxes);
-router.get("/taxes/getTaxesById",[authJwt.verifyToken],  taxesController.getTaxesById);
-router.delete("/taxes/deleteTaxes",[authJwt.verifyToken], taxesController.deleteTaxes);
-router.put("/taxes/updateTaxes",[authJwt.verifyToken], [taxesController.validate("updateTaxes")], taxesController.updateTaxes);
+router.post("/taxes", [authJwt.verifyToken], [taxesController.validate("addtaxes")], taxesController.addtaxes);
+router.get("/taxes",[authJwt.verifyToken],  taxesController.getAllTaxes);
+router.get("/getTaxesById",[authJwt.verifyToken],  taxesController.getTaxesById);
+router.put("/updateTaxes",[authJwt.verifyToken], [taxesController.validate("updateTaxes")], taxesController.updateTaxes);
+router.delete("/deleteTaxes",[authJwt.verifyToken], taxesController.deleteTaxes);
 
 module.exports = router;

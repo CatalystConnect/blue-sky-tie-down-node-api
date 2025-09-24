@@ -13,9 +13,6 @@ module.exports = (sequelize, Sequelize) => {
         name: {
           type: Sequelize.STRING,
         },
-        status: {
-          type: Sequelize.STRING,
-        },
       },
       { timestamps: true, freezeTableName: true }
     );

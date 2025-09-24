@@ -46,9 +46,20 @@ module.exports = {
         const wareHouses = await db.wareHouseObj.findAll({
           where: whereCondition,
           order,
-          limit: limit || undefined,
+          ...(limit ? { limit } : {}),
         });
-        return { data: wareHouses, total: wareHouses.length };
+
+        return {
+          data: wareHouses,
+          meta: {
+            current_page: 1,
+            from: 1,
+            to: wareHouses.length,
+            per_page: limit || wareHouses.length,
+            total: wareHouses.length,
+            last_page: 1,
+          },
+        };
       }
 
       const { rows, count } = await db.wareHouseObj.findAndCountAll({
@@ -60,10 +71,14 @@ module.exports = {
 
       return {
         data: rows,
-        total: count,
-        current_page: page,
-        per_page,
-        last_page: Math.ceil(count / per_page),
+        meta: {
+          current_page: page,
+          from: offset + 1,
+          to: offset + rows.length,
+          per_page,
+          total: count,
+          last_page: Math.ceil(count / per_page),
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -72,20 +87,20 @@ module.exports = {
   },
 
   /* Update WareHouse */
-    async updateWareHouse(wareHouseId, data) {
-      try {
-        const [updated] = await db.wareHouseObj.update(data, {
-          where: { id: wareHouseId },
-        });
+  async updateWareHouse(wareHouseId, data) {
+    try {
+      const [updated] = await db.wareHouseObj.update(data, {
+        where: { id: wareHouseId },
+      });
 
-        if (!updated) return null;
+      if (!updated) return null;
 
-        return await db.wareHouseObj.findOne({ where: { id: wareHouseId } });
-      } catch (e) {
-        logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-        throw e;
-      }
-    },
+      return await db.wareHouseObj.findOne({ where: { id: wareHouseId } });
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 
   /* Get WareHouse By Id */
   async getWareHouseById(wareHouseId) {

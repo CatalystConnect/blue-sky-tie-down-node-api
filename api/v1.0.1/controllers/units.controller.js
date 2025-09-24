@@ -26,9 +26,14 @@ module.exports = {
 
       const unit = await unitsServices.addUnits(postData);
 
-      return res
-        .status(200)
-        .send(commonHelper.parseSuccessRespose("", "Units added successfully"));
+     return res
+      .status(200)
+      .send({
+        status: true,
+        message: "Units displayed successfully",
+        data: unit.data,
+        meta: unit.meta
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -37,41 +42,8 @@ module.exports = {
       });
     }
   },
-  /*getAddUnits*/
-  // async getAddUnits(req, res) {
-  //   try {
-  //     const { page = 1, per_page = 10, search = "", id = "" } = req.query;
-  //     let units = await unitsServices.getAddUnits({
-  //       page,
-  //       per_page,
-  //       search,
-  //       id,
-  //     });
-  //     if (!units) {
-  //       throw new Error("Unit not found");
-  //     }
-  //     return res
-  //       .status(200)
-  //       .send(
-  //         commonHelper.parseSuccessRespose(
-  //           units,
-  //           "Units displayed successfully"
-  //         )
-  //       );
-  //   } catch (error) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message:
-  //         error.response?.data?.error ||
-  //         error.message ||
-  //         "Getting Units failed",
-  //       data: error.response?.data || {},
-  //     });
-  //   }
-  // },
-
-  // ================ Controller =================
-  async getAddUnits(req, res) {
+ 
+  async getAllAddUnits(req, res) {
     try {
       const {
         page = 1,
@@ -83,7 +55,7 @@ module.exports = {
         take_all = "",
       } = req.query;
 
-      const units = await unitsServices.getAddUnits({
+      const units = await unitsServices.getAllAddUnits({
         page,
         per_page,
         search,

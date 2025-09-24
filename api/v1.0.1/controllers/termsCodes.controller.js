@@ -1,7 +1,7 @@
 require("dotenv").config();
 var commonHelper = require("../helper/common.helper");
 const { check, validationResult } = require("express-validator");
-const leadTeamsServices = require("../services/leadTeams.services");
+const termsCodesServices = require("../services/termsCodes.services");
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => {
     return error.msg;
@@ -9,8 +9,8 @@ const myValidationResult = validationResult.withDefaults({
 });
 
 module.exports = {
-  /*addLeadTeams*/
-  async addLeadTeams(req, res) {
+  /* Add Terms Code */
+  async addTeams(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -19,37 +19,39 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      let data = req.body;
+      const data = req.body;
 
-      let postData = {
-        user_id: req.userId,
-        name: data.name,
-        contact_id: Array.isArray(data.contact)
-          ? data.contact.join(",")
-          : data.contact,
-        status: data.status || "active",
+      const postData = {
+        code: data.code,
+        term_type: data.term_type,
+        description: data.description,
+        days_due: data.days_due,
+        due_type: data.due_type,
+        discount_days: data.discount_days,
+        discount_percent: data.discount_percent,
+        is_cod: data.is_cod === true || data.is_cod === "true" ? 1 : 0,
+        is_prepay: data.is_prepay === true || data.is_prepay === "true" ? 1 : 0,
+        active: data.active === true || data.active === "true" ? 1 : 0,
       };
-      await leadTeamsServices.addLeadTeams(postData);
+
+      await termsCodesServices.addTeams(postData);
 
       return res
         .status(200)
         .send(
-          commonHelper.parseSuccessRespose("", "Add lead team successfully")
+          commonHelper.parseSuccessRespose({}, "Terms code added successfully")
         );
     } catch (error) {
       return res.status(400).json({
         status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Add lead team failed",
-        data: error.response?.data || {},
+        message: error.message || "Add terms code failed",
+        data: {},
       });
     }
   },
 
-  /*getAllLeadTeams*/
-  async getAllLeadTeams(req, res) {
+  /*getAllTeams*/
+  async getAllTeams(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -62,7 +64,7 @@ module.exports = {
       page = parseInt(page);
       limit = parseInt(limit);
 
-      const result = await leadTeamsServices.getAllLeadTeams({
+      const result = await termsCodesServices.getAllTeams({
         page,
         limit,
         search,
@@ -73,7 +75,7 @@ module.exports = {
         .send(
           commonHelper.parseSuccessRespose(
             result,
-            "Lead team fetched successfully"
+            "Terms code fetched successfully"
           )
         );
     } catch (error) {
@@ -82,14 +84,14 @@ module.exports = {
         message:
           error.response?.data?.error ||
           error.message ||
-          "Get lead team failed",
+          "Get Terms code failed",
         data: error.response?.data || {},
       });
     }
   },
 
-  /*getLeadTeamsById*/
-  async getLeadTeamsById(req, res) {
+  /*getTeamsById*/
+  async getTeamsById(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -105,14 +107,14 @@ module.exports = {
           .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
       }
 
-      const result = await leadTeamsServices.getLeadTeamsById(id);
+      const result = await termsCodesServices.getTeamsById(id);
 
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
             result,
-            "Lead team fetched successfully"
+            "Terms code fetched successfully"
           )
         );
     } catch (error) {
@@ -121,14 +123,14 @@ module.exports = {
         message:
           error.response?.data?.error ||
           error.message ||
-          "Get lead team failed",
+          "Get terms code failed",
         data: error.response?.data || {},
       });
     }
   },
 
-  /*deleteLeadTeams*/
-  async deleteLeadTeams(req, res) {
+  /*deleteTeams*/
+  async deleteTeams(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -144,12 +146,15 @@ module.exports = {
           .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
       }
 
-      await leadTeamsServices.deleteLeadTeams(id);
+      await termsCodesServices.deleteTeams(id);
 
       return res
         .status(200)
         .send(
-          commonHelper.parseSuccessRespose("", "Lead team deleted successfully")
+          commonHelper.parseSuccessRespose(
+            "",
+            "Terms code deleted successfully"
+          )
         );
     } catch (error) {
       return res.status(400).json({
@@ -157,14 +162,14 @@ module.exports = {
         message:
           error.response?.data?.error ||
           error.message ||
-          "Delete lead team failed",
+          "Delete terms code failed",
         data: error.response?.data || {},
       });
     }
   },
 
-  /*updateLeadTeams*/
-  async updateLeadTeams(req, res) {
+  /*updateTeams*/
+  async updateTeams(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -182,23 +187,27 @@ module.exports = {
 
       const data = req.body;
 
-      let postData = {
-        user_id: req.userId,
-        name: data.name,
-        contact_id: Array.isArray(data.contact)
-          ? data.contact.join(",")
-          : data.contact,
-        status: data.status || "active",
+      const postData = {
+        code: data.code,
+        term_type: data.term_type,
+        description: data.description,
+        days_due: data.days_due,
+        due_type: data.due_type,
+        discount_days: data.discount_days,
+        discount_percent: data.discount_percent,
+        is_cod: data.is_cod === true || data.is_cod === "true" ? 1 : 0,
+        is_prepay: data.is_prepay === true || data.is_prepay === "true" ? 1 : 0,
+        active: data.active === true || data.active === "true" ? 1 : 0,
       };
 
-      const result = await leadTeamsServices.updateLeadTeams(id, postData);
+      const result = await termsCodesServices.updateTeams(id, postData);
 
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
             result,
-            "Lead team updated successfully"
+            "Terms code updated successfully"
           )
         );
     } catch (error) {
@@ -207,7 +216,7 @@ module.exports = {
         message:
           error.response?.data?.error ||
           error.message ||
-          "Update lead team failed",
+          "Update terms code failed",
         data: error.response?.data || {},
       });
     }

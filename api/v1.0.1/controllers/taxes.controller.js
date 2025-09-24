@@ -55,7 +55,7 @@ module.exports = {
         id = "",
       } = req.query;
 
-      const getAllTaxes = await taxesServices.getAllTaxes({
+      const result = await taxesServices.getAllTaxes({
         page,
         per_page,
         search,
@@ -64,18 +64,16 @@ module.exports = {
         id,
       });
 
-      if (!getAllTaxes) {
+      if (!result || !result.data || result.data.length === 0) {
         throw new Error("Taxes not found");
       }
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            getAllTaxes,
-            "Taxes displayed successfully"
-          )
-        );
+      return res.status(200).send({
+        status: true,
+        message: "Taxes displayed successfully",
+        data: result.data,
+        meta: result.meta,
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,

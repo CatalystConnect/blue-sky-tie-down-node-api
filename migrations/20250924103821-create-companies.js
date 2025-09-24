@@ -1,7 +1,9 @@
-module.exports = (sequelize, Sequelize) => {
-  const company = sequelize.define(
-    "companies",
-    {
+"use strict";
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("companies", {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -48,16 +50,22 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-    },
-    {
-      timestamps: true,
-      paranoid: true,
-      underscored: true,
-      freezeTableName: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    }
-  );
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+    });
+  },
 
-  return company;
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("companies");
+  },
 };

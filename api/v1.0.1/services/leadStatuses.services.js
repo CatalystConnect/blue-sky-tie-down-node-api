@@ -35,10 +35,15 @@ module.exports = {
             });
 
             return {
-                total: count,
-                page,
-                limit,
                 data: rows,
+                meta: {
+                    current_page: page,
+                    from: offset + 1,
+                    to: offset + rows.length,
+                    per_page: limit,
+                    total: count,
+                    last_page: Math.ceil(count / limit)
+                }
             };
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -79,8 +84,8 @@ module.exports = {
     },
     /* Update Lead Status by ID */
     async updateleadStatuses(id, postData) {
-        try { 
-            
+        try {
+
             const leadStatus = await db.leadStatusesObj.findOne({ where: { id: parseInt(id) } });
             if (!leadStatus) throw new Error("Lead Status not found");
 

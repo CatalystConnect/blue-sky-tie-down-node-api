@@ -35,15 +35,17 @@ module.exports = {
         address: data.address,
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
-        avatar: req.file ? `files/${req.file.filename}` : null,
       };
+      if (req.file) {
+        postData.avatar = `files/${req.file.filename}`;
+      }
 
       commonHelper.removeFalsyKeys(postData);
 
       await authServices.register(postData);
 
       return res
-        .status(201)
+        .status(200)
         .send(
           commonHelper.parseSuccessRespose(null, "User registered successfully")
         );

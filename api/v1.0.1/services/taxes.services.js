@@ -48,7 +48,18 @@ module.exports = {
           order,
           limit: limit || undefined,
         });
-        return { data: taxes, total: taxes.length };
+
+        return {
+          data: taxes,
+          meta: {
+            current_page: 1,
+            from: taxes.length > 0 ? 1 : 0,
+            last_page: 1,
+            per_page: taxes.length,
+            to: taxes.length,
+            total: taxes.length,
+          },
+        };
       }
 
       const { rows, count } = await db.taxesObj.findAndCountAll({
@@ -58,12 +69,20 @@ module.exports = {
         offset,
       });
 
+      const lastPage = Math.ceil(count / per_page);
+      const from = count > 0 ? offset + 1 : 0;
+      const to = offset + rows.length;
+
       return {
         data: rows,
-        total: count,
-        current_page: page,
-        per_page,
-        last_page: Math.ceil(count / per_page),
+        meta: {
+          current_page: page,
+          from,
+          last_page: lastPage,
+          per_page,
+          to,
+          total: count,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

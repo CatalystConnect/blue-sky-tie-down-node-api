@@ -55,28 +55,45 @@ module.exports = {
         ];
       }
 
+      // ✅ Take all case
       if (take_all === "all") {
         const brands = await db.brandObj.findAll({
           where: whereCondition,
-          order: order,
-          limit: limit || undefined,
+          order,
+          ...(limit ? { limit } : {}),
         });
-        return { data: brands, total: brands.length };
+
+        return {
+          data: brands,
+          meta: {
+            current_page: 1,
+            from: 1,
+            to: brands.length,
+            per_page: limit || brands.length,
+            total: brands.length,
+            last_page: 1,
+          },
+        };
       }
 
+      // ✅ Normal paginated case
       const { rows, count } = await db.brandObj.findAndCountAll({
         where: whereCondition,
-        order: order,
+        order,
         limit: per_page,
-        offset: offset,
+        offset,
       });
 
       return {
         data: rows,
-        total: count,
-        current_page: page,
-        per_page: per_page,
-        last_page: Math.ceil(count / per_page),
+        meta: {
+          current_page: page,
+          from: offset + 1,
+          to: offset + rows.length,
+          per_page,
+          total: count,
+          last_page: Math.ceil(count / per_page),
+        },
       };
     } catch (e) {
       console.error(commonHelper.customizeCatchMsg(e));

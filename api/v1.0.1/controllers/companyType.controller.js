@@ -66,7 +66,7 @@ module.exports = {
 
   async getCompanyTypeById(req, res) {
     try {
-      const companyTypeId = req.query.companyType;
+      const companyTypeId = req.query.id;
       if (!companyTypeId) {
         return res.status(400).json({
           status: false,
@@ -101,7 +101,7 @@ module.exports = {
 
   async updateCompanyType(req, res) {
     try {
-      const companyTypeId = req.query.companyType;
+      const companyTypeId = req.query.id;
       const updatedData = req.body;
 
       const companyType = await companyTypeServices.updateCompanyType(
@@ -133,7 +133,7 @@ module.exports = {
 
   async deleteCompanyType(req, res) {
     try {
-      const companyTypeId = req.query.companyType;
+      const companyTypeId = req.query.id;
 
       if (!companyTypeId) {
         return res.status(400).json({

@@ -170,6 +170,8 @@ db.teamsCodesObj = require("./termsCodes.models")(dbObj, Sequelize);
 
 db.interactionTypesObj = require("./interactionTypes.models")(dbObj, Sequelize);
 db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
+db.contactsObj = require("./contacts.models")(dbObj, Sequelize);
+
 // db.saleMaterialQuotesObj.hasMany(db.additionalQuotesObj, {
 //   foreignKey: "material_quote_id",
 //   sourceKey: "id"

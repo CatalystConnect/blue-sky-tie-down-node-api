@@ -46,5 +46,6 @@ router.use(require("./termsCodes.routes"));
 router.use(require("./interactionTypes.routes"));
 router.use(require("./budgetKeyAreas.routes"));
 router.use(require("./contacts.routes"));
+router.use(require("./productTags.routes"));
 
 module.exports = router;

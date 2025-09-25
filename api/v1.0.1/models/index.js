@@ -387,15 +387,15 @@ db.itemObj.belongsTo(db.brandItemObj, {
   as: "item_brands",
 });
 db.itemUnitsObj.belongsTo(db.unitObj, { foreignKey: "unit_id", as: "unit" });
-db.leadsObj.belongsTo(db.userObj, { foreignKey: "customerId", as: "customer" });
-db.userObj.hasMany(db.leadsObj, { foreignKey: "customerId", as: "leads" });
+// db.leadsObj.belongsTo(db.userObj, { foreignKey: "customerId", as: "customer" });
+// db.userObj.hasMany(db.leadsObj, { foreignKey: "customerId", as: "leads" });
 db.leadsObj.hasMany(db.projectImagesObj, {
   foreignKey: "lead_id",
   as: "projectImages",
 });
 
 db.leadsObj.belongsTo(db.userObj, {
-  foreignKey: "salesPerson",
+  foreignKey: "sale_person_id",
   as: "salesPersons",
 });
 

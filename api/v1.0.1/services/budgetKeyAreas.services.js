@@ -20,23 +20,32 @@ module.exports = {
       const offset = (page - 1) * limit;
 
       const whereCondition = {};
-
       if (search) {
         whereCondition[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
       }
 
       const { rows, count } = await db.budgetKeyAreasObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "ASC"]],
+        order: [["ordering", "ASC"]], // order by 'ordering' column
         limit,
         offset,
       });
 
+      // Pagination metadata
+      const lastPage = Math.ceil(count / limit);
+      const from = count > 0 ? offset + 1 : 0;
+      const to = offset + rows.length;
+
       return {
-        total: count,
-        page,
-        limit,
         data: rows,
+        meta: {
+          current_page: page,
+          from: from,
+          to: to,
+          per_page: limit,
+          last_page: lastPage,
+          total: count,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

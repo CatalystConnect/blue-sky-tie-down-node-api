@@ -175,7 +175,7 @@ db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(dbObj, Seque
 
 db.leadTeamsObj.belongsTo(db.userObj, {
   foreignKey: "contact_id",
-  as: "leadUsers"
+  as: "contactDetails"
 });
 
 db.userObj.hasMany(db.leadTeamsObj, {

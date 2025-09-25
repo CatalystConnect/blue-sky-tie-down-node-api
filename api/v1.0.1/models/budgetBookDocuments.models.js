@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const BudgetBookDocuments = sequelize.define(
+    "budget_book_documents",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,51 +8,27 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
-      user_id: {
+      budget_book_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      file_name: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      file_path: {
+        type: Sequelize.TEXT('long'),
+        allowNull: true
+      },
+      type: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      short_description: {
-        type: Sequelize.TEXT,
+      notes: {
+        type: Sequelize.TEXT('long'),
         allowNull: true
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
+      is_display: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -79,5 +55,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return BudgetBookDocuments;
 };

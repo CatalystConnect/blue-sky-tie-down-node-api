@@ -1,0 +1,43 @@
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up (queryInterface, Sequelize) {
+    await queryInterface.createTable('project_scope_categories', {
+      id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      project_scope_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      scope_category_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      title: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true
+      }
+    });
+  },
+
+  async down (queryInterface, Sequelize) {
+    await queryInterface.dropTable('project_scope_categories');
+  }
+};

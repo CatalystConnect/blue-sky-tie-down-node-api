@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const projectCosts = sequelize.define(
+    "project_costs",
     {
-      id: {
+        id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
@@ -12,48 +12,68 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      image: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      short_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
+      lead_id: {
         type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      sp: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      td: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      swm: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      up: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      rf: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      co: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      dk: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      st: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      dm: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      po: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      cmu: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      stl: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      mc: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      rtu: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      type: {
+        type: Sequelize.STRING(255),
         allowNull: true
       },
       created_at: {
@@ -79,5 +99,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return projectCosts;
 };

@@ -47,5 +47,6 @@ router.use(require("./interactionTypes.routes"));
 router.use(require("./budgetKeyAreas.routes"));
 router.use(require("./contacts.routes"));
 router.use(require("./productTags.routes"));
+router.use(require("./salesPipelineGroups.routes"));
 
 module.exports = router;

@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const projectRfis = sequelize.define(
+    "project_rfis",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,61 +8,61 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
-      user_id: {
+      budget_book_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      rfi_number: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      rfi_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
+      },
+      submitted_by: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      plan_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
+      },
+      subject: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      short_description: {
+      notes: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      description: {
+      attachmentsLink: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      website_id: {
-        type: Sequelize.STRING(255),
+      document_history: {
+        type: Sequelize.TEXT,
         allowNull: true
       },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
+      impacts: {
         type: Sequelize.TEXT,
         allowNull: true
       },
       status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true
+        type: Sequelize.ENUM('SUBMITTED', 'CLOSED'),
+        allowNull: true,
+        defaultValue: 'SUBMITTED'
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       deleted_at: {
         type: Sequelize.DATE,
@@ -79,5 +79,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return projectRfis;
 };

@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const projectCovers = sequelize.define(
+    "project_covers",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,52 +8,32 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
-      user_id: {
+      project_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      rev: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
-        type: Sequelize.STRING(255),
+      date: {
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
-      short_description: {
-        type: Sequelize.TEXT,
+      plan_date: {
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       description: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      website_id: {
+      scope: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      freeform: {
+      quote: {
         type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
         allowNull: true
       },
       created_at: {
@@ -79,5 +59,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return projectCovers;
 };

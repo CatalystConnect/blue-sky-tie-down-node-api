@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const leadContracts = sequelize.define(
+    "lead_contracts",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,61 +8,59 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
+      lead_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
-        type: Sequelize.STRING(255),
+      project_id: {
+        type: Sequelize.INTEGER,
         allowNull: true
       },
-      image: {
-        type: Sequelize.STRING(255),
+      budget_id: {
+        type: Sequelize.INTEGER,
         allowNull: true
       },
-      short_description: {
-        type: Sequelize.TEXT,
+      scope_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      site_plan_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      bldg_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      bldg_types: {
+        type: Sequelize.STRING(255),
         allowNull: true
       },
       description: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      website_id: {
-        type: Sequelize.STRING(255),
+      total: {
+        type: Sequelize.DECIMAL(10, 4),
         allowNull: true
       },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
+      contract_status: {
+        type: Sequelize.ENUM('accept', 'reject'),
         allowNull: true
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       deleted_at: {
         type: Sequelize.DATE,
@@ -79,5 +77,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return leadContracts;
 };

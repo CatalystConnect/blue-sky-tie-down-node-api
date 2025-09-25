@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const BudgetBooks = sequelize.define(
+    "budget_books",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -12,48 +12,92 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      name: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
-        type: Sequelize.STRING(255),
+      start_date: {
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
-      short_description: {
-        type: Sequelize.TEXT,
+      end_date: {
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       description: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      website_id: {
+      address: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      freeform: {
+      city: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      meta: {
+      state: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      title_tag: {
+      zip: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      meta_description: {
+      project_status: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      engineer: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      customer: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      architect: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      gross_sqft: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      project_tags: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      status: {
+      project_file: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      brand_id: {
+      project_manager: {
         type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      alternate_project_name: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      project_value: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      estimated_value: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      units: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      projectType: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      projectAttachmentUrls: {
+        type: Sequelize.TEXT,
         allowNull: true
       },
       created_at: {
@@ -79,5 +123,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return BudgetBooks;
 };

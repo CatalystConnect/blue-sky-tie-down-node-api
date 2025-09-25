@@ -4,74 +4,67 @@ const db = require("../models");
 const { Op } = require("sequelize");
 
 module.exports = {
-  /*addTeams*/
-  async addTeams(postData) {
+  /*addTerms*/
+  async addTerms(postData) {
     try {
-      return await db.teamsCodesObj.create(postData); 
+      return await db.teamsCodesObj.create(postData);
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  /*getAllTeams*/
-  async getAllTeams({ page, limit, search }) {
+  /*getAllTerms*/
+  async getAllTerms({ page = 1, limit = 10, search = "" }) {
     try {
       const offset = (page - 1) * limit;
 
-      const whereCondition = {};
-
-      if (search) {
-        whereCondition[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
-      }
-
-      const { rows, count } = await db.teamsCodesObj.findAndCountAll({
-        where: whereCondition,
-        order: [["id", "ASC"]],
-        limit,
+      const result = await db.teamsCodesObj.findAndCountAll({
+        where: search
+          ? {
+              name: { [db.Sequelize.Op.iLike]: `%${search}%` }, // adjust field
+            }
+          : {},
         offset,
+        limit,
+        order: [["id", "DESC"]],
       });
 
-      return {
-        total: count,
-        page,
-        limit,
-        data: rows,
-      };
+      return result; // { rows: [...], count: totalRecords }
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  /*getTeamsById*/
-  async getTeamsById(id) {
+  /*getTermsById*/
+  async getTermsById(id) {
     try {
-      const leadTeams = await db.teamsCodesObj.findOne({
+      const leadTerms = await db.teamsCodesObj.findOne({
         where: { id },
       });
 
-      if (!leadTeams) {
+      if (!leadTerms) {
         throw new Error("Terms code not found");
       }
 
-      return leadTeams;
+      return leadTerms;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  /*deleteTeams*/
-  async deleteTeams(id) {
+  /*deleteTerms*/
+  async deleteTerms(id) {
     try {
-      const leadTeams = await db.teamsCodesObj.findOne({ where: { id } });
-      if (!leadTeams) {
+      const leadTerms = await db.teamsCodesObj.findOne({ where: { id } });
+      if (!leadTerms) {
         throw new Error("Terms code not found");
       }
 
       // Soft delete
-      await leadTeams.destroy();
+      await leadTerms.destroy();
 
       return true;
     } catch (e) {
@@ -80,15 +73,15 @@ module.exports = {
     }
   },
 
-  /*updateTeams*/
-  async updateTeams(id, postData) {
+  /*updateTerms*/
+  async updateTerms(id, postData) {
     try {
-      const leadTeams = await db.teamsCodesObj.findOne({
+      const leadTerms = await db.teamsCodesObj.findOne({
         where: { id: parseInt(id) },
       });
-      if (!leadTeams) throw new Error("Terms code not found");
+      if (!leadTerms) throw new Error("Terms code not found");
 
-      const updated = await leadTeams.update(postData);
+      const updated = await leadTerms.update(postData);
       return updated;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

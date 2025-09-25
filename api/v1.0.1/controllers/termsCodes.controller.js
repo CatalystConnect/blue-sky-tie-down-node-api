@@ -10,7 +10,7 @@ const myValidationResult = validationResult.withDefaults({
 
 module.exports = {
   /* Add Terms Code */
-  async addTeams(req, res) {
+  async addTerms(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -34,7 +34,7 @@ module.exports = {
         active: data.active === true || data.active === "true" ? 1 : 0,
       };
 
-      await termsCodesServices.addTeams(postData);
+      await termsCodesServices.addTerms(postData);
 
       return res
         .status(200)
@@ -50,8 +50,46 @@ module.exports = {
     }
   },
 
-  /*getAllTeams*/
-  async getAllTeams(req, res) {
+  /*getAllTerms*/
+  // async getAllTerms(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     let { page = 1, limit = 10, search = "" } = req.query;
+  //     page = parseInt(page);
+  //     limit = parseInt(limit);
+
+  //     const result = await termsCodesServices.getAllTerms({
+  //       page,
+  //       limit,
+  //       search,
+  //     });
+
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose(
+  //           result,
+  //           "Terms code fetched successfully"
+  //         )
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Get Terms code failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+  async getAllTerms(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -64,17 +102,29 @@ module.exports = {
       page = parseInt(page);
       limit = parseInt(limit);
 
-      const result = await termsCodesServices.getAllTeams({
+      const result = await termsCodesServices.getAllTerms({
         page,
         limit,
         search,
       });
 
+      const response = {
+        data: result.rows, // array of records
+        meta: {
+          current_page: page,
+          per_page: limit,
+          total: result.count,
+          last_page: Math.ceil(result.count / limit),
+          from: result.count > 0 ? (page - 1) * limit + 1 : 0,
+          to: Math.min(page * limit, result.count),
+        },
+      };
+
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
-            result,
+            response,
             "Terms code fetched successfully"
           )
         );
@@ -90,8 +140,8 @@ module.exports = {
     }
   },
 
-  /*getTeamsById*/
-  async getTeamsById(req, res) {
+  /*getTermsById*/
+  async getTermsById(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -107,7 +157,7 @@ module.exports = {
           .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
       }
 
-      const result = await termsCodesServices.getTeamsById(id);
+      const result = await termsCodesServices.getTermsById(id);
 
       return res
         .status(200)
@@ -129,8 +179,8 @@ module.exports = {
     }
   },
 
-  /*deleteTeams*/
-  async deleteTeams(req, res) {
+  /*deleteTerms*/
+  async deleteTerms(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -146,7 +196,7 @@ module.exports = {
           .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
       }
 
-      await termsCodesServices.deleteTeams(id);
+      await termsCodesServices.deleteTerms(id);
 
       return res
         .status(200)
@@ -168,8 +218,8 @@ module.exports = {
     }
   },
 
-  /*updateTeams*/
-  async updateTeams(req, res) {
+  /*updateTerms*/
+  async updateTerms(req, res) {
     try {
       const errors = myValidationResult(req);
       if (!errors.isEmpty()) {
@@ -200,7 +250,7 @@ module.exports = {
         active: data.active === true || data.active === "true" ? 1 : 0,
       };
 
-      const result = await termsCodesServices.updateTeams(id, postData);
+      const result = await termsCodesServices.updateTerms(id, postData);
 
       return res
         .status(200)

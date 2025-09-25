@@ -46,9 +46,9 @@ module.exports = {
             where: { id: contactIds },
             attributes: { exclude: ["password"] },
           });
-          team.dataValues.leadUsers = users;
+          team.dataValues.contactDetails = users;
         } else {
-          team.dataValues.leadUsers = [];
+          team.dataValues.contactDetails = [];
         }
       }
 
@@ -98,9 +98,9 @@ module.exports = {
           where: { id: contactIds },
           attributes: { exclude: ["password"] },
         });
-        team.dataValues.leadUsers = users;
+        team.dataValues.contactDetails = users;
       } else {
-        team.dataValues.leadUsers = [];
+        team.dataValues.contactDetails = [];
       }
 
       return team;

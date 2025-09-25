@@ -1,7 +1,9 @@
-module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
-    {
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('materials', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -9,51 +11,35 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true
       },
       user_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      sku: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      item: {
         type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      short_description: {
-        type: Sequelize.TEXT,
         allowNull: true
       },
       description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      freeform: {
+      brand: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      meta: {
+      qty: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      title_tag: {
+      cost: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
+      total: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      brand_id: {
-        type: Sequelize.INTEGER,
+      hardware_type: {
+        type: Sequelize.STRING(255),
         allowNull: true
       },
       created_at: {
@@ -64,20 +50,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true
       },
-      deleted_at: {
+      deleted: {
         type: Sequelize.DATE,
         allowNull: true
-      },
-    },
-    {
-      timestamps: true,
-      freezeTableName: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-    }
-  );
+      }
+    });
+  },
 
-  return items;
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('materials');
+  }
 };

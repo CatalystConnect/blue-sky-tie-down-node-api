@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const leadTasks = sequelize.define(
+    "lead_tasks",
     {
-      id: {
+       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
@@ -12,48 +12,60 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      lead_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      task_status_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      subject: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      priority: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      short_description: {
+      file: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      file_name: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      due_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
+      },
+      task_group_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      task_subject_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      task_urgency_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      company_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      project_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      checklist: {
         type: Sequelize.TEXT,
         allowNull: true
       },
       description: {
         type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
         allowNull: true
       },
       created_at: {
@@ -79,5 +91,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return leadTasks;
 };

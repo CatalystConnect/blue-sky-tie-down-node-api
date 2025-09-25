@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
+  const customers = sequelize.define(
+    "customers",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -12,48 +12,20 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      name: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      email: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      short_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
+      phone: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      freeform: {
+      address: {
         type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
         allowNull: true
       },
       created_at: {
@@ -79,5 +51,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return items;
+  return customers;
 };

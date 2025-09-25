@@ -1,59 +1,53 @@
-module.exports = (sequelize, Sequelize) => {
-  const items = sequelize.define(
-    "items",
-    {
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up (queryInterface, Sequelize) {
+    await queryInterface.createTable('material_quote_additionals', {
       id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        primaryKey: true,
         autoIncrement: true,
-        primaryKey: true
+        allowNull: false
       },
-      user_id: {
+      material_quote_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      sku: {
+      item: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      image: {
+      qty: {
         type: Sequelize.STRING(255),
         allowNull: true
       },
-      short_description: {
+      cost: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      margin: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      commission: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      price: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      total: {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      },
+      notes: {
         type: Sequelize.TEXT,
         allowNull: true
       },
       description: {
         type: Sequelize.TEXT,
-        allowNull: true
-      },
-      website_id: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      freeform: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      title_tag: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      meta_description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      brand_id: {
-        type: Sequelize.INTEGER,
         allowNull: true
       },
       created_at: {
@@ -67,17 +61,11 @@ module.exports = (sequelize, Sequelize) => {
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
-      },
-    },
-    {
-      timestamps: true,
-      freezeTableName: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-    }
-  );
+      }
+    });
+  },
 
-  return items;
+  async down (queryInterface, Sequelize) {
+    await queryInterface.dropTable('material_quote_additionals');
+  }
 };

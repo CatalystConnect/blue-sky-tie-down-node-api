@@ -21,11 +21,8 @@ module.exports = {
       const offset = (page - 1) * limit;
 
       const whereCondition = {};
-
       if (search) {
-        whereCondition[Op.or] = [
-          { name: { [Op.iLike]: `%${search}%` } },
-        ];
+        whereCondition[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
       }
 
       const { rows, count } = await db.leadTeamsObj.findAndCountAll({
@@ -35,11 +32,41 @@ module.exports = {
         offset,
       });
 
+      // Fetch users for each team manually
+      for (const team of rows) {
+        let contactIds = [];
+        try {
+          contactIds = JSON.parse(team.contact_id || "[]");
+        } catch (e) {
+          contactIds = [];
+        }
+
+        if (contactIds.length > 0) {
+          const users = await db.userObj.findAll({
+            where: { id: contactIds },
+            attributes: { exclude: ["password"] },
+          });
+          team.dataValues.leadUsers = users;
+        } else {
+          team.dataValues.leadUsers = [];
+        }
+      }
+
+      // Calculate pagination metadata
+      const lastPage = Math.ceil(count / limit);
+      const from = count > 0 ? offset + 1 : 0;
+      const to = offset + rows.length;
+
       return {
-        total: count,
-        page,
-        limit,
         data: rows,
+        meta: {
+          current_page: page,
+          from: from,
+          to: to,
+          per_page: limit,
+          last_page: lastPage,
+          total: count,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -50,15 +77,33 @@ module.exports = {
   /*getLeadTeamsById*/
   async getLeadTeamsById(id) {
     try {
-      const leadTeams = await db.leadTeamsObj.findOne({
+      const team = await db.leadTeamsObj.findOne({
         where: { id },
       });
 
-      if (!leadTeams) {
+      if (!team) {
         throw new Error("Lead team not found");
       }
 
-      return leadTeams;
+      // Parse contact IDs and fetch users
+      let contactIds = [];
+      try {
+        contactIds = JSON.parse(team.contact_id || "[]");
+      } catch (e) {
+        contactIds = [];
+      }
+
+      if (contactIds.length > 0) {
+        const users = await db.userObj.findAll({
+          where: { id: contactIds },
+          attributes: { exclude: ["password"] },
+        });
+        team.dataValues.leadUsers = users;
+      } else {
+        team.dataValues.leadUsers = [];
+      }
+
+      return team;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

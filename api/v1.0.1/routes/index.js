@@ -45,5 +45,6 @@ router.use(require("./leadTeams.routes"));
 router.use(require("./termsCodes.routes"));
 router.use(require("./interactionTypes.routes"));
 router.use(require("./budgetKeyAreas.routes"));
+router.use(require("./contacts.routes"));
 
 module.exports = router;

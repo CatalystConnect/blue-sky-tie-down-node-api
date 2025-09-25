@@ -201,10 +201,6 @@ module.exports = {
           ? {
               id: user.department.id,
               name: user.department.name,
-              status: user.department.status || "active",
-              created_at: user.department.created_at || null,
-              updated_at: user.department.updated_at || null,
-              deleted_at: user.department.deleted_at || null,
             }
           : null,
         userType: user.userType,

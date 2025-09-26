@@ -172,6 +172,60 @@ db.interactionTypesObj = require("./interactionTypes.models")(dbObj, Sequelize);
 db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
 db.contactsObj = require("./contacts.models")(dbObj, Sequelize);
 db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(dbObj, Sequelize);
+db.salesPipelinesObj = require("./salesPipelines.models")(dbObj, Sequelize);
+db.salesPipelinesStatusesObj = require("./salesPipelineStatuses.models")(dbObj, Sequelize);
+db.salesPipelinesTriggersObj = require("./salesPipelineTriggers.models")(dbObj, Sequelize);
+db.salesPipelinesDelayIndicatorsObj = require("./salesPipelineDelayIndicators.models")(dbObj, Sequelize);
+
+/*Associations*/
+
+db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesStatusesObj, {
+  foreignKey: "field_value",
+  as: "pipelinesStatuses"
+});
+db.salesPipelinesStatusesObj.hasMany(db.salesPipelinesTriggersObj, {
+  foreignKey: "field_value",
+  as: "pipelinesStatusesData"
+});
+
+db.salesPipelinesObj.hasMany(db.salesPipelinesDelayIndicatorsObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesDelayIndicators"
+});
+db.salesPipelinesDelayIndicatorsObj.belongsTo(db.salesPipelinesObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesDelayIndicatorsData"
+});
+
+
+db.salesPipelinesObj.hasMany(db.salesPipelinesTriggersObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesTriggers"
+});
+db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesTriggersData"
+});
+
+db.salesPipelinesObj.hasMany(db.salesPipelinesStatusesObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesStatuses"
+});
+db.salesPipelinesStatusesObj.belongsTo(db.salesPipelinesObj, {
+  foreignKey: "sales_pipeline_id",
+  as: "salesPipelinesStatusesData"
+});
+
+
+db.salesPipelinesObj.belongsTo(db.salesPipelineGroupsObj, {
+  foreignKey: "sales_pipeline_group_id",
+  as: "salesPipelineGroups"
+});
+
+db.salesPipelineGroupsObj.hasMany(db.salesPipelinesObj, {
+  foreignKey: "sales_pipeline_group_id",
+  as: "salesPipelineGroupsData"
+});
 
 db.leadTeamsObj.belongsTo(db.userObj, {
   foreignKey: "contact_id",
@@ -183,7 +237,7 @@ db.userObj.hasMany(db.leadTeamsObj, {
   as: "leadUser"
 });
 
-/*Associations*/
+
 
 db.warehouseItemsObj.belongsTo(db.contractObj, {
   foreignKey: "contractor_id",

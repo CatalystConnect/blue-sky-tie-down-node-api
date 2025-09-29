@@ -3,66 +3,82 @@ const logger = require("../../../config/winston");
 const db = require("../models");
 
 module.exports = {
-     /*addProject*/
-     async addProject(postData) {
+    /*addProject*/
+    async addProject(postData) {
         try {
             let addProject = await db.projectObj.create(postData);
             return addProject;
-        }  catch (e) {
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
-          }
+        }
     },
-     /*getAllProject*/
-     async getAllProject(page, length) {
+    /*getAllProject*/
+    async getAllProject(page, length) {
         try {
             limit = length || 10;
             offset = (page - 1) * limit || 0;
             let getAllProject = await db.projectObj.findAll({
                 limit,
                 offset,
+                include: [
+                    { model: db.companyObj, as: "engineer" },
+                    // { model: db.companyObj, as: "architect" },
+                    { model: db.companyObj, as: "developer" },
+                    { model: db.companyObj, as: "general_contractor" },
+                    { model: db.userObj, as: "planReviewer" }
+                ],
+
                 order: [["id", "DESC"]]
             });
             return getAllProject;
-        }  catch (e) {
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
-          }
+        }
     },
     // /*getProjectById*/
     async getProjectById(projectId) {
         try {
             let getProjectById = await db.projectObj.findOne({
-                where: {id: projectId}
+                where: { id: projectId },
+                include: [
+                    { model: db.companyObj, as: "engineer" },
+                    // { model: db.companyObj, as: "architect" },
+                    { model: db.companyObj, as: "developer" },
+                    { model: db.companyObj, as: "general_contractor" },
+                    { model: db.userObj, as: "planReviewer" }
+                ],
+
             });
             return getProjectById;
-        }  catch (e) {
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
-          }
+        }
     },
     // /*updateProject*/
     async updateProject(data, projectId) {
         try {
             let updateProject = await db.projectObj.update(data, {
-                where: {id: projectId}
+                where: { id: projectId }
             });
             return updateProject;
-        }  catch (e) {
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
-          }
+        }
     },
     // /*deleteProject*/
     async deleteProject(projectId) {
         try {
             let deleteProject = await db.projectObj.destroy({
-                where: {id: projectId}
+                where: { id: projectId }
             });
             return deleteProject;
-        }  catch (e) {
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
-          }
+        }
     }
 }

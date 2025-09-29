@@ -122,6 +122,12 @@ module.exports = (sequelize, Sequelize) => {
       defaultAssignTeam: {
         type: Sequelize.TEXT,
       },
+       leadNotesField: {
+        type: Sequelize.TEXT,
+      },
+       requestedScope: {
+        type: Sequelize.TEXT,
+      },
       isTicket: {
         type: Sequelize.STRING(255),
       },

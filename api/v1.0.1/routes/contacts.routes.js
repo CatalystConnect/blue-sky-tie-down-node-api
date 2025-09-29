@@ -11,5 +11,9 @@ router.get("/Contacts/getContactsById",[authJwt.verifyToken],  Contactscontrolle
 router.delete("/Contacts/deleteContacts", [authJwt.verifyToken], Contactscontroller.deleteContacts);
 router.put("/Contacts/updateContacts", [authJwt.verifyToken],upload.none(), Contactscontroller.updateContacts);
 
+router.get("/Contacts/getContactCompany/:id", [authJwt.verifyToken], Contactscontroller.getContactCompany);
+
+
+
 
 module.exports = router;

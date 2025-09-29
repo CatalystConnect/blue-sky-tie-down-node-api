@@ -22,7 +22,7 @@ module.exports = {
             let data = req.body;
 
             let postData = {
-                user_id: req.userId,         
+                user_id: req.userId,
                 company_id: data.company_id,
                 name: data.name,
                 email: data.email,
@@ -32,7 +32,7 @@ module.exports = {
                 zip: data.zip,
                 state: data.state,
                 notes: data.notes,
-                
+
             }
             await contactsServices.addContacts(postData);
             return res
@@ -186,6 +186,32 @@ module.exports = {
                 status: false,
                 message: error.response?.data?.error || error.message || "Update Contacts failed",
                 data: error.response?.data || {},
+            });
+        }
+    },
+
+    async getContactCompany(req, res) {
+        try {
+            const { id: company_id } = req.params;
+
+            if (!company_id) {
+                return res.status(200).send(
+                    commonHelper.parseErrorRespose({ id: "Company ID is required" })
+                );
+            }
+
+            const result = await contactsServices.getContactCompany(company_id);
+
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(result, "Contacts fetched successfully")
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.response?.data?.error || error.message || "Get Contacts failed",
+                data: error.response?.data || {}
             });
         }
     },

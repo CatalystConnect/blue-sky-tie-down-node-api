@@ -30,6 +30,9 @@ module.exports = {
             const { rows, count } = await db.contactsObj.findAndCountAll({
                 where: whereCondition,
                 order: [["id", "DESC"]],
+                include:[
+                    { model: db.companyObj, as: "company" }
+                ],
                 limit,
                 offset,
             });
@@ -54,6 +57,9 @@ module.exports = {
         try {
             const contacts = await db.contactsObj.findOne({
                 where: { id },
+                include:[
+                    { model: db.companyObj, as: "company" }
+                ]
             });
 
             if (!contacts) {

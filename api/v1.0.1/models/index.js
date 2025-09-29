@@ -684,6 +684,7 @@ db.ticketsObj.belongsTo(db.leadsObj, { foreignKey: "lead_id", as: "lead" });
 db.ticketsObj.belongsToMany(db.tagsObj, { through: "ticket_tags", as: "tags", foreignKey: "ticket_id" });
 db.tagsObj.belongsToMany(db.ticketsObj, { through: "ticket_tags", as: "tickets", foreignKey: "tag_id" });
 
-
+db.contactsObj.belongsTo(db.companyObj, { foreignKey: "company_id", as: "company" });
+db.companyObj.hasMany(db.contactsObj, { foreignKey: "company_id", as: "contacts" });
 
 module.exports = db;

@@ -29,7 +29,7 @@ module.exports = {
             throw e;
           }
     },
-    /*getProjectById*/
+    // /*getProjectById*/
     async getProjectById(projectId) {
         try {
             let getProjectById = await db.projectObj.findOne({
@@ -41,7 +41,7 @@ module.exports = {
             throw e;
           }
     },
-    /*updateProject*/
+    // /*updateProject*/
     async updateProject(data, projectId) {
         try {
             let updateProject = await db.projectObj.update(data, {
@@ -53,7 +53,7 @@ module.exports = {
             throw e;
           }
     },
-    /*deleteProject*/
+    // /*deleteProject*/
     async deleteProject(projectId) {
         try {
             let deleteProject = await db.projectObj.destroy({

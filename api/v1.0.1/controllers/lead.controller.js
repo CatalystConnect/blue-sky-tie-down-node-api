@@ -116,6 +116,8 @@ module.exports = {
           ? JSON.stringify(data.secondary_contact)
           : null,
         secretId: data.secretId || null,
+        leadNotesField: data.leadNotesField || null,
+        requestedScope: data.requestedScope || null,
       };
 
       const lead = await leadServices.addLead(postData);
@@ -219,6 +221,8 @@ module.exports = {
           ? JSON.stringify(data.secondary_contact)
           : null,
         secretId: data.secretId || null,
+        leadNotesField: data.leadNotesField || null,
+        requestedScope: data.requestedScope || null,
       };
 
       // update lead

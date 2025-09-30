@@ -14,11 +14,18 @@ module.exports = {
         }
     },
     /*getAllProject*/
-    async getAllProject(page, length) {
+    async getAllProject(page = 1, length = 10, search = "") {
         try {
-            limit = length || 10;
-            offset = (page - 1) * limit || 0;
-            let getAllProject = await db.projectObj.findAll({
+            const limit = parseInt(length) || 10;
+            const offset = (parseInt(page) - 1) * limit || 0;
+
+            const whereClause = {};
+            if (search) {
+                whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+            }
+
+            const { rows, count } = await db.projectObj.findAndCountAll({
+                where: whereClause,
                 limit,
                 offset,
                 include: [
@@ -28,10 +35,20 @@ module.exports = {
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" }
                 ],
-
                 order: [["id", "DESC"]]
             });
-            return getAllProject;
+
+            return {
+                data: rows,
+                meta: {
+                    current_page: parseInt(page),
+                    from: offset + 1,
+                    to: offset + rows.length,
+                    last_page: Math.ceil(count / limit),
+                    per_page: limit,
+                    total: count
+                }
+            };
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;

@@ -72,15 +72,18 @@ module.exports = {
     // /*getAllProject*/
     async getAllProject(req, res) {
         try {
-            let { page, length } = req.query;
+            let { page, length,search } = req.query;
             if (page <= 0 || length <= 0) {
                 throw new Error("Page and length must be greater than 0");
             }
             let getAllProject = await projectServices.getAllProject(page, length);
             if (!getAllProject) throw new Error("Projects not found");
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose(getAllProject, "Projects displayed successfully"));
+            return res.status(200).send({
+                status: true,
+                message: " Get all Projects",
+                data: getAllProject.data,
+                meta: getAllProject.meta
+            });
         } catch (error) {
             return res.status(400).json({
                 status: false,

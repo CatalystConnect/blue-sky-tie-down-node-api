@@ -110,7 +110,15 @@ module.exports = {
                 assign_date: data.assign_date,
                 plan_link: data.plan_link,
                 submissionType: data.submissionType,
-                planFiles: data.planFiles
+                planFiles: data.planFiles,
+                projectTags: data.projectTags,
+                projectFiles: data.projectFiles,
+                architecture: data.architecture,
+                takeoffactualtime: data.takeoffactualtime,
+                dueDate: data.dueDate,
+                projectAttachmentUrls: data.projectAttachmentUrls,
+                attachmentsLink: data.attachmentsLink,
+                projectRifFields: data.projectRifFields 
             }
             await projectServices.addProject(postData);
             return res
@@ -272,7 +280,15 @@ module.exports = {
                 assign_date: data.assign_date,
                 plan_link: data.plan_link,
                 submissionType: data.submissionType,
-                planFiles: data.planFiles
+                planFiles: data.planFiles,
+                projectTags: data.projectTags,
+                projectFiles: data.projectFiles,
+                architecture: data.architecture,
+                takeoffactualtime: data.takeoffactualtime,
+                dueDate: data.dueDate,
+                projectAttachmentUrls: data.projectAttachmentUrls,
+                attachmentsLink: data.attachmentsLink,
+                projectRifFields: data.projectRifFields 
             }
             commonHelper.removeFalsyKeys(postData);
 

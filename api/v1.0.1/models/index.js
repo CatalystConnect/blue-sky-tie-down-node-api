@@ -703,4 +703,24 @@ db.companyObj.hasMany(db.projectObj, { foreignKey: "general_contractor_id", as: 
 db.userObj.hasMany(db.projectObj, { foreignKey: "plan_reviewed_by", as: "reviewedProjects" });
 
 
+db.leadsObj.belongsTo(db.companyObj, { as: "company", foreignKey: "company_id" });
+db.companyObj.hasMany(db.leadsObj, { foreignKey: "company_id", as: "company_leads" });
+
+db.leadsObj.belongsTo(db.contactsObj, { as: "contact", foreignKey: "contact_id" });
+db.contactsObj.hasMany(db.leadsObj, { foreignKey: "contact_id", as: "contact_leads" });
+
+db.leadsObj.belongsTo(db.userObj, { as: "salesPerson", foreignKey: "sale_person_id" }); // singular
+db.userObj.hasMany(db.leadsObj, { foreignKey: "sale_person_id", as: "sales_person_leads" });
+
+db.leadsObj.belongsTo(db.userObj, { as: "engineer", foreignKey: "engineer_id" });
+db.userObj.hasMany(db.leadsObj, { foreignKey: "engineer_id", as: "engineer_leads" });
+
+db.leadsObj.belongsTo(db.leadTeamsObj, { as: "leadTeam", foreignKey: "leadTeamId" });
+db.leadTeamsObj.hasMany(db.leadsObj, { foreignKey: "leadTeamId", as: "team_leads" });
+
+db.leadsObj.belongsTo(db.leadStatusesObj, { as: "leadStatus", foreignKey: "lead_status_id" });
+db.leadStatusesObj.hasMany(db.leadsObj, { foreignKey: "lead_status_id", as: "status_leads" });
+
+
+
 module.exports = db;

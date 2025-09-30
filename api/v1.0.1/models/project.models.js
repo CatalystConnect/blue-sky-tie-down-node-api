@@ -128,7 +128,10 @@ module.exports = (sequelize, Sequelize) => {
             take_off_team_id: { type: Sequelize.INTEGER, allowNull: true },
             take_off_type: { type: Sequelize.STRING, allowNull: true },
             take_off_scope: { type: Sequelize.STRING, allowNull: true },
-            assign_date: { type: Sequelize.DATEONLY, allowNull: true }
+            assign_date: { type: Sequelize.DATEONLY, allowNull: true },
+            plan_link: { type: Sequelize.STRING, allowNull: true },
+            submissionType: { type: Sequelize.STRING, allowNull: true },
+            planFiles: { type: Sequelize.STRING, allowNull: true }
         },
         {timestamps: true,        
         createdAt: "created_at",

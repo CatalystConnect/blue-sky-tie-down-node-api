@@ -95,7 +95,8 @@ module.exports = {
           { model: db.userObj, as: "salesPerson", attributes: { exclude: ["password"] } },
           { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
           { model: db.leadTeamsObj, as: "leadTeam" },
-          { model: db.leadStatusesObj, as: "leadStatus" }
+          { model: db.leadStatusesObj, as: "leadStatus" },
+          { model: db.projectObj, as: "project" }
         ]
       };
 
@@ -151,7 +152,8 @@ module.exports = {
           { model: db.userObj, as: "salesPerson", attributes: { exclude: ["password"] } },
           { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
           { model: db.leadTeamsObj, as: "leadTeam" },
-          { model: db.leadStatusesObj, as: "leadStatus" }
+          { model: db.leadStatusesObj, as: "leadStatus" },
+          { model: db.projectObj, as: "project" }
         ]
       });
       return lead;

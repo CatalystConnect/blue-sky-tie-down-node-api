@@ -721,6 +721,9 @@ db.leadTeamsObj.hasMany(db.leadsObj, { foreignKey: "leadTeamId", as: "team_leads
 db.leadsObj.belongsTo(db.leadStatusesObj, { as: "leadStatus", foreignKey: "lead_status_id" });
 db.leadStatusesObj.hasMany(db.leadsObj, { foreignKey: "lead_status_id", as: "status_leads" });
 
+db.leadsObj.belongsTo(db.projectObj, { as: "project", foreignKey: "project_id" });
+db.projectObj.hasMany(db.leadsObj, { foreignKey: "project_id", as: "project_leads" });
+
 
 
 module.exports = db;

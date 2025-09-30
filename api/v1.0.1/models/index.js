@@ -170,13 +170,16 @@ db.leadTypesObj = require("./leadTypes.models")(dbObj, Sequelize);
 db.teamsCodesObj = require("./termsCodes.models")(dbObj, Sequelize);
 
 db.interactionTypesObj = require("./interactionTypes.models")(dbObj, Sequelize);
-db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
 db.contactsObj = require("./contacts.models")(dbObj, Sequelize);
 db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(dbObj, Sequelize);
 db.salesPipelinesObj = require("./salesPipelines.models")(dbObj, Sequelize);
 db.salesPipelinesStatusesObj = require("./salesPipelineStatuses.models")(dbObj, Sequelize);
 db.salesPipelinesTriggersObj = require("./salesPipelineTriggers.models")(dbObj, Sequelize);
 db.salesPipelinesDelayIndicatorsObj = require("./salesPipelineDelayIndicators.models")(dbObj, Sequelize);
+
+db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
+db.budgetCategoryObj = require("./budgetCategory.models")(dbObj, Sequelize);
+db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
 
 /*Associations*/
 

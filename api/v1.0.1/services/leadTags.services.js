@@ -134,4 +134,15 @@ module.exports = {
       throw e;
     }
   },
+
+  async addLeadTeam(postData) {
+    try {
+      // postData should be an array of objects
+      let leadTeam = await db.leadTeamsMemberObj.bulkCreate(postData);
+      return leadTeam;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 };

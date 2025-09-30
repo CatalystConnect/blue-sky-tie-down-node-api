@@ -182,6 +182,17 @@ module.exports = {
         await leadTagsServices.addleadTags(tags);
       }
 
+      if (data.leadTeamId) {
+        const leadTeamIds = Array.isArray(data.leadTeamId) ? data.leadTeamId : [data.leadTeamId];
+
+        const teamMembers = leadTeamIds.map((userId) => ({
+          lead_id: lead.id,
+          user_id: userId,
+        }));
+
+        await leadTagsServices.addLeadTeam(teamMembers);
+      }
+
       return res.status(200).send({
         status: true,
         message: "Lead added successfully",
@@ -257,8 +268,8 @@ module.exports = {
           ? typeof data.dcs === "string"
             ? data.dcs
             : Array.isArray(data.dcs)
-              ? data.dcs.join(",") 
-              : String(data.dcs)   
+              ? data.dcs.join(",")
+              : String(data.dcs)
           : null,
         isDelayed: data.isDelayed || null,
         project_id: data.project_id || null,

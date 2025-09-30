@@ -1,6 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
+const { Op, fn, col, where } = require("sequelize");
 
 module.exports = {
     /*addProject*/

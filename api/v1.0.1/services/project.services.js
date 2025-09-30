@@ -23,7 +23,7 @@ module.exports = {
                 offset,
                 include: [
                     { model: db.companyObj, as: "engineer" },
-                    // { model: db.companyObj, as: "architect" },
+                    { model: db.companyObj, as: "architect" },
                     { model: db.companyObj, as: "developer" },
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" }

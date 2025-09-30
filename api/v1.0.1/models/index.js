@@ -689,7 +689,7 @@ db.companyObj.hasMany(db.contactsObj, { foreignKey: "company_id", as: "contacts"
 
 // Project belongs to Company in multiple roles
 db.projectObj.belongsTo(db.companyObj, { foreignKey: "engineer_id", as: "engineer" });
-// db.projectObj.belongsTo(db.companyObj, { foreignKey: "architecture", as: "architect" });
+db.projectObj.belongsTo(db.companyObj, { foreignKey: "architecture", as: "architect" });
 db.projectObj.belongsTo(db.companyObj, { foreignKey: "developer_id", as: "developer" });
 db.projectObj.belongsTo(db.companyObj, { foreignKey: "general_contractor_id", as: "general_contractor" });
 db.projectObj.belongsTo(db.userObj, { foreignKey: "plan_reviewed_by", as: "planReviewer" });
@@ -697,7 +697,7 @@ db.projectObj.belongsTo(db.userObj, { foreignKey: "plan_reviewed_by", as: "planR
 
 // Optional: Company has many projects in each role
 db.companyObj.hasMany(db.projectObj, { foreignKey: "engineer_id", as: "engineered_projects" });
-// db.companyObj.hasMany(db.projectObj, { foreignKey: "architecture", as: "architected_projects" });
+db.companyObj.hasMany(db.projectObj, { foreignKey: "architecture", as: "architected_projects" });
 db.companyObj.hasMany(db.projectObj, { foreignKey: "developer_id", as: "developed_projects" });
 db.companyObj.hasMany(db.projectObj, { foreignKey: "general_contractor_id", as: "contracted_projects" });
 db.userObj.hasMany(db.projectObj, { foreignKey: "plan_reviewed_by", as: "reviewedProjects" });

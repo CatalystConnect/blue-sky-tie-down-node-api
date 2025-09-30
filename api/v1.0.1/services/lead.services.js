@@ -96,7 +96,18 @@ module.exports = {
           { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
-          { model: db.projectObj, as: "project" }
+          { model: db.projectObj, as: "project" },
+          {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            include: [
+              {
+                model: db.tagsObj,
+                as: "tag",
+                
+              }
+            ]
+          }
         ]
       };
 
@@ -107,7 +118,7 @@ module.exports = {
 
       let { rows: leads, count } = await db.leadsObj.findAndCountAll(queryOptions);
 
-      
+
 
       // 📊 Pagination meta
       let lastPage = Math.ceil(count / limit);

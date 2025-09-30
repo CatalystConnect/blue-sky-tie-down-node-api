@@ -92,7 +92,7 @@ module.exports = {
         include: [
           { model: db.companyObj, as: "company" },
           { model: db.contactsObj, as: "contact" },
-          { model: db.userObj, as: "salesPerson", attributes: { exclude: ["password"] } },
+          { model: db.userObj, as: "salePerson", attributes: { exclude: ["password"] } },
           { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
@@ -160,11 +160,22 @@ module.exports = {
         include: [
           { model: db.companyObj, as: "company" },
           { model: db.contactsObj, as: "contact" },
-          { model: db.userObj, as: "salesPerson", attributes: { exclude: ["password"] } },
+          { model: db.userObj, as: "salePerson", attributes: { exclude: ["password"] } },
           { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
-          { model: db.projectObj, as: "project" }
+          { model: db.projectObj, as: "project" },
+          {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            include: [
+              {
+                model: db.tagsObj,
+                as: "tag",
+                
+              }
+            ]
+          }
         ]
       });
       return lead;

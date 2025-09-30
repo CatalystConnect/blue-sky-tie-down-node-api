@@ -709,7 +709,7 @@ db.companyObj.hasMany(db.leadsObj, { foreignKey: "company_id", as: "company_lead
 db.leadsObj.belongsTo(db.contactsObj, { as: "contact", foreignKey: "contact_id" });
 db.contactsObj.hasMany(db.leadsObj, { foreignKey: "contact_id", as: "contact_leads" });
 
-db.leadsObj.belongsTo(db.userObj, { as: "salesPerson", foreignKey: "sale_person_id" }); // singular
+db.leadsObj.belongsTo(db.userObj, { as: "salePerson", foreignKey: "sale_person_id" }); // singular
 db.userObj.hasMany(db.leadsObj, { foreignKey: "sale_person_id", as: "sales_person_leads" });
 
 db.leadsObj.belongsTo(db.userObj, { as: "engineer", foreignKey: "engineer_id" });

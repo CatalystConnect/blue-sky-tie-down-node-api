@@ -107,7 +107,10 @@ module.exports = {
                 take_off_team_id: data.take_off_team_id,
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
-                assign_date: data.assign_date
+                assign_date: data.assign_date,
+                plan_link: data.plan_link,
+                submissionType: data.submissionType,
+                planFiles: data.planFiles
             }
             await projectServices.addProject(postData);
             return res
@@ -175,7 +178,7 @@ module.exports = {
             }
             let projectId = req.query.projectId;
             let getProjectById = await projectServices.getProjectById(projectId);
-            
+
             if (!getProjectById) throw new Error("Project not found");
             let data = req.body;
             let postData = {
@@ -266,10 +269,13 @@ module.exports = {
                 take_off_team_id: data.take_off_team_id,
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
-                assign_date: data.assign_date
+                assign_date: data.assign_date,
+                plan_link: data.plan_link,
+                submissionType: data.submissionType,
+                planFiles: data.planFiles
             }
             commonHelper.removeFalsyKeys(postData);
-           
+
             let updateProject = await projectServices.updateProject(postData, projectId);
             return res
                 .status(200)

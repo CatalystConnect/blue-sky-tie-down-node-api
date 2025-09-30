@@ -253,7 +253,13 @@ module.exports = {
         date_record: data.date_record || null,
         due_date: data.due_date || null,
         nextStepDate: data.nextStepDate || null,
-        dcs: data.dcs || null,
+        dcs: data.dcs
+          ? typeof data.dcs === "string"
+            ? data.dcs
+            : Array.isArray(data.dcs)
+              ? data.dcs.join(",") 
+              : String(data.dcs)   
+          : null,
         isDelayed: data.isDelayed || null,
         project_id: data.project_id || null,
         company_id: data.company_id || null,

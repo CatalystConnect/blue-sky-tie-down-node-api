@@ -44,10 +44,13 @@ router.use(require("./tickets.routes"));
 router.use(require("./leadTeams.routes"));
 router.use(require("./termsCodes.routes"));
 router.use(require("./interactionTypes.routes"));
-router.use(require("./budgetKeyAreas.routes"));
 router.use(require("./contacts.routes"));
 router.use(require("./productTags.routes"));
 router.use(require("./salesPipelineGroups.routes"));
 router.use(require("./salesPipelines.routes"));
+
+router.use(require("./budgetKeyAreas.routes"));
+router.use(require("./budgetScope.routes"));
+router.use(require("./budgetCategory.routes"));
 
 module.exports = router;

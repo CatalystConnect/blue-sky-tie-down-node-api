@@ -164,12 +164,12 @@ module.exports = {
                             { model: db.userObj, as: "lead_sales_person" },
                             {
                                 model: db.leadStatusesObj,
-                                as: "leadStatus", 
+                                as: "leadStatus",
                             },
                             {
                                 model: db.projectObj,
                                 as: "project",
-                                
+
                             }
                         ]
                     }
@@ -284,8 +284,14 @@ module.exports = {
                 ];
             }
 
-            const planSets = await db.projectplanSetsObj.findAll({
+            const page = filters.page ? parseInt(filters.page) : 1;
+            const limit = filters.limit ? parseInt(filters.limit) : 10;
+            const offset = (page - 1) * limit;
+
+            const { count, rows } = await db.projectplanSetsObj.findAndCountAll({
                 where: whereClause,
+                limit,
+                offset,
                 order: [["id", "DESC"]],
                 include: [
                     {
@@ -296,7 +302,17 @@ module.exports = {
                 ]
             });
 
-            return planSets;
+            return {
+                meta: {
+                    current_page: page,
+                    from: offset + 1,
+                    to: offset + rows.length,
+                    last_page: Math.ceil(count / limit),
+                    per_page: limit,
+                    total: count
+                },
+                records: rows
+            };
         } catch (e) {
             console.error("Error in getProjectPlanSet:", e);
             throw e;

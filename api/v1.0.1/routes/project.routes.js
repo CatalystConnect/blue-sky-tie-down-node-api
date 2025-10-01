@@ -23,5 +23,8 @@ router.delete("/project/deleteProject",[authJwt.verifyToken],  controller.delete
 /*set default lead*/
 router.put("/project/setDefaultLead",[authJwt.verifyToken],  controller.setDefaultLead);
 
+router.put("/project/updateProjectPlanSet",[authJwt.verifyToken, upload.none()],  controller.updateProjectPlanSet);
+
+
 module.exports = router;
 

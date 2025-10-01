@@ -135,7 +135,7 @@ module.exports = {
             let data = req.body;
             let postData = {
                 user_id: req.userId,
-                site_plan_id: data.site_plan_id,
+                site_plan_id: data.site_plan_id === null || data.site_plan_id === "null" ? null : data.site_plan_id,
                 engineer_id: data.engineer_id,
                 name: data.name,
                 city:data.city,

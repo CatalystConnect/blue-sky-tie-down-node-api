@@ -691,6 +691,20 @@ db.tagsObj.hasMany(db.leadTagsObj, { foreignKey: "tag_id", as: "lead_tags" });
 
 db.ticketsObj.belongsTo(db.leadsObj, { foreignKey: "lead_id", as: "lead" });
 
+db.leadTeamsMemberObj.belongsTo(db.leadsObj, {
+  foreignKey: "lead_id",
+  as: "leads",
+});
+
+db.leadsObj.hasMany(db.leadTeamsMemberObj, {
+  foreignKey: "lead_id",
+  as: "leadTeamMembers",
+});
+db.leadTeamsMemberObj.belongsTo(db.userObj, {
+  as: "user",
+  foreignKey: "user_id",
+});
+
 db.ticketsObj.belongsToMany(db.tagsObj, {
   through: "ticket_tags",
   as: "tags",
@@ -828,33 +842,26 @@ db.projectplanSetsObj.belongsTo(db.projectObj, {
   as: "project",
 });
 
-
 db.projectplanSetsObj.belongsTo(db.userObj, {
-    foreignKey: "plan_reviewed_by", 
-    as: "reviewedByUser"
+  foreignKey: "plan_reviewed_by",
+  as: "reviewedByUser",
 });
-
 
 db.leadsObj.belongsTo(db.companyObj, {
   foreignKey: "engineer_id",
-  as: "lead_engineer"
+  as: "lead_engineer",
 });
 db.leadsObj.belongsTo(db.contactsObj, {
   foreignKey: "contact_id",
-  as: "lead_contact"
+  as: "lead_contact",
 });
 db.leadsObj.belongsTo(db.companyObj, {
   foreignKey: "company_id",
-  as: "lead_company"
+  as: "lead_company",
 });
 db.leadsObj.belongsTo(db.userObj, {
   foreignKey: "sale_person_id",
-  as: "lead_sales_person"
+  as: "lead_sales_person",
 });
-
-
-
-
-
 
 module.exports = db;

@@ -110,6 +110,8 @@ db.catalogAttributeObj = require("./catalologAttributes.models")(
 db.customerObj = require("./customer.models")(dbObj, Sequelize);
 db.jwtTokenObj = require("./jwtToken.models")(dbObj, Sequelize);
 db.projectObj = require("./project.models")(dbObj, Sequelize);
+db.projectplanSetsObj = require("./projectPlanSet.models")(dbObj, Sequelize);
+
 db.roofMeasureObj = require("./roofMeasure.models")(dbObj, Sequelize);
 db.takeOffQuotesItemsObj = require("./takeOffQuotesItems.models")(
   dbObj,
@@ -728,6 +730,14 @@ db.leadStatusesObj.hasMany(db.leadsObj, { foreignKey: "lead_status_id", as: "sta
 db.leadsObj.belongsTo(db.projectObj, { as: "project", foreignKey: "project_id" });
 db.projectObj.hasMany(db.leadsObj, { foreignKey: "project_id", as: "project_leads" });
 
+db.projectObj.hasMany(db.projectplanSetsObj, {
+    foreignKey: "project_id",
+    as: "planSets"
+});
 
+db.projectplanSetsObj.belongsTo(db.projectObj, {
+    foreignKey: "project_id",
+    as: "project"
+});
 
 module.exports = db;

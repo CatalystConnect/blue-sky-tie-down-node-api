@@ -474,6 +474,50 @@ module.exports = {
     }
   },
 
+  async updateProjectNotes(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      const { projectNoteId, notes } = req.body;
+
+      if (!projectNoteId || !notes) {
+        return res.status(400).json({
+          status: false,
+          message: "Project note id and notes are required",
+        });
+      }
+
+      const updatedNote = await projectServices.updateProjectNotes(
+        projectNoteId,
+        notes
+      );
+
+      if (!updatedNote) {
+        throw new Error("Project note not found or update failed");
+      }
+
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            updatedNote,
+            "Project note updated successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to update project note",
+        data: {},
+      });
+    }
+  },
+
   async deleteProjectNotes(req, res) {
     try {
       const { projectNoteId } = req.query;

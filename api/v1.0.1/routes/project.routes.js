@@ -30,6 +30,9 @@ router.post("/project/addProjectNotes", [authJwt.verifyToken], controller.addPro
 // List Project Notes
 router.get("/project-notes", [authJwt.verifyToken], controller.listProjectNotes);
 
+// Update Project Notes
+router.put("/updateProjectNotes", [authJwt.verifyToken], controller.updateProjectNotes);
+
 // Delete Project Notes
 router.delete("/deleteProjectNotes", [authJwt.verifyToken], controller.deleteProjectNotes);
 

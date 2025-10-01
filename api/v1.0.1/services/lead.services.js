@@ -145,6 +145,17 @@ module.exports = {
               },
             ],
           },
+          {
+            model: db.leadTeamsMemberObj,
+            as: "leadTeamMembers",
+            include: [
+              {
+                model: db.userObj,
+                as: "user",
+                attributes: { exclude: ["password"] },
+              },
+            ],
+          },
         ],
       });
       return lead;
@@ -291,6 +302,34 @@ module.exports = {
         where: { id: leadNoteId },
       });
       return deleted > 0;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  /* updateLeadTeamMember */
+  async updateLeadTeamMember(members, leadId) {
+    try {
+      await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
+
+      const newMembers = members.map((userId) => ({
+        lead_id: leadId,
+        user_id: userId,
+      }));
+
+      await db.leadTeamsMemberObj.bulkCreate(newMembers);
+
+      return await db.leadTeamsMemberObj.findAll({
+        where: { lead_id: leadId },
+        // include: [
+        //   {
+        //     model: db.userObj,
+        //     as: "user",
+        //     attributes: ["id", "full_name", "email"],
+        //   },
+        // ],
+      });
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

@@ -319,4 +319,33 @@ module.exports = {
         }
 
     },
+    async updateProjectPlanSetById(id, updateData) {
+        try {
+            const planSet = await db.projectplanSetsObj.findOne({ where: { id } });
+
+            if (!planSet) {
+                return null;
+            }
+
+            await planSet.update(updateData);
+
+            return planSet;
+        } catch (e) {
+            console.error("Error in updateProjectPlanSetById:", e);
+            throw e;
+        }
+    },
+    async deleteProjectPlanSet(id) {
+        try {
+            const deleted = await db.projectplanSetsObj.destroy({
+                where: { id }
+            });
+
+            return deleted; 
+        } catch (e) {
+            console.error("Error in deleteProjectPlanSet:", e);
+            throw e;
+        }
+    }
+
 };

@@ -209,32 +209,32 @@ module.exports = {
                 projectId
             );
 
-            // await db.projectplanSetsObj.destroy({
-            //     where: { project_id: projectId },
-            // });
-            // if (data.planSets && typeof data.planSets === "string") {
-            //     data.planSets = JSON.parse(data.planSets);
-            // }
+            await db.projectplanSetsObj.destroy({
+                where: { project_id: projectId },
+            });
+            if (data.planSets && typeof data.planSets === "string") {
+                data.planSets = JSON.parse(data.planSets);
+            }
 
-            // if (data.planSets && Array.isArray(data.planSets)) {
-            //     for (let plan of data.planSets) {
-            //         let planData = {
-            //             project_id: projectId,
-            //             submissionType: plan.submissionType,
-            //             date_received: plan.date_received,
-            //             plan_link: plan.plan_link,
-            //             planFiles: plan.planFiles,
-            //             plan_date: plan.plan_date,
-            //             rev_status: plan.rev_status,
-            //             plan_reviewed_date: plan.plan_reviewed_date,
-            //             plan_reviewed_by: plan.plan_reviewed_by,
-            //             data_collocated_date: plan.data_collocated_date,
-            //             plan_revision_notes: plan.plan_revision_notes,
-            //         };
+            if (data.planSets && Array.isArray(data.planSets)) {
+                for (let plan of data.planSets) {
+                    let planData = {
+                        project_id: projectId,
+                        submissionType: plan.submissionType,
+                        date_received: plan.date_received,
+                        plan_link: plan.plan_link,
+                        planFiles: plan.planFiles,
+                        plan_date: plan.plan_date,
+                        rev_status: plan.rev_status,
+                        plan_reviewed_date: plan.plan_reviewed_date,
+                        plan_reviewed_by: plan.plan_reviewed_by,
+                        data_collocated_date: plan.data_collocated_date,
+                        plan_revision_notes: plan.plan_revision_notes,
+                    };
 
-            //         await projectServices.projectplanSets(planData);
-            //     }
-            // }
+                    await projectServices.projectplanSets(planData);
+                }
+            }
             return res
                 .status(200)
                 .send(

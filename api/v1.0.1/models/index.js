@@ -888,4 +888,6 @@ db.leadsObj.belongsTo(db.userObj, {
   as: "lead_sales_person",
 });
 
+db.projectNotesObj.belongsTo(db.userObj, { foreignKey: "user_id", as: "user" });
+
 module.exports = db;

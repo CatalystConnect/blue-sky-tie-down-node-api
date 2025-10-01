@@ -827,4 +827,10 @@ db.projectplanSetsObj.belongsTo(db.projectObj, {
   as: "project",
 });
 
+
+db.projectplanSetsObj.belongsTo(db.userObj, {
+    foreignKey: "plan_reviewed_by", 
+    as: "reviewedByUser"
+});
+
 module.exports = db;

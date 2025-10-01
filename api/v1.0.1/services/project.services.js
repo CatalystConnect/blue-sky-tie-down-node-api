@@ -154,7 +154,16 @@ module.exports = {
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" },
                     { model: db.projectplanSetsObj, as: "planSets" },
-                    { model: db.leadsObj, as: "project_leads" },
+                    {
+                        model: db.leadsObj,
+                        as: "project_leads",
+                        include: [
+                            { model: db.companyObj, as: "lead_engineer" },
+                            { model: db.contactsObj, as: "lead_contact" },
+                            { model: db.companyObj, as: "lead_company" },
+                            { model: db.userObj, as: "lead_sales_person" }
+                        ]
+                    }
                 ],
             });
             return getProjectById;

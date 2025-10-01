@@ -833,4 +833,22 @@ db.projectplanSetsObj.belongsTo(db.userObj, {
     as: "reviewedByUser"
 });
 
+
+db.leadsObj.belongsTo(db.companyObj, {
+  foreignKey: "engineer_id",
+  as: "lead_engineer"
+});
+db.leadsObj.belongsTo(db.contactsObj, {
+  foreignKey: "contact_id",
+  as: "lead_contact"
+});
+db.leadsObj.belongsTo(db.companyObj, {
+  foreignKey: "company_id",
+  as: "lead_company"
+});
+db.leadsObj.belongsTo(db.userObj, {
+  foreignKey: "sale_person_id",
+  as: "lead_sales_person"
+});
+
 module.exports = db;

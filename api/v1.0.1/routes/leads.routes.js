@@ -33,4 +33,7 @@ router.put("/updateLeadNotes", [authJwt.verifyToken], upload.none(), controller.
 // // Delete Leadt Notes
 router.delete("/deleteLeadNotes", [authJwt.verifyToken], controller.deleteLeadNotes);
 
+// // Update Leadt Notes
+router.put("/update-lead-team-member", [authJwt.verifyToken], controller.updateLeadTeamMember);
+
 module.exports = router;

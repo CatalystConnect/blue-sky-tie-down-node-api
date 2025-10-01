@@ -367,7 +367,7 @@ module.exports = {
                 data_collocated_date: data.data_collocated_date,
                 plan_revision_notes: data.plan_revision_notes,
             };
-            commonHelper.removeFalsyKeys(postData);
+            // commonHelper.removeFalsyKeys(postData);
             // await db.projectplanSetsObj.destroy({
             //     where: { project_id: projectId },
             // });

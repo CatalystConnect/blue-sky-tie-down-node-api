@@ -529,6 +529,51 @@ module.exports = {
       });
     }
   },
+  async updateLeadTeamMember(req, res) {
+    try {
+      const { leadId } = req.query;
+      const { members } = req.body;
+
+      if (!leadId) {
+        return res.status(400).json({
+          status: false,
+          message: "leadId is required",
+        });
+      }
+
+      const lead = await db.leadsObj.findByPk(leadId);
+      if (!lead) {
+        return res.status(404).json({
+          status: false,
+          message: "Lead not found",
+        });
+      }
+
+      if (!Array.isArray(members) || members.length === 0) {
+        return res.status(400).json({
+          status: false,
+          message: "Members must be a non-empty array of user IDs",
+        });
+      }
+
+      const updatedMembers = await leadServices.updateLeadTeamMember(
+        members,
+        leadId
+      );
+
+      return res.status(200).json({
+        status: true,
+        message: "Lead team member list updated successfully!",
+        data: updatedMembers,
+      });
+    } catch (error) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+      return res.status(500).json({
+        status: false,
+        message: error.message || "Failed to update lead team members",
+      });
+    }
+  },
 
   /* validate */
   validate(method) {

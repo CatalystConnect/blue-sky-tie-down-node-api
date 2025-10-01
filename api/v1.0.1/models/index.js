@@ -62,6 +62,7 @@ dbObj
 /*Models defined*/
 db.userObj = require("./users.models")(dbObj, Sequelize);
 db.leadsObj = require("./leads.models")(dbObj, Sequelize);
+db.leadNotesObj = require("./leadNotes.models")(dbObj, Sequelize);
 db.rolesObj = require("./roles.model")(dbObj, Sequelize);
 db.contractObj = require("./contract.models")(dbObj, Sequelize);
 db.workOrderObj = require("./workOrders.models")(dbObj, Sequelize);

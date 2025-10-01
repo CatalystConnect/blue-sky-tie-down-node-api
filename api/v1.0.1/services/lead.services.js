@@ -5,50 +5,6 @@ const { Op, fn, col, where } = require("sequelize");
 
 module.exports = {
   /*getAllLeads*/
-  // async getAllLeads(
-  //   page,
-  //   length,
-  //   search,
-  //   date,
-  //   role_id,
-  //   userId,
-  //   role,
-  //   take_all
-  // ) {
-  //   try {
-  //     const limit = length || 10;
-  //     const offset = (page - 1) * limit || 0;
-
-  //     let whereCondition = {};
-
-  //     let queryOptions = {
-  //       where: whereCondition,
-  //       order: [["id", "DESC"]],
-  //       distinct: true,
-  //       include: [
-  //         {
-  //           model: db.userObj,
-  //           as: "salesPersons",
-  //           attributes: { exclude: ["password"] },
-  //         },
-  //       ],
-  //     };
-
-  //     if (!(take_all && take_all === "all")) {
-  //       queryOptions.limit = limit;
-  //       queryOptions.offset = offset;
-  //     }
-
-  //     let { rows: leads, count } = await db.leadsObj.findAndCountAll(
-  //       queryOptions
-  //     );
-
-  //     return { leads, count };
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
   async getAllLeads(
     page,
     length,
@@ -224,7 +180,7 @@ module.exports = {
     }
   },
 
-  // /*setDefaultLead*/
+  /*setDefaultLead*/
   async setDefaultLead(leadId, isDefaultLead) {
     try {
       if (isDefaultLead === "true" || isDefaultLead === true) {
@@ -240,6 +196,101 @@ module.exports = {
         );
       }
       return await db.leadsObj.findByPk(leadId);
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  /*getAllLeadNotes*/
+  async getAllLeadNotes(page, length, search, date, lead_id, take_all) {
+    try {
+      const limit = length || 10;
+      const offset = (page - 1) * limit || 0;
+
+      let whereCondition = { lead_id: lead_id };
+
+      if (search) {
+        whereCondition.notes = { [Sequelize.Op.like]: `%${search}%` };
+      }
+
+      if (date) {
+        whereCondition.created_at = {
+          [Sequelize.Op.gte]: new Date(date + " 00:00:00"),
+          [Sequelize.Op.lte]: new Date(date + " 23:59:59"),
+        };
+      }
+
+      let queryOptions = {
+        where: whereCondition,
+        order: [["id", "DESC"]],
+        distinct: true,
+      };
+
+      if (!(take_all && take_all === "all")) {
+        queryOptions.limit = limit;
+        queryOptions.offset = offset;
+      }
+
+      let { rows: notes, count } = await db.leadNotesObj.findAndCountAll(
+        queryOptions
+      );
+
+      let lastPage = Math.ceil(count / limit);
+      let from = offset + 1;
+      let to = offset + notes.length;
+
+      return {
+        notes,
+        meta: {
+          current_page: page,
+          from: from,
+          to: to,
+          last_page: lastPage,
+          per_page: limit,
+          total: count,
+        },
+      };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  /*addLeadtNotes*/
+  async addLeadtNotes(postData) {
+    try {
+      const addLeadtNotes = await db.leadNotesObj.create(postData);
+      return addLeadtNotes;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  async updateLeadNotes(leadNoteId, notes) {
+    try {
+      const [updated] = await db.leadNotesObj.update(
+        { notes: notes },
+        { where: { id: leadNoteId } }
+      );
+
+      if (updated === 0) return null;
+
+      return await db.leadNotesObj.findByPk(leadNoteId);
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  // // Delete Project Notes
+  async deleteLeadNotes(leadNoteId) {
+    try {
+      const deleted = await db.leadNotesObj.destroy({
+        where: { id: leadNoteId },
+      });
+      return deleted > 0;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

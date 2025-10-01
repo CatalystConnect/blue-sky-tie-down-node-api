@@ -20,4 +20,17 @@ router.put("/leadUpdate",[authJwt.verifyToken],upload.none(), [controller.valida
 /*lead delete by id*/
 router.delete("/leadDelete",[authJwt.verifyToken], [controller.validate("getLeadById")], controller.leadDelete);
 
+
+/*get all leads notes */
+router.post("/lead-notes/", [authJwt.verifyToken], controller.addLeadtNotes);
+
+// List Project Notes
+router.get("/lead-notes", [authJwt.verifyToken], controller.getAllLeadNotes);
+
+// // Update Leadt Notes
+router.put("/updateLeadNotes", [authJwt.verifyToken], controller.updateLeadNotes);
+
+// // Delete Leadt Notes
+router.delete("/deleteLeadNotes", [authJwt.verifyToken], controller.deleteLeadNotes);
+
 module.exports = router;

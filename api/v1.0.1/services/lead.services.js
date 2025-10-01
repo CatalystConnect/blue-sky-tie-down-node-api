@@ -335,4 +335,23 @@ module.exports = {
       throw e;
     }
   },
+
+  /* getLeadTeamMembers */
+  async getLeadTeamMembers(leadId) {
+    try {
+      return await db.leadTeamsMemberObj.findAll({
+        where: { lead_id: leadId },
+        include: [
+          {
+            model: db.userObj,
+            as: "user",
+            attributes: { exclude: ["password"] },
+          },
+        ],
+      });
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 };

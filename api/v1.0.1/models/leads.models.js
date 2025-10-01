@@ -122,10 +122,10 @@ module.exports = (sequelize, Sequelize) => {
       defaultAssignTeam: {
         type: Sequelize.TEXT,
       },
-       leadNotesField: {
+      leadNotesField: {
         type: Sequelize.TEXT,
       },
-       requestedScope: {
+      requestedScope: {
         type: Sequelize.TEXT,
       },
       isTicket: {
@@ -139,6 +139,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       deleted_at: {
         type: Sequelize.DATE,
+      },
+      isDefaultLead: {
+        type: Sequelize.STRING(255),
       },
     },
     {

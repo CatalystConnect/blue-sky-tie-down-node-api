@@ -65,14 +65,13 @@ module.exports = {
 
       let whereCondition = {};
 
-
       if (search) {
         whereCondition = {
           ...whereCondition,
           [Sequelize.Op.or]: [
             { project_id: { [Sequelize.Op.like]: `%${search}%` } },
             { "$company.name$": { [Sequelize.Op.like]: `%${search}%` } },
-            { "$contact.full_name$": { [Sequelize.Op.like]: `%${search}%` } }
+            { "$contact.full_name$": { [Sequelize.Op.like]: `%${search}%` } },
           ],
         };
       }
@@ -92,8 +91,16 @@ module.exports = {
         include: [
           { model: db.companyObj, as: "company" },
           { model: db.contactsObj, as: "contact" },
-          { model: db.userObj, as: "salePerson", attributes: { exclude: ["password"] } },
-          { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
+          {
+            model: db.userObj,
+            as: "salePerson",
+            attributes: { exclude: ["password"] },
+          },
+          {
+            model: db.userObj,
+            as: "engineer",
+            attributes: { exclude: ["password"] },
+          },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
           { model: db.projectObj, as: "project" },
@@ -104,11 +111,10 @@ module.exports = {
               {
                 model: db.tagsObj,
                 as: "tag",
-                
-              }
-            ]
-          }
-        ]
+              },
+            ],
+          },
+        ],
       };
 
       if (!(take_all && take_all === "all")) {
@@ -116,9 +122,9 @@ module.exports = {
         queryOptions.offset = offset;
       }
 
-      let { rows: leads, count } = await db.leadsObj.findAndCountAll(queryOptions);
-
-
+      let { rows: leads, count } = await db.leadsObj.findAndCountAll(
+        queryOptions
+      );
 
       // 📊 Pagination meta
       let lastPage = Math.ceil(count / limit);
@@ -160,8 +166,16 @@ module.exports = {
         include: [
           { model: db.companyObj, as: "company" },
           { model: db.contactsObj, as: "contact" },
-          { model: db.userObj, as: "salePerson", attributes: { exclude: ["password"] } },
-          { model: db.userObj, as: "engineer", attributes: { exclude: ["password"] } },
+          {
+            model: db.userObj,
+            as: "salePerson",
+            attributes: { exclude: ["password"] },
+          },
+          {
+            model: db.userObj,
+            as: "engineer",
+            attributes: { exclude: ["password"] },
+          },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
           { model: db.projectObj, as: "project" },
@@ -172,11 +186,10 @@ module.exports = {
               {
                 model: db.tagsObj,
                 as: "tag",
-                
-              }
-            ]
-          }
-        ]
+              },
+            ],
+          },
+        ],
       });
       return lead;
     } catch (e) {
@@ -205,6 +218,23 @@ module.exports = {
         where: { id: leadId },
       });
       return leads;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  // /*setDefaultLead*/
+  async setDefaultLead(leadId, isDefaultLead) {
+    try {
+      const [updated] = await db.leadsObj.update(
+        { isDefaultLead: isDefaultLead === "true" },
+        { where: { id: leadId } }
+      );
+
+      if (updated === 0) return null;
+
+      return await db.leadsObj.findByPk(leadId);
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

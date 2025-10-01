@@ -19,67 +19,6 @@ const db = require("../models");
 const leadTagsServices = require("../services/leadTags.services");
 module.exports = {
   /*getAllLeads*/
-  // async getAllLeads(req, res) {
-  //   try {
-  //     let {
-  //       page = 1,
-  //       length = 10,
-  //       search,
-  //       date,
-  //       role_id,
-  //       take_all,
-  //     } = req.query;
-
-  //     const userId = req.userId;
-  //     const role = req.role;
-
-  //     page = parseInt(page);
-  //     length = parseInt(length);
-
-  //     if (page <= 0 || length <= 0) {
-  //       throw new Error("Page and length must be greater than 0");
-  //     }
-
-  //     let { leads, count } = await leadServices.getAllLeads(
-  //       page,
-  //       length,
-  //       search,
-  //       date,
-  //       role_id,
-  //       userId,
-  //       role,
-  //       take_all
-  //     );
-
-  //     let totalPages = Math.ceil(count / length);
-
-  //     let response = {
-  //       leads: leads,
-  //       total: count,
-  //       page,
-  //       perPage: length,
-  //       totalPages,
-  //     };
-
-  //     return res
-  //       .status(200)
-  //       .send(
-  //         commonHelper.parseSuccessRespose(
-  //           response,
-  //           "Leads displayed successfully"
-  //         )
-  //       );
-  //   } catch (error) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message:
-  //         error.response?.data?.error ||
-  //         error.message ||
-  //         "Getting leads failed",
-  //       data: error.response?.data || {},
-  //     });
-  //   }
-  // },
   async getAllLeads(req, res) {
     try {
       let {
@@ -606,10 +545,10 @@ module.exports = {
   validate(method) {
     switch (method) {
       case "addLead": {
-        return [check("lead_id").notEmpty().withMessage("Lead is Required")];
+        return [check("project_id").notEmpty().withMessage("project is Required")];
       }
       case "getLeadById": {
-        return [check("id").not().isEmpty().withMessage("LeadId is Required")];
+        return [check("project_id").not().isEmpty().withMessage("LeadId is Required")];
       }
     }
   },

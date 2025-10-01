@@ -575,6 +575,33 @@ module.exports = {
     }
   },
 
+  async getLeadTeamMembers(req, res) {
+    try {
+      const { leadId } = req.query;
+
+      if (!leadId) {
+        return res.status(400).json({
+          status: false,
+          message: "leadId is required",
+        });
+      }
+
+      const teamMembers = await leadServices.getLeadTeamMembers(leadId);
+
+      return res.status(200).json({
+        status: true,
+        message: "Lead team members fetched successfully!",
+        data: teamMembers,
+      });
+    } catch (error) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+      return res.status(500).json({
+        status: false,
+        message: error.message || "Failed to fetch lead team members",
+      });
+    }
+  },
+
   /* validate */
   validate(method) {
     switch (method) {

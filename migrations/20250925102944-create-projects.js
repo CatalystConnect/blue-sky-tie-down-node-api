@@ -130,7 +130,20 @@ module.exports = {
       take_off_team_id: { type: Sequelize.INTEGER, allowNull: true }, 
       take_off_type: { type: Sequelize.STRING, allowNull: true },
       take_off_scope: { type: Sequelize.STRING, allowNull: true },
-      assign_date: { type: Sequelize.DATEONLY, allowNull: true }
+      assign_date: { type: Sequelize.DATEONLY, allowNull: true },
+      plan_link: { type: Sequelize.STRING, allowNull: true },
+      submissionType: { type: Sequelize.STRING, allowNull: true },
+      planFiles: { type: Sequelize.STRING, allowNull: true },
+      projectTags: { type: Sequelize.STRING, allowNull: true },
+      projectFiles: { type: Sequelize.STRING, allowNull: true },
+      architecture: { type: Sequelize.INTEGER, allowNull: true },
+      takeoffactualtime: { type: Sequelize.DATE, allowNull: true },
+      dueDate: { type: Sequelize.DATE, allowNull: true },
+      projectAttachmentUrls: { type: Sequelize.STRING, allowNull: true },
+      attachmentsLink: { type: Sequelize.STRING, allowNull: true },
+      projectRifFields: { type: Sequelize.STRING, allowNull: true },
+      
+
     });
   },
 

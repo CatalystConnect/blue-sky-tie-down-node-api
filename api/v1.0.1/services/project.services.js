@@ -77,7 +77,8 @@ module.exports = {
                     { model: db.companyObj, as: "architect" },
                     { model: db.companyObj, as: "developer" },
                     { model: db.companyObj, as: "general_contractor" },
-                    { model: db.userObj, as: "planReviewer" }
+                    { model: db.userObj, as: "planReviewer" },
+                    { model: db.projectplanSetsObj, as: "planSets" }
                 ],
                 order: [["id", "DESC"]]
             });
@@ -151,7 +152,8 @@ module.exports = {
                     { model: db.companyObj, as: "architect" },
                     { model: db.companyObj, as: "developer" },
                     { model: db.companyObj, as: "general_contractor" },
-                    { model: db.userObj, as: "planReviewer" }
+                    { model: db.userObj, as: "planReviewer" },
+                    { model: db.projectplanSetsObj, as: "planSets" }
                 ],
 
             });
@@ -184,5 +186,15 @@ module.exports = {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
-    }
+    },
+     async projectplanSets(postData) {
+        try {
+            
+            let projectplanSets = await db.projectplanSetsObj.create(postData);
+            return projectplanSets;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
 }

@@ -211,10 +211,27 @@ module.exports = {
   async listProjectNotes(projectId, limit) {
     try {
       return await db.projectNotesObj.findAll({
-        where: { project_id: projectId }, 
+        where: { project_id: projectId },
         order: [["created_at", "DESC"]],
         limit: limit,
       });
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  // Update Project Note
+  async updateProjectNotes(projectNoteId, notes) {
+    try {
+      const [updated] = await db.projectNotesObj.update(
+        { notes: notes },
+        { where: { id: projectNoteId } }
+      );
+
+      if (updated === 0) return null;
+
+      return await db.projectNotesObj.findByPk(projectNoteId);
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
@@ -225,7 +242,7 @@ module.exports = {
   async deleteProjectNotes(projectNoteId) {
     try {
       const deleted = await db.projectNotesObj.destroy({
-        where: {id: projectNoteId },
+        where: { id: projectNoteId },
       });
       return deleted > 0;
     } catch (e) {

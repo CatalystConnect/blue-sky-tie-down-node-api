@@ -161,7 +161,16 @@ module.exports = {
                             { model: db.companyObj, as: "lead_engineer" },
                             { model: db.contactsObj, as: "lead_contact" },
                             { model: db.companyObj, as: "lead_company" },
-                            { model: db.userObj, as: "lead_sales_person" }
+                            { model: db.userObj, as: "lead_sales_person" },
+                            {
+                                model: db.leadStatusesObj,
+                                as: "leadStatus", 
+                            },
+                            {
+                                model: db.projectObj,
+                                as: "project",
+                                
+                            }
                         ]
                     }
                 ],

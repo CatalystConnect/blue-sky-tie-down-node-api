@@ -153,7 +153,8 @@ module.exports = {
                     { model: db.companyObj, as: "developer" },
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" },
-                    { model: db.projectplanSetsObj, as: "planSets" }
+                    { model: db.projectplanSetsObj, as: "planSets" },
+                    { model: db.leadsObj, as: "project_leads" }
                 ],
 
             });

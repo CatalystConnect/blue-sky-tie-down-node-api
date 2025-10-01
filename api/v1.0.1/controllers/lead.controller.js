@@ -112,15 +112,12 @@ module.exports = {
         take_all
       );
 
-
-      return res
-        .status(200)
-        .send({
-          status: true,
-          message: "Lead Types fetched successfully",
-          data: leads,
-          meta: meta
-        });
+      return res.status(200).send({
+        status: true,
+        message: "Lead Types fetched successfully",
+        data: leads,
+        meta: meta,
+      });
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -150,7 +147,7 @@ module.exports = {
         nextStepDate: data.nextStepDate || null,
         dcs: data.dcs || null,
         isDelayed: data.isDelayed || null,
-        project_id: data.project_id || null,
+        lead_id: data.lead_id || null,
         company_id: data.company_id || null,
         contact_id: data.contact_id || null,
         sale_person_id: data.sale_person_id || null,
@@ -183,7 +180,9 @@ module.exports = {
       }
 
       if (data.leadTeamId) {
-        const leadTeamIds = Array.isArray(data.leadTeamId) ? data.leadTeamId : [data.leadTeamId];
+        const leadTeamIds = Array.isArray(data.leadTeamId)
+          ? data.leadTeamId
+          : [data.leadTeamId];
 
         const teamMembers = leadTeamIds.map((userId) => ({
           lead_id: lead.id,
@@ -268,11 +267,11 @@ module.exports = {
           ? typeof data.dcs === "string"
             ? data.dcs
             : Array.isArray(data.dcs)
-              ? data.dcs.join(",")
-              : String(data.dcs)
+            ? data.dcs.join(",")
+            : String(data.dcs)
           : null,
         isDelayed: data.isDelayed || null,
-        project_id: data.project_id || null,
+        lead_id: data.lead_id || null,
         company_id: data.company_id || null,
         contact_id: data.contact_id || null,
         sale_person_id: data.sale_person_id || null,
@@ -360,13 +359,182 @@ module.exports = {
     }
   },
 
+  /*getAllLeadNotes*/
+  async getAllLeadNotes(req, res) {
+    try {
+      let {
+        page = 1,
+        length = 10,
+        search,
+        date,
+        take_all,
+        lead_id,
+      } = req.query;
+
+      page = parseInt(page);
+      length = parseInt(length);
+
+      if (page <= 0 || length <= 0) {
+        throw new Error("Page and length must be greater than 0");
+      }
+
+      if (!lead_id) {
+        return res.status(400).json({
+          status: false,
+          message: "lead_id is required",
+        });
+      }
+
+      let { notes, meta } = await leadServices.getAllLeadNotes(
+        page,
+        length,
+        search,
+        date,
+        lead_id,
+        take_all
+      );
+
+      return res.status(200).send({
+        status: true,
+        message: "Lead notes fetched successfully",
+        data: notes,
+        meta: meta,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Getting lead notes failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+
+  /*addLeadtNotes*/
+  async addLeadtNotes(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      const { lead_id, notes } = req.body;
+
+      if (!lead_id || !notes) {
+        return res.status(400).json({
+          status: false,
+          message: "lead_id and notes are required",
+        });
+      }
+
+      const postData = {
+        user_id: req.userId, // comes from token
+        lead_id,
+        notes,
+      };
+
+      const LeadNotes = await leadServices.addLeadtNotes(postData);
+
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            LeadNotes,
+            "Lead notes added successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "Lead notes failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+
+  /*updateLeadNotes*/
+  async updateLeadNotes(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      const { leadNoteId, notes } = req.body;
+
+      if (!leadNoteId || !notes) {
+        return res.status(400).json({
+          status: false,
+          message: "Lead note ID and notes are required",
+        });
+      }
+
+      const updatedNote = await leadServices.updateLeadNotes(leadNoteId, notes);
+
+      if (!updatedNote) {
+        throw new Error("Lead note not found or update failed");
+      }
+
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            updatedNote,
+            "Lead note updated successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to update lead note",
+        data: {},
+      });
+    }
+  },
+
+  async deleteLeadNotes(req, res) {
+    try {
+      const { leadNoteId } = req.query;
+
+      if (!leadNoteId) {
+        return res.status(400).json({
+          status: false,
+          message: "Lead note ID is required",
+        });
+      }
+
+      const deleted = await leadServices.deleteLeadNotes(leadNoteId);
+
+      if (!deleted) {
+        throw new Error("Lead note not found or already deleted");
+      }
+
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose({}, "Lead note deleted successfully")
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to delete lead note",
+        data: {},
+      });
+    }
+  },
+
   /* validate */
   validate(method) {
     switch (method) {
       case "addLead": {
-        return [
-          check("project_id").notEmpty().withMessage("project is Required"),
-        ];
+        return [check("lead_id").notEmpty().withMessage("Lead is Required")];
       }
       case "getLeadById": {
         return [check("id").not().isEmpty().withMessage("LeadId is Required")];

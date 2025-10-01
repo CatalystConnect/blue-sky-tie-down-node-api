@@ -227,13 +227,18 @@ module.exports = {
   // /*setDefaultLead*/
   async setDefaultLead(leadId, isDefaultLead) {
     try {
-      const [updated] = await db.leadsObj.update(
-        { isDefaultLead: isDefaultLead === "true" },
-        { where: { id: leadId } }
-      );
-
-      if (updated === 0) return null;
-
+      if (isDefaultLead === "true" || isDefaultLead === true) {
+        await db.leadsObj.update({ isDefaultLead: false }, { where: {} });
+        await db.leadsObj.update(
+          { isDefaultLead: true },
+          { where: { id: leadId } }
+        );
+      } else {
+        await db.leadsObj.update(
+          { isDefaultLead: false },
+          { where: { id: leadId } }
+        );
+      }
       return await db.leadsObj.findByPk(leadId);
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

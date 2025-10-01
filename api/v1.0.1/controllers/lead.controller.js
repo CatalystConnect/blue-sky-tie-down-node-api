@@ -548,7 +548,7 @@ module.exports = {
         return [check("project_id").notEmpty().withMessage("project is Required")];
       }
       case "getLeadById": {
-        return [check("project_id").not().isEmpty().withMessage("LeadId is Required")];
+        return [check("id").not().isEmpty().withMessage("LeadId is Required")];
       }
     }
   },

@@ -110,6 +110,7 @@ db.catalogAttributeObj = require("./catalologAttributes.models")(
 db.customerObj = require("./customer.models")(dbObj, Sequelize);
 db.jwtTokenObj = require("./jwtToken.models")(dbObj, Sequelize);
 db.projectObj = require("./project.models")(dbObj, Sequelize);
+db.projectNotesObj = require("./projectNotes.models")(dbObj, Sequelize);
 db.projectplanSetsObj = require("./projectPlanSet.models")(dbObj, Sequelize);
 
 db.roofMeasureObj = require("./roofMeasure.models")(dbObj, Sequelize);
@@ -173,11 +174,21 @@ db.teamsCodesObj = require("./termsCodes.models")(dbObj, Sequelize);
 
 db.interactionTypesObj = require("./interactionTypes.models")(dbObj, Sequelize);
 db.contactsObj = require("./contacts.models")(dbObj, Sequelize);
-db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(dbObj, Sequelize);
+db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(
+  dbObj,
+  Sequelize
+);
 db.salesPipelinesObj = require("./salesPipelines.models")(dbObj, Sequelize);
-db.salesPipelinesStatusesObj = require("./salesPipelineStatuses.models")(dbObj, Sequelize);
-db.salesPipelinesTriggersObj = require("./salesPipelineTriggers.models")(dbObj, Sequelize);
-db.salesPipelinesDelayIndicatorsObj = require("./salesPipelineDelayIndicators.models")(dbObj, Sequelize);
+db.salesPipelinesStatusesObj = require("./salesPipelineStatuses.models")(
+  dbObj,
+  Sequelize
+);
+db.salesPipelinesTriggersObj = require("./salesPipelineTriggers.models")(
+  dbObj,
+  Sequelize
+);
+db.salesPipelinesDelayIndicatorsObj =
+  require("./salesPipelineDelayIndicators.models")(dbObj, Sequelize);
 
 db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
 db.budgetCategoryObj = require("./budgetCategory.models")(dbObj, Sequelize);
@@ -187,63 +198,59 @@ db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
 
 db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesStatusesObj, {
   foreignKey: "field_value",
-  as: "pipelinesStatuses"
+  as: "pipelinesStatuses",
 });
 db.salesPipelinesStatusesObj.hasMany(db.salesPipelinesTriggersObj, {
   foreignKey: "field_value",
-  as: "pipelinesStatusesData"
+  as: "pipelinesStatusesData",
 });
 
 db.salesPipelinesObj.hasMany(db.salesPipelinesDelayIndicatorsObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesDelayIndicators"
+  as: "salesPipelinesDelayIndicators",
 });
 db.salesPipelinesDelayIndicatorsObj.belongsTo(db.salesPipelinesObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesDelayIndicatorsData"
+  as: "salesPipelinesDelayIndicatorsData",
 });
-
 
 db.salesPipelinesObj.hasMany(db.salesPipelinesTriggersObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesTriggers"
+  as: "salesPipelinesTriggers",
 });
 db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesTriggersData"
+  as: "salesPipelinesTriggersData",
 });
 
 db.salesPipelinesObj.hasMany(db.salesPipelinesStatusesObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesStatuses"
+  as: "salesPipelinesStatuses",
 });
 db.salesPipelinesStatusesObj.belongsTo(db.salesPipelinesObj, {
   foreignKey: "sales_pipeline_id",
-  as: "salesPipelinesStatusesData"
+  as: "salesPipelinesStatusesData",
 });
-
 
 db.salesPipelinesObj.belongsTo(db.salesPipelineGroupsObj, {
   foreignKey: "sales_pipeline_group_id",
-  as: "salesPipelineGroups"
+  as: "salesPipelineGroups",
 });
 
 db.salesPipelineGroupsObj.hasMany(db.salesPipelinesObj, {
   foreignKey: "sales_pipeline_group_id",
-  as: "salesPipelineGroupsData"
+  as: "salesPipelineGroupsData",
 });
 
 db.leadTeamsObj.belongsTo(db.userObj, {
   foreignKey: "contact_id",
-  as: "contactDetails"
+  as: "contactDetails",
 });
 
 db.userObj.hasMany(db.leadTeamsObj, {
   foreignKey: "contact_id",
-  as: "leadUser"
+  as: "leadUser",
 });
-
-
 
 db.warehouseItemsObj.belongsTo(db.contractObj, {
   foreignKey: "contractor_id",
@@ -665,7 +672,6 @@ db.departmentObj.hasMany(db.userObj, {
   as: "users",
 });
 
-
 db.userObj.belongsTo(db.rolesObj, {
   foreignKey: "role",
   as: "roles",
@@ -682,62 +688,143 @@ db.leadsObj.hasMany(db.leadTagsObj, { foreignKey: "lead_id", as: "lead_tags" });
 db.leadTagsObj.belongsTo(db.tagsObj, { foreignKey: "tag_id", as: "tag" });
 db.tagsObj.hasMany(db.leadTagsObj, { foreignKey: "tag_id", as: "lead_tags" });
 
-
-
 db.ticketsObj.belongsTo(db.leadsObj, { foreignKey: "lead_id", as: "lead" });
 
+db.ticketsObj.belongsToMany(db.tagsObj, {
+  through: "ticket_tags",
+  as: "tags",
+  foreignKey: "ticket_id",
+});
+db.tagsObj.belongsToMany(db.ticketsObj, {
+  through: "ticket_tags",
+  as: "tickets",
+  foreignKey: "tag_id",
+});
 
-db.ticketsObj.belongsToMany(db.tagsObj, { through: "ticket_tags", as: "tags", foreignKey: "ticket_id" });
-db.tagsObj.belongsToMany(db.ticketsObj, { through: "ticket_tags", as: "tickets", foreignKey: "tag_id" });
-
-db.contactsObj.belongsTo(db.companyObj, { foreignKey: "company_id", as: "company" });
-db.companyObj.hasMany(db.contactsObj, { foreignKey: "company_id", as: "contacts" });
+db.contactsObj.belongsTo(db.companyObj, {
+  foreignKey: "company_id",
+  as: "company",
+});
+db.companyObj.hasMany(db.contactsObj, {
+  foreignKey: "company_id",
+  as: "contacts",
+});
 
 // Project belongs to Company in multiple roles
-db.projectObj.belongsTo(db.companyObj, { foreignKey: "engineer_id", as: "engineer" });
-db.projectObj.belongsTo(db.companyObj, { foreignKey: "architecture", as: "architect" });
-db.projectObj.belongsTo(db.companyObj, { foreignKey: "developer_id", as: "developer" });
-db.projectObj.belongsTo(db.companyObj, { foreignKey: "general_contractor_id", as: "general_contractor" });
-db.projectObj.belongsTo(db.userObj, { foreignKey: "plan_reviewed_by", as: "planReviewer" });
-
+db.projectObj.belongsTo(db.companyObj, {
+  foreignKey: "engineer_id",
+  as: "engineer",
+});
+db.projectObj.belongsTo(db.companyObj, {
+  foreignKey: "architecture",
+  as: "architect",
+});
+db.projectObj.belongsTo(db.companyObj, {
+  foreignKey: "developer_id",
+  as: "developer",
+});
+db.projectObj.belongsTo(db.companyObj, {
+  foreignKey: "general_contractor_id",
+  as: "general_contractor",
+});
+db.projectObj.belongsTo(db.userObj, {
+  foreignKey: "plan_reviewed_by",
+  as: "planReviewer",
+});
 
 // Optional: Company has many projects in each role
-db.companyObj.hasMany(db.projectObj, { foreignKey: "engineer_id", as: "engineered_projects" });
-db.companyObj.hasMany(db.projectObj, { foreignKey: "architecture", as: "architected_projects" });
-db.companyObj.hasMany(db.projectObj, { foreignKey: "developer_id", as: "developed_projects" });
-db.companyObj.hasMany(db.projectObj, { foreignKey: "general_contractor_id", as: "contracted_projects" });
-db.userObj.hasMany(db.projectObj, { foreignKey: "plan_reviewed_by", as: "reviewedProjects" });
+db.companyObj.hasMany(db.projectObj, {
+  foreignKey: "engineer_id",
+  as: "engineered_projects",
+});
+db.companyObj.hasMany(db.projectObj, {
+  foreignKey: "architecture",
+  as: "architected_projects",
+});
+db.companyObj.hasMany(db.projectObj, {
+  foreignKey: "developer_id",
+  as: "developed_projects",
+});
+db.companyObj.hasMany(db.projectObj, {
+  foreignKey: "general_contractor_id",
+  as: "contracted_projects",
+});
+db.userObj.hasMany(db.projectObj, {
+  foreignKey: "plan_reviewed_by",
+  as: "reviewedProjects",
+});
 
+db.leadsObj.belongsTo(db.companyObj, {
+  as: "company",
+  foreignKey: "company_id",
+});
+db.companyObj.hasMany(db.leadsObj, {
+  foreignKey: "company_id",
+  as: "company_leads",
+});
 
-db.leadsObj.belongsTo(db.companyObj, { as: "company", foreignKey: "company_id" });
-db.companyObj.hasMany(db.leadsObj, { foreignKey: "company_id", as: "company_leads" });
+db.leadsObj.belongsTo(db.contactsObj, {
+  as: "contact",
+  foreignKey: "contact_id",
+});
+db.contactsObj.hasMany(db.leadsObj, {
+  foreignKey: "contact_id",
+  as: "contact_leads",
+});
 
-db.leadsObj.belongsTo(db.contactsObj, { as: "contact", foreignKey: "contact_id" });
-db.contactsObj.hasMany(db.leadsObj, { foreignKey: "contact_id", as: "contact_leads" });
+db.leadsObj.belongsTo(db.userObj, {
+  as: "salePerson",
+  foreignKey: "sale_person_id",
+}); // singular
+db.userObj.hasMany(db.leadsObj, {
+  foreignKey: "sale_person_id",
+  as: "sales_person_leads",
+});
 
-db.leadsObj.belongsTo(db.userObj, { as: "salePerson", foreignKey: "sale_person_id" }); // singular
-db.userObj.hasMany(db.leadsObj, { foreignKey: "sale_person_id", as: "sales_person_leads" });
+db.leadsObj.belongsTo(db.userObj, {
+  as: "engineer",
+  foreignKey: "engineer_id",
+});
+db.userObj.hasMany(db.leadsObj, {
+  foreignKey: "engineer_id",
+  as: "engineer_leads",
+});
 
-db.leadsObj.belongsTo(db.userObj, { as: "engineer", foreignKey: "engineer_id" });
-db.userObj.hasMany(db.leadsObj, { foreignKey: "engineer_id", as: "engineer_leads" });
+db.leadsObj.belongsTo(db.leadTeamsObj, {
+  as: "leadTeam",
+  foreignKey: "leadTeamId",
+});
+db.leadTeamsObj.hasMany(db.leadsObj, {
+  foreignKey: "leadTeamId",
+  as: "team_leads",
+});
 
-db.leadsObj.belongsTo(db.leadTeamsObj, { as: "leadTeam", foreignKey: "leadTeamId" });
-db.leadTeamsObj.hasMany(db.leadsObj, { foreignKey: "leadTeamId", as: "team_leads" });
+db.leadsObj.belongsTo(db.leadStatusesObj, {
+  as: "leadStatus",
+  foreignKey: "lead_status_id",
+});
+db.leadStatusesObj.hasMany(db.leadsObj, {
+  foreignKey: "lead_status_id",
+  as: "status_leads",
+});
 
-db.leadsObj.belongsTo(db.leadStatusesObj, { as: "leadStatus", foreignKey: "lead_status_id" });
-db.leadStatusesObj.hasMany(db.leadsObj, { foreignKey: "lead_status_id", as: "status_leads" });
-
-db.leadsObj.belongsTo(db.projectObj, { as: "project", foreignKey: "project_id" });
-db.projectObj.hasMany(db.leadsObj, { foreignKey: "project_id", as: "project_leads" });
+db.leadsObj.belongsTo(db.projectObj, {
+  as: "project",
+  foreignKey: "project_id",
+});
+db.projectObj.hasMany(db.leadsObj, {
+  foreignKey: "project_id",
+  as: "project_leads",
+});
 
 db.projectObj.hasMany(db.projectplanSetsObj, {
-    foreignKey: "project_id",
-    as: "planSets"
+  foreignKey: "project_id",
+  as: "planSets",
 });
 
 db.projectplanSetsObj.belongsTo(db.projectObj, {
-    foreignKey: "project_id",
-    as: "project"
+  foreignKey: "project_id",
+  as: "project",
 });
 
 module.exports = db;

@@ -7,6 +7,7 @@ const myValidationResult = validationResult.withDefaults({
         return error.msg;
     },
 });
+const db = require("../models");
 
 module.exports = {
     /*addProject*/
@@ -24,21 +25,14 @@ module.exports = {
                 site_plan_id: data.site_plan_id,
                 engineer_id: data.engineer_id,
                 name: data.name,
-                city:data.city,
-                state:data.state,
-                plan_date:data.plan_date,
-                bldg_gsqft:data.bldg_gsqft,
+                city: data.city,
+                state: data.state,
+                bldg_gsqft: data.bldg_gsqft,
                 address: data.address,
                 zip: data.zip,
                 units: data.units,
                 projectType: data.projectType,
                 project_phase: data.project_phase,
-                date_received: data.date_received,
-                rev_status: data.rev_status,
-                plan_reviewed_date: data.plan_reviewed_date,
-                plan_reviewed_by: data.plan_reviewed_by,
-                plan_revision_notes: data.plan_revision_notes,
-                data_collocated_date: data.data_collocated_date,
                 bldgs: data.bldgs,
                 wind_zone: data.wind_zone,
                 seismic_zone: data.seismic_zone,
@@ -49,9 +43,6 @@ module.exports = {
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
                 assign_date: data.assign_date,
-                plan_link: data.plan_link,
-                submissionType: data.submissionType,
-                planFiles: data.planFiles,
                 projectTags: data.projectTags,
                 projectFiles: data.projectFiles,
                 architecture: data.architecture,
@@ -59,9 +50,33 @@ module.exports = {
                 dueDate: data.dueDate,
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
-                projectRifFields: data.projectRifFields 
+                projectRifFields: data.projectRifFields
             }
-            await projectServices.addProject(postData);
+            let project = await projectServices.addProject(postData);
+
+            if (data.planSets && typeof data.planSets === "string") {
+                data.planSets = JSON.parse(data.planSets);
+            }
+
+            if (data.planSets && Array.isArray(data.planSets)) {
+                for (let plan of data.planSets) {
+                    let planData = {
+                        project_id: project.id,
+                        submissionType: plan.submissionType,
+                        date_received: plan.date_received,
+                        plan_link: plan.plan_link,
+                        planFiles: plan.planFiles,
+                        plan_date: plan.plan_date,
+                        rev_status: plan.rev_status,
+                        plan_reviewed_date: plan.plan_reviewed_date,
+                        plan_reviewed_by: plan.plan_reviewed_by,
+                        data_collocated_date: plan.data_collocated_date,
+                        plan_revision_notes: plan.plan_revision_notes
+                    };
+
+                    await projectServices.projectplanSets(planData);
+                }
+            }
             return res
                 .status(200)
                 .send(commonHelper.parseSuccessRespose("", "Project added successfully"));
@@ -76,11 +91,11 @@ module.exports = {
     // /*getAllProject*/
     async getAllProject(req, res) {
         try {
-            let { page, length,search } = req.query;
+            let { page, length, search } = req.query;
             if (page <= 0 || length <= 0) {
                 throw new Error("Page and length must be greater than 0");
             }
-            let getAllProject = await projectServices.getAllProject(page, length,search);
+            let getAllProject = await projectServices.getAllProject(page, length, search);
             if (!getAllProject) throw new Error("Projects not found");
             return res.status(200).send({
                 status: true,
@@ -134,25 +149,18 @@ module.exports = {
             if (!getProjectById) throw new Error("Project not found");
             let data = req.body;
             let postData = {
-                user_id: req.userId,
                 site_plan_id: data.site_plan_id === null || data.site_plan_id === "null" ? null : data.site_plan_id,
+                user_id: req.userId,
                 engineer_id: data.engineer_id,
                 name: data.name,
-                city:data.city,
-                state:data.state,
-                plan_date:data.plan_date,
-                bldg_gsqft:data.bldg_gsqft,
+                city: data.city,
+                state: data.state,
+                bldg_gsqft: data.bldg_gsqft,
                 address: data.address,
                 zip: data.zip,
                 units: data.units,
                 projectType: data.projectType,
                 project_phase: data.project_phase,
-                date_received: data.date_received,
-                rev_status: data.rev_status,
-                plan_reviewed_date: data.plan_reviewed_date,
-                plan_reviewed_by: data.plan_reviewed_by,
-                plan_revision_notes: data.plan_revision_notes,
-                data_collocated_date: data.data_collocated_date,
                 bldgs: data.bldgs,
                 wind_zone: data.wind_zone,
                 seismic_zone: data.seismic_zone,
@@ -163,9 +171,6 @@ module.exports = {
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
                 assign_date: data.assign_date,
-                plan_link: data.plan_link,
-                submissionType: data.submissionType,
-                planFiles: data.planFiles,
                 projectTags: data.projectTags,
                 projectFiles: data.projectFiles,
                 architecture: data.architecture,
@@ -173,11 +178,38 @@ module.exports = {
                 dueDate: data.dueDate,
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
-                projectRifFields: data.projectRifFields 
+                projectRifFields: data.projectRifFields
             }
             commonHelper.removeFalsyKeys(postData);
 
             let updateProject = await projectServices.updateProject(postData, projectId);
+
+            await db.projectplanSetsObj.destroy({
+                where: { project_id: projectId }
+            });
+            if (data.planSets && typeof data.planSets === "string") {
+                data.planSets = JSON.parse(data.planSets);
+            }
+
+            if (data.planSets && Array.isArray(data.planSets)) {
+                for (let plan of data.planSets) {
+                    let planData = {
+                        project_id: projectId,
+                        submissionType: plan.submissionType,
+                        date_received: plan.date_received,
+                        plan_link: plan.plan_link,
+                        planFiles: plan.planFiles,
+                        plan_date: plan.plan_date,
+                        rev_status: plan.rev_status,
+                        plan_reviewed_date: plan.plan_reviewed_date,
+                        plan_reviewed_by: plan.plan_reviewed_by,
+                        data_collocated_date: plan.data_collocated_date,
+                        plan_revision_notes: plan.plan_revision_notes
+                    };
+
+                    await projectServices.projectplanSets(planData);
+                }
+            }
             return res
                 .status(200)
                 .send(commonHelper.parseSuccessRespose(updateProject, "Project updated successfully"));

@@ -3,11 +3,8 @@
 /node_modules
 
 # Logs
-log/*
+/log/*
 *.log
-nodejs_api_access.log
-nodejs_api_error.log
-nodejs_api_info.log
 
 package-lock.json
 

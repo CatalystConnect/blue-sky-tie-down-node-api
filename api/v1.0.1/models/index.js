@@ -30,8 +30,8 @@ const dbObj = new Sequelize(DATABASE_URL, {
   pool: {
     max: 5,
     min: 0,
-    acquire: 10000,
-    idle: 30000,
+    acquire: 30000,
+    idle: 10000,   // disconnect faster to free connections
   },
   dialectOptions: {
     ssl: {
@@ -194,6 +194,9 @@ db.salesPipelinesDelayIndicatorsObj =
 db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
 db.budgetCategoryObj = require("./budgetCategory.models")(dbObj, Sequelize);
 db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
+db.scopeCategoryObj = require("./scopeCategory.models")(dbObj, Sequelize);
+db.scopeGroupObj = require("./scopeGroup.models")(dbObj, Sequelize);
+db.scopeSegmentObj = require("./scopeSegment.models")(dbObj, Sequelize);
 
 /*Associations*/
 
@@ -841,6 +844,14 @@ db.projectplanSetsObj.belongsTo(db.projectObj, {
   foreignKey: "project_id",
   as: "project",
 });
+db.budgetScopeObj.hasMany(db.scopeCategoryObj, { as: "categories", foreignKey: "scope_id" });
+db.scopeCategoryObj.belongsTo(db.budgetScopeObj, { foreignKey: "scope_id" });
+
+db.scopeCategoryObj.hasMany(db.scopeGroupObj, { as: "groups", foreignKey: "scope_category_id" });
+db.scopeGroupObj.belongsTo(db.scopeCategoryObj, { foreignKey: "scope_category_id" });
+
+db.scopeGroupObj.hasMany(db.scopeSegmentObj, { as: "segments", foreignKey: "scope_group_id" });
+db.scopeSegmentObj.belongsTo(db.scopeGroupObj, { foreignKey: "scope_group_id" });
 
 db.projectplanSetsObj.belongsTo(db.userObj, {
   foreignKey: "plan_reviewed_by",

@@ -397,7 +397,7 @@ module.exports = {
 
     async getProjectPlanSet(req, res) {
         try {
-            const { projectId, search, id } = req.query;
+            const { projectId, search, id, page, limit } = req.query;
 
             if (!projectId) {
 
@@ -409,17 +409,18 @@ module.exports = {
 
             }
             const planSets = await projectServices.getProjectPlanSet({
-               project_id: projectId,
+                project_id: projectId,
                 id,
-                search
+                search,
+                page, limit
 
             });
 
             return res.status(200).json({
                 status: true,
                 message: "Project plan sets fetched successfully",
-                data: planSets
-
+                data: planSets.records,
+                meta: planSets.meta
             });
 
         } catch (error) {
@@ -433,311 +434,311 @@ module.exports = {
         }
 
     },
-  
-  // /*deleteProject*/
-  async deleteProject(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
-      let projectId = req.query.projectId;
-      let getProjectById = await projectServices.getProjectById(projectId);
-      if (!getProjectById) throw new Error("Project not found");
-      let deleteProject = await projectServices.deleteProject(projectId);
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            deleteProject,
-            "Project deleted successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Project deletion failed",
-        data: error.response?.data || {},
-      });
-    }
-  },
-  // /*setDefaultLead*/
-  async setDefaultLead(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
 
-      const leadId = req.query.leadId;
-      const { isDefaultLead } = req.body;
+    // /*deleteProject*/
+    async deleteProject(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
+            let projectId = req.query.projectId;
+            let getProjectById = await projectServices.getProjectById(projectId);
+            if (!getProjectById) throw new Error("Project not found");
+            let deleteProject = await projectServices.deleteProject(projectId);
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        deleteProject,
+                        "Project deleted successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Project deletion failed",
+                data: error.response?.data || {},
+            });
+        }
+    },
+    // /*setDefaultLead*/
+    async setDefaultLead(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
 
-      if (!leadId) {
-        return res.status(400).json({
-          status: false,
-          message: "leadId is required",
-        });
-      }
+            const leadId = req.query.leadId;
+            const { isDefaultLead } = req.body;
 
-      if (isDefaultLead === undefined) {
-        return res.status(400).json({
-          status: false,
-          message: "isDefaultLead is required in body",
-        });
-      }
+            if (!leadId) {
+                return res.status(400).json({
+                    status: false,
+                    message: "leadId is required",
+                });
+            }
 
-      const updatedLead = await leadServices.setDefaultLead(
-        leadId,
-        isDefaultLead
-      );
+            if (isDefaultLead === undefined) {
+                return res.status(400).json({
+                    status: false,
+                    message: "isDefaultLead is required in body",
+                });
+            }
 
-      if (!updatedLead) {
-        throw new Error("Lead not found or update failed");
-      }
+            const updatedLead = await leadServices.setDefaultLead(
+                leadId,
+                isDefaultLead
+            );
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            updatedLead,
-            `Lead updated successfully with isDefaultLead=${isDefaultLead}`
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Failed to set default lead",
-        data: error.response?.data || {},
-      });
-    }
-  },
-  async updateProjectPlanSet(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
-      let projectId = req.query.projectId;
-      let getProjectById = await projectServices.getProjectById(projectId);
+            if (!updatedLead) {
+                throw new Error("Lead not found or update failed");
+            }
 
-      if (!getProjectById) throw new Error("Project not found");
-      let data = req.body;
-      let postData = {
-        project_id: projectId,
-        submissionType: data.submissionType,
-        date_received: data.date_received,
-        plan_link: data.plan_link,
-        planFiles: data.planFiles,
-        plan_date: data.plan_date,
-        rev_status: data.rev_status,
-        plan_reviewed_date: data.plan_reviewed_date,
-        plan_reviewed_by: data.plan_reviewed_by,
-        data_collocated_date: data.data_collocated_date,
-        plan_revision_notes: data.plan_revision_notes,
-      };
-      commonHelper.removeFalsyKeys(postData);
-      await db.projectplanSetsObj.destroy({
-        where: { project_id: projectId },
-      });
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        updatedLead,
+                        `Lead updated successfully with isDefaultLead=${isDefaultLead}`
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Failed to set default lead",
+                data: error.response?.data || {},
+            });
+        }
+    },
+    async updateProjectPlanSet(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
+            let projectId = req.query.projectId;
+            let getProjectById = await projectServices.getProjectById(projectId);
 
-      await projectServices.projectplanSets(postData);
+            if (!getProjectById) throw new Error("Project not found");
+            let data = req.body;
+            let postData = {
+                project_id: projectId,
+                submissionType: data.submissionType,
+                date_received: data.date_received,
+                plan_link: data.plan_link,
+                planFiles: data.planFiles,
+                plan_date: data.plan_date,
+                rev_status: data.rev_status,
+                plan_reviewed_date: data.plan_reviewed_date,
+                plan_reviewed_by: data.plan_reviewed_by,
+                data_collocated_date: data.data_collocated_date,
+                plan_revision_notes: data.plan_revision_notes,
+            };
+            commonHelper.removeFalsyKeys(postData);
+            await db.projectplanSetsObj.destroy({
+                where: { project_id: projectId },
+            });
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            "",
-            "Project plan set updated successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Project plan set updation failed",
-        data: error.response?.data || {},
-      });
-    }
-  },
+            await projectServices.projectplanSets(postData);
 
-  /*addProjectNotes*/
-  async addProjectNotes(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        "",
+                        "Project plan set updated successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Project plan set updation failed",
+                data: error.response?.data || {},
+            });
+        }
+    },
 
-      const { project_id, notes } = req.body;
+    /*addProjectNotes*/
+    async addProjectNotes(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
 
-      if (!project_id || !notes) {
-        return res.status(400).json({
-          status: false,
-          message: "project_id and notes are required",
-        });
-      }
+            const { project_id, notes } = req.body;
 
-      const postData = {
-        user_id: req.userId, // comes from token
-        project_id,
-        notes,
-      };
+            if (!project_id || !notes) {
+                return res.status(400).json({
+                    status: false,
+                    message: "project_id and notes are required",
+                });
+            }
 
-      const projectNotes = await projectServices.addProjectNotes(postData);
+            const postData = {
+                user_id: req.userId, // comes from token
+                project_id,
+                notes,
+            };
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            projectNotes,
-            "Project notes added successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Project notes failed",
-        data: error.response?.data || {},
-      });
-    }
-  },
+            const projectNotes = await projectServices.addProjectNotes(postData);
 
-  async listProjectNotes(req, res) {
-    try {
-      const { limit = 50, projectId } = req.query;
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        projectNotes,
+                        "Project notes added successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Project notes failed",
+                data: error.response?.data || {},
+            });
+        }
+    },
 
-      if (!projectId) {
-        return res.status(400).json({
-          status: false,
-          message: "project_id is required",
-        });
-      }
+    async listProjectNotes(req, res) {
+        try {
+            const { limit = 50, projectId } = req.query;
 
-      const notes = await projectServices.listProjectNotes(
-        projectId,
-        parseInt(limit)
-      );
+            if (!projectId) {
+                return res.status(400).json({
+                    status: false,
+                    message: "project_id is required",
+                });
+            }
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            notes,
-            "Project notes fetched successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message: error.message || "Failed to fetch project notes",
-        data: {},
-      });
-    }
-  },
+            const notes = await projectServices.listProjectNotes(
+                projectId,
+                parseInt(limit)
+            );
 
-  async updateProjectNotes(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        notes,
+                        "Project notes fetched successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Failed to fetch project notes",
+                data: {},
+            });
+        }
+    },
 
-      const { projectNoteId, notes } = req.body;
+    async updateProjectNotes(req, res) {
+        try {
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
 
-      if (!projectNoteId || !notes) {
-        return res.status(400).json({
-          status: false,
-          message: "Project note id and notes are required",
-        });
-      }
+            const { projectNoteId, notes } = req.body;
 
-      const updatedNote = await projectServices.updateProjectNotes(
-        projectNoteId,
-        notes
-      );
+            if (!projectNoteId || !notes) {
+                return res.status(400).json({
+                    status: false,
+                    message: "Project note id and notes are required",
+                });
+            }
 
-      if (!updatedNote) {
-        throw new Error("Project note not found or update failed");
-      }
+            const updatedNote = await projectServices.updateProjectNotes(
+                projectNoteId,
+                notes
+            );
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            updatedNote,
-            "Project note updated successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message: error.message || "Failed to update project note",
-        data: {},
-      });
-    }
-  },
+            if (!updatedNote) {
+                throw new Error("Project note not found or update failed");
+            }
 
-  async deleteProjectNotes(req, res) {
-    try {
-      const { projectNoteId } = req.query;
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        updatedNote,
+                        "Project note updated successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Failed to update project note",
+                data: {},
+            });
+        }
+    },
 
-      if (!projectNoteId) {
-        return res.status(400).json({
-          status: false,
-          message: "project note id is required",
-        });
-      }
+    async deleteProjectNotes(req, res) {
+        try {
+            const { projectNoteId } = req.query;
 
-      const deleted = await projectServices.deleteProjectNotes(projectNoteId);
+            if (!projectNoteId) {
+                return res.status(400).json({
+                    status: false,
+                    message: "project note id is required",
+                });
+            }
 
-      if (!deleted) {
-        throw new Error("Project note not found or already deleted");
-      }
+            const deleted = await projectServices.deleteProjectNotes(projectNoteId);
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            {},
-            "Project note deleted successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message: error.message || "Failed to delete project note",
-        data: {},
-      });
-    }
-  },
-  // validate(method) {
-  //     switch (method) {
-  //         case "getProjectById": {
-  //             return [
-  //                 check("projectId").not().isEmpty().withMessage("ProjectId is Required")
-  //             ];
-  //         }
-  //     }
-  // }
+            if (!deleted) {
+                throw new Error("Project note not found or already deleted");
+            }
+
+            return res
+                .status(200)
+                .send(
+                    commonHelper.parseSuccessRespose(
+                        {},
+                        "Project note deleted successfully"
+                    )
+                );
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Failed to delete project note",
+                data: {},
+            });
+        }
+    },
+    // validate(method) {
+    //     switch (method) {
+    //         case "getProjectById": {
+    //             return [
+    //                 check("projectId").not().isEmpty().withMessage("ProjectId is Required")
+    //             ];
+    //         }
+    //     }
+    // }
 };

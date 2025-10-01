@@ -393,6 +393,48 @@ module.exports = {
             });
         }
     },
+    async addProjectPlanSet(req, res) {
+        try {
+            let projectId = req.query.projectId;
+            let getProjectById = await projectServices.getProjectById(projectId);
+
+            if (!getProjectById) throw new Error("Project not found");
+
+            let data = req.body;
+            let postData = {
+                project_id: projectId,
+                submissionType: data.submissionType,
+                date_received: data.date_received,
+                plan_link: data.plan_link,
+                planFiles: data.planFiles,
+                plan_date: data.plan_date,
+                rev_status: data.rev_status,
+                plan_reviewed_date: data.plan_reviewed_date,
+                plan_reviewed_by: data.plan_reviewed_by,
+                data_collocated_date: data.data_collocated_date,
+                plan_revision_notes: data.plan_revision_notes,
+            };
+
+            const newPlanSet = await projectServices.projectplanSets(postData);
+
+            return res.status(200).send(
+                commonHelper.parseSuccessRespose(
+                    newPlanSet,
+                    "Project plan set added successfully"
+                )
+            );
+
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Adding project plan set failed",
+                data: error.response?.data || {},
+            });
+        }
+    },
 
 
     async getProjectPlanSet(req, res) {

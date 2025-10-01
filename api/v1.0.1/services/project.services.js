@@ -232,6 +232,13 @@ module.exports = {
                 where: { project_id: projectId },
                 order: [["created_at", "DESC"]],
                 limit: limit,
+                include: [
+                {
+                    model: db.userObj,
+                    as: "user", 
+                    attributes: ["id", "name", "email", "phone"] 
+                }
+            ]
             });
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

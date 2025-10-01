@@ -732,6 +732,95 @@ module.exports = {
             });
         }
     },
+    async updateProjectPlanSetById(req, res) {
+        try {
+            const { id } = req.query;
+            const data = req.body;
+            if (!id) {
+                return res.status(400).json({
+                    status: false,
+                    message: "planSet id is required",
+                    data: {}
+                });
+            }
+
+            let postData = {
+                project_id: data.project_id,
+                submissionType: data.submissionType,
+                date_received: data.date_received,
+                plan_link: data.plan_link,
+                planFiles: data.planFiles,
+                plan_date: data.plan_date,
+                rev_status: data.rev_status,
+                plan_reviewed_date: data.plan_reviewed_date,
+                plan_reviewed_by: data.plan_reviewed_by,
+                data_collocated_date: data.data_collocated_date,
+                plan_revision_notes: data.plan_revision_notes,
+            }
+
+            const updatedPlanSet = await projectServices.updateProjectPlanSetById(id, postData);
+
+            if (!updatedPlanSet) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Plan set not found",
+                    data: {}
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Project plan set updated successfully",
+                data: updatedPlanSet
+            });
+
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Updating project plan set failed",
+                data: {}
+            });
+        }
+    },
+
+    async deleteProjectPlanSet(req, res) {
+        try {
+            const { id } = req.query;
+
+            if (!id) {
+                return res.status(400).json({
+                    status: false,
+                    message: "planSet id is required",
+                    data: {}
+                });
+            }
+
+            const deleted = await projectServices.deleteProjectPlanSet(id);
+
+            if (!deleted) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Plan set not found",
+                    data: {}
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Project plan set deleted successfully",
+                data: {}
+            });
+
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Deleting project plan set failed",
+                data: {}
+            });
+        }
+    }
+
+
     // validate(method) {
     //     switch (method) {
     //         case "getProjectById": {

@@ -1,50 +1,46 @@
 module.exports = (sequelize, Sequelize) => {
-  const budgetCategories = sequelize.define(
-    "budget_categories",
+  const scopeCategory = sequelize.define(
+    "scope_categories", // table name
     {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
       },
-      name: {
-        type: Sequelize.STRING(255),
-        allowNull: true
-      },
-      status: {
-        type: Sequelize.ENUM('active', 'inactive'),
-        allowNull: false,
-        defaultValue: 'active'
-      },
-      ordering: {
+      user_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: false,
+      },
+      scope_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      title: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        allowNull: true,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        allowNull: true,
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
-      },
+        allowNull: true,
+      }
     },
     {
       timestamps: true,
       freezeTableName: true,
       createdAt: "created_at",
       updatedAt: "updated_at",
-      paranoid: true,
+      paranoid: true, // enable soft deletes
       deletedAt: "deleted_at",
     }
   );
-
-  return budgetCategories;
+  return scopeCategory;
 };

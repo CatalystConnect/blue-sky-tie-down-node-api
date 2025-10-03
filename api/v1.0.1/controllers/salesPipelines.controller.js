@@ -130,14 +130,12 @@ module.exports = {
 
   async getAllSalesPipelines(req, res) {
     try {
-      const pipelines = await salesPipelinesServices.getAllSalesPipelines(
-        req.query
-      );
-
+      const pipelines = await salesPipelinesServices.getAllSalesPipelines(req.query);
+  
       res.status(200).json({
         status: true,
         message: "Sales pipelines fetched successfully",
-        data: pipelines,
+        ...pipelines, // spread to include pagination + data
       });
     } catch (err) {
       res.status(500).json({
@@ -147,6 +145,7 @@ module.exports = {
       });
     }
   },
+  
 
   // async getSalesPipelinesById(req, res) {
   //   try {

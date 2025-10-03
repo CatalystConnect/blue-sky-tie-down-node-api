@@ -21,14 +21,7 @@ module.exports = {
   /*getAllLeads*/
   async getAllLeads(req, res) {
     try {
-      let {
-        page = 1,
-        per_page,
-        search,
-        date,
-        role_id,
-        take_all,
-      } = req.query;
+      let { page = 1, per_page, search, date, role_id, take_all } = req.query;
 
       const userId = req.userId;
       const role = req.role;
@@ -79,11 +72,11 @@ module.exports = {
       }
 
       let data = req.body;
-
       let postData = {
         date_record: data.date_record || null,
         due_date: data.due_date || null,
         nextStepDate: data.nextStepDate || null,
+        project_id: data.project_id || null,
         dcs: data.dcs || null,
         isDelayed: data.isDelayed || null,
         lead_id: data.lead_id || null,
@@ -200,24 +193,18 @@ module.exports = {
 
       const data = req.body;
 
-      // check lead exists
+      // Check lead exists
       const existingLead = await leadServices.getLeadById(leadId);
       if (!existingLead) throw new Error("Lead not found");
 
-      // build update data
+      // Build update data
       const postData = {
         date_record: data.date_record || null,
         due_date: data.due_date || null,
         nextStepDate: data.nextStepDate || null,
-        dcs: data.dcs
-          ? typeof data.dcs === "string"
-            ? data.dcs
-            : Array.isArray(data.dcs)
-            ? data.dcs.join(",")
-            : String(data.dcs)
-          : null,
+        project_id: data.project_id || null,
+        dcs: data.dcs || null,
         isDelayed: data.isDelayed || null,
-        lead_id: data.lead_id || null,
         company_id: data.company_id || null,
         contact_id: data.contact_id || null,
         sale_person_id: data.sale_person_id || null,
@@ -238,26 +225,27 @@ module.exports = {
         requestedScope: data.requestedScope || null,
       };
 
-      // update lead
-      const lead = await leadServices.addLead(postData);
+      // Update lead
+      await leadServices.leadUpdate(postData, leadId);
 
+      // Handle tags
+      await leadTagsServices.deleteByLeadId(leadId);
       if (data.leadTags && data.leadTags.length > 0) {
         const tags = data.leadTags.map((tagId) => ({
-          lead_id: lead.id,
+          lead_id: leadId,
           tag_id: tagId,
         }));
-
         await leadTagsServices.addleadTags(tags);
       }
 
+      // Handle lead team
       if (data.leadTeamId) {
-        // Fetch LeadTeam by ID
         const leadTeam = await db.leadTeamsObj.findOne({
           where: { id: data.leadTeamId },
         });
 
         let contactIds = [];
-        if (leadTeam && leadTeam.contact_id) {
+        if (leadTeam?.contact_id) {
           try {
             contactIds = JSON.parse(leadTeam.contact_id);
           } catch (err) {
@@ -265,17 +253,24 @@ module.exports = {
           }
         }
 
-        if (Array.isArray(contactIds) && contactIds.length > 0) {
-          await leadServices.updateLeadTeamMember(contactIds, lead.id);
+        if (contactIds.length) {
+          await leadServices.updateLeadTeamMember(contactIds, leadId);
+        } else {
+          await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
         }
+      } else {
+        await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
       }
+
+      // Fetch updated lead
+      const updatedLead = await leadServices.getLeadById(leadId);
 
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
-            { id: leadId, ...postData },
-            "Lead Updated successfully"
+            updatedLead,
+            "Lead updated successfully"
           )
         );
     } catch (error) {
@@ -325,17 +320,10 @@ module.exports = {
   /*getAllLeadNotes*/
   async getAllLeadNotes(req, res) {
     try {
-      let {
-        page = 1,
-        per_page,
-        search,
-        date,
-        take_all,
-        lead_id,
-      } = req.query;
+      let { page = 1, per_page, search, date, take_all, lead_id } = req.query;
 
       page = parseInt(page);
-      per_page = parseInt(per_page) || 10 ;
+      per_page = parseInt(per_page) || 10;
 
       if (page <= 0 || per_page <= 0) {
         throw new Error("Page and per_page must be greater than 0");

@@ -56,13 +56,13 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      let { page = 1, limit = 10, search = "" } = req.query;
+      let { page = 1, per_page = 10, search = "" } = req.query;
       page = parseInt(page);
-      limit = parseInt(limit);
+      per_page = parseInt(per_page);
 
       const result = await budgetCategoryServices.getAll({
         page,
-        limit,
+        per_page,
         search,
       });
 

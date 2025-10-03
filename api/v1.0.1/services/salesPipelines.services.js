@@ -169,17 +169,19 @@ module.exports = {
         total = count;
       }
 
-      // 🔥 Transform data into desired structure
       const formattedData = pipelinesData.map((pipeline) => {
         const statuses =
           pipeline.salesPipelinesStatuses?.map((status) => ({
             id: status.id,
-            status: status.status,
+            status: status.name,
             order: status.order,
-            is_default: status.is_default,
+            is_default:
+              status.is_default === "1" || status.is_default === true
+                ? "true"
+                : "0",
             hide_status: status.hide_status,
             expectedDays: status.expectedDays,
-            rules: [], // you can fill from triggers if needed
+            rules: [], 
           })) || [];
 
         return {
@@ -264,7 +266,7 @@ module.exports = {
         ],
       });
 
-      if (!pipeline) return null;      
+      if (!pipeline) return null;
 
       const formattedPipeline = {
         id: pipeline.id,

@@ -41,6 +41,7 @@ router.delete("/deleteProjectNotes", [authJwt.verifyToken], controller.deletePro
 router.get("/getProjectPlanSet", [authJwt.verifyToken], controller.getProjectPlanSet);
 router.put("/updateProjectPlanSetById", [authJwt.verifyToken,upload.none()], controller.updateProjectPlanSetById);
 router.delete("/deleteProjectPlanSet", [authJwt.verifyToken,upload.none()], controller.deleteProjectPlanSet);
+router.get("/getProjectPlanSetById", [authJwt.verifyToken], controller.getProjectPlanSetById);
 
 module.exports = router;
 

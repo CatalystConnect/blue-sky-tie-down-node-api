@@ -596,6 +596,41 @@ module.exports = {
     }
   },
 
+  async updateLeadDcs(req, res) {
+    try {
+      const data = req.body;
+
+      if (!data.id) {
+        return res.status(400).json({
+          status: false,
+          message: "Lead ID is required",
+        });
+      }
+
+      const lead = await db.leadsObj.findByPk(data.id);
+      if (!lead) {
+        return res.status(404).json({
+          status: false,
+          message: "Lead not found",
+        });
+      }
+
+      const updatedLead = await leadServices.updateLeadDcs(data);
+
+      return res.status(200).json({
+        status: true,
+        message: "Lead DCS updated successfully!",
+        data: updatedLead,
+      });
+    } catch (error) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+      return res.status(500).json({
+        status: false,
+        message: error.message || "Failed to update lead DCS",
+      });
+    }
+  },
+
   /* validate */
   validate(method) {
     switch (method) {

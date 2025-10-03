@@ -391,4 +391,22 @@ module.exports = {
       throw e;
     }
   },
+
+  /* updateLeadDcs */
+  async updateLeadDcs(data) {
+    try {
+      const [updated] = await db.leadsObj.update(
+        { dcs: data.dcs },
+        { where: { id: data.id } }
+      );
+
+      if (updated) {
+        return await db.leadsObj.findByPk(data.id);
+      }
+      return null;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 };

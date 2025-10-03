@@ -254,6 +254,8 @@ module.exports = {
       await budgetScopeServices.update(scopeId, postData);
 
       let scopeCategories = data.categories;
+
+      // Update / Insert node
       for (let i = 0; i < scopeCategories.length; i++) {
         const category = scopeCategories[i];
         let categoryId;
@@ -295,8 +297,8 @@ module.exports = {
           for (let k = 0; k < group.segments.length; k++) {
             const segment = group.segments[k];
             let segmentId;
-            if( segmentId?.id ){
-              segmentId = segmentId.id;
+            if( segment?.id ){
+              segmentId = segment.id;
               const segmentPostData = {
                 title : segment.title,
                 url : segment.url,
@@ -316,6 +318,26 @@ module.exports = {
             }
           }
         }
+      }
+
+      // Delete Node
+      const deleteCategory = data.delete.category;
+      const deleteGroup = data.delete.group;
+      const deleteSegment = data.delete.segment;
+
+      for (let i = 0; i < deleteCategory.length; i++) {
+        const categoryId = deleteCategory[i];
+        await scopeCategoryServices.delete(categoryId);
+      }
+
+      for (let i = 0; i < deleteGroup.length; i++) {
+        const groupId = deleteGroup[i];
+        await scopeGroupServices.delete(groupId);
+      }
+
+      for (let i = 0; i < deleteSegment.length; i++) {
+        const segmentId = deleteSegment[i];
+        await scopeSegmentServices.delete(segmentId);
       }
 
       return res

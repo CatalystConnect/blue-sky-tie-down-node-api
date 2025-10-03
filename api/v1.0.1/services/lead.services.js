@@ -309,26 +309,49 @@ module.exports = {
   },
 
   /* updateLeadTeamMember */
-  async updateLeadTeamMember(members, leadId) {
+  // async updateLeadTeamMember(members, leadId) {
+  //   try {
+  //     await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
+
+  //     const newMembers = members.map((userId) => ({
+  //       lead_id: leadId,
+  //       user_id: userId,
+  //     }));
+
+  //     await db.leadTeamsMemberObj.bulkCreate(newMembers);
+
+  //     return await db.leadTeamsMemberObj.findAll({
+  //       where: { lead_id: leadId },
+  //       // include: [
+  //       //   {
+  //       //     model: db.userObj,
+  //       //     as: "user",
+  //       //     attributes: ["id", "full_name", "email"],
+  //       //   },
+  //       // ],
+  //     });
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async updateLeadTeamMember(userIds, leadId) {
     try {
+      // 1. Delete old team members
       await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
 
-      const newMembers = members.map((userId) => ({
+      // 2. Prepare new members
+      const newMembers = userIds.map((userId) => ({
         lead_id: leadId,
-        user_id: userId,
+        user_id: parseInt(userId, 10),
       }));
 
+      // 3. Insert new members
       await db.leadTeamsMemberObj.bulkCreate(newMembers);
 
+      // 4. Return fresh members
       return await db.leadTeamsMemberObj.findAll({
         where: { lead_id: leadId },
-        // include: [
-        //   {
-        //     model: db.userObj,
-        //     as: "user",
-        //     attributes: ["id", "full_name", "email"],
-        //   },
-        // ],
       });
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -344,8 +367,8 @@ module.exports = {
         include: [
           {
             model: db.userObj,
-            as: "user",
-            attributes: { exclude: ["password"] },
+            as: "userData",
+            attributes: ["id", "name", "email"], // only required fields
           },
         ],
       });

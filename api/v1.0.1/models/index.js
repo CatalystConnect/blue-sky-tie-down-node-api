@@ -704,7 +704,13 @@ db.leadsObj.hasMany(db.leadTeamsMemberObj, {
   as: "leadTeamMembers",
 });
 db.leadTeamsMemberObj.belongsTo(db.userObj, {
-  as: "user",
+  as: "userData",
+  foreignKey: "user_id",
+});
+
+// A user can be in many lead teams
+db.userObj.hasMany(db.leadTeamsMemberObj, {
+  as: "leadTeams",
   foreignKey: "user_id",
 });
 

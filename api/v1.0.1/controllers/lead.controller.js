@@ -119,16 +119,23 @@ module.exports = {
       }
 
       if (data.leadTeamId) {
-        const leadTeamIds = Array.isArray(data.leadTeamId)
-          ? data.leadTeamId
-          : [data.leadTeamId];
+        // Fetch LeadTeam by ID
+        const leadTeam = await db.leadTeamsObj.findOne({
+          where: { id: data.leadTeamId },
+        });
 
-        const teamMembers = leadTeamIds.map((userId) => ({
-          lead_id: lead.id,
-          user_id: userId,
-        }));
+        let contactIds = [];
+        if (leadTeam && leadTeam.contact_id) {
+          try {
+            contactIds = JSON.parse(leadTeam.contact_id);
+          } catch (err) {
+            console.error("Invalid contact_id JSON:", err);
+          }
+        }
 
-        await leadTagsServices.addLeadTeam(teamMembers);
+        if (Array.isArray(contactIds) && contactIds.length > 0) {
+          await leadServices.updateLeadTeamMember(contactIds, lead.id);
+        }
       }
 
       return res.status(200).send({
@@ -232,18 +239,35 @@ module.exports = {
       };
 
       // update lead
-      await leadServices.leadUpdate(postData, leadId);
+      const lead = await leadServices.addLead(postData);
 
-      // delete old tags and insert new ones
       if (data.leadTags && data.leadTags.length > 0) {
-        await leadTagsServices.deleteByLeadId(leadId); // ✅ remove old tags
-
         const tags = data.leadTags.map((tagId) => ({
-          lead_id: leadId,
+          lead_id: lead.id,
           tag_id: tagId,
         }));
 
         await leadTagsServices.addleadTags(tags);
+      }
+
+      if (data.leadTeamId) {
+        // Fetch LeadTeam by ID
+        const leadTeam = await db.leadTeamsObj.findOne({
+          where: { id: data.leadTeamId },
+        });
+
+        let contactIds = [];
+        if (leadTeam && leadTeam.contact_id) {
+          try {
+            contactIds = JSON.parse(leadTeam.contact_id);
+          } catch (err) {
+            console.error("Invalid contact_id JSON:", err);
+          }
+        }
+
+        if (Array.isArray(contactIds) && contactIds.length > 0) {
+          await leadServices.updateLeadTeamMember(contactIds, lead.id);
+        }
       }
 
       return res
@@ -553,11 +577,21 @@ module.exports = {
       }
 
       const teamMembers = await leadServices.getLeadTeamMembers(leadId);
+
+      if (!teamMembers || teamMembers.length === 0) {
+        return res.status(404).json({
+          status: false,
+          message: "No team members found for this lead",
+          data: [],
+        });
+      }
+
+      // Format response
       const formattedMembers = teamMembers.map((member) => ({
-        id: member.id,
-        user_id: member.user_id,
-        name: member.user.name,
-        email: member.user.email,
+        id: member.id, // lead_team_member id
+        user_id: member.user_id, // FK user_id
+        name: member.userData?.name, // from included user
+        email: member.userData?.email,
       }));
 
       return res.status(200).json({

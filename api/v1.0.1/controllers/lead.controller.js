@@ -23,7 +23,7 @@ module.exports = {
     try {
       let {
         page = 1,
-        length = 10,
+        per_page,
         search,
         date,
         role_id,
@@ -34,15 +34,15 @@ module.exports = {
       const role = req.role;
 
       page = parseInt(page);
-      length = parseInt(length);
+      per_page = parseInt(per_page) || 10;
 
-      if (page <= 0 || length <= 0) {
+      if (page <= 0 || per_page <= 0) {
         throw new Error("Page and length must be greater than 0");
       }
 
       let { leads, meta } = await leadServices.getAllLeads(
         page,
-        length,
+        per_page,
         search,
         date,
         role_id,
@@ -303,7 +303,7 @@ module.exports = {
     try {
       let {
         page = 1,
-        length = 10,
+        per_page,
         search,
         date,
         take_all,
@@ -311,10 +311,10 @@ module.exports = {
       } = req.query;
 
       page = parseInt(page);
-      length = parseInt(length);
+      per_page = parseInt(per_page) || 10 ;
 
-      if (page <= 0 || length <= 0) {
-        throw new Error("Page and length must be greater than 0");
+      if (page <= 0 || per_page <= 0) {
+        throw new Error("Page and per_page must be greater than 0");
       }
 
       if (!lead_id) {
@@ -326,7 +326,7 @@ module.exports = {
 
       let { notes, meta } = await leadServices.getAllLeadNotes(
         page,
-        length,
+        per_page,
         search,
         date,
         lead_id,

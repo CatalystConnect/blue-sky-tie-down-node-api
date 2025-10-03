@@ -7,7 +7,7 @@ module.exports = {
   /*getAllLeads*/
   async getAllLeads(
     page,
-    length,
+    per_page,
     search,
     date,
     role_id,
@@ -16,7 +16,7 @@ module.exports = {
     take_all
   ) {
     try {
-      const limit = length || 10;
+      const limit = per_page || 10;
       const offset = (page - 1) * limit || 0;
 
       let whereCondition = {};
@@ -214,9 +214,9 @@ module.exports = {
   },
 
   /*getAllLeadNotes*/
-  async getAllLeadNotes(page, length, search, date, lead_id, take_all) {
+  async getAllLeadNotes(page, per_page, search, date, lead_id, take_all) {
     try {
-      const limit = length || 10;
+      const limit = per_page || 10;
       const offset = (page - 1) * limit || 0;
 
       let whereCondition = { lead_id: lead_id };

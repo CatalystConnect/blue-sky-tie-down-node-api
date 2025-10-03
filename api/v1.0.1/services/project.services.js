@@ -15,9 +15,9 @@ module.exports = {
         }
     },
     /*getAllProject*/
-    async getAllProject(page = 1, length = 10, search = "") {
+    async getAllProject(page = 1, per_page = 10, search = "") {
         try {
-            const limit = parseInt(length) || 10;
+            const limit = parseInt(per_page) || 10;
             const offset = (parseInt(page) - 1) * limit || 0;
 
             const whereClause = {};
@@ -226,12 +226,15 @@ module.exports = {
         }
     },
 
-    async listProjectNotes(projectId, limit) {
+    async listProjectNotes(projectId, page, per_page) {
         try {
-            return await db.projectNotesObj.findAll({
+            const offset = (page - 1) * per_page;
+
+            const { count, rows } = await db.projectNotesObj.findAndCountAll({
                 where: { project_id: projectId },
                 order: [["created_at", "DESC"]],
-                limit: limit,
+                limit: per_page,
+                offset: offset,
                 include: [
                     {
                         model: db.userObj,
@@ -240,6 +243,19 @@ module.exports = {
                     }
                 ]
             });
+
+            return {
+                data: rows,
+                meta: {
+                    current_page: parseInt(page),
+                    from: offset + 1,
+                    to: offset + rows.length,
+                    last_page: Math.ceil(count / per_page),
+                    per_page: per_page,
+                    total: count,
+                }
+            };
+
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
@@ -292,12 +308,12 @@ module.exports = {
             }
 
             const page = filters.page ? parseInt(filters.page) : 1;
-            const limit = filters.limit ? parseInt(filters.limit) : 10;
-            const offset = (page - 1) * limit;
+            const per_page = filters.per_page ? parseInt(filters.per_page) : 10;
+            const offset = (page - 1) * per_page;
 
             const { count, rows } = await db.projectplanSetsObj.findAndCountAll({
                 where: whereClause,
-                limit,
+                per_page,
                 offset,
                 order: [["id", "DESC"]],
                 include: [
@@ -314,8 +330,8 @@ module.exports = {
                     current_page: page,
                     from: offset + 1,
                     to: offset + rows.length,
-                    last_page: Math.ceil(count / limit),
-                    per_page: limit,
+                    last_page: Math.ceil(count / per_page),
+                    per_page: per_page,
                     total: count
                 },
                 records: rows

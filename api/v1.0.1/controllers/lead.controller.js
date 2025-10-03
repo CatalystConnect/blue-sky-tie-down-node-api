@@ -514,6 +514,33 @@ module.exports = {
     }
   },
 
+  // async getLeadTeamMembers(req, res) {
+  //   try {
+  //     const { leadId } = req.query;
+
+  //     if (!leadId) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "leadId is required",
+  //       });
+  //     }
+
+  //     const teamMembers = await leadServices.getLeadTeamMembers(leadId);
+
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "Lead team members fetched successfully!",
+  //       data: teamMembers,
+  //     });
+  //   } catch (error) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+  //     return res.status(500).json({
+  //       status: false,
+  //       message: error.message || "Failed to fetch lead team members",
+  //     });
+  //   }
+  // },
+
   async getLeadTeamMembers(req, res) {
     try {
       const { leadId } = req.query;
@@ -526,11 +553,17 @@ module.exports = {
       }
 
       const teamMembers = await leadServices.getLeadTeamMembers(leadId);
+      const formattedMembers = teamMembers.map((member) => ({
+        id: member.id,
+        user_id: member.user_id,
+        name: member.user.name,
+        email: member.user.email,
+      }));
 
       return res.status(200).json({
         status: true,
         message: "Lead team members fetched successfully!",
-        data: teamMembers,
+        data: formattedMembers,
       });
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
@@ -545,7 +578,9 @@ module.exports = {
   validate(method) {
     switch (method) {
       case "addLead": {
-        return [check("project_id").notEmpty().withMessage("project is Required")];
+        return [
+          check("project_id").notEmpty().withMessage("project is Required"),
+        ];
       }
       case "getLeadById": {
         return [check("id").not().isEmpty().withMessage("LeadId is Required")];

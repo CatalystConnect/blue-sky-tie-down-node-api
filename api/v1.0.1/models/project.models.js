@@ -114,6 +114,7 @@ module.exports = (sequelize, Sequelize) => {
             project_phase: { type: Sequelize.STRING, allowNull: true },
             date_received: { type: Sequelize.DATEONLY, allowNull: true },
             rev_status: { type: Sequelize.STRING, allowNull: true },
+            status: { type: Sequelize.STRING, allowNull: true },
             plan_reviewed_date: { type: Sequelize.DATEONLY, allowNull: true },
             plan_reviewed_by: { type: Sequelize.INTEGER, allowNull: true },
             plan_revision_notes: { type: Sequelize.TEXT, allowNull: true },

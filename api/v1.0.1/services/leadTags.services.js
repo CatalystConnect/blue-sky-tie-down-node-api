@@ -25,10 +25,10 @@ module.exports = {
     }
   },
   /* Get All Lead Tags */
-  async getAllleadTags({ page = 1, limit = 10, search }) {
+  async getAllleadTags({ page = 1, per_page, search }) {
     try {
       page = parseInt(page);
-      limit = parseInt(limit);
+      limit = parseInt(per_page);
       const offset = (page - 1) * limit;
 
       let whereCondition = {};
@@ -61,7 +61,7 @@ module.exports = {
       return {
         total: count,
         page,
-        limit,
+        per_page,
         data: rows,
       };
     } catch (e) {

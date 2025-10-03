@@ -708,6 +708,26 @@ db.leadTeamsMemberObj.belongsTo(db.userObj, {
   foreignKey: "user_id",
 });
 
+db.leadsObj.belongsTo(db.salesPipelinesObj, {
+  as: "salesPipelines",
+  foreignKey: "pipeline_type",
+});
+
+db.salesPipelinesObj.hasMany(db.leadsObj, {
+  foreignKey: "pipeline_type",
+  as: "salesPipelinesData",
+});
+
+db.leadsObj.belongsTo(db.salesPipelinesStatusesObj, {
+  as: "salesPipelinesStatus",
+  foreignKey: "pipeline_status",
+});
+
+db.salesPipelinesStatusesObj.hasMany(db.leadsObj, {
+  foreignKey: "pipeline_status",
+  as: "salesPipelinesStatusData",
+});
+
 // A user can be in many lead teams
 db.userObj.hasMany(db.leadTeamsMemberObj, {
   as: "leadTeams",

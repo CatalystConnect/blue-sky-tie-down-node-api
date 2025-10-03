@@ -15,9 +15,9 @@ module.exports = {
   },
 
   /*getAllBudgetCategories*/
-  async getAll({ page, limit, search }) {
+  async getAll({ page, per_page, search }) {
     try {
-      const offset = (page - 1) * limit;
+      const offset = (page - 1) * per_page;
 
       const whereCondition = {};
       if (search) {
@@ -27,12 +27,12 @@ module.exports = {
       const { rows, count } = await db.budgetCategoryObj.findAndCountAll({
         where: whereCondition,
         order: [["ordering", "ASC"]], // order by 'ordering' column
-        limit,
+        per_page,
         offset,
       });
 
       // Pagination metadata
-      const lastPage = Math.ceil(count / limit);
+      const lastPage = Math.ceil(count / per_page);
       const from = count > 0 ? offset + 1 : 0;
       const to = offset + rows.length;
 
@@ -42,7 +42,7 @@ module.exports = {
           current_page: page,
           from: from,
           to: to,
-          per_page: limit,
+          per_page: per_page,
           last_page: lastPage,
           total: count,
         },

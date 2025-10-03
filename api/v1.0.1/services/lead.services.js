@@ -151,7 +151,7 @@ module.exports = {
             include: [
               {
                 model: db.userObj,
-                as: "user",
+                as: "userData",
                 attributes: { exclude: ["password"] },
               },
             ],

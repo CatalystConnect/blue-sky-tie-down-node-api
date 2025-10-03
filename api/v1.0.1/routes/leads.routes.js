@@ -39,6 +39,6 @@ router.put("/update-lead-team-member", [authJwt.verifyToken], controller.updateL
 // get-lead-team-member-by-lead-id
 router.get("/get-lead-team-members", [authJwt.verifyToken], controller.getLeadTeamMembers);
 
-router.put("/update-lead-dcs", [authJwt.verifyToken], upload.none(), controller.updateLeadDcs);
+router.put("/update-lead-dcs", [authJwt.verifyToken], upload.none(), controller.updateLeadDcs); 
 
 module.exports = router;

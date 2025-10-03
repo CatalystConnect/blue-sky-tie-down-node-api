@@ -397,7 +397,7 @@ module.exports = {
     try {
       const [updated] = await db.leadsObj.update(
         { dcs: data.dcs },
-        { where: { id: data.id } }
+        { where: { id: data.id } } 
       );
 
       if (updated) {

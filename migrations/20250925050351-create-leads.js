@@ -158,7 +158,7 @@ module.exports = {
         allowNull: true,
       },
       defaultAssignTeam: {
-        type: Sequelize.TEXT,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       isTicket: {

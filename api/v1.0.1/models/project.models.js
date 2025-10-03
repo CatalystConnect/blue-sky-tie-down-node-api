@@ -141,6 +141,12 @@ module.exports = (sequelize, Sequelize) => {
             projectAttachmentUrls: { type: Sequelize.STRING, allowNull: true },
             attachmentsLink: { type: Sequelize.STRING, allowNull: true },
             projectRifFields: { type: Sequelize.STRING, allowNull: true },
+            takeofCompleteDate: { type: Sequelize.DATE, allowNull: true },
+            connectplan: { type: Sequelize.STRING, allowNull: true },
+            surveyorNotes: { type: Sequelize.TEXT, allowNull: true },
+            completedFiles: { type: Sequelize.STRING, allowNull: true },
+            takeOfEstimateTime: { type: Sequelize.INTEGER, allowNull: true },
+
         },
         {timestamps: true,        
         createdAt: "created_at",

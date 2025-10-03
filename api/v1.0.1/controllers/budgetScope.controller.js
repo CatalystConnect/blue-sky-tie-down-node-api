@@ -29,12 +29,12 @@ module.exports = {
         title: data.title,
         short_title: data.short_title,
         status: data.status || "active",
-        category: data.category,
+        category: data.categoryId,
         user_id: req.userId, 
       };
       const scopeObj = await budgetScopeServices.add(postData);
       const scopeId = scopeObj.id;
-      let scopeCategories = JSON.parse(data.categories);
+      let scopeCategories = data.categories;
 
       for (let i = 0; i < scopeCategories.length; i++) {
         const category = scopeCategories[i];
@@ -184,7 +184,26 @@ module.exports = {
           .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
       }
 
-      await budgetScopeServices.delete(id);
+      let scopeId = id;
+      const result = await budgetScopeServices.getById(id);
+      let scopeCategories = result.categories;
+      await budgetScopeServices.delete(scopeId);
+
+      for (let i = 0; i < scopeCategories.length; i++) {
+        const category = scopeCategories[i];
+        const categoryId = category.id;
+        await scopeCategoryServices.delete(categoryId);
+        for (let j = 0; j < category.groups.length; j++) {
+          const group = category.groups[j];
+          const groupId = group.id;
+          await scopeGroupServices.delete(groupId);
+          for (let k = 0; k < group.segments.length; k++) {
+            const segment = group.segments[k];
+            const segmentId = segment.id;
+            await scopeSegmentServices.delete(segmentId);
+          }
+        }
+      }
 
       return res
         .status(200)
@@ -224,19 +243,80 @@ module.exports = {
       }
 
       const data = req.body;
+      const scopeId = id;
 
       const postData = {
-        title: data.title,
-        short_title: data.short_title,
-        status: data.status || "active",
-        category: data.category,
-        user_id: req.userId, 
+        title       : data.title,
+        short_title : data.short_title,
+        status      : data.status,
+        category    : data.categoryId,
       };
+      await budgetScopeServices.update(scopeId, postData);
 
-      const result = await budgetScopeServices.update(
-        id,
-        postData
-      );
+      let scopeCategories = data.categories;
+      for (let i = 0; i < scopeCategories.length; i++) {
+        const category = scopeCategories[i];
+        let categoryId;
+        if( category?.id ){
+          categoryId = category.id;
+          const catPostData = {
+            title : category.title
+          }
+          await scopeCategoryServices.update(categoryId, catPostData);
+        }else{
+          const catPostData = {
+            user_id : req.userId,
+            scope_id : scopeId,
+            title : category.title
+          }
+          const categoryObj = await scopeCategoryServices.add(catPostData);
+          categoryId = categoryObj.id;
+        }
+
+        for (let j = 0; j < category.groups.length; j++) {
+          const group = category.groups[j];
+          let groupId;
+          if( group?.id ){
+            groupId = group.id;
+            const groupPostData = {
+              title : group.title
+            }
+            await scopeGroupServices.update(groupId, groupPostData);
+          }else{
+            const groupPostData = {
+              user_id : req.userId,
+              scope_category_id : categoryId,
+              title : group.title
+            }
+            const groupObj = await scopeGroupServices.add(groupPostData);
+            groupId = groupObj.id;
+          }
+
+          for (let k = 0; k < group.segments.length; k++) {
+            const segment = group.segments[k];
+            let segmentId;
+            if( segmentId?.id ){
+              segmentId = segmentId.id;
+              const segmentPostData = {
+                title : segment.title,
+                url : segment.url,
+                options : JSON.stringify(segment.option)
+              }
+              await scopeSegmentServices.update(segmentId, segmentPostData);
+            }else{
+              const segmentPostData = {
+                user_id : req.userId,
+                scope_group_id : groupId,
+                title : segment.title,
+                url : segment.url,
+                options : JSON.stringify(segment.option)
+              }
+              const segmentObj = await scopeSegmentServices.add(segmentPostData);
+              segmentId = segmentObj.id;
+            }
+          }
+        }
+      }
 
       return res
         .status(200)

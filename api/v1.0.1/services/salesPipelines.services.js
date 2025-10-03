@@ -25,6 +25,91 @@ module.exports = {
   },
 
   /*getAllSalesPipelines*/
+  // async getAllSalesPipelines(query) {
+  //   try {
+  //     let { page, per_page, limit, take_all, search, id } = query;
+
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+  //     limit = parseInt(limit) || null;
+  //     const offset = (page - 1) * per_page;
+
+  //     const whereCondition = {};
+  //     if (search) {
+  //       whereCondition.name = { [Op.like]: `%${search}%` };
+  //     }
+
+  //     let order = [["id", "DESC"]];
+  //     if (id) {
+  //       order = [
+  //         [
+  //           Sequelize.literal(
+  //             `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ];
+  //     }
+
+  //     const includeRelations = [
+  //       {
+  //         model: db.salesPipelineGroupsObj,
+  //         as: "salesPipelineGroups",
+  //       },
+  //       {
+  //         model: db.salesPipelinesStatusesObj,
+  //         as: "salesPipelinesStatuses",
+  //       },
+  //       {
+  //         model: db.salesPipelinesTriggersObj,
+  //         as: "salesPipelinesTriggers",
+  //       },
+  //       {
+  //         model: db.salesPipelinesDelayIndicatorsObj,
+  //         as: "salesPipelinesDelayIndicators",
+  //       },
+  //     ];
+
+  //     let pipelinesData;
+  //     let total;
+
+  //     if (take_all === "all") {
+  //       pipelinesData = await db.salesPipelinesObj.findAll({
+  //         where: whereCondition,
+  //         order,
+  //         include: includeRelations,
+  //         ...(limit ? { limit } : {}),
+  //       });
+  //       total = pipelinesData.length;
+  //     } else {
+  //       const { rows, count } = await db.salesPipelinesObj.findAndCountAll({
+  //         where: whereCondition,
+  //         order,
+  //         include: includeRelations,
+  //         limit: per_page,
+  //         offset,
+  //       });
+  //       pipelinesData = rows;
+  //       total = count;
+  //     }
+
+  //     return {
+  //       data: pipelinesData,
+  //       total,
+  //       current_page: page,
+  //       per_page,
+  //       last_page: Math.ceil(total / per_page),
+  //     };
+  //   } catch (e) {
+  //     console.error(
+  //       "getAllSalesPipelines Error:",
+  //       commonHelper.customizeCatchMsg(e)
+  //     );
+  //     throw e;
+  //   }
+  // },
+
   async getAllSalesPipelines(query) {
     try {
       let { page, per_page, limit, take_all, search, id } = query;
@@ -53,26 +138,16 @@ module.exports = {
       }
 
       const includeRelations = [
-        {
-          model: db.salesPipelineGroupsObj,
-          as: "salesPipelineGroups",
-        },
-        {
-          model: db.salesPipelinesStatusesObj,
-          as: "salesPipelinesStatuses",
-        },
-        {
-          model: db.salesPipelinesTriggersObj,
-          as: "salesPipelinesTriggers",
-        },
+        { model: db.salesPipelineGroupsObj, as: "salesPipelineGroups" },
+        { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatuses" },
+        { model: db.salesPipelinesTriggersObj, as: "salesPipelinesTriggers" },
         {
           model: db.salesPipelinesDelayIndicatorsObj,
           as: "salesPipelinesDelayIndicators",
         },
       ];
 
-      let pipelinesData;
-      let total;
+      let pipelinesData, total;
 
       if (take_all === "all") {
         pipelinesData = await db.salesPipelinesObj.findAll({
@@ -94,8 +169,37 @@ module.exports = {
         total = count;
       }
 
+      // 🔥 Transform data into desired structure
+      const formattedData = pipelinesData.map((pipeline) => {
+        const statuses =
+          pipeline.salesPipelinesStatuses?.map((status) => ({
+            id: status.id,
+            status: status.status,
+            order: status.order,
+            is_default: status.is_default,
+            hide_status: status.hide_status,
+            expectedDays: status.expectedDays,
+            rules: [], // you can fill from triggers if needed
+          })) || [];
+
+        return {
+          id: pipeline.id,
+          name: pipeline.name,
+          materialType: pipeline.salesPipelineGroups || null,
+          order: pipeline.order || 0,
+          statusGroup: {
+            pipelineStatus: statuses,
+          },
+          pipelineGlobal: {
+            pipeline: pipeline.id,
+            pipelineStatus: statuses.length ? statuses[0].id : null,
+            status: statuses.length ? statuses[0].id : null,
+          },
+        };
+      });
+
       return {
-        data: pipelinesData,
+        data: formattedData,
         total,
         current_page: page,
         per_page,

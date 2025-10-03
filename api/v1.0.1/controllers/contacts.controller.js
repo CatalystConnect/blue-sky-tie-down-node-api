@@ -56,11 +56,11 @@ module.exports = {
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
 
-            let { page = 1, limit = 10, search = "" } = req.query;
+            let { page = 1, per_page , search = "" } = req.query;
             page = parseInt(page);
-            limit = parseInt(limit);
+            per_page = parseInt(per_page) || 10;
 
-            const result = await contactsServices.getAllContacts({ page, limit, search });
+            const result = await contactsServices.getAllContacts({ page, per_page, search });
 
             return res
                 .status(200)

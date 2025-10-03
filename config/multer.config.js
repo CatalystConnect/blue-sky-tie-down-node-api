@@ -58,6 +58,7 @@ const upload = multer({
 const multiUpload = multer({
   storage,
 }).fields([
+  { name: "completedFiles", maxCount: 5 },
   { name: "avatar", maxCount: 1 },
   { name: "doc1File", maxCount: 1 },
   { name: "doc2File", maxCount: 1 },

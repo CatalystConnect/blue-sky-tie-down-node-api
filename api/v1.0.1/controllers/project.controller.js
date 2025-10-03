@@ -30,6 +30,9 @@ module.exports = {
                     size: file.size,
                 }));
             }
+
+            completedFiles = JSON.stringify(completedFiles);
+
             let postData = {
                 user_id: req.userId,
                 site_plan_id: data.site_plan_id,
@@ -191,6 +194,8 @@ module.exports = {
                     size: file.size,
                 }));
             }
+
+            completedFiles = JSON.stringify(completedFiles);
             let postData = {
                 site_plan_id:
                     data.site_plan_id === null || data.site_plan_id === "null"

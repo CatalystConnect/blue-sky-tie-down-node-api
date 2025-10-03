@@ -156,6 +156,8 @@ module.exports = {
               },
             ],
           },
+          { model: db.salesPipelinesObj, as: "salesPipelines" },
+          { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatus" },
         ],
       });
       return lead;

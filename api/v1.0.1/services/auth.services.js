@@ -41,7 +41,7 @@ module.exports = {
     }
   },
 
-  async getAllUsers(page, length, role, search, date, id, take_all, limit) {
+  async getAllUsers(page, length, role, search, date, id, take_all, per_page) {
     try {
       let whereCondition = {};
 
@@ -89,7 +89,7 @@ module.exports = {
       const total = await db.userObj.count({ where: whereCondition });
 
       if (!take_all) {
-        queryOptions.limit = limit ? parseInt(limit) : length || 10;
+        queryOptions.per_page = per_page ? parseInt(per_page) : length || 10;
         queryOptions.offset = (page - 1) * (length || 10);
       }
 

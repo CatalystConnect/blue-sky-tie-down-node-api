@@ -233,12 +233,12 @@ module.exports = {
                 order: [["created_at", "DESC"]],
                 limit: limit,
                 include: [
-                {
-                    model: db.userObj,
-                    as: "user", 
-                    attributes: ["id", "name", "email", "phone"] 
-                }
-            ]
+                    {
+                        model: db.userObj,
+                        as: "user",
+                        attributes: ["id", "name", "email", "phone"]
+                    }
+                ]
             });
         } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -348,9 +348,28 @@ module.exports = {
                 where: { id }
             });
 
-            return deleted; 
+            return deleted;
         } catch (e) {
             console.error("Error in deleteProjectPlanSet:", e);
+            throw e;
+        }
+    },
+    // Get Project Plan Set By ID
+    async getProjectPlanSetById(id) {
+        try {
+            const planSet = await db.projectplanSetsObj.findOne({
+                where: { id },
+                include: [
+                    {
+                        model: db.userObj,
+                        as: "reviewedByUser",
+                        attributes: ["id", "name", "email"]
+                    }
+                ]
+            });
+            return planSet;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
     }

@@ -322,7 +322,7 @@ module.exports = {
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
-            result,
+            "",
             "Budget scope updated successfully"
           )
         );

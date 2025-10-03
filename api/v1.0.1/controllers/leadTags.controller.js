@@ -40,15 +40,15 @@ module.exports = {
     /* Get All Lead Tags with pagination */
     async getAllleadTags(req, res) {
         try {
-            let { page = 1, limit = 10, search } = req.query;
+            let { page = 1, per_page, search } = req.query;
 
             page = parseInt(page);
-            limit = parseInt(limit);
+            per_page = parseInt(per_page);
 
             if (isNaN(page) || page < 1) page = 1;
-            if (isNaN(limit) || limit < 1) limit = 10;
+            if (isNaN(per_page) || per_page < 1) per_page = 10;
 
-            const result = await leadTagsServices.getAllleadTags({ page, limit, search });
+            const result = await leadTagsServices.getAllleadTags({ page, per_page, search });
 
             return res
                 .status(200)

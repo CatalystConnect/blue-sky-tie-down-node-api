@@ -16,9 +16,9 @@ module.exports = {
   },
 
   /*getAllLeadTeams*/
-  async getAllLeadTeams({ page, limit, search }) {
+  async getAllLeadTeams({ page, per_page, search }) {
     try {
-      const offset = (page - 1) * limit;
+      const offset = (page - 1) * per_page;
 
       const whereCondition = {};
       if (search) {
@@ -28,7 +28,7 @@ module.exports = {
       const { rows, count } = await db.leadTeamsObj.findAndCountAll({
         where: whereCondition,
         order: [["id", "ASC"]],
-        limit,
+        limit:per_page,
         offset,
       });
 
@@ -53,7 +53,7 @@ module.exports = {
       }
 
       // Calculate pagination metadata
-      const lastPage = Math.ceil(count / limit);
+      const lastPage = Math.ceil(count / per_page);
       const from = count > 0 ? offset + 1 : 0;
       const to = offset + rows.length;
 
@@ -63,7 +63,7 @@ module.exports = {
           current_page: page,
           from: from,
           to: to,
-          per_page: limit,
+          per_page: per_page,
           last_page: lastPage,
           total: count,
         },

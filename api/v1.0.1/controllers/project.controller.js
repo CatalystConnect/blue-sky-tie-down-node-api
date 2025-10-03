@@ -95,13 +95,13 @@ module.exports = {
     // /*getAllProject*/
     async getAllProject(req, res) {
         try {
-            let { page, length, search } = req.query;
-            if (page <= 0 || length <= 0) {
+            let { page, per_page, search } = req.query;
+            if (page <= 0 || per_page <= 0) {
                 throw new Error("Page and length must be greater than 0");
             }
             let getAllProject = await projectServices.getAllProject(
                 page,
-                length,
+                per_page,
                 search
             );
             if (!getAllProject) throw new Error("Projects not found");
@@ -439,7 +439,7 @@ module.exports = {
 
     async getProjectPlanSet(req, res) {
         try {
-            const { projectId, search, id, page, limit } = req.query;
+            const { projectId, search, id, page, per_page } = req.query;
 
             if (!projectId) {
 
@@ -454,7 +454,7 @@ module.exports = {
                 project_id: projectId,
                 id,
                 search,
-                page, limit
+                page, per_page
 
             });
 
@@ -666,7 +666,7 @@ module.exports = {
 
     async listProjectNotes(req, res) {
         try {
-            const { limit = 50, projectId } = req.query;
+            const { page = 1, per_page = 10, projectId } = req.query;
 
             if (!projectId) {
                 return res.status(400).json({
@@ -677,7 +677,9 @@ module.exports = {
 
             const notes = await projectServices.listProjectNotes(
                 projectId,
-                parseInt(limit)
+                parseInt(page),
+               parseInt(per_page)
+               
             );
 
             return res

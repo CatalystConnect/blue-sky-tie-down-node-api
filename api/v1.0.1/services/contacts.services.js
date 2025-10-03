@@ -14,9 +14,9 @@ module.exports = {
             throw e;
         }
     },
-    async getAllContacts({ page, limit, search }) {
+    async getAllContacts({ page, per_page, search }) {
         try {
-            const offset = (page - 1) * limit;
+            const offset = (page - 1) * per_page;
 
             const whereCondition = {};
 
@@ -33,7 +33,7 @@ module.exports = {
                 include: [
                     { model: db.companyObj, as: "company" }
                 ],
-                limit,
+                per_page,
                 offset,
             });
 
@@ -43,9 +43,9 @@ module.exports = {
                     current_page: page,
                     from: offset + 1,
                     to: offset + rows.length,
-                    per_page: limit,
+                    per_page: per_page,
                     total: count,
-                    last_page: Math.ceil(count / limit)
+                    last_page: Math.ceil(count / per_page)
                 }
             };
         } catch (e) {

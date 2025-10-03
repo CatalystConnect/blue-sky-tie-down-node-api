@@ -20,7 +20,7 @@ module.exports = {
       allowNull: true,
     });
     await queryInterface.addColumn("projects", "takeOfEstimateTime", {
-      type: Sequelize.INTEGER,
+      type: Sequelize.DATE,
       allowNull: true,
     });
   },

@@ -29,7 +29,7 @@ module.exports = {
         title: data.title,
         short_title: data.short_title,
         status: data.status || "active",
-        category: data.categoryId,
+        category_id: data.category_id,
         user_id: req.userId, 
       };
       const scopeObj = await budgetScopeServices.add(postData);
@@ -249,7 +249,7 @@ module.exports = {
         title       : data.title,
         short_title : data.short_title,
         status      : data.status,
-        category    : data.categoryId,
+        category_id : data.category_id,
       };
       await budgetScopeServices.update(scopeId, postData);
 

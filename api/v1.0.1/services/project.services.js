@@ -71,6 +71,12 @@ module.exports = {
                     "projectAttachmentUrls",
                     "attachmentsLink",
                     "projectRifFields",
+                    "takeofCompleteDate",
+                    "connectplan",
+                    "surveyorNotes",
+                    "completedFiles",
+                    "takeOfEstimateTime"
+
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -146,6 +152,11 @@ module.exports = {
                     "projectAttachmentUrls",
                     "attachmentsLink",
                     "projectRifFields",
+                    "takeofCompleteDate",
+                    "connectplan",
+                    "surveyorNotes",
+                    "completedFiles",
+                    "takeOfEstimateTime"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -450,6 +461,11 @@ module.exports = {
                     "attachmentsLink",
                     "projectRifFields",
                     "status",
+                    "takeofCompleteDate",
+                    "connectplan",
+                    "surveyorNotes",
+                    "completedFiles",
+                    "takeOfEstimateTime"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },

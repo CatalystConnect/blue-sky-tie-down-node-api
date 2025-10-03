@@ -145,7 +145,7 @@ module.exports = (sequelize, Sequelize) => {
             connectplan: { type: Sequelize.STRING, allowNull: true },
             surveyorNotes: { type: Sequelize.TEXT, allowNull: true },
             completedFiles: { type: Sequelize.STRING, allowNull: true },
-            takeOfEstimateTime: { type: Sequelize.INTEGER, allowNull: true },
+            takeOfEstimateTime: { type: Sequelize.DATE, allowNull: true },
 
         },
         {timestamps: true,        

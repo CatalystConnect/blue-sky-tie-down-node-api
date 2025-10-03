@@ -21,6 +21,15 @@ module.exports = {
             //         .send(commonHelper.parseErrorRespose(errors.mapped()));
             // }
             let data = req.body;
+
+            let completedFiles = [];
+            if (req.files && req.files.completedFiles) {
+                completedFiles = req.files.completedFiles.map(file => ({
+                    fileName: file.originalname,
+                    path: `files/${file.filename}`,
+                    size: file.size,
+                }));
+            }
             let postData = {
                 user_id: req.userId,
                 site_plan_id: data.site_plan_id,
@@ -52,7 +61,13 @@ module.exports = {
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
                 projectRifFields: data.projectRifFields,
-                status: data.status
+                status: "new",
+                takeofCompleteDate: data.takeofCompleteDate,
+                connectplan: data.connectplan,
+                surveyorNotes: data.surveyorNotes,
+                completedFiles: completedFiles,
+                takeOfEstimateTime: data.takeOfEstimateTime,
+
             };
             let project = await projectServices.addProject(postData);
 
@@ -168,6 +183,14 @@ module.exports = {
 
             if (!getProjectById) throw new Error("Project not found");
             let data = req.body;
+            let completedFiles = [];
+            if (req.files && req.files.completedFiles) {
+                completedFiles = req.files.completedFiles.map(file => ({
+                    fileName: file.originalname,
+                    path: `files/${file.filename}`,
+                    size: file.size,
+                }));
+            }
             let postData = {
                 site_plan_id:
                     data.site_plan_id === null || data.site_plan_id === "null"
@@ -202,7 +225,12 @@ module.exports = {
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
                 projectRifFields: data.projectRifFields,
-                status: data.status
+                status: data.status,
+                takeofCompleteDate: data.takeofCompleteDate,
+                connectplan: data.connectplan,
+                surveyorNotes: data.surveyorNotes,
+                completedFiles: completedFiles,
+                takeOfEstimateTime: data.takeOfEstimateTime,
             };
             commonHelper.removeFalsyKeys(postData);
 
@@ -917,7 +945,7 @@ module.exports = {
                 });
             }
 
-            
+
             const getAllProject = await projectServices.getAllProjectDataStatusNew(
                 page,
                 per_page,

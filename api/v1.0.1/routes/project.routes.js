@@ -2,11 +2,11 @@ var express = require("express");
 var router = express.Router();
 const controller = require("../controllers/project.controller");
 var { authJwt } = require("../middleware");
-let { upload } = require("../../../config/multer.config");
+let { upload,multiUpload } = require("../../../config/multer.config");
 
 
 /*addProject*/
-router.post("/project/addProject", [authJwt.verifyToken, upload.none()], controller.addProject);
+router.post("/project/addProject", [authJwt.verifyToken,multiUpload ], controller.addProject);
 
 // /*getAllProject*/
 router.get("/project/getAllProject",[authJwt.verifyToken],  controller.getAllProject);

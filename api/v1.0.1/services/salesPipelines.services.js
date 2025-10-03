@@ -215,38 +215,85 @@ module.exports = {
   },
 
   /*getSalesPipelinesById*/
-  async getSalesPipelinesById(id) {
+  // async getSalesPipelinesById(id) {
+  //   try {
+  //     return await db.salesPipelinesObj.findOne({
+  //       where: { id: id },
+  //       include: [
+  //         {
+  //           model: db.salesPipelineGroupsObj,
+  //           as: "salesPipelineGroups",
+  //         },
+  //         {
+  //           model: db.salesPipelinesStatusesObj,
+  //           as: "salesPipelinesStatuses",
+  //         },
+  //         {
+  //           model: db.salesPipelinesTriggersObj,
+  //           as: "salesPipelinesTriggers",
+  //           include: [
+  //             {
+  //               model: db.salesPipelinesStatusesObj,
+  //               as: "pipelinesStatuses",
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.salesPipelinesDelayIndicatorsObj,
+  //           as: "salesPipelinesDelayIndicators",
+  //         },
+  //       ],
+  //     });
+  //   } catch (e) {
+  //     console.error("Service Update Company Error:", e.message);
+  //     throw e;
+  //   }
+  // },
+  async getSalesPipelinesById(pipelineId) {
     try {
-      return await db.salesPipelinesObj.findOne({
-        where: { id: id },
+      const pipeline = await db.salesPipelinesObj.findOne({
+        where: { id: pipelineId },
         include: [
-          {
-            model: db.salesPipelineGroupsObj,
-            as: "salesPipelineGroups",
-          },
-          {
-            model: db.salesPipelinesStatusesObj,
-            as: "salesPipelinesStatuses",
-          },
-          {
-            model: db.salesPipelinesTriggersObj,
-            as: "salesPipelinesTriggers",
-            include: [
-              {
-                model: db.salesPipelinesStatusesObj,
-                as: "pipelinesStatuses",
-              },
-            ],
-          },
+          { model: db.salesPipelineGroupsObj, as: "salesPipelineGroups" },
+          { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatuses" },
+          { model: db.salesPipelinesTriggersObj, as: "salesPipelinesTriggers" },
           {
             model: db.salesPipelinesDelayIndicatorsObj,
             as: "salesPipelinesDelayIndicators",
           },
         ],
       });
-    } catch (e) {
-      console.error("Service Update Company Error:", e.message);
-      throw e;
+
+      if (!pipeline) return null;      
+
+      const formattedPipeline = {
+        id: pipeline.id,
+        name: pipeline.name,
+        materialType: pipeline.salesPipelineGroups || null,
+        order: pipeline.order || 0,
+        statusGroup: {
+          pipelineStatus:
+            pipeline.salesPipelinesStatuses?.map((status) => ({
+              id: status.id,
+              status: status.name,
+              order: status.order,
+              is_default: status.is_default,
+              leadCount: status.leadCount || 0, // assuming you have this column
+              hide_status: status.hide_status,
+              expectedDays: status.expectedDays,
+              statusColor: status.statusColor,
+              percentage: status.percentage,
+              rules: [], // fill from triggers if needed
+              pipelineGlobal: [], // if needed you can map pipeline-global relations
+            })) || [],
+        },
+        pipelineDelayIndicators: pipeline.salesPipelinesDelayIndicators || [],
+      };
+
+      return formattedPipeline;
+    } catch (err) {
+      console.error("getSalesPipelinesById Error:", err);
+      throw err;
     }
   },
 

@@ -148,6 +148,41 @@ module.exports = {
     }
   },
 
+  // async getSalesPipelinesById(req, res) {
+  //   try {
+  //     const pipelineId = req.query.id;
+  //     if (!pipelineId) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "Sales pipelines ID is required",
+  //       });
+  //     }
+
+  //     const pipeline = await salesPipelinesServices.getSalesPipelinesById(
+  //       pipelineId
+  //     );
+
+  //     if (!pipeline) {
+  //       return res.status(404).json({
+  //         status: false,
+  //         message: "Sales pipelines not found",
+  //       });
+  //     }
+
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "Sales pipelines fetched successfully",
+  //       data: pipeline,
+  //     });
+  //   } catch (err) {
+  //     return res.status(500).json({
+  //       status: false,
+  //       message: "Failed to fetch Sales pipelines",
+  //       error: err.message,
+  //     });
+  //   }
+  // },
+
   async getSalesPipelinesById(req, res) {
     try {
       const pipelineId = req.query.id;

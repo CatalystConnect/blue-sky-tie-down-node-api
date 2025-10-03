@@ -120,7 +120,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
       },
       defaultAssignTeam: {
-        type: Sequelize.TEXT,
+        type: Sequelize.INTEGER,
       },
       leadNotesField: {
         type: Sequelize.TEXT,

@@ -708,6 +708,11 @@ db.leadTeamsMemberObj.belongsTo(db.userObj, {
   foreignKey: "user_id",
 });
 
+db.leadsObj.belongsTo(db.userObj, {
+  as: "defaultAssignTeams",
+  foreignKey: "defaultAssignTeam",
+});
+
 db.leadsObj.belongsTo(db.salesPipelinesObj, {
   as: "salesPipelines",
   foreignKey: "pipeline_type",

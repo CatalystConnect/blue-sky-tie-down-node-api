@@ -860,7 +860,45 @@ module.exports = {
                 data: {}
             });
         }
+    },
+    // Get Project Plan Set By ID
+    async getProjectPlanSetById(req, res) {
+        try {
+            const { id } = req.query;
+
+            if (!id) {
+                return res.status(400).json({
+                    status: false,
+                    message: "planSet id is required",
+                    data: {}
+                });
+            }
+
+            const planSet = await projectServices.getProjectPlanSetById(id);
+
+            if (!planSet) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Plan set not found",
+                    data: {}
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Project plan set fetched successfully",
+                data: planSet
+            });
+
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Fetching project plan set failed",
+                data: {}
+            });
+        }
     }
+
 
 
     // validate(method) {

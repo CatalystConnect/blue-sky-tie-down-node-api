@@ -70,6 +70,13 @@ module.exports = {
               },
             ],
           },
+          { model: db.salesPipelinesObj, as: "salesPipelines" },
+          { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatus" },
+          {
+            model: db.userObj,
+            as: "defaultAssignTeams",
+            attributes: { exclude: ["password"] },
+          },
         ],
       };
 

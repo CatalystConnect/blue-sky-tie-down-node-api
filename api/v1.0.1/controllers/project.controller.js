@@ -23,12 +23,16 @@ module.exports = {
             let data = req.body;
 
             let completedFiles = [];
-            if (req.files && req.files.completedFiles) {
-                completedFiles = req.files.completedFiles.map(file => ({
-                    fileName: file.originalname,
-                    path: `files/${file.filename}`,
-                    size: file.size,
-                }));
+            if (req.files) {
+                Object.keys(req.files).forEach(key => {
+                    req.files[key].forEach(file => {
+                        completedFiles.push({
+                            fileName: file.originalname,
+                            path: `files/${file.filename}`,
+                            size: file.size,
+                        });
+                    });
+                });
             }
 
             completedFiles = JSON.stringify(completedFiles);
@@ -187,12 +191,16 @@ module.exports = {
             if (!getProjectById) throw new Error("Project not found");
             let data = req.body;
             let completedFiles = [];
-            if (req.files && req.files.completedFiles) {
-                completedFiles = req.files.completedFiles.map(file => ({
-                    fileName: file.originalname,
-                    path: `files/${file.filename}`,
-                    size: file.size,
-                }));
+            if (req.files) {
+                Object.keys(req.files).forEach(key => {
+                    req.files[key].forEach(file => {
+                        completedFiles.push({
+                            fileName: file.originalname,
+                            path: `files/${file.filename}`,
+                            size: file.size,
+                        });
+                    });
+                });
             }
 
             completedFiles = JSON.stringify(completedFiles);

@@ -17,6 +17,7 @@ const myValidationResult = validationResult.withDefaults({
 });
 const db = require("../models");
 const leadTagsServices = require("../services/leadTags.services");
+const salesPipelineStatusesServices = require("../services/salesPipelineStatuses.services");
 module.exports = {
   /*getAllLeads*/
   async getAllLeads(req, res) {
@@ -72,6 +73,24 @@ module.exports = {
       }
 
       let data = req.body;
+
+      let pipeline_status = null;
+      if (data.pipeline_type) {
+        try {
+          const defaultPipeline =
+            await salesPipelineStatusesServices.getDefaultPipelineStatusByType(
+              data.pipeline_type
+            );
+
+          if (defaultPipeline) {
+            pipeline_status = defaultPipeline.id;
+          }
+        } catch (err) {
+          console.warn("Default pipeline not found:", err.message);
+        }
+      }
+
+      
       let postData = {
         date_record: data.date_record || null,
         due_date: data.due_date || null,
@@ -85,7 +104,7 @@ module.exports = {
         sale_person_id: data.sale_person_id || null,
         engineer_id: data.engineer_id || null,
         pipeline_type: data.pipeline_type || null,
-        pipeline_status: data.pipeline_status || null,
+        pipeline_status: pipeline_status,
         next_action: data.next_action || null,
         priority: data.priority || null,
         lead_status_id: data.lead_status_id || null,
@@ -130,6 +149,8 @@ module.exports = {
           await leadServices.updateLeadTeamMember(contactIds, lead.id);
         }
       }
+
+
 
       return res.status(200).send({
         status: true,
@@ -599,7 +620,7 @@ module.exports = {
   async updateLeadDcs(req, res) {
     try {
       const data = req.body;
- 
+
       if (!data.id) {
         return res.status(400).json({
           status: false,

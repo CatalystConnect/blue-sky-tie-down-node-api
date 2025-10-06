@@ -45,6 +45,7 @@ router.get("/getProjectPlanSetById", [authJwt.verifyToken], controller.getProjec
 
 router.get("/getAllProjectDataStatusNew", [authJwt.verifyToken], controller.getAllProjectDataStatusNew);
 
+router.put("/updateProjectType", [authJwt.verifyToken,upload.none()], controller.updateProjectType); 
 
 module.exports = router;
 

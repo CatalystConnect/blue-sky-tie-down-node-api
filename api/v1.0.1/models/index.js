@@ -197,9 +197,33 @@ db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
 db.scopeCategoryObj = require("./scopeCategory.models")(dbObj, Sequelize);
 db.scopeGroupObj = require("./scopeGroup.models")(dbObj, Sequelize);
 db.scopeSegmentObj = require("./scopeSegment.models")(dbObj, Sequelize);
+db.projectScopeIncludesObj = require("./projectScopeIncludes.models")(
+  dbObj,
+  Sequelize
+);
+db.projectContractsObj = require("./projectContracts.models")(dbObj, Sequelize);
+db.projectKeyAreasObj = require("./projectKeyAreas.models")(dbObj, Sequelize);
+db.projectDrawingsObj = require("./projectDrawings.models")(dbObj, Sequelize);
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 /*Associations*/
+
+// budgetBooksObj.hasMany(db.projectScopeIncludesObj, {
+//   foreignKey: "project_id",
+//   as: "projectScopeIncludes",
+// });
+// budgetBooksObj.hasMany(db.projectDrawingsObj, {
+//   foreignKey: "project_id",
+//   as: "projectSubmittals",
+// });
+// budgetBooksObj.hasMany(db.projectKeyAreasObj, {
+//   foreignKey: "project_id",
+//   as: "projectKeyAreas",
+// });
+// budgetBooksObj.hasMany(db.projectContractsObj, {
+//   foreignKey: "project_id",
+//   as: "projectContracts",
+// });
 
 db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesStatusesObj, {
   foreignKey: "field_value",

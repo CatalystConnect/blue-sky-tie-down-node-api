@@ -33,11 +33,30 @@ module.exports = {
       const searchTerm =
         search && search.trim() !== "" ? search.trim() : undefined;
 
+      // const companyWhere = searchTerm
+      //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+      //   : undefined;
+      // const projectWhere = searchTerm
+      //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+      //   : undefined;
       const companyWhere = searchTerm
-        ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+        ? {
+            name: {
+              [Op.iLike]: `%${searchTerm}%`,
+              [Op.ne]: "", 
+              [Op.not]: null, 
+            },
+          }
         : undefined;
+
       const projectWhere = searchTerm
-        ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+        ? {
+            name: {
+              [Op.iLike]: `%${searchTerm}%`,
+              [Op.ne]: "",
+              [Op.not]: null,
+            },
+          }
         : undefined;
 
       let queryOptions = {
@@ -49,7 +68,7 @@ module.exports = {
             model: db.companyObj,
             as: "company",
             attributes: ["id", "name"],
-            required: false, 
+            required: false,
             where: companyWhere,
           },
           {
@@ -59,7 +78,7 @@ module.exports = {
             required: false,
             where: projectWhere,
           },
-        
+
           { model: db.contactsObj, as: "contact" },
           {
             model: db.userObj,

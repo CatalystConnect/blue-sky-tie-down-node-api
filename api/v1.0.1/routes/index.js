@@ -52,5 +52,5 @@ router.use(require("./salesPipelines.routes"));
 router.use(require("./budgetKeyAreas.routes"));
 router.use(require("./budgetScope.routes"));
 router.use(require("./budgetCategory.routes"));
-
+router.use(require("./budgetBooks.routes"));
 module.exports = router;

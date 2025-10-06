@@ -41,22 +41,22 @@ module.exports = {
       //   : undefined;
       const companyWhere = searchTerm
         ? {
-            name: {
-              [Op.iLike]: `%${searchTerm}%`,
-              [Op.ne]: "",
-              [Op.not]: null,
-            },
-          }
+          name: {
+            [Op.iLike]: `%${searchTerm}%`,
+            [Op.ne]: "",
+            [Op.not]: null,
+          },
+        }
         : undefined;
 
       const projectWhere = searchTerm
         ? {
-            name: {
-              [Op.iLike]: `%${searchTerm}%`,
-              [Op.ne]: "",
-              [Op.not]: null,
-            },
-          }
+          name: {
+            [Op.iLike]: `%${searchTerm}%`,
+            [Op.ne]: "",
+            [Op.not]: null,
+          },
+        }
         : undefined;
 
       let queryOptions = {
@@ -397,6 +397,22 @@ module.exports = {
           },
         ],
       });
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+  async updateLeadDcs(data) {
+    try {
+      const [updated] = await db.leadsObj.update(
+        { dcs: data.dcs },
+        { where: { id: data.id } }
+      );
+
+      if (updated) {
+        return await db.leadsObj.findByPk(data.id);
+      }
+      return null;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

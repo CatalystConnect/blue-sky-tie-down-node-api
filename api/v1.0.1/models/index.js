@@ -197,6 +197,7 @@ db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
 db.scopeCategoryObj = require("./scopeCategory.models")(dbObj, Sequelize);
 db.scopeGroupObj = require("./scopeGroup.models")(dbObj, Sequelize);
 db.scopeSegmentObj = require("./scopeSegment.models")(dbObj, Sequelize);
+db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 /*Associations*/
 

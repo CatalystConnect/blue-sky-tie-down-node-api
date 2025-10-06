@@ -205,10 +205,6 @@ module.exports = {
 
             completedFiles = JSON.stringify(completedFiles);
             let postData = {
-                site_plan_id:
-                    data.site_plan_id === null || data.site_plan_id === "null"
-                        ? null
-                        : data.site_plan_id,
                 user_id: req.userId,
                 engineer_id: data.engineer_id,
                 name: data.name,

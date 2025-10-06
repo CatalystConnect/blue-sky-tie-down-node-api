@@ -43,8 +43,8 @@ module.exports = {
         ? {
             name: {
               [Op.iLike]: `%${searchTerm}%`,
-              [Op.ne]: "", 
-              [Op.not]: null, 
+              [Op.ne]: "",
+              [Op.not]: null,
             },
           }
         : undefined;
@@ -96,6 +96,16 @@ module.exports = {
             model: db.leadTagsObj,
             as: "lead_tags",
             include: [{ model: db.tagsObj, as: "tag" }],
+          },
+          {
+            model: db.salesPipelinesObj,
+            as: "salesPipelines",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.salesPipelinesStatusesObj,
+            as: "salesPipelinesStatus",
+            attributes: ["id", "name"],
           },
         ],
       };
@@ -183,6 +193,16 @@ module.exports = {
                 attributes: { exclude: ["password"] },
               },
             ],
+          },
+          {
+            model: db.salesPipelinesObj,
+            as: "salesPipelines",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.salesPipelinesStatusesObj,
+            as: "salesPipelinesStatus",
+            attributes: ["id", "name"],
           },
         ],
       });

@@ -100,4 +100,15 @@ module.exports = {
       throw e;
     }
   },
+  async findByCategoryId(categoryId) {
+    try {
+      const groups = await db.scopeGroupObj.findAll({
+        where: { scope_category_id: categoryId }, 
+      });
+      return groups; 
+    } catch (error) {
+      console.error("Error in findByCategoryId:", error);
+      throw error; 
+    }
+  },
 };

@@ -100,4 +100,15 @@ module.exports = {
       throw e;
     }
   },
+  async findByGroupId(groupId) {
+    try {
+      const segments = await db.scopeSegmentObj.findAll({
+        where: { scope_group_id: groupId },
+      });
+      return segments;
+    } catch (error) {
+      console.error("Error in findByGroupId:", error);
+      throw error;
+    }
+  },
 };

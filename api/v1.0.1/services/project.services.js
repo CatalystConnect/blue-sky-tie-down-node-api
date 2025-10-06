@@ -493,7 +493,26 @@ module.exports = {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
-    }
+    },
+    async updateProjectType(projectId, projectType, name = null, units = null) {
+        try {
+            const project = await db.projectObj.findOne({ where: { id: projectId } });
+
+            if (!project) {
+                throw new Error("Project not found");
+            }
+
+            project.projectType = projectType;
+            if (name !== null) project.name = name;
+            if (units !== null) project.units = units;
+            await project.save();
+
+            return project;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
 
 
 };

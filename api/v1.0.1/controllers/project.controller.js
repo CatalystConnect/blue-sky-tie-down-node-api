@@ -986,6 +986,47 @@ module.exports = {
                 data: {},
             });
         }
+    },
+    async updateProjectType(req, res) {
+        try {
+            const { projectId } = req.query;
+            const { name, units, projectType } = req.body;
+
+            if (!projectId || !projectType) {
+                return res.status(400).json({
+                    status: false,
+                    message: "projectId and projectType are required",
+                    data: {}
+                });
+            }
+            const updatedProject = await projectServices.updateProjectType(
+                projectId,
+                projectType,
+                name,
+                units
+            );
+
+            if (!updatedProject) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Project not found",
+                    data: {}
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Project type updated successfully",
+                data: updatedProject
+            });
+
+        } catch (error) {
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Updating project type failed",
+                data: {}
+            });
+        }
     }
 
 

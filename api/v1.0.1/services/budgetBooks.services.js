@@ -7,11 +7,33 @@ module.exports = {
   /*addBudgetBooks*/
   async addBudgetBooks(postData) {
     try {
-      let budgetBooks = await db.budgetBooksObj.create(postData);
-      return budgetBooks;
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
+      const budgetBook = await db.budgetBooksObj.create(postData);
+
+      return budgetBook;
+    } catch (error) {
+      console.log("❌ DB Insert Error:", error);
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+      throw error;
     }
   },
+
+  // async getAllBudgetBooks() {
+  //   try {
+  //     const budgetBooks = await db.budgetBooksObj.findAll({
+  //       order: [["created_at", "DESC"]],
+  //       // Optional: include related tables if you want
+  //       include: [
+  //         { model: db.projectScopeIncludesObj, as: "projectScopeIncludes" },
+  //         { model: db.projectDrawingsObj, as: "projectSubmittals" },
+  //         { model: db.projectKeyAreasObj, as: "projectKeyAreas" },
+  //         { model: db.projectContractsObj, as: "projectContracts" },
+  //       ],
+  //     });
+  //     return budgetBooks;
+  //   } catch (error) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+  //     throw error;
+  //   }
+  // }
+  
 };

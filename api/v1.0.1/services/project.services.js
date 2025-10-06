@@ -32,7 +32,6 @@ module.exports = {
                 attributes: [
                     "id",
                     "user_id",
-                    "site_plan_id",
                     "engineer_id",
                     "name",
                     "city",
@@ -113,7 +112,6 @@ module.exports = {
                 attributes: [
                     "id",
                     "user_id",
-                    "site_plan_id",
                     "engineer_id",
                     "name",
                     "city",

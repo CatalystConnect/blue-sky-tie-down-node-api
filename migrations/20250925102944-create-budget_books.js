@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('projects', {
+    await queryInterface.createTable('budget_books', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -48,6 +48,7 @@ module.exports = {
         allowNull: false,
         defaultValue: false
       },
+      
       up_margin: { type: Sequelize.STRING, allowNull: true },
       sp_margin: { type: Sequelize.STRING, allowNull: true },
       mc_margin: { type: Sequelize.STRING, allowNull: true },
@@ -148,6 +149,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-   await queryInterface.dropTable('projects');
+   await queryInterface.dropTable('budget_books');
   }
 };

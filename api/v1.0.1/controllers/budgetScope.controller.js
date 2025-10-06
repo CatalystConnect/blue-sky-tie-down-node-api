@@ -327,12 +327,33 @@ module.exports = {
 
       for (let i = 0; i < deleteCategory.length; i++) {
         const categoryId = deleteCategory[i];
+
+        const groups = await scopeGroupServices.findByCategoryId(categoryId);
+        for (let j = 0; j < groups.length; j++) {
+          const group = groups[j];
+          const groupId = group.id;
+          const segments = await scopeSegmentServices.findByGroupId(groupId);
+          for (let k = 0; k < segments.length; k++) {
+            const segment = segments[k];
+            const segmentId = segment.id;
+            await scopeSegmentServices.delete(segmentId);
+          }
+          await scopeGroupServices.delete(groupId);
+        }
         await scopeCategoryServices.delete(categoryId);
+
       }
 
       for (let i = 0; i < deleteGroup.length; i++) {
         const groupId = deleteGroup[i];
+         const segments = await scopeSegmentServices.findByGroupId(groupId);
+        for (let k = 0; k < segments.length; k++) {
+          const segment = segments[k];
+          const segmentId = segment.id;
+          await scopeSegmentServices.delete(segmentId);
+        }
         await scopeGroupServices.delete(groupId);
+
       }
 
       for (let i = 0; i < deleteSegment.length; i++) {

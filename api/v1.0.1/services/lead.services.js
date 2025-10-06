@@ -1,13 +1,13 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op, fn, col, where } = require("sequelize");
+const { Op, fn, col, where, Sequelize } = require("sequelize");
 
 module.exports = {
   /*getAllLeads*/
   async getAllLeads(
     page,
-    per_page,
+    length,
     search,
     date,
     role_id,
@@ -16,36 +16,50 @@ module.exports = {
     take_all
   ) {
     try {
-      const limit = per_page || 10;
-      const offset = (page - 1) * limit || 0;
+      page = Math.max(parseInt(page) || 1, 1);
+      length = Math.max(parseInt(length) || 10, 1);
+      const limit = length;
+      const offset = (page - 1) * limit;
 
       let whereCondition = {};
 
-      if (search) {
-        whereCondition = {
-          ...whereCondition,
-          [Sequelize.Op.or]: [
-            { project_id: { [Sequelize.Op.like]: `%${search}%` } },
-            { "$company.name$": { [Sequelize.Op.like]: `%${search}%` } },
-            { "$contact.full_name$": { [Sequelize.Op.like]: `%${search}%` } },
-          ],
+      if (date) {
+        whereCondition.createdAt = {
+          [Op.gte]: new Date(date + " 00:00:00"),
+          [Op.lte]: new Date(date + " 23:59:59"),
         };
       }
 
-      // 📅 Date filter
-      if (date) {
-        whereCondition.createdAt = {
-          [Sequelize.Op.gte]: new Date(date + " 00:00:00"),
-          [Sequelize.Op.lte]: new Date(date + " 23:59:59"),
-        };
-      }
+      const searchTerm =
+        search && search.trim() !== "" ? search.trim() : undefined;
+
+      const companyWhere = searchTerm
+        ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+        : undefined;
+      const projectWhere = searchTerm
+        ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+        : undefined;
 
       let queryOptions = {
         where: whereCondition,
         order: [["id", "DESC"]],
         distinct: true,
         include: [
-          { model: db.companyObj, as: "company" },
+          {
+            model: db.companyObj,
+            as: "company",
+            attributes: ["id", "name"],
+            required: false, 
+            where: companyWhere,
+          },
+          {
+            model: db.projectObj,
+            as: "project",
+            attributes: ["id", "name"],
+            required: false,
+            where: projectWhere,
+          },
+        
           { model: db.contactsObj, as: "contact" },
           {
             model: db.userObj,
@@ -59,23 +73,10 @@ module.exports = {
           },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
-          { model: db.projectObj, as: "project" },
           {
             model: db.leadTagsObj,
             as: "lead_tags",
-            include: [
-              {
-                model: db.tagsObj,
-                as: "tag",
-              },
-            ],
-          },
-          { model: db.salesPipelinesObj, as: "salesPipelines" },
-          { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatus" },
-          {
-            model: db.userObj,
-            as: "defaultAssignTeams",
-            attributes: { exclude: ["password"] },
+            include: [{ model: db.tagsObj, as: "tag" }],
           },
         ],
       };
@@ -85,11 +86,11 @@ module.exports = {
         queryOptions.offset = offset;
       }
 
-      let { rows: leads, count } = await db.leadsObj.findAndCountAll(
-        queryOptions
-      );
+      let { rows: leads, count } = await db.leadsObj.findAndCountAll({
+        ...queryOptions,
+        // logging: console.log,
+      });
 
-      // 📊 Pagination meta
       let lastPage = Math.ceil(count / limit);
       let from = offset + 1;
       let to = offset + leads.length;
@@ -110,6 +111,7 @@ module.exports = {
       throw e;
     }
   },
+
   /*addLead*/
   async addLead(postData) {
     try {
@@ -158,17 +160,10 @@ module.exports = {
             include: [
               {
                 model: db.userObj,
-                as: "userData",
+                as: "user",
                 attributes: { exclude: ["password"] },
               },
             ],
-          },
-          { model: db.salesPipelinesObj, as: "salesPipelines" },
-          { model: db.salesPipelinesStatusesObj, as: "salesPipelinesStatus" },
-          {
-            model: db.userObj,
-            as: "defaultAssignTeams",
-            attributes: { exclude: ["password"] },
           },
         ],
       });
@@ -228,9 +223,9 @@ module.exports = {
   },
 
   /*getAllLeadNotes*/
-  async getAllLeadNotes(page, per_page, search, date, lead_id, take_all) {
+  async getAllLeadNotes(page, length, search, date, lead_id, take_all) {
     try {
-      const limit = per_page || 10;
+      const limit = length || 10;
       const offset = (page - 1) * limit || 0;
 
       let whereCondition = { lead_id: lead_id };
@@ -323,49 +318,26 @@ module.exports = {
   },
 
   /* updateLeadTeamMember */
-  // async updateLeadTeamMember(members, leadId) {
-  //   try {
-  //     await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
-
-  //     const newMembers = members.map((userId) => ({
-  //       lead_id: leadId,
-  //       user_id: userId,
-  //     }));
-
-  //     await db.leadTeamsMemberObj.bulkCreate(newMembers);
-
-  //     return await db.leadTeamsMemberObj.findAll({
-  //       where: { lead_id: leadId },
-  //       // include: [
-  //       //   {
-  //       //     model: db.userObj,
-  //       //     as: "user",
-  //       //     attributes: ["id", "full_name", "email"],
-  //       //   },
-  //       // ],
-  //     });
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
-  async updateLeadTeamMember(userIds, leadId) {
+  async updateLeadTeamMember(members, leadId) {
     try {
-      // 1. Delete old team members
       await db.leadTeamsMemberObj.destroy({ where: { lead_id: leadId } });
 
-      // 2. Prepare new members
-      const newMembers = userIds.map((userId) => ({
+      const newMembers = members.map((userId) => ({
         lead_id: leadId,
-        user_id: parseInt(userId, 10),
+        user_id: userId,
       }));
 
-      // 3. Insert new members
       await db.leadTeamsMemberObj.bulkCreate(newMembers);
 
-      // 4. Return fresh members
       return await db.leadTeamsMemberObj.findAll({
         where: { lead_id: leadId },
+        // include: [
+        //   {
+        //     model: db.userObj,
+        //     as: "user",
+        //     attributes: ["id", "full_name", "email"],
+        //   },
+        // ],
       });
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -381,29 +353,11 @@ module.exports = {
         include: [
           {
             model: db.userObj,
-            as: "userData",
-            attributes: ["id", "name", "email"], // only required fields
+            as: "user",
+            attributes: { exclude: ["password"] },
           },
         ],
       });
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
-    }
-  },
-
-  /* updateLeadDcs */
-  async updateLeadDcs(data) {
-    try {
-      const [updated] = await db.leadsObj.update(
-        { dcs: data.dcs },
-        { where: { id: data.id } } 
-      );
-
-      if (updated) {
-        return await db.leadsObj.findByPk(data.id);
-      }
-      return null;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

@@ -954,4 +954,16 @@ db.leadsObj.belongsTo(db.userObj, {
 
 db.projectNotesObj.belongsTo(db.userObj, { foreignKey: "user_id", as: "user" });
 
+db.projectObj.belongsTo(db.leadTeamsObj, {
+  foreignKey: "take_off_team_id",
+  as: "takeoff_team",
+});
+
+db.leadTeamsObj.hasMany(db.projectObj, {
+  foreignKey: "take_off_team_id",
+  as: "projects",
+});
+
+
+
 module.exports = db;

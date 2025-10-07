@@ -8,7 +8,13 @@ const ACCESS_MODULES = {
     LEADS: "Leads",
     COMPANY: "Company",
     CONTACT: "Contact",
-    PROJECTS: "Projects",
+    PROJECTS: {
+      LIST: "List",
+      DATA_COLLECTION_FORM: "Data Collection Form",
+      TAKEOFF_APPROVAL_FORM: "Takeoff Approval Form",
+      ASSIGNED_TAKEOFFS_OVERVIEW: "Assigned Takeoffs Overview",
+      LEAD_PRICING_LIST: "Lead Pricing List",
+    },
   },
 
   SALES: {

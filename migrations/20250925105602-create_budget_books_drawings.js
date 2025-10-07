@@ -3,30 +3,30 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-  await queryInterface.createTable('project_contracts', {
+    await queryInterface.createTable('budget_books_drawings', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      contract_component_id: {
+      submittal_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
       title: {
         type: Sequelize.STRING(255),
         allowNull: false,
-        defaultValue: '1'
+        defaultValue: false
       },
       is_include: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: true
+        defaultValue: 1
       },
       created_at: {
         type: Sequelize.DATE,
@@ -44,6 +44,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-   await queryInterface.dropTable('project_contracts');
+    await queryInterface.dropTable('budget_books_drawings');
   }
 };

@@ -23,10 +23,10 @@ module.exports = {
   //       order: [["created_at", "DESC"]],
   //       // Optional: include related tables if you want
   //       include: [
-  //         { model: db.projectScopeIncludesObj, as: "projectScopeIncludes" },
-  //         { model: db.projectDrawingsObj, as: "projectSubmittals" },
-  //         { model: db.projectKeyAreasObj, as: "projectKeyAreas" },
-  //         { model: db.projectContractsObj, as: "projectContracts" },
+  //         { model: db.budgetBooksScopeIncludesObj, as: "projectScopeIncludes" },
+  //       //   { model: db.budgetBooksDrawingsObj, as: "projectSubmittals" },
+  //       //   { model: db.budgetBooksKeyAreasObj, as: "projectKeyAreas" },
+  //       //   { model: db.budgetBooksContractsObj, as: "projectContracts" },
   //       ],
   //     });
   //     return budgetBooks;

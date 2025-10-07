@@ -152,6 +152,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+       takeoff_status: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
       seismic_zone: {
         type: Sequelize.STRING(255),
         allowNull: true,

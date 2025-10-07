@@ -5,7 +5,6 @@ const config = require("../../../config/db.config");
 var jwt = require("jsonwebtoken");
 const authServices = require("../services/auth.services");
 const { check, validationResult } = require("express-validator"); // Updated import
-const { ACCESS_MODULES } = require("../helper/constant");
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => {
     return error.msg;
@@ -306,22 +305,6 @@ module.exports = {
         message:
           error.response?.data?.error || error.message || "User updated failed",
         data: error.response?.data || {},
-      });
-    }
-  },
-
-  async getAllAccessModules(req, res) {
-    try {
-      return res.status(200).json({
-        status: true,
-        message: "Access modules fetched successfully",
-        data: ACCESS_MODULES,
-      });
-    } catch (error) {
-      console.error("Error fetching access modules:", error);
-      return res.status(500).json({
-        status: false,
-        message: "Something went wrong while fetching access modules",
       });
     }
   },

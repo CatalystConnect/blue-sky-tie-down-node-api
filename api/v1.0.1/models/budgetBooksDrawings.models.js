@@ -1,35 +1,30 @@
 module.exports = (sequelize, Sequelize) => {
-  const projectScopeIncludes = sequelize.define(
-    "project_scope_includes",
+  const budgetBooksDrawings = sequelize.define(
+    "budget_books_drawings",
     {
-      id: {
+       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      budget_category_id: {
+      submittal_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
       title: {
         type: Sequelize.STRING(255),
         allowNull: false,
-        defaultValue: '1'
+        defaultValue: false
       },
       is_include: {
         type: Sequelize.INTEGER,
-        allowNull: true,
-        defaultValue: 1
-      },
-      is_exclude: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        defaultValue: 1
+        allowNull: false,
+        defaultValue: false
       },
       created_at: {
         type: Sequelize.DATE,
@@ -54,5 +49,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return projectScopeIncludes;
+  return budgetBooksDrawings;
 };

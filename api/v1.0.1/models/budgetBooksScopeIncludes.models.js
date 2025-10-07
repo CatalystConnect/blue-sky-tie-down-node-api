@@ -1,16 +1,14 @@
-'use strict';
-
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('project_scope_includes', {
+module.exports = (sequelize, Sequelize) => {
+  const budgetBooksScopeIncludes = sequelize.define(
+    "budget_books_scope_includes",
+    {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -44,11 +42,17 @@ module.exports = {
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
-      }
-    });
-  },
+      },
+    },
+    {
+      timestamps: true,
+      freezeTableName: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+    }
+  );
 
-  async down(queryInterface, Sequelize) {
-   await queryInterface.dropTable('project_scope_includes');
-  }
+  return budgetBooksScopeIncludes;
 };

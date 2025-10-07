@@ -197,32 +197,40 @@ db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
 db.scopeCategoryObj = require("./scopeCategory.models")(dbObj, Sequelize);
 db.scopeGroupObj = require("./scopeGroup.models")(dbObj, Sequelize);
 db.scopeSegmentObj = require("./scopeSegment.models")(dbObj, Sequelize);
-db.projectScopeIncludesObj = require("./projectScopeIncludes.models")(
+db.budgetBooksScopeIncludesObj = require("./budgetBooksScopeIncludes.models")(
   dbObj,
   Sequelize
 );
-db.projectContractsObj = require("./projectContracts.models")(dbObj, Sequelize);
-db.projectKeyAreasObj = require("./projectKeyAreas.models")(dbObj, Sequelize);
-db.projectDrawingsObj = require("./projectDrawings.models")(dbObj, Sequelize);
+db.budgetBooksContractsObj = require("./budgetBooksContracts.models")(
+  dbObj,
+  Sequelize
+);
+db.budgetBooksKeyAreasObj = require("./budgetBooksKeyAreas.models")(
+  dbObj,
+  Sequelize
+);
+db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
+  dbObj,
+  Sequelize
+);
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 /*Associations*/
-
-// budgetBooksObj.hasMany(db.projectScopeIncludesObj, {
-//   foreignKey: "project_id",
+// db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
+//   foreignKey: "budget_books_id",
 //   as: "projectScopeIncludes",
 // });
-// budgetBooksObj.hasMany(db.projectDrawingsObj, {
-//   foreignKey: "project_id",
-//   as: "projectSubmittals",
+// db.budgetBooksObj.hasMany(db.budgetBooksContractsObj, {
+//   foreignKey: "budget_books_id",
+//   as: "projectContracts",
 // });
-// budgetBooksObj.hasMany(db.projectKeyAreasObj, {
-//   foreignKey: "project_id",
+// db.budgetBooksObj.hasMany(db.budgetBooksKeyAreasObj, {
+//   foreignKey: "budget_books_id",
 //   as: "projectKeyAreas",
 // });
-// budgetBooksObj.hasMany(db.projectContractsObj, {
-//   foreignKey: "project_id",
-//   as: "projectContracts",
+// db.budgetBooksObj.hasMany(db.budgetBooksDrawingsObj, {
+//   foreignKey: "budget_books_id",
+//   as: "projectDrawings",
 // });
 
 db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesStatusesObj, {

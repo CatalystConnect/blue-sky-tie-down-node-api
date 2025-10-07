@@ -405,7 +405,7 @@ module.exports = {
 
 
             const whereClause = {
-                status: "new",
+                takeoff_status: "new",
             };
 
             if (search) {
@@ -502,6 +502,23 @@ module.exports = {
             project.projectType = projectType;
             if (name !== null) project.name = name;
             if (units !== null) project.units = units;
+            await project.save();
+
+            return project;
+        } catch (e) {
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    },
+    async updateProjecttakeOffStatusDataCollect(projectId, takeoff_status) {
+        try {
+            const project = await db.projectObj.findOne({ where: { id: projectId } });
+
+            if (!project) {
+                throw new Error("Project not found");
+            }
+
+            project.takeoff_status = takeoff_status;
             await project.save();
 
             return project;

@@ -10,15 +10,15 @@ const ACCESS_MODULES = {
     CONTACT: "Contact",
     PROJECTS: {
       LIST: "List",
-      DATA_COLLECTION_FORM: "Data Collection Form",
-      TAKEOFF_APPROVAL_FORM: "Takeoff Approval Form",
-      ASSIGNED_TAKEOFFS_OVERVIEW: "Assigned Takeoffs Overview",
-      LEAD_PRICING_LIST: "Lead Pricing List",
+      DATA_COLLECTION_FORM: "DataCollectionForm",
+      TAKEOFF_APPROVAL_FORM: "TakeoffApprovalForm",
+      ASSIGNED_TAKEOFFS_OVERVIEW: "AssignedTakeoffsOverview",
+      LEAD_PRICING_LIST: "LeadPricingList",
     },
   },
 
   SALES: {
-    BUDGET_BOOK: "Budget Book",
+    BUDGET_BOOK: "BudgetBook",
   },
 
   INVENTORY: {
@@ -28,26 +28,26 @@ const ACCESS_MODULES = {
 
   SETTINGS: {
     LEAD: {
-      LEADS_STATUS: "Leads Status",
-      LEADS_TYPE: "Leads Type",
-      LEADS_TAGS: "Leads Tags",
-      INTERACTION_TYPE: "Interaction Type",
+      LEADS_STATUS: "LeadsStatus",
+      LEADS_TYPE: "LeadsType",
+      LEADS_TAGS: "LeadsTags",
+      INTERACTION_TYPE: "InteractionType",
     },
     ITEM: {
       BRANDS: "Brands",
-      PRODUCT_TAGS: "Product Tags",
+      PRODUCT_TAGS: "ProductTags",
       UNITS: "Units",
     },
     BUDGET: {
-      BUDGET_BOOK_SCOPE: "Budget Book Scope",
-      BUDGET_CATEGORY: "Budget Category",
-      KEY_AREAS: "Key Areas",
+      BUDGET_BOOK_SCOPE: "BudgetBookScope",
+      BUDGET_CATEGORY: "BudgetCategory",
+      KEY_AREAS: "KeyAreas",
     },
     SYSTEM: {
-      COMPANY_TYPE: "Company Type",
+      COMPANY_TYPE: "CompanyType",
       DEPARTMENT: "Department",
-      TERMS_CODES: "Terms Codes",
-      ZIP_CODE: "Zip Code",
+      TERMS_CODES: "TermsCodes",
+      ZIP_CODE: "ZipCode",
     },
     PIPELINE_SETTINGS: {
       PIPELINE: "Pipeline",
@@ -63,7 +63,19 @@ const ACCESS_MODULES = {
     TEAM: "Team",
   },
 };
+const PROJECT_STATUS = {
+  LEAD: "Lead",
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
+};
 
+const TAKEOFF_STATUS = {
+  NEW: "new",
+  PROJECT_DATA_COLLECTED: "ProjectDataCollected",
+  TAKEOFF_ASSIGNED: "TakeoffAssigned",
+  TAKEOFF_IN_PROGRESS: "TakeoffInProgress",
+  TAKEOFF_COMPLETED: "TakeoffCompleted",
+};
 module.exports = {
   ACCESS_MODULES,
 };

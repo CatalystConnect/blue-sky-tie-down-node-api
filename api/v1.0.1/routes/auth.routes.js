@@ -22,6 +22,4 @@ router.put("/updateUser", multiUpload,[authJwt.verifyToken], controller.updateUs
 /*deleteUser*/
 router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
 
-// Auth-protected route
-router.get("/getAllModule", [authJwt.verifyToken], controller.getAllAccessModules);
 module.exports = router;

@@ -74,7 +74,9 @@ module.exports = {
                     "connectplan",
                     "surveyorNotes",
                     "completedFiles",
-                    "takeOfEstimateTime"
+                    "takeOfEstimateTime",
+                    "takeoff_status",
+                    "project_status"
 
                 ],
                 include: [
@@ -154,7 +156,9 @@ module.exports = {
                     "connectplan",
                     "surveyorNotes",
                     "completedFiles",
-                    "takeOfEstimateTime"
+                    "takeOfEstimateTime",
+                    "takeoff_status",
+                    "project_status"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -462,7 +466,9 @@ module.exports = {
                     "connectplan",
                     "surveyorNotes",
                     "completedFiles",
-                    "takeOfEstimateTime"
+                    "takeOfEstimateTime",
+                    "takeoff_status",
+                    "project_status"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -547,7 +553,7 @@ module.exports = {
     async getAllProjectDatatakeoffStatusDataCollected(page = 1, per_page, search = "") {
         try {
             const limit = parseInt(per_page) || 10;
-            const offset = (parseInt(page) - 1) * limit || 0;       
+            const offset = (parseInt(page) - 1) * limit || 0;
             const whereClause = {
                 takeoff_status: "PROJECT DATA COLLECTED",
             };
@@ -597,7 +603,7 @@ module.exports = {
                     "projectFiles",
                     "architecture",
                     "takeoffactualtime",
-                    "dueDate",      
+                    "dueDate",
                     "projectAttachmentUrls",
                     "attachmentsLink",
                     "projectRifFields",
@@ -617,6 +623,7 @@ module.exports = {
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" },
                     { model: db.projectplanSetsObj, as: "planSets" },
+                    { model: db.leadTeamsObj, as: "takeoff_team" },
                 ],
                 order: [["id", "DESC"]],
             });

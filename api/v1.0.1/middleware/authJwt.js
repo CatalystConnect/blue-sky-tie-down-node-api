@@ -19,24 +19,27 @@ verifyToken = (req, res, next) => {
         data: {},
       });
     }
-    
     req.userId = decoded.id;
-    req.userName = decoded.name;
-    req.role = decoded.role
+    req.name = decoded.name;
+    req.role = decoded.role;
+    req.roleName = decoded.roleName;
+    req.roleAccess = decoded.roleAccess;
     next();
   });
 };
 
 generateAccessToken = (user) => {
-  return jwt.sign({ id: user.id, name: user.firstName, role:user.role }, config.secret, {
-    expiresIn: "5d", //2 minutes
-  });
+  return jwt.sign(
+    { id: user.id, name: user.firstName, role: user.role },
+    config.secret,
+    {
+      expiresIn: "5d", //2 minutes
+    }
+  );
 };
-
-
 
 const authJwt = {
   verifyToken: verifyToken,
-  generateAccessToken: generateAccessToken
+  generateAccessToken: generateAccessToken,
 };
 module.exports = authJwt;

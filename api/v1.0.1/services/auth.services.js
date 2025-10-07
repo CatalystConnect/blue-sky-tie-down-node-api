@@ -19,6 +19,13 @@ module.exports = {
     try {
       let user = await db.userObj.findOne({
         where: { email: email },
+        include: [
+        {
+          model: db.rolesObj,
+          as: "roles",
+          attributes: ["id", "name", "access"],
+        },
+      ],
         raw: true,
       });
       return user;

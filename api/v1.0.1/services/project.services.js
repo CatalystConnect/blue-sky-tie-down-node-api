@@ -86,6 +86,7 @@ module.exports = {
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" },
                     { model: db.projectplanSetsObj, as: "planSets" },
+                    { model: db.leadTeamsObj, as: "takeoff_team" },
                 ],
                 order: [["id", "DESC"]],
             });
@@ -166,6 +167,7 @@ module.exports = {
                     { model: db.companyObj, as: "developer" },
                     { model: db.companyObj, as: "general_contractor" },
                     { model: db.userObj, as: "planReviewer" },
+                    { model: db.leadTeamsObj, as: "takeoff_team" },
                     { model: db.projectplanSetsObj, as: "planSets" },
                     {
                         model: db.leadsObj,
@@ -644,5 +646,103 @@ module.exports = {
             throw e;
         }
     },
+    async getAllProjectDatatakeoffAssignToTeam(page = 1, per_page, search = "") {
+        try {
+            const limit = parseInt(per_page) || 10;
+            const offset = (parseInt(page) - 1) * limit || 0;
+            const whereClause = {
+                takeoff_status: "TAKEOFF ASSIGNED",
+            };
+
+            if (search) {
+                whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+            }
+
+            const { rows, count } = await db.projectObj.findAndCountAll({
+                where: whereClause,
+                limit,
+                offset,
+                attributes: [
+                    "id",
+                    "user_id",
+                    "engineer_id",
+                    "name",
+                    "city",
+                    "state",
+                    "plan_date",
+                    "bldg_gsqft",           
+                    "address",
+                    "zip",
+                    "units",
+                    "projectType",
+                    "project_phase",
+                    "date_received",
+                    "rev_status",
+                    "plan_reviewed_date",
+                    "plan_reviewed_by",
+                    "plan_revision_notes",
+                    "data_collocated_date",
+                    "bldgs",
+                    "wind_zone",
+                    "seismic_zone",
+                    "developer_id",
+                    "general_contractor_id",
+                    "assign_to_budget",
+                    "take_off_team_id",
+                    "take_off_type",
+                    "take_off_scope",
+                    "assign_date",
+                    "plan_link",
+                    "submissionType",
+                    "planFiles",
+                    "projectTags",
+                    "projectFiles",
+                    "architecture",
+                    "takeoffactualtime",
+                    "dueDate",
+                    "projectAttachmentUrls",
+                    "attachmentsLink",
+                    "projectRifFields",
+                    "status",
+                    "takeofCompleteDate",
+                    "connectplan",
+                    "surveyorNotes",
+                    "completedFiles",
+                    "takeOfEstimateTime",   
+                    "takeoff_status",
+                    "project_status"
+                ],
+                include: [
+                    { model: db.companyObj, as: "engineer" },
+                    { model: db.companyObj, as: "architect" },
+                    { model: db.companyObj, as: "developer" },
+                    { model: db.companyObj, as: "general_contractor" },
+                    { model: db.userObj, as: "planReviewer" },
+                    { model: db.projectplanSetsObj, as: "planSets" },
+                    { model: db.leadTeamsObj, as: "takeoff_team" },
+                ],
+                order: [["id", "DESC"]],
+            });
+
+            return {
+                data: rows,
+                meta: {
+                    current_page: parseInt(page),
+                    from: offset + 1,
+                    to: offset + rows.length,
+                    last_page: Math.ceil(count / limit),
+                    per_page: limit,
+                    total: count,
+                },
+            };
+        } catch (e      ) {     
+            logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+            throw e;
+        }
+    } 
+
+
+                    
+
 
 };

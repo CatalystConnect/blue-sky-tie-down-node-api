@@ -19,5 +19,8 @@ router.put("/role/updateRole",[authJwt.verifyToken], [controller.validate("getRo
 /*deleteRole*/
 router.delete("/role/deleteRole",[authJwt.verifyToken], [controller.validate("getRoleById")], controller.deleteRole);
 
+// Auth-protected route
+router.get("/getAllModule", [authJwt.verifyToken], controller.getAllAccessModules);
+
 module.exports = router;
 

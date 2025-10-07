@@ -124,7 +124,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      plan_reviewed_by: {
+        plan_reviewed_by: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+       assign_team: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },

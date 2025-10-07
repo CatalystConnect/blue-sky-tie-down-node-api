@@ -11,6 +11,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      team_type: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
       contact_id: {
         type: Sequelize.TEXT,
         allowNull: true,

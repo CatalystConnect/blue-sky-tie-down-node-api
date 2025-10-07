@@ -28,6 +28,7 @@ module.exports = {
           ? data.contact.join(",")
           : data.contact,
         status: data.status || "active",
+        team_type: data.team_type || null,
       };
       await leadTeamsServices.addLeadTeams(postData);
 
@@ -189,6 +190,7 @@ module.exports = {
           ? data.contact.join(",")
           : data.contact,
         status: data.status || "active",
+         team_type: data.team_type || null, 
       };
 
       const result = await leadTeamsServices.updateLeadTeams(id, postData);

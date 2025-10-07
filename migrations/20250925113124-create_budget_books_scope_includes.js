@@ -1,18 +1,20 @@
-module.exports = (sequelize, Sequelize) => {
-  const projectKeyAreas = sequelize.define(
-    "project_key_areas",
-    {
-       id: {
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('budget_books_scope_includes', {
+      id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      key_area_id: {
+      budget_category_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -23,7 +25,12 @@ module.exports = (sequelize, Sequelize) => {
       },
       is_include: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: 1
+      },
+      is_exclude: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
         defaultValue: 1
       },
       created_at: {
@@ -37,17 +44,11 @@ module.exports = (sequelize, Sequelize) => {
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
-      },
-    },
-    {
-      timestamps: true,
-      freezeTableName: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-    }
-  );
+      }
+    });
+  },
 
-  return projectKeyAreas;
+  async down(queryInterface, Sequelize) {
+   await queryInterface.dropTable('budget_books_scope_includes');
+  }
 };

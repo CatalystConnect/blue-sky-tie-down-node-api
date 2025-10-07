@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const projectDrawings = sequelize.define(
-    "project_drawings",
+  const budgetBooksKeyAreas = sequelize.define(
+    "budget_books_key_areas",
     {
        id: {
         type: Sequelize.INTEGER,
@@ -8,23 +8,23 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      submittal_id: {
+      key_area_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
       title: {
         type: Sequelize.STRING(255),
         allowNull: false,
-        defaultValue: false
+        defaultValue: '1'
       },
       is_include: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: false
+        defaultValue: 1
       },
       created_at: {
         type: Sequelize.DATE,
@@ -49,5 +49,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return projectDrawings;
+  return budgetBooksKeyAreas;
 };

@@ -74,6 +74,9 @@ module.exports = {
                 surveyorNotes: data.surveyorNotes,
                 completedFiles: completedFiles,
                 takeOfEstimateTime: data.takeOfEstimateTime,
+                project_status: data.project_status || "active",
+                takeoff_status: data.takeoff_status || null,
+
 
             };
             let project = await projectServices.addProject(postData);
@@ -240,6 +243,8 @@ module.exports = {
                 surveyorNotes: data.surveyorNotes,
                 completedFiles: completedFiles,
                 takeOfEstimateTime: data.takeOfEstimateTime,
+                project_status: data.project_status || "active",
+                takeoff_status: data.takeoff_status || null,
             };
             commonHelper.removeFalsyKeys(postData);
 

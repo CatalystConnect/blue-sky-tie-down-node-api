@@ -26,15 +26,16 @@ module.exports = {
         throw new Error("This role name already exists");
       }
 
-      const accessModules = Array.isArray(data.access)
-        ? JSON.stringify(data.access)
-        : JSON.stringify([]);
+      let accessModules = {};
+      if (data.access && typeof data.access === "object") {
+        accessModules = data.access;
+      }
 
       const postData = {
         name: data.name,
         guard_name: data.guard_name || "api",
         is_hidden: data.is_hidden || "false",
-        access: accessModules,
+        access: JSON.stringify(accessModules),
       };
 
       await roleServices.addRole(postData);
@@ -121,15 +122,16 @@ module.exports = {
         throw new Error("Role not found");
       }
       let data = req.body;
-      const accessModules = Array.isArray(data.access)
-        ? JSON.stringify(data.access)
-        : JSON.stringify([]);
+      let accessModules = {};
+      if (data.access && typeof data.access === "object") {
+        accessModules = data.access;
+      }
 
       const postData = {
         name: data.name,
         guard_name: data.guard_name || "api",
         is_hidden: data.is_hidden || "false",
-        access: accessModules,
+        access: JSON.stringify(accessModules),
       };
       commonHelper.removeFalsyKeys(postData);
       let updateRole = await roleServices.updateRole(postData, roleId);

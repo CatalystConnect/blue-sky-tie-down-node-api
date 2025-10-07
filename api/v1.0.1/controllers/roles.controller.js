@@ -19,17 +19,26 @@ module.exports = {
           .status(200)
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
-      let data = req.body;
+
+      const data = req.body;
       const existingRole = await roleServices.getRoleByName(data.name);
       if (existingRole) {
         throw new Error("This role name already exists");
       }
-      let postData = {
+
+      const accessModules = Array.isArray(data.access)
+        ? JSON.stringify(data.access)
+        : JSON.stringify([]);
+
+      const postData = {
         name: data.name,
-        guard_name: data.guard_name || null,
-        is_hidden: data.is_hidden ?? false,
+        guard_name: data.guard_name || "api",
+        is_hidden: data.is_hidden || "false",
+        access: accessModules,
       };
-    //   await roleServices.addRole(postData);
+
+      await roleServices.addRole(postData);
+
       return res
         .status(200)
         .send(commonHelper.parseSuccessRespose("", "Role added successfully"));
@@ -41,6 +50,7 @@ module.exports = {
       });
     }
   },
+
   /*getAllRoles*/
   async getAllRoles(req, res) {
     try {
@@ -111,9 +121,15 @@ module.exports = {
         throw new Error("Role not found");
       }
       let data = req.body;
-      let postData = {
-        role: data.role,
+      const accessModules = Array.isArray(data.access)
+        ? JSON.stringify(data.access)
+        : JSON.stringify([]);
+
+      const postData = {
         name: data.name,
+        guard_name: data.guard_name || "api",
+        is_hidden: data.is_hidden || "false",
+        access: accessModules,
       };
       commonHelper.removeFalsyKeys(postData);
       let updateRole = await roleServices.updateRole(postData, roleId);

@@ -5,6 +5,7 @@ const config = require("../../../config/db.config");
 var jwt = require("jsonwebtoken");
 const authServices = require("../services/auth.services");
 const { check, validationResult } = require("express-validator"); // Updated import
+const { access } = require("fs");
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => {
     return error.msg;
@@ -72,11 +73,18 @@ module.exports = {
       let dbPassword = getUserInfo.password;
       var passwordIsValid = bcrypt.compareSync(password, dbPassword);
       if (!passwordIsValid) throw new Error("Invalid Password!");
+
+      const roleName = getUserInfo["roles.name"];
+      const roleAccess = JSON.parse(getUserInfo["roles.access"] || "[]");
+
       const payload = {
         id: getUserInfo.id,
-        name: getUserInfo.firstName,
+        name: getUserInfo.name,
         role: getUserInfo.role,
+        roleName:roleName,
+        roleAccess:roleAccess
       };
+      
       var accessToken = jwt.sign(payload, config.secret, {
         expiresIn: "1d", // 24x7 hours
       });
@@ -177,7 +185,6 @@ module.exports = {
       }
 
       let userId = req.query.userId;
-      console.log("userIduserId", userId);
 
       let user = await authServices.getUserById(userId);
 
@@ -195,6 +202,7 @@ module.exports = {
         address: user.address,
         status: user.status,
         role: user.roles?.name || null,
+        access: user.roles?.access || null,
         roleId: user.roles?.id || null,
         avatar: user.avatar,
         departments: user.department

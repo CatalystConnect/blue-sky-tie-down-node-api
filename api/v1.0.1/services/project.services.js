@@ -634,7 +634,8 @@ module.exports = {
                     { model: db.leadTeamsObj, as: "takeoff_team" },
                 ],
                 order: [
-                    [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
+                    [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "DESC"],
+                    ["id", "DESC"],
 
                 ],
             });

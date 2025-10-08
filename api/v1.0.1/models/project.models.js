@@ -180,7 +180,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
-       star_approval: {
+       priority: {
         type: Sequelize.STRING(255),
         defaultValue: "false",
       },

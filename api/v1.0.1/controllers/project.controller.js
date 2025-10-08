@@ -1120,7 +1120,7 @@ module.exports = {
                     message: "Page and per_page must be greater than 0",
                     data: {},
                 });
-            }       
+            }
             const getAllProject = await projectServices.getAllProjectDatatakeoffStatusDataCollected(
                 page,
                 per_page,
@@ -1148,7 +1148,7 @@ module.exports = {
                 data: {},
             });
         }
-    },  
+    },
     async getAllProjectDatatakeoffAssignToTeam(req, res) {
         try {
             let { page = 1, per_page = 10, search = "" } = req.query;
@@ -1162,7 +1162,7 @@ module.exports = {
                     message: "Page and per_page must be greater than 0",
                     data: {},
                 });
-            }       
+            }
             const getAllProject = await projectServices.getAllProjectDatatakeoffAssignToTeam(
                 page,
                 per_page,
@@ -1191,7 +1191,43 @@ module.exports = {
             });
         }
     },
+    async updateProjecttakeOffStatus(req, res) {
+        try {
+            const { takeoff_status, ids } = req.body;
 
+            if (!takeoff_status || !Array.isArray(ids) || ids.length === 0) {
+                return res.status(400).json({
+                    status: false,
+                    message: "takeoff_status and ids[] are required",
+                });
+            }
+
+            
+            const updatedCount = await projectServices.updateProjecttakeOffStatus(ids, takeoff_status);
+
+            if (updatedCount === 0) {
+                return res.status(404).json({
+                    status: false,
+                    message: "No projects found for the given IDs",
+                    data: {},
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Project takeoff status updated successfully",
+                updatedCount,
+            });
+
+        } catch (error) {
+            console.error("Error updating project takeoff status:", error);
+            return res.status(400).json({
+                status: false,
+                message: error.message || "Updating project takeoff status failed",
+                data: {},
+            });
+        }
+    }
 
 
 

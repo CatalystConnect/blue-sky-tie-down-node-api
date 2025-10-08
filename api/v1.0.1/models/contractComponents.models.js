@@ -31,11 +31,13 @@ module.exports = (sequelize, Sequelize) => {
     },
     {
       timestamps: true,
-      freezeTableName: true,
+      // freezeTableName: true,
       createdAt: "created_at",
       updatedAt: "updated_at",
       paranoid: true,
       deletedAt: "deleted_at",
+      underscored: true,
+
     }
   );
 

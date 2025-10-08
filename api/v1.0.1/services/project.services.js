@@ -740,14 +740,22 @@ module.exports = {
             throw e;
         }
     },
-    async updateProjecttakeOffStatus(ids, takeoff_status) {
-        
+    // async updateProjecttakeOffStatus(ids, takeoff_status) {
+
+    //     const [updatedRows] = await db.projectObj.update(
+    //         { takeoff_status },
+    //         { where: { id: ids } }
+    //     );
+    //     return updatedRows; 
+    // }
+    async updateProjecttakeOffStatus(ids, takeoff_status, star_approval = false) {
         const [updatedRows] = await db.projectObj.update(
-            { takeoff_status },
+            { takeoff_status, star_approval },
             { where: { id: ids } }
         );
-        return updatedRows; 
+        return updatedRows;
     }
+
 
 
 

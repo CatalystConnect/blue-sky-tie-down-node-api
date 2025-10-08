@@ -1241,12 +1241,7 @@ module.exports = {
         try {
             const { takeoff_status, ids } = req.body;
 
-            if (!takeoff_status || !Array.isArray(ids) || ids.length === 0) {
-                return res.status(400).json({
-                    status: false,
-                    message: "takeoff_status and ids[] are required",
-                });
-            }
+            
 
             // Update all projects
             const updatePromises = ids.map(item =>

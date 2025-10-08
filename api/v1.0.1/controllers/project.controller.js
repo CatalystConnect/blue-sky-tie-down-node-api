@@ -1245,7 +1245,7 @@ module.exports = {
 
             // Update all projects
             const updatePromises = ids.map(item =>
-                projectServices.updateProjecttakeOffStatus([item.id], takeoff_status, item.star_approval)
+                projectServices.updateProjecttakeOffStatus([item.id], takeoff_status, item.priority)
             );
 
             await Promise.all(updatePromises);

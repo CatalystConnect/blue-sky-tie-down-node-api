@@ -99,7 +99,7 @@ module.exports = (sequelize, Sequelize) => {
       limit_notes: Sequelize.TEXT,
 
       // ---------- Relations ----------
-      budget_book_id: Sequelize.INTEGER,
+      project_id: Sequelize.INTEGER,
 
       // ---------- Extra ----------
       terms: Sequelize.TEXT,

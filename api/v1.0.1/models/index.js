@@ -216,6 +216,7 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 db.submittalsObj = require("./submittals.models")(dbObj, Sequelize);
+db.contractComponentsObj = require("./contractComponents.models")(dbObj, Sequelize);
 
 /*Associations*/
 db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {

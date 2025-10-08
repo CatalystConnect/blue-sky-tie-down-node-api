@@ -180,6 +180,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+       star_approval: {
+        type: Sequelize.STRING(255),
+        defaultValue: "false",
+      },
       take_off_scope: {
         type: Sequelize.STRING(255),
         allowNull: true,

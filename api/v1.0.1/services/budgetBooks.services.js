@@ -2,6 +2,7 @@ var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
 const { Op, Sequelize } = require("sequelize");
+const slugify = require("slugify");
 
 module.exports = {
   /*addBudgetBooks*/
@@ -29,6 +30,8 @@ module.exports = {
           { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
           { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
           { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
+          { model: db.projectObj, as: "budgetProject" },
+          { model: db.leadsObj, as: "budgetLead" },
         ],
       });
       return budgetBooks;
@@ -50,6 +53,8 @@ module.exports = {
           { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
           { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
           { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
+          { model: db.projectObj, as: "budgetProject" },
+          { model: db.leadsObj, as: "budgetLead" },
         ],
       });
 
@@ -198,6 +203,185 @@ module.exports = {
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
       throw error;
+    }
+  },
+  async getAllBudgetCategory() {
+    try {
+      const budgetCategories = await db.budgetCategoryObj.findAll({
+        where: { status: "active" },
+        order: [["id", "ASC"]],
+      });
+
+      if (!budgetCategories || !budgetCategories.length) return [];
+
+      const categoryIds = budgetCategories.map((c) => c.id);
+      const scopes = await db.budgetScopeObj.findAll({
+        where: {
+          status: "active",
+          category_id: { [Op.in]: categoryIds },
+        },
+      });
+
+      const scopeIds = scopes.map((s) => s.id);
+      if (!scopeIds.length) {
+        return budgetCategories.map((category) => ({
+          budgetCategory: {
+            id: category.id,
+            catName: (category.catName || category.name || "").toUpperCase(),
+            cat_value: slugify(category.catName || category.name || "", {
+              replacement: "_",
+              lower: true,
+              strict: true,
+            }),
+          },
+          scopes: [],
+        }));
+      }
+
+      const scopeCategories = await db.scopeCategoryObj.findAll({
+        where: { scope_id: { [Op.in]: scopeIds } },
+      });
+
+      const scopeCategoryIds = scopeCategories.map((sc) => sc.id);
+
+      const groups = await db.scopeGroupObj.findAll({
+        where: { scope_category_id: { [Op.in]: scopeCategoryIds } },
+      });
+
+      const groupIds = groups.map((g) => g.id);
+
+      const segments = await db.scopeSegmentObj.findAll({
+        where: { scope_group_id: { [Op.in]: groupIds } },
+      });
+
+      const segmentIds = segments.map((s) => s.id);
+
+      const projectSegments = segmentIds.length
+        ? await db.projectScopeSegmentsObj.findAll({
+            where: {
+              [Op.or]: [
+                { scope_sagment_id: { [Op.in]: segmentIds } },
+              ],
+            },
+          })
+        : [];
+
+      const scopesByCategoryId = {};
+      scopes.forEach((s) => {
+        scopesByCategoryId[s.category_id] =
+          scopesByCategoryId[s.category_id] || [];
+        scopesByCategoryId[s.category_id].push(s);
+      });
+
+      const categoriesByScopeId = {};
+      scopeCategories.forEach((sc) => {
+        categoriesByScopeId[sc.scope_id] =
+          categoriesByScopeId[sc.scope_id] || [];
+        categoriesByScopeId[sc.scope_id].push(sc);
+      });
+
+      const groupsByScopeCategoryId = {};
+      groups.forEach((g) => {
+        groupsByScopeCategoryId[g.scope_category_id] =
+          groupsByScopeCategoryId[g.scope_category_id] || [];
+        groupsByScopeCategoryId[g.scope_category_id].push(g);
+      });
+
+      const segmentsByGroupId = {};
+      segments.forEach((seg) => {
+        segmentsByGroupId[seg.scope_group_id] =
+          segmentsByGroupId[seg.scope_group_id] || [];
+        segmentsByGroupId[seg.scope_group_id].push(seg);
+      });
+
+      const projectSegmentsBySegmentId = {};
+      projectSegments.forEach((ps) => {
+        const key =
+          ps.scope_sagment_id || ps.scope_segment_id || ps.scopeSegmentId;
+        if (!key) return;
+        projectSegmentsBySegmentId[key] = projectSegmentsBySegmentId[key] || [];
+        projectSegmentsBySegmentId[key].push(ps);
+      });
+
+      const allCategoryData = budgetCategories.map((category) => {
+        const catScopes = scopesByCategoryId[category.id] || [];
+
+        const scopesData = catScopes.map((scope) => {
+          const cats = categoriesByScopeId[scope.id] || [];
+
+          const categoriesData = cats.map((cat) => {
+            const catGroups = groupsByScopeCategoryId[cat.id] || [];
+
+            const groupsData = catGroups.map((group) => {
+              const groupSegments = segmentsByGroupId[group.id] || [];
+
+              const sagmentsData = groupSegments.map((sagment) => {
+                const matched = projectSegmentsBySegmentId[sagment.id] || [];
+
+                const data = matched.map((item) => ({
+                  site_id: item.site_id,
+                  segments: [
+                    {
+                      price_sqft: item.price_sqft,
+                      additionals: item.additionals,
+                      price_w_additional: item.price_w_additional,
+                      cost: item.cost,
+                      budgetIndex: item.budgetIndex,
+                    },
+                  ],
+                }));
+
+                return {
+                  scope_sagment_id: sagment.id,
+                  title: sagment.title,
+                  option: sagment.options || "",
+                  url: sagment.url || "",
+                  data,
+                };
+              });
+
+              return {
+                scope_group_id: group.id,
+                title: group.title,
+                sagments: sagmentsData,
+              };
+            });
+
+            return {
+              scope_category_id: cat.id,
+              title: cat.title,
+              groups: groupsData,
+            };
+          });
+
+          return {
+            scope_id: scope.id,
+            title: scope.title,
+            short_title: scope.short_title,
+            categories: categoriesData,
+          };
+        });
+
+        const originalName = category.catName || category.name || "";
+
+        return {
+          budgetCategory: {
+            id: category.id,
+            catName: originalName.toUpperCase(),
+            cat_value: slugify(originalName, {
+              replacement: "_",
+              lower: true,
+              strict: true,
+            }),
+          },
+          scopes: scopesData,
+        };
+      });
+
+      return allCategoryData;
+    } catch (e) {
+      console.error("Error in getAllBudgetCategory:", e);
+      throw e;
     }
   },
 };

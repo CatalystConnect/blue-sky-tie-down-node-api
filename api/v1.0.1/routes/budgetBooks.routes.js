@@ -11,4 +11,6 @@ router.get("/getBudgetBooksById", [authJwt.verifyToken], budgetBooksController.g
 router.put("/updateBudgetBooks", [authJwt.verifyToken], upload.none(), budgetBooksController.updateBudgetBooks);
 router.delete("/deleteBudgetBooks", [authJwt.verifyToken], budgetBooksController.deleteBudgetBooks);
 
+router.get("/budget-category", [authJwt.verifyToken], budgetBooksController.getAllBudgetCategory);
+
 module.exports = router;

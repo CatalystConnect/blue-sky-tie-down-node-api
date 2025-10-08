@@ -215,6 +215,8 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
 );
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
+db.submittalsObj = require("./submittals.models")(dbObj, Sequelize);
+
 /*Associations*/
 db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
   foreignKey: "budget_books_id",

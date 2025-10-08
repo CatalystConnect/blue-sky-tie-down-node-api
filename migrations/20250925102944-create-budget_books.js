@@ -13,7 +13,6 @@ module.exports = {
       user_id: { type: Sequelize.INTEGER, allowNull: true },
       site_plan_id: { type: Sequelize.INTEGER, allowNull: true },
       engineer_id: { type: Sequelize.INTEGER, allowNull: true },
-      budget_book_id: { type: Sequelize.INTEGER, allowNull: true },
       customer_id: { type: Sequelize.INTEGER, allowNull: true },
       contact_id: { type: Sequelize.STRING, allowNull: true },
       lead_id: { type: Sequelize.INTEGER, allowNull: true },

@@ -37,26 +37,31 @@ module.exports = {
 
             completedFiles = JSON.stringify(completedFiles);
 
+            const sanitizeInteger = (value) => {
+                if (value === "" || value === null || value === undefined) return null;
+                return Number(value);
+            };
+
             let postData = {
                 user_id: req.userId,
-                site_plan_id: data.site_plan_id,
-                engineer_id: data.engineer_id,
+                // site_plan_id: data.site_plan_id,
+                engineer_id: sanitizeInteger(data.engineer_id),
                 name: data.name,
                 city: data.city,
                 state: data.state,
-                bldg_gsqft: data.bldg_gsqft,
+                bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
                 address: data.address,
                 zip: data.zip,
-                units: data.units,
+                units: sanitizeInteger(data.units),
                 projectType: data.projectType,
                 project_phase: data.project_phase,
-                bldgs: data.bldgs,
+                bldgs: sanitizeInteger(data.bldgs),
                 wind_zone: data.wind_zone,
                 seismic_zone: data.seismic_zone,
-                developer_id: data.developer_id,
-                general_contractor_id: data.general_contractor_id,
-                assign_to_budget: data.assign_to_budget,
-                take_off_team_id: data.take_off_team_id,
+                developer_id: sanitizeInteger(data.developer_id),
+                general_contractor_id: sanitizeInteger(data.general_contractor_id),
+                assign_to_budget: sanitizeInteger(data.assign_to_budget),
+                take_off_team_id: sanitizeInteger(data.take_off_team_id),
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
                 assign_date: data.assign_date,
@@ -207,25 +212,29 @@ module.exports = {
             }
 
             completedFiles = JSON.stringify(completedFiles);
+            const sanitizeInteger = (value) => {
+                if (value === "" || value === null || value === undefined) return null;
+                return Number(value);
+            };
             let postData = {
                 user_id: req.userId,
-                engineer_id: data.engineer_id,
+                engineer_id: sanitizeInteger(data.engineer_id),
                 name: data.name,
                 city: data.city,
                 state: data.state,
-                bldg_gsqft: data.bldg_gsqft,
+                bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
                 address: data.address,
                 zip: data.zip,
-                units: data.units,
+                units: sanitizeInteger(data.units),
                 projectType: data.projectType,
                 project_phase: data.project_phase,
-                bldgs: data.bldgs,
+                bldgs: sanitizeInteger(data.bldgs),
                 wind_zone: data.wind_zone,
                 seismic_zone: data.seismic_zone,
-                developer_id: data.developer_id,
-                general_contractor_id: data.general_contractor_id,
-                assign_to_budget: data.assign_to_budget,
-                take_off_team_id: data.take_off_team_id,
+                developer_id: sanitizeInteger(data.developer_id),
+                general_contractor_id: sanitizeInteger(data.general_contractor_id),
+                assign_to_budget: sanitizeInteger(data.assign_to_budget),
+                take_off_team_id: sanitizeInteger(data.take_off_team_id),
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
                 assign_date: data.assign_date,
@@ -237,7 +246,7 @@ module.exports = {
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
                 projectRifFields: data.projectRifFields,
-                status: data.status,
+                status: "new",
                 takeofCompleteDate: data.takeofCompleteDate,
                 connectplan: data.connectplan,
                 surveyorNotes: data.surveyorNotes,

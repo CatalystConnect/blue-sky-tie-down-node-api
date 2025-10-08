@@ -1,7 +1,7 @@
 require("dotenv").config();
 var commonHelper = require("../helper/common.helper");
 const { check, validationResult } = require("express-validator"); // Updated import
-const submittalsServices = require("../services/submittals.services");
+const contractComponentsServices = require("../services/contractComponents.services");
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => {
     return error.msg;
@@ -10,89 +10,93 @@ const myValidationResult = validationResult.withDefaults({
 
 module.exports = {
   // Add
-  async addSubmittal(req, res) {
+  async addContractComponents(req, res) {
     try {
       const postData = {
         name: req.body.name,
         user_id: req.userId,
       };
-      const submittal = await submittalsServices.addSubmittal(postData);
+
+      const component = await contractComponentsServices.addContractComponents(
+        postData
+      );
+
       return res.status(200).json({
         status: true,
-        message: "Submittal added successfully",
-        data: submittal,
+        message: "Contract Component added successfully",
+        data: component,
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to add submittal",
+        message: "Failed to add Contract Component",
         error: error.message,
       });
     }
   },
 
   // Get all
-  async getAllSubmittals(req, res) {
+  async getAllContractComponents(req, res) {
     try {
       const { page, per_page, take_all } = req.query;
 
-      const result = await submittalsServices.getAllSubmittals({
+      const components = await contractComponentsServices.getAllContractComponents({
         page,
         per_page,
         take_all,
       });
-
       return res.status(200).json({
         status: true,
-        message: "Submittals fetched successfully",
-        data: result.data,
-        meta: result.meta,
+        message: "Contract Components fetched successfully",
+        data: components,
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to fetch submittals",
+        message: "Failed to fetch Contract Components",
         error: error.message,
       });
     }
   },
 
-  async getSubmittalById(req, res) {
+  // Get one
+  async getContractComponentsById(req, res) {
     try {
-      const { id } = req.query; 
+      const { id } = req.query;
 
       if (!id) {
         return res.status(400).json({
           status: false,
-          message: "Submittal ID is required",
+          message: "Contract Component ID is required",
         });
       }
 
-      const submittal = await submittalsServices.getSubmittalById(id);
+      const component =
+        await contractComponentsServices.getContractComponentsById(id);
 
-      if (!submittal) {
+      if (!component) {
         return res.status(404).json({
           status: false,
-          message: "Submittal not found",
+          message: "Contract Component not found",
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: "Submittal fetched successfully",
-        data: submittal,
+        message: "Contract Component fetched successfully",
+        data: component,
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to fetch submittal",
+        message: "Failed to fetch Contract Component",
         error: error.message,
       });
     }
   },
 
   // Update
-  async updateSubmittal(req, res) {
+  async updateContractComponents(req, res) {
     try {
       const { id } = req.query;
       const { name } = req.body;
@@ -100,75 +104,69 @@ module.exports = {
       if (!id) {
         return res.status(400).json({
           status: false,
-          message: "Submittal ID is required",
+          message: "Contract Component ID is required",
         });
       }
 
-      const updatedSubmittal = await submittalsServices.updateSubmittal(id, {
-        name,
-      });
+      const updated = await contractComponentsServices.updateContractComponents(
+        id,
+        { name }
+      );
 
-      if (!updatedSubmittal) {
+      if (!updated) {
         return res.status(404).json({
           status: false,
-          message: "Submittal not found",
+          message: "Contract Component not found",
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: "Submittal updated successfully",
-        data: updatedSubmittal,
+        message: "Contract Component updated successfully",
+        data: updated,
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to update submittal",
+        message: "Failed to update Contract Component",
         error: error.message,
       });
     }
   },
 
   // Delete
-  async deleteSubmittal(req, res) {
+  async deleteContractComponents(req, res) {
     try {
-      const { id } = req.query; 
+      const { id } = req.query;
 
       if (!id) {
         return res.status(400).json({
           status: false,
-          message: "Submittal ID is required",
+          message: "Contract Component ID is required",
         });
       }
 
-      const deleted = await submittalsServices.deleteSubmittal(id);
+      const deleted = await contractComponentsServices.deleteContractComponents(
+        id
+      );
 
       if (!deleted) {
         return res.status(404).json({
           status: false,
-          message: "Submittal not found",
+          message: "Contract Component not found",
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: "Submittal deleted successfully",
+        message: "Contract Component deleted successfully",
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to delete submittal",
+        message: "Failed to delete Contract Component",
         error: error.message,
       });
-    }
-  },
-
-  validate(method) {
-    switch (method) {
-      case "addSubmittals":
-        return [check("name").notEmpty().withMessage("Name is required")];
-      default:
-        return [];
     }
   },
 };

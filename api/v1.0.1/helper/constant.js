@@ -1,7 +1,7 @@
 const ACCESS_MODULES = {
-  HOME: {
-    HOME: "Home",
-  },
+  // HOME: {
+  //   HOME: "Home",
+  // },
 
   CRM: {
     USERS: "Users",
@@ -21,10 +21,10 @@ const ACCESS_MODULES = {
     BUDGET_BOOK: "BudgetBook",
   },
 
-  INVENTORY: {
-    VENDOR: "Vendor",
-    WAREHOUSE: "Warehouse",
-  },
+  // INVENTORY: {
+  //   VENDOR: "Vendor",
+  //   WAREHOUSE: "Warehouse",
+  // },
 
   SETTINGS: {
     LEAD: {
@@ -33,11 +33,11 @@ const ACCESS_MODULES = {
       LEADS_TAGS: "LeadsTags",
       INTERACTION_TYPE: "InteractionType",
     },
-    ITEM: {
-      BRANDS: "Brands",
-      PRODUCT_TAGS: "ProductTags",
-      UNITS: "Units",
-    },
+    // ITEM: {
+    //   BRANDS: "Brands",
+    //   PRODUCT_TAGS: "ProductTags",
+    //   UNITS: "Units",
+    // },
     BUDGET: {
       BUDGET_BOOK_SCOPE: "BudgetBookScope",
       BUDGET_CATEGORY: "BudgetCategory",
@@ -49,15 +49,15 @@ const ACCESS_MODULES = {
       TERMS_CODES: "TermsCodes",
       ZIP_CODE: "ZipCode",
     },
-    PIPELINE_SETTINGS: {
-      PIPELINE: "Pipeline",
-      GROUP: "Group",
-    },
+    // PIPELINE_SETTINGS: {
+    //   PIPELINE: "Pipeline",
+    //   GROUP: "Group",
+    // },
   },
 
-  ROLE: {
-    ROLE: "Role",
-  },
+  // ROLE: {
+  //   ROLE: "Role",
+  // },
 
   TEAM: {
     TEAM: "Team",

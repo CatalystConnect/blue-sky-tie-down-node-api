@@ -42,6 +42,12 @@ module.exports = {
                 return Number(value);
             };
 
+            const sanitizeDate = (value) => {
+                if (!value) return null; 
+                const date = new Date(value);
+                return isNaN(date.getTime()) ? null : date;
+            };
+
             let postData = {
                 user_id: req.userId,
                 // site_plan_id: data.site_plan_id,
@@ -64,17 +70,17 @@ module.exports = {
                 take_off_team_id: sanitizeInteger(data.take_off_team_id),
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
-                assign_date: data.assign_date,
+                assign_date: sanitizeDate(data.assign_date),
                 projectTags: data.projectTags,
                 projectFiles: data.projectFiles,
                 architecture: data.architecture,
                 takeoffactualtime: data.takeoffactualtime,
-                dueDate: data.dueDate,
+                dueDate: sanitizeDate(data.dueDate),
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
                 projectRifFields: data.projectRifFields,
                 status: "new",
-                takeofCompleteDate: data.takeofCompleteDate,
+                takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
                 connectplan: data.connectplan,
                 surveyorNotes: data.surveyorNotes,
                 completedFiles: completedFiles,
@@ -95,14 +101,14 @@ module.exports = {
                     let planData = {
                         project_id: project.id,
                         submissionType: plan.submissionType,
-                        date_received: plan.date_received,
+                        date_received: sanitizeDate(plan.date_received),
                         plan_link: plan.plan_link,
                         planFiles: plan.planFiles,
-                        plan_date: plan.plan_date,
+                        plan_date: sanitizeDate(plan.plan_date),
                         rev_status: plan.rev_status,
-                        plan_reviewed_date: plan.plan_reviewed_date,
+                        plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
                         plan_reviewed_by: plan.plan_reviewed_by,
-                        data_collocated_date: plan.data_collocated_date,
+                        data_collocated_date: sanitizeDate(plan.data_collocated_date),
                         plan_revision_notes: plan.plan_revision_notes,
                     };
 
@@ -1164,6 +1170,7 @@ module.exports = {
 
             page = parseInt(page);
             per_page = parseInt(per_page);
+            userId = req.userId;
 
             if (page <= 0 || per_page <= 0) {
                 return res.status(400).json({
@@ -1175,7 +1182,8 @@ module.exports = {
             const getAllProject = await projectServices.getAllProjectDatatakeoffAssignToTeam(
                 page,
                 per_page,
-                search
+                search,
+                userId
             );
 
             if (!getAllProject || getAllProject.data.length === 0) {
@@ -1241,7 +1249,7 @@ module.exports = {
         try {
             const { takeoff_status, ids } = req.body;
 
-            
+
 
             // Update all projects
             const updatePromises = ids.map(item =>

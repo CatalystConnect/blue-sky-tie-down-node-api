@@ -36,7 +36,7 @@ module.exports = {
         user_id: req.userId || null,
         name: data.name || null,
         engineer_id: data.engineer_id || null,
-        budget_book_id: data.budget_book_id || null,
+        project_id: data.project_id || null,
         customer_id: data.customer_id || null,
         contact_id: data.contact_id || null,
         address: data.address || null,
@@ -119,18 +119,18 @@ module.exports = {
       const budgetBook = await budgetBooksServices.addBudgetBooks(postData);
 
       const {
-        projectScopeIncludes,
-        projectSubmittals,
-        projectKeyAreas,
-        projectContracts,
+        budgetBooksScopeIncludes,
+        budgetBooksDrawings,
+        budgetBooksKeyAreas,
+        budgetBooksContracts,
       } = data;
 
       const promises = [];
 
-      if (Array.isArray(projectScopeIncludes) && projectScopeIncludes.length) {
+      if (Array.isArray(budgetBooksScopeIncludes) && budgetBooksScopeIncludes.length) {
         promises.push(
           await db.budgetBooksScopeIncludesObj.bulkCreate(
-            projectScopeIncludes.map((item) => ({
+            budgetBooksScopeIncludes.map((item) => ({
               budget_books_id: budgetBook.id,
               budget_category_id: item.budget_category_id,
               is_include: item.is_include,
@@ -140,10 +140,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectSubmittals) && projectSubmittals.length) {
+      if (Array.isArray(budgetBooksDrawings) && budgetBooksDrawings.length) {
         promises.push(
           await db.budgetBooksDrawingsObj.bulkCreate(
-            projectSubmittals.map((item) => ({
+            budgetBooksDrawings.map((item) => ({
               budget_books_id: budgetBook.id,
               submittal_id: item.submittal_id,
               is_include: item.is_include,
@@ -152,10 +152,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectKeyAreas) && projectKeyAreas.length) {
+      if (Array.isArray(budgetBooksKeyAreas) && budgetBooksKeyAreas.length) {
         promises.push(
           await db.budgetBooksKeyAreasObj.bulkCreate(
-            projectKeyAreas.map((item) => ({
+            budgetBooksKeyAreas.map((item) => ({
               budget_books_id: budgetBook.id,
               key_area_id: item.key_area_id,
               is_include: item.is_include,
@@ -164,10 +164,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectContracts) && projectContracts.length) {
+      if (Array.isArray(budgetBooksContracts) && budgetBooksContracts.length) {
         promises.push(
           await db.budgetBooksContractsObj.bulkCreate(
-            projectContracts.map((item) => ({
+            budgetBooksContracts.map((item) => ({
               budget_books_id: budgetBook.id,
               contract_component_id: item.contract_component_id,
               is_include: item.is_include,
@@ -289,7 +289,7 @@ module.exports = {
         user_id: req.userId || null,
         name: data.name || null,
         engineer_id: data.engineer_id || null,
-        budget_book_id: data.budget_book_id || null,
+        project_id: data.project_id || null,
         customer_id: data.customer_id || null,
         contact_id: data.contact_id || null,
         address: data.address || null,
@@ -356,18 +356,18 @@ module.exports = {
       );
 
       const {
-        projectScopeIncludes,
-        projectSubmittals,
-        projectKeyAreas,
-        projectContracts,
+        budgetBooksScopeIncludes,
+        budgetBooksDrawings,
+        budgetBooksKeyAreas,
+        budgetBooksContracts,
       } = data;
 
       // Delete old associations and insert new ones
       await budgetBooksServices.replaceAssociations(id, {
-        projectScopeIncludes,
-        projectSubmittals,
-        projectKeyAreas,
-        projectContracts,
+        budgetBooksScopeIncludes,
+        budgetBooksDrawings,
+        budgetBooksKeyAreas,
+        budgetBooksContracts,
       });
 
       return res

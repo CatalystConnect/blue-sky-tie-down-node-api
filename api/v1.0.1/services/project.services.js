@@ -76,7 +76,8 @@ module.exports = {
                     "completedFiles",
                     "takeOfEstimateTime",
                     "takeoff_status",
-                    "project_status"
+                    "project_status",
+                    "priority"
 
                 ],
                 include: [
@@ -159,7 +160,8 @@ module.exports = {
                     "completedFiles",
                     "takeOfEstimateTime",
                     "takeoff_status",
-                    "project_status"
+                    "project_status",
+                    "priority"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -470,7 +472,8 @@ module.exports = {
                     "completedFiles",
                     "takeOfEstimateTime",
                     "takeoff_status",
-                    "project_status"
+                    "project_status",
+                    "priority"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -480,7 +483,10 @@ module.exports = {
                     { model: db.userObj, as: "planReviewer" },
                     { model: db.projectplanSetsObj, as: "planSets" },
                 ],
-                order: [["id", "DESC"]],
+                order: [
+                    [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
+                    ["id", "DESC"]
+                ],
             });
 
             return {
@@ -616,7 +622,7 @@ module.exports = {
                     "completedFiles",
                     "takeOfEstimateTime",
                     "takeoff_status",
-                    "project_status"
+                    "project_status", "priority"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -627,7 +633,10 @@ module.exports = {
                     { model: db.projectplanSetsObj, as: "planSets" },
                     { model: db.leadTeamsObj, as: "takeoff_team" },
                 ],
-                order: [["id", "DESC"]],
+                order: [
+                    [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
+
+                ],
             });
 
             return {
@@ -710,7 +719,8 @@ module.exports = {
                     "completedFiles",
                     "takeOfEstimateTime",
                     "takeoff_status",
-                    "project_status"
+                    "project_status",
+                    "priority"
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -721,7 +731,10 @@ module.exports = {
                     { model: db.projectplanSetsObj, as: "planSets" },
                     { model: db.leadTeamsObj, as: "takeoff_team" },
                 ],
-                order: [["id", "DESC"]],
+                order: [
+                    [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
+                    ["id", "DESC"]
+                ],
             });
 
             return {
@@ -748,13 +761,23 @@ module.exports = {
     //     );
     //     return updatedRows; 
     // }
-    async updateProjecttakeOffStatus(ids, takeoff_status, star_approval = false) {
-        const [updatedRows] = await db.projectObj.update(
-            { takeoff_status, star_approval },
-            { where: { id: ids } }
-        );
+    async updateProjecttakeOffStatus(ids, takeoff_status, priority = false) {
+        
+        const updateData = {};
+
+        if (takeoff_status && takeoff_status.trim() !== "") {
+            updateData.takeoff_status = takeoff_status;
+        }
+       
+        updateData.priority = priority;
+
+        const [updatedRows] = await db.projectObj.update(updateData, {
+            where: { id: ids }
+        });
+
         return updatedRows;
     }
+
 
 
 

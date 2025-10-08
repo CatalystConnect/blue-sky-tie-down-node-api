@@ -100,6 +100,7 @@ module.exports = (sequelize, Sequelize) => {
 
       // ---------- Relations ----------
       project_id: Sequelize.INTEGER,
+      lead_id: Sequelize.INTEGER,
 
       // ---------- Extra ----------
       terms: Sequelize.TEXT,

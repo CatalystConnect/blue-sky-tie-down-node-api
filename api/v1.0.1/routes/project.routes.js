@@ -53,6 +53,8 @@ router.put("/updateProjecttakeOffStatusAssignToBudget", [authJwt.verifyToken], c
 router.get("/getAllProjectDatatakeoffStatusDataCollected", [authJwt.verifyToken], controller.getAllProjectDatatakeoffStatusDataCollected);
 router.get("/getAllProjectDatatakeoffAssignToTeam", [authJwt.verifyToken], controller.getAllProjectDatatakeoffAssignToTeam);
 
+router.put("/updateProjecttakeOffStatus", [authJwt.verifyToken], controller.updateProjecttakeOffStatus);
+
 
 module.exports = router
 

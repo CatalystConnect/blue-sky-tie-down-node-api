@@ -670,7 +670,7 @@ module.exports = {
                     "city",
                     "state",
                     "plan_date",
-                    "bldg_gsqft",           
+                    "bldg_gsqft",
                     "address",
                     "zip",
                     "units",
@@ -708,7 +708,7 @@ module.exports = {
                     "connectplan",
                     "surveyorNotes",
                     "completedFiles",
-                    "takeOfEstimateTime",   
+                    "takeOfEstimateTime",
                     "takeoff_status",
                     "project_status"
                 ],
@@ -735,14 +735,23 @@ module.exports = {
                     total: count,
                 },
             };
-        } catch (e      ) {     
+        } catch (e) {
             logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
             throw e;
         }
-    } 
+    },
+    async updateProjecttakeOffStatus(ids, takeoff_status) {
+        
+        const [updatedRows] = await db.projectObj.update(
+            { takeoff_status },
+            { where: { id: ids } }
+        );
+        return updatedRows; 
+    }
 
 
-                    
+
+
 
 
 };

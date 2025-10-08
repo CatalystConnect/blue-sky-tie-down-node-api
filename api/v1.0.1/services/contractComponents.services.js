@@ -4,47 +4,47 @@ const db = require("../models");
 const { Op, Sequelize } = require("sequelize");
 
 module.exports = {
-  async addSubmittal(postData) {
+  async addContractComponents(postData) {
     try {
-      return await db.submittalsObj.create(postData);
+      return await db.contractComponentsObj.create(postData);
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  async getAllSubmittals(query = {}) {
+  async getAllContractComponents(query = {}) {
     try {
       let { page, per_page, take_all } = query;
-  
+
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
       const offset = (page - 1) * per_page;
-  
+
       if (take_all === "all") {
-        const submittals = await db.submittalsObj.findAll({
+        const components = await db.contractComponentsObj.findAll({
           order: [["id", "DESC"]],
         });
-  
+
         return {
-          data: submittals,
+          data: components,
           meta: {
             current_page: 1,
             from: 1,
-            to: submittals.length,
-            per_page: submittals.length,
-            total: submittals.length,
+            to: components.length,
+            per_page: components.length,
+            total: components.length,
             last_page: 1,
           },
         };
       }
-  
-      const { rows, count } = await db.submittalsObj.findAndCountAll({
+
+      const { rows, count } = await db.contractComponentsObj.findAndCountAll({
         order: [["id", "DESC"]],
         limit: per_page,
         offset,
       });
-  
+
       return {
         data: rows,
         meta: {
@@ -61,36 +61,39 @@ module.exports = {
       throw e;
     }
   },
-  
 
-  async getSubmittalById(id) {
+  async getContractComponentsById(id) {
     try {
-      return await db.submittalsObj.findOne({ where: { id } });
+      return await db.contractComponentsObj.findOne({ where: { id } });
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  async updateSubmittal(id, data) {
+  async updateContractComponents(id, data) {
     try {
-      const submittal = await db.submittalsObj.findOne({ where: { id } });
-      if (!submittal) return null;
+      const component = await db.contractComponentsObj.findOne({
+        where: { id },
+      });
+      if (!component) return null;
 
-      await submittal.update(data);
-      return submittal;
+      await component.update(data);
+      return component;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
 
-  async deleteSubmittal(id) {
+  async deleteContractComponents(id) {
     try {
-      const submittal = await db.submittalsObj.findOne({ where: { id } });
-      if (!submittal) return null;
+      const component = await db.contractComponentsObj.findOne({
+        where: { id },
+      });
+      if (!component) return null;
 
-      await submittal.destroy();
+      await component.destroy();
       return true;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

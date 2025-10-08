@@ -655,10 +655,118 @@ module.exports = {
             throw e;
         }
     },
-    async getAllProjectDatatakeoffAssignToTeam(page = 1, per_page, search = "") {
+    // async getAllProjectDatatakeoffAssignToTeam(page = 1, per_page, search = "") {
+    //     try {
+    //         const limit = parseInt(per_page) || 10;
+    //         const offset = (parseInt(page) - 1) * limit || 0;
+    //         const whereClause = {
+    //             takeoff_status: "TAKEOFF ASSIGNED",
+    //         };
+
+    //         if (search) {
+    //             whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+    //         }
+
+    //         const { rows, count } = await db.projectObj.findAndCountAll({
+    //             where: whereClause,
+    //             limit,
+    //             offset,
+    //             attributes: [
+    //                 "id",
+    //                 "user_id",
+    //                 "engineer_id",
+    //                 "name",
+    //                 "city",
+    //                 "state",
+    //                 "plan_date",
+    //                 "bldg_gsqft",
+    //                 "address",
+    //                 "zip",
+    //                 "units",
+    //                 "projectType",
+    //                 "project_phase",
+    //                 "date_received",
+    //                 "rev_status",
+    //                 "plan_reviewed_date",
+    //                 "plan_reviewed_by",
+    //                 "plan_revision_notes",
+    //                 "data_collocated_date",
+    //                 "bldgs",
+    //                 "wind_zone",
+    //                 "seismic_zone",
+    //                 "developer_id",
+    //                 "general_contractor_id",
+    //                 "assign_to_budget",
+    //                 "take_off_team_id",
+    //                 "take_off_type",
+    //                 "take_off_scope",
+    //                 "assign_date",
+    //                 "plan_link",
+    //                 "submissionType",
+    //                 "planFiles",
+    //                 "projectTags",
+    //                 "projectFiles",
+    //                 "architecture",
+    //                 "takeoffactualtime",
+    //                 "dueDate",
+    //                 "projectAttachmentUrls",
+    //                 "attachmentsLink",
+    //                 "projectRifFields",
+    //                 "status",
+    //                 "takeofCompleteDate",
+    //                 "connectplan",
+    //                 "surveyorNotes",
+    //                 "completedFiles",
+    //                 "takeOfEstimateTime",
+    //                 "takeoff_status",
+    //                 "project_status",
+    //                 "priority"
+    //             ],
+    //             include: [
+    //                 { model: db.companyObj, as: "engineer" },
+    //                 { model: db.companyObj, as: "architect" },
+    //                 { model: db.companyObj, as: "developer" },
+    //                 { model: db.companyObj, as: "general_contractor" },
+    //                 { model: db.userObj, as: "planReviewer" },
+    //                 { model: db.projectplanSetsObj, as: "planSets" },
+    //                 { model: db.leadTeamsObj, as: "takeoff_team" },
+    //             ],
+    //             order: [
+    //                 [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
+    //                 ["id", "DESC"]
+    //             ],
+    //         });
+
+    //         return {
+    //             data: rows,
+    //             meta: {
+    //                 current_page: parseInt(page),
+    //                 from: offset + 1,
+    //                 to: offset + rows.length,
+    //                 last_page: Math.ceil(count / limit),
+    //                 per_page: limit,
+    //                 total: count,
+    //             },
+    //         };
+    //     } catch (e) {
+    //         logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    //         throw e;
+    //     }
+    // },
+    // async updateProjecttakeOffStatus(ids, takeoff_status) {
+
+    //     const [updatedRows] = await db.projectObj.update(
+    //         { takeoff_status },
+    //         { where: { id: ids } }
+    //     );
+    //     return updatedRows; 
+    // }
+
+    async getAllProjectDatatakeoffAssignToTeam(page = 1, per_page, search = "", userId) {
         try {
             const limit = parseInt(per_page) || 10;
             const offset = (parseInt(page) - 1) * limit || 0;
+
             const whereClause = {
                 takeoff_status: "TAKEOFF ASSIGNED",
             };
@@ -666,6 +774,7 @@ module.exports = {
             if (search) {
                 whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
             }
+
 
             const { rows, count } = await db.projectObj.findAndCountAll({
                 where: whereClause,
@@ -720,7 +829,7 @@ module.exports = {
                     "takeOfEstimateTime",
                     "takeoff_status",
                     "project_status",
-                    "priority"
+                    "priority",
                 ],
                 include: [
                     { model: db.companyObj, as: "engineer" },
@@ -733,19 +842,73 @@ module.exports = {
                 ],
                 order: [
                     [db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`), "ASC"],
-                    ["id", "DESC"]
+                    ["id", "DESC"],
                 ],
             });
 
+            if (parseInt(userId) === 1) {
+                return {
+                    data: rows,
+                    meta: {
+                        current_page: parseInt(page),
+                        from: offset + 1,
+                        to: offset + rows.length,
+                        last_page: Math.ceil(count / limit),
+                        per_page: limit,
+                        total: count,
+                    },
+                };
+            }
+
+            const teamIds = rows
+                .map(row => row.take_off_team_id)
+                .filter(id => id !== null && id !== undefined);
+
+            if (teamIds.length === 0) {
+                return {
+                    data: [],
+                    meta: {
+                        current_page: parseInt(page),
+                        from: 0,
+                        to: 0,
+                        last_page: 0,
+                        per_page: limit,
+                        total: 0,
+                    },
+                };
+            }
+         
+            const teams = await db.leadTeamsObj.findAll({
+                where: {
+                    id: { [db.Sequelize.Op.in]: teamIds },
+                },
+            });
+
+            const allowedTeamIds = teams
+                .filter(team => {
+                    try {
+                        const contactIds = JSON.parse(team.dataValues.contact_id || "[]");
+                        return contactIds.includes(String(userId));
+                    } catch (err) {
+                        return false;
+                    }
+                })
+                .map(team => team.id);
+
+            const filteredProjects = rows.filter(project =>
+                allowedTeamIds.includes(project.take_off_team_id)
+            );
+
+    
             return {
-                data: rows,
+                data: filteredProjects,
                 meta: {
                     current_page: parseInt(page),
                     from: offset + 1,
-                    to: offset + rows.length,
-                    last_page: Math.ceil(count / limit),
+                    to: offset + filteredProjects.length,
+                    last_page: Math.ceil(filteredProjects.length / limit),
                     per_page: limit,
-                    total: count,
+                    total: filteredProjects.length,
                 },
             };
         } catch (e) {
@@ -753,22 +916,15 @@ module.exports = {
             throw e;
         }
     },
-    // async updateProjecttakeOffStatus(ids, takeoff_status) {
 
-    //     const [updatedRows] = await db.projectObj.update(
-    //         { takeoff_status },
-    //         { where: { id: ids } }
-    //     );
-    //     return updatedRows; 
-    // }
     async updateProjecttakeOffStatus(ids, takeoff_status, priority = false) {
-        
+
         const updateData = {};
 
         if (takeoff_status && takeoff_status.trim() !== "") {
             updateData.takeoff_status = takeoff_status;
         }
-       
+
         updateData.priority = priority;
 
         const [updatedRows] = await db.projectObj.update(updateData, {

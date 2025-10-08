@@ -216,22 +216,22 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 /*Associations*/
-// db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
-//   foreignKey: "budget_books_id",
-//   as: "projectScopeIncludes",
-// });
-// db.budgetBooksObj.hasMany(db.budgetBooksContractsObj, {
-//   foreignKey: "budget_books_id",
-//   as: "projectContracts",
-// });
-// db.budgetBooksObj.hasMany(db.budgetBooksKeyAreasObj, {
-//   foreignKey: "budget_books_id",
-//   as: "projectKeyAreas",
-// });
-// db.budgetBooksObj.hasMany(db.budgetBooksDrawingsObj, {
-//   foreignKey: "budget_books_id",
-//   as: "projectDrawings",
-// });
+db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
+  foreignKey: "budget_books_id",
+  as: "budgetBooksScopeIncludes",
+});
+db.budgetBooksObj.hasMany(db.budgetBooksContractsObj, {
+  foreignKey: "budget_books_id",
+  as: "budgetBooksContracts",
+});
+db.budgetBooksObj.hasMany(db.budgetBooksKeyAreasObj, {
+  foreignKey: "budget_books_id",
+  as: "budgetBooksKeyAreas",
+});
+db.budgetBooksObj.hasMany(db.budgetBooksDrawingsObj, {
+  foreignKey: "budget_books_id",
+  as: "budgetBooksDrawings",
+});
 
 db.salesPipelinesTriggersObj.belongsTo(db.salesPipelinesStatusesObj, {
   foreignKey: "field_value",
@@ -963,7 +963,5 @@ db.leadTeamsObj.hasMany(db.projectObj, {
   foreignKey: "take_off_team_id",
   as: "projects",
 });
-
-
 
 module.exports = db;

@@ -27,7 +27,7 @@ module.exports = {
 
       const { rows, count } = await db.leadTeamsObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "ASC"]],
+        order: [["id", "DESC"]],
         limit:per_page,
         offset,
       });

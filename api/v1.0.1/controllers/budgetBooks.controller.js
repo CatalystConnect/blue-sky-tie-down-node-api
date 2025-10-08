@@ -37,6 +37,7 @@ module.exports = {
         name: data.name || null,
         engineer_id: data.engineer_id || null,
         project_id: data.project_id || null,
+        lead_id: data.lead_id || null,
         customer_id: data.customer_id || null,
         contact_id: data.contact_id || null,
         address: data.address || null,
@@ -127,7 +128,10 @@ module.exports = {
 
       const promises = [];
 
-      if (Array.isArray(budgetBooksScopeIncludes) && budgetBooksScopeIncludes.length) {
+      if (
+        Array.isArray(budgetBooksScopeIncludes) &&
+        budgetBooksScopeIncludes.length
+      ) {
         promises.push(
           await db.budgetBooksScopeIncludesObj.bulkCreate(
             budgetBooksScopeIncludes.map((item) => ({
@@ -290,6 +294,7 @@ module.exports = {
         name: data.name || null,
         engineer_id: data.engineer_id || null,
         project_id: data.project_id || null,
+        lead_id: data.lead_id || null,
         customer_id: data.customer_id || null,
         contact_id: data.contact_id || null,
         address: data.address || null,
@@ -423,6 +428,31 @@ module.exports = {
         status: false,
         message: error.message || "Failed to delete Budget Book",
         data: [],
+      });
+    }
+  },
+
+  async getAllBudgetCategory(req, res) {
+    try {
+      const data = await budgetBooksServices.getAllBudgetCategory();
+
+      if (!data.length) {
+        return res.status(404).json({
+          status: false,
+          message: "No record found",
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "Budget Categories fetched successfully",
+        data,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: false,
+        message: "Failed to fetch Budget Categories",
+        error: error.message,
       });
     }
   },

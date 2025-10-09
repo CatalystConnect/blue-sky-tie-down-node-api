@@ -18,9 +18,49 @@ module.exports = {
     }
   },
 
-  async getAllBudgetBooks() {
+  async getAllBudgetBooks(query) {
     try {
+      let { page = 1, per_page = 10, take_all = false } = query;
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+
+      if (take_all) {
+        // Fetch all records
+        const allRecords = await db.budgetBooksObj.findAll({
+          order: [["created_at", "DESC"]],
+          include: [
+            {
+              model: db.budgetBooksScopeIncludesObj,
+              as: "budgetBooksScopeIncludes",
+            },
+            { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
+            { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
+            { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
+            { model: db.projectObj, as: "budgetProject" },
+            { model: db.leadsObj, as: "budgetLead" },
+          ],
+        });
+
+        return {
+          data: allRecords,
+          meta: {
+            current_page: 1,
+            from: 1,
+            last_page: 1,
+            per_page: allRecords.length,
+            to: allRecords.length,
+            total: allRecords.length,
+          },
+        };
+      }
+
+      // Pagination logic
+      const offset = (page - 1) * per_page;
+      const total = await db.budgetBooksObj.count();
+
       const budgetBooks = await db.budgetBooksObj.findAll({
+        limit: per_page,
+        offset,
         order: [["created_at", "DESC"]],
         include: [
           {
@@ -34,7 +74,22 @@ module.exports = {
           { model: db.leadsObj, as: "budgetLead" },
         ],
       });
-      return budgetBooks;
+
+      const last_page = Math.ceil(total / per_page);
+      const from = total > 0 ? offset + 1 : 0;
+      const to = Math.min(offset + per_page, total);
+
+      return {
+        data: budgetBooks,
+        meta: {
+          current_page: page,
+          from,
+          last_page,
+          per_page,
+          to,
+          total,
+        },
+      };
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
       throw error;
@@ -259,9 +314,7 @@ module.exports = {
       const projectSegments = segmentIds.length
         ? await db.projectScopeSegmentsObj.findAll({
             where: {
-              [Op.or]: [
-                { scope_sagment_id: { [Op.in]: segmentIds } },
-              ],
+              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
             },
           })
         : [];

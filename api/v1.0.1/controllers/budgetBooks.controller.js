@@ -180,6 +180,8 @@ module.exports = {
         );
       }
 
+      
+
       await Promise.all(promises);
       return res
         .status(200)

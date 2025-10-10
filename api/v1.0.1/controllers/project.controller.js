@@ -194,12 +194,12 @@ module.exports = {
     // /*updateProject*/
     async updateProject(req, res) {
         try {
-            const errors = myValidationResult(req);
-            if (!errors.isEmpty()) {
-                return res
-                    .status(200)
-                    .send(commonHelper.parseErrorRespose(errors.mapped()));
-            }
+            // const errors = myValidationResult(req);
+            // if (!errors.isEmpty()) {
+            //     return res
+            //         .status(200)
+            //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+            // }
             let projectId = req.query.projectId;
             let getProjectById = await projectServices.getProjectById(projectId);
 
@@ -1330,11 +1330,11 @@ module.exports = {
                     check("name").not().isEmpty().withMessage("Project name is required")
                 ];
             }
-            case "updateProject": {
-                return [
-                    check("name").not().isEmpty().withMessage("Project name is required")
-                ];
-            }
+            // case "updateProject": {
+            //     return [
+            //         check("name").not().isEmpty().withMessage("Project name is required")
+            //     ];
+            // }
         }
     }
 };

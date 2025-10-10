@@ -84,8 +84,9 @@ module.exports = {
           { model: db.companyObj, as: "architect" },
           { model: db.companyObj, as: "developer" },
           { model: db.companyObj, as: "general_contractor" },
-          { model: db.userObj, as: "planReviewer" },
-          { model: db.projectplanSetsObj, as: "planSets" },
+          { model: db.projectplanSetsObj, as: "planSets",include:[
+            { model: db.userObj, as: "planReviewer" },
+          ]},
           { model: db.leadTeamsObj, as: "takeoff_team" },
           {
             model: db.taxesObj,
@@ -175,9 +176,11 @@ module.exports = {
           { model: db.companyObj, as: "architect" },
           { model: db.companyObj, as: "developer" },
           { model: db.companyObj, as: "general_contractor" },
-          { model: db.userObj, as: "planReviewer" },
+         
           { model: db.leadTeamsObj, as: "takeoff_team" },
-          { model: db.projectplanSetsObj, as: "planSets" },
+          { model: db.projectplanSetsObj, as: "planSets",include:[
+            { model: db.userObj, as: "planReviewer" },
+          ]},
           {
             model: db.taxesObj,
             as: "zipCodeDetails",

@@ -835,9 +835,13 @@ db.projectObj.belongsTo(db.companyObj, {
   foreignKey: "general_contractor_id",
   as: "general_contractor",
 });
-db.projectplanSetsObj.belongsTo(db.userObj, {
+db.projectObj.belongsTo(db.userObj, {
   foreignKey: "plan_reviewed_by",
   as: "planReviewer",
+});
+db.projectplanSetsObj.belongsTo(db.userObj, {
+  foreignKey: "plan_reviewed_by",
+  as: "planReviewerUers",
 });
 
 // Optional: Company has many projects in each role

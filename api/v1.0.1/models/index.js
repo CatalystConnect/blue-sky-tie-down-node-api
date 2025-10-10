@@ -216,10 +216,21 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
 
 db.submittalsObj = require("./submittals.models")(dbObj, Sequelize);
-db.contractComponentsObj = require("./contractComponents.models")(dbObj, Sequelize);
-db.projectScopeSegmentsObj = require("./projectScopeSegments.models")(dbObj, Sequelize);
+db.contractComponentsObj = require("./contractComponents.models")(
+  dbObj,
+  Sequelize
+);
+db.projectScopeSegmentsObj = require("./projectScopeSegments.models")(
+  dbObj,
+  Sequelize
+);
 
 /*Associations*/
+db.projectObj.belongsTo(db.taxesObj, {
+  foreignKey: "zip",
+  as: "zipCodeDetails",
+});
+
 db.budgetBooksObj.belongsTo(db.projectObj, {
   foreignKey: "project_id",
   as: "budgetProject",
@@ -229,7 +240,6 @@ db.budgetBooksObj.belongsTo(db.leadsObj, {
   foreignKey: "lead_id",
   as: "budgetLead",
 });
-
 
 db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
   foreignKey: "budget_books_id",

@@ -43,7 +43,7 @@
           allowNull: true,
         },
         zip: {
-          type: Sequelize.STRING(20),
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         project_status: {
@@ -240,7 +240,7 @@
           allowNull: true,
         },
         takeOfEstimateTime: {
-           type: Sequelize.DATE,
+          type: Sequelize.STRING(255),
           allowNull: true,
         },
         surveyorNotes: {

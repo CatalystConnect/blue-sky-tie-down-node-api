@@ -91,6 +91,10 @@ module.exports = {
             model: db.taxesObj,
             as: "zipCodeDetails",
           },
+          {
+            model: db.taxesObj,
+            as: "stateDetails",
+          },
         ],
         order: [["id", "DESC"]],
       });
@@ -177,6 +181,10 @@ module.exports = {
           {
             model: db.taxesObj,
             as: "zipCodeDetails",
+          },
+          {
+            model: db.taxesObj,
+            as: "stateDetails",
           },
           {
             model: db.leadsObj,

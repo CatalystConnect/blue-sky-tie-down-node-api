@@ -72,7 +72,7 @@ module.exports = {
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
         projectTags: data.projectTags || null,
         projectFiles: data.projectFiles || null,
-        architecture: data.architecture || null,
+        architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: data.takeoffactualtime || null,
         dueDate: sanitizeDate(data.dueDate),
         projectAttachmentUrls: data.projectAttachmentUrls || null,
@@ -105,7 +105,7 @@ module.exports = {
             plan_date: sanitizeDate(plan.plan_date),
             rev_status: plan.rev_status || null,
             plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
-            plan_reviewed_by: plan.plan_reviewed_by || null,
+            plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by) || null,
             data_collocated_date: sanitizeDate(plan.data_collocated_date),
             plan_revision_notes: plan.plan_revision_notes || null,
           };
@@ -250,7 +250,7 @@ module.exports = {
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
         projectTags: data.projectTags || null,
         projectFiles: data.projectFiles || null,
-        architecture: data.architecture || null,
+        architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: data.takeoffactualtime || null,
         dueDate: sanitizeDate(data.dueDate),
         projectAttachmentUrls: data.projectAttachmentUrls || null,
@@ -290,7 +290,7 @@ module.exports = {
             plan_date: sanitizeDate(plan.plan_date),
             rev_status: plan.rev_status || null,
             plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
-            plan_reviewed_by: plan.plan_reviewed_by || null,
+            plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by) || null,
             data_collocated_date: sanitizeDate(plan.data_collocated_date),
             plan_revision_notes: plan.plan_revision_notes || null,
           };

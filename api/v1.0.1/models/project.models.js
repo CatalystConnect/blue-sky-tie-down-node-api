@@ -217,7 +217,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       takeoffactualtime: {
-        type: Sequelize.DATE,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       dueDate: {
@@ -249,7 +249,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       takeOfEstimateTime: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       surveyorNotes: {

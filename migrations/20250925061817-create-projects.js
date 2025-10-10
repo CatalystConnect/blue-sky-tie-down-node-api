@@ -39,7 +39,7 @@
           allowNull: true,
         },
         state: {
-          type: Sequelize.STRING(255),
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         zip: {

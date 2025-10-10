@@ -14,12 +14,12 @@ module.exports = {
     /*addProject*/
     async addProject(req, res) {
         try {
-            // const errors = myValidationResult(req);
-            // if (!errors.isEmpty()) {
-            //     return res
-            //         .status(200)
-            //         .send(commonHelper.parseErrorRespose(errors.mapped()));
-            // }
+            const errors = myValidationResult(req);
+            if (!errors.isEmpty()) {
+                return res
+                    .status(200)
+                    .send(commonHelper.parseErrorRespose(errors.mapped()));
+            }
             let data = req.body;
 
             let completedFiles = [];
@@ -84,12 +84,13 @@ module.exports = {
                 connectplan: data.connectplan,
                 surveyorNotes: data.surveyorNotes,
                 completedFiles: completedFiles,
-                takeOfEstimateTime: data.takeOfEstimateTime,
+                takeOfEstimateTime: sanitizeDate(data.takeOfEstimateTime) || null,
                 project_status: data.project_status || "active",
                 takeoff_status: data.takeoff_status || null,
 
 
             };
+
             let project = await projectServices.addProject(postData);
 
             if (data.planSets && typeof data.planSets === "string") {
@@ -222,6 +223,11 @@ module.exports = {
                 if (value === "" || value === null || value === undefined) return null;
                 return Number(value);
             };
+            const sanitizeDate = (value) => {
+                if (!value) return null; 
+                const date = new Date(value);
+                return isNaN(date.getTime()) ? null : date;
+            };
             let postData = {
                 user_id: req.userId,
                 engineer_id: sanitizeInteger(data.engineer_id),
@@ -243,21 +249,21 @@ module.exports = {
                 take_off_team_id: sanitizeInteger(data.take_off_team_id),
                 take_off_type: data.take_off_type,
                 take_off_scope: data.take_off_scope,
-                assign_date: data.assign_date,
+                assign_date: sanitizeDate(data.assign_date),
                 projectTags: data.projectTags,
                 projectFiles: data.projectFiles,
                 architecture: data.architecture,
                 takeoffactualtime: data.takeoffactualtime,
-                dueDate: data.dueDate,
+                dueDate: sanitizeDate(data.dueDate),
                 projectAttachmentUrls: data.projectAttachmentUrls,
                 attachmentsLink: data.attachmentsLink,
                 projectRifFields: data.projectRifFields,
                 status: "new",
-                takeofCompleteDate: data.takeofCompleteDate,
+                takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
                 connectplan: data.connectplan,
                 surveyorNotes: data.surveyorNotes,
                 completedFiles: completedFiles,
-                takeOfEstimateTime: data.takeOfEstimateTime,
+                takeOfEstimateTime: sanitizeDate(data.takeOfEstimateTime) || null,
                 project_status: data.project_status || "active",
                 takeoff_status: data.takeoff_status || null,
             };
@@ -280,14 +286,14 @@ module.exports = {
                     let planData = {
                         project_id: projectId,
                         submissionType: plan.submissionType,
-                        date_received: plan.date_received,
+                        date_received: sanitizeDate(plan.date_received),
                         plan_link: plan.plan_link,
                         planFiles: plan.planFiles,
-                        plan_date: plan.plan_date,
+                        plan_date: sanitizeDate(plan.plan_date),
                         rev_status: plan.rev_status,
-                        plan_reviewed_date: plan.plan_reviewed_date,
+                        plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
                         plan_reviewed_by: plan.plan_reviewed_by,
-                        data_collocated_date: plan.data_collocated_date,
+                        data_collocated_date: sanitizeDate(plan.data_collocated_date),
                         plan_revision_notes: plan.plan_revision_notes,
                     };
 
@@ -1317,15 +1323,18 @@ module.exports = {
     },
 
 
-
-
-    // validate(method) {
-    //     switch (method) {
-    //         case "getProjectById": {
-    //             return [
-    //                 check("projectId").not().isEmpty().withMessage("ProjectId is Required")
-    //             ];
-    //         }
-    //     }
-    // }
+    validate(method) {
+        switch (method) {
+            case "addProject": {
+                return [
+                    check("name").not().isEmpty().withMessage("Project name is required")
+                ];
+            }
+            case "updateProject": {
+                return [
+                    check("name").not().isEmpty().withMessage("Project name is required")
+                ];
+            }
+        }
+    }
 };

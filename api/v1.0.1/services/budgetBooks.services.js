@@ -145,10 +145,10 @@ module.exports = {
   async replaceAssociations(
     budgetBooksId,
     {
-      projectScopeIncludes,
-      projectSubmittals,
-      projectKeyAreas,
-      projectContracts,
+      budgetBooksScopeIncludes,
+        budgetBooksDrawings,
+        budgetBooksKeyAreas,
+        budgetBooksContracts,
     }
   ) {
     try {
@@ -169,10 +169,10 @@ module.exports = {
 
       const promises = [];
 
-      if (Array.isArray(projectScopeIncludes) && projectScopeIncludes.length) {
+      if (Array.isArray(budgetBooksScopeIncludes) && budgetBooksScopeIncludes.length) {
         promises.push(
           db.budgetBooksScopeIncludesObj.bulkCreate(
-            projectScopeIncludes.map((item) => ({
+            budgetBooksScopeIncludes.map((item) => ({
               budget_books_id: budgetBooksId,
               budget_category_id: item.budget_category_id,
               is_include: item.is_include,
@@ -182,10 +182,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectSubmittals) && projectSubmittals.length) {
+      if (Array.isArray(budgetBooksDrawings) && budgetBooksDrawings.length) {
         promises.push(
           db.budgetBooksDrawingsObj.bulkCreate(
-            projectSubmittals.map((item) => ({
+            budgetBooksDrawings.map((item) => ({
               budget_books_id: budgetBooksId,
               submittal_id: item.submittal_id,
               is_include: item.is_include,
@@ -194,10 +194,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectKeyAreas) && projectKeyAreas.length) {
+      if (Array.isArray(budgetBooksKeyAreas) && budgetBooksKeyAreas.length) {
         promises.push(
           db.budgetBooksKeyAreasObj.bulkCreate(
-            projectKeyAreas.map((item) => ({
+            budgetBooksKeyAreas.map((item) => ({
               budget_books_id: budgetBooksId,
               key_area_id: item.key_area_id,
               is_include: item.is_include,
@@ -206,10 +206,10 @@ module.exports = {
         );
       }
 
-      if (Array.isArray(projectContracts) && projectContracts.length) {
+      if (Array.isArray(budgetBooksContracts) && budgetBooksContracts.length) {
         promises.push(
           db.budgetBooksContractsObj.bulkCreate(
-            projectContracts.map((item) => ({
+            budgetBooksContracts.map((item) => ({
               budget_books_id: budgetBooksId,
               contract_component_id: item.contract_component_id,
               is_include: item.is_include,

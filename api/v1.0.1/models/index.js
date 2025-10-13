@@ -214,6 +214,11 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
   Sequelize
 );
 db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
+db.sitePlansObj = require("./sitePlans.models")(dbObj, Sequelize);
+db.budgetBooksSitesObj = require("./budgetBooksSites.models")(dbObj, Sequelize);
+db.projectBudgetsObj = require("./projectBudgets.models")(dbObj, Sequelize);
+db.budgetBookOthersObj = require("./budgetBookOthers.models")(dbObj, Sequelize);
+db.sitePlanItemsObj = require("./sitePlanItems.models")(dbObj, Sequelize);
 
 db.submittalsObj = require("./submittals.models")(dbObj, Sequelize);
 db.contractComponentsObj = require("./contractComponents.models")(dbObj, Sequelize);

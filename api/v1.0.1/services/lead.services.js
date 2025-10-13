@@ -74,7 +74,7 @@ module.exports = {
           {
             model: db.projectObj,
             as: "project",
-            attributes: ["id", "name"],
+            // attributes: ["id", "name"],
             required: false,
             where: projectWhere,
           },

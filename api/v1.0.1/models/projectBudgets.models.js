@@ -1,8 +1,7 @@
-'use strict';
-
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('project_budgets', {
+module.exports = (sequelize, Sequelize) => {
+  const ProjectBudgets = sequelize.define(
+    "project_budgets",
+    {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -28,8 +27,6 @@ module.exports = {
       posts: { type: Sequelize.STRING(255), allowNull: true },
       misc: { type: Sequelize.STRING(255), allowNull: true },
       budget_total: { type: Sequelize.STRING(255), allowNull: true },
-
-      // SOV sqft and cost details
       sqft_sw_tiedown: { type: Sequelize.STRING(255), allowNull: true },
       sqft_up_lift: { type: Sequelize.STRING(255), allowNull: true },
       sqft_sill_plate: { type: Sequelize.STRING(255), allowNull: true },
@@ -38,8 +35,6 @@ module.exports = {
       cost_up_lift: { type: Sequelize.STRING(255), allowNull: true },
       cost_sill_plate: { type: Sequelize.STRING(255), allowNull: true },
       cost_misc_hardware: { type: Sequelize.STRING(255), allowNull: true },
-
-      // Cost details
       cost_roof: { type: Sequelize.STRING(255), allowNull: true },
       cost_coridor: { type: Sequelize.STRING(255), allowNull: true },
       cost_deck: { type: Sequelize.STRING(255), allowNull: true },
@@ -52,7 +47,6 @@ module.exports = {
       cost_rtu: { type: Sequelize.STRING(255), allowNull: true },
       total: { type: Sequelize.STRING(255), allowNull: true },
 
-      // Cost type details
       costType_sw_tiedown: { type: Sequelize.STRING(255), allowNull: true },
       costType_sill_plate: { type: Sequelize.STRING(255), allowNull: true },
       costType_up_lift: { type: Sequelize.STRING(255), allowNull: true },
@@ -68,7 +62,6 @@ module.exports = {
       costType_misc: { type: Sequelize.STRING(255), allowNull: true },
       costType_rtu: { type: Sequelize.STRING(255), allowNull: true },
 
-      // Price details
       price_sill_plate: { type: Sequelize.STRING(255), allowNull: true },
       price_sw_tiedown: { type: Sequelize.STRING(255), allowNull: true },
       price_up_lift: { type: Sequelize.STRING(255), allowNull: true },
@@ -84,7 +77,6 @@ module.exports = {
       price_misc: { type: Sequelize.STRING(255), allowNull: true },
       price_rtu: { type: Sequelize.STRING(255), allowNull: true },
 
-      // Price type details
       priceType_sill_plate: { type: Sequelize.STRING(255), allowNull: true },
       priceType_sw_tiedown: { type: Sequelize.STRING(255), allowNull: true },
       priceType_up_lift: { type: Sequelize.STRING(255), allowNull: true },
@@ -103,14 +95,16 @@ module.exports = {
       costType_Total: { type: Sequelize.STRING(255), allowNull: true },
       price_total: { type: Sequelize.STRING(255), allowNull: true },
       priceType_total: { type: Sequelize.STRING(255), allowNull: true },
+    },
+    {
+      timestamps: true,
+      freezeTableName: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+    }
+  );
 
-      created_at: { type: Sequelize.DATE, allowNull: true },
-      updated_at: { type: Sequelize.DATE, allowNull: true },
-      deleted_at: { type: Sequelize.DATE, allowNull: true },
-    });
-  },
-
-  async down(queryInterface) {
-    await queryInterface.dropTable('project_budgets');
-  },
+  return ProjectBudgets;
 };

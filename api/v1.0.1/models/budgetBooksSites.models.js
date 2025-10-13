@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const projectSites = sequelize.define(
-    "project_sites",
+  const budgetBooksSites = sequelize.define(
+    "budget_books_sites",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,7 +8,7 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -219,5 +219,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return projectSites;
+  return budgetBooksSites;
 };

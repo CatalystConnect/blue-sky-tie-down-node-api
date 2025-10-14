@@ -76,7 +76,10 @@ module.exports = {
             as: "project",
             // attributes: ["id", "name"],
             required: false,
-            where: projectWhere,
+            where: projectWhere, 
+           include: [{ model: db.taxesObj, as: "stateDetails" },
+            { model: db.taxesObj, as: "zipCodeDetails" }
+           ],
           },
 
           { model: db.contactsObj, as: "contact" },

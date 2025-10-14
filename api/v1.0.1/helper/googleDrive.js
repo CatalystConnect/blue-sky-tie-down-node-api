@@ -107,6 +107,8 @@ async function uploadFileToDrive(filePath, fileName, mimeType, folderPath = null
   });
 
   return file.data;
+
+  
 }
 
 module.exports = { uploadFileToDrive, getOrCreateSubfolder, getOrCreateNestedFolders };

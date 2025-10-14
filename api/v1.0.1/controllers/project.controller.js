@@ -15,6 +15,8 @@ const fs = require("fs");
 
 module.exports = {
   /*addProject*/
+
+  // test
   // async addProject(req, res) {
   //   try {
   //     const errors = myValidationResult(req);

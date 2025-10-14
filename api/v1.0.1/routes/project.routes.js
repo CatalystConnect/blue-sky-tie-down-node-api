@@ -6,8 +6,8 @@ let { upload,multiUpload } = require("../../../config/multer.config");
 
 
 /*addProject*/
-router.post("/project/addProject", [authJwt.verifyToken,multiUpload ],[controller.validate("addProject")], controller.addProject);
-
+// router.post("/project/addProject", [authJwt.verifyToken,multiUpload ],[controller.validate("addProject")], controller.addProject);
+router.post("/project/addProject", [authJwt.verifyToken,upload.any() ],[controller.validate("addProject")], controller.addProject);
 // /*getAllProject*/
 router.get("/project/getAllProject",[authJwt.verifyToken],  controller.getAllProject);
 

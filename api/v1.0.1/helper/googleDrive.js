@@ -3,13 +3,22 @@ const path = require("path");
 const { google } = require("googleapis");
 require("dotenv").config();
 
-const credentialsPath = path.resolve(__dirname, process.env.GOOGLE_CREDENTIALS_PATH);
-const KEYFILEJSON = require(credentialsPath);
+ const credentialsPath = JSON.parse(process.env.GOOGLE_CREDENTIALS_PATH);
+
+
+// const credentialsPath = path.resolve(__dirname, process.env.GOOGLE_CREDENTIALS_PATH);
+// const KEYFILEJSON = require(credentialsPath);
 
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
+// const auth = new google.auth.JWT({
+//   email: credentialsPath.client_email,
+//   key: credentialsPath.private_key,
+//   scopes: SCOPES,
+// });
+
 const auth = new google.auth.JWT({
-  email: KEYFILEJSON.client_email,
-  key: KEYFILEJSON.private_key,
+  email: credentialsPath.client_email,
+  key:credentialsPath.private_key,
   scopes: SCOPES,
 });
 const drive = google.drive({ version: "v3", auth });

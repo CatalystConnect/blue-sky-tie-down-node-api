@@ -3,45 +3,45 @@ module.exports = (sequelize, Sequelize) => {
     "ve_options",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
       budget_books_id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       subject: {
-        type: DataTypes.STRING(255),
+        type: Sequelize.STRING(255),
         allowNull: true,
       },
       amount: {
-        type: DataTypes.STRING(255),
+        type: Sequelize.STRING(255),
         allowNull: true,
       },
       optionDate: {
-        type: DataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
       description: {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       groups: {
-        type: DataTypes.TEXT("long"),
+        type: Sequelize.TEXT("long"),
         allowNull: true,
       },
       created_at: {
-        type: DataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
       updated_at: {
-        type: DataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
       deleted_at: {
-        type: DataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: true,
       },
     },

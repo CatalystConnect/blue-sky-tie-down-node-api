@@ -8,6 +8,8 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
+const fs = require("fs");
+const path = require("path");
 
 module.exports = {
   /*addBudgetBooks*/
@@ -126,6 +128,7 @@ module.exports = {
             veOptions,
             optionPackages,
             scopes,
+            uploadDocument,
           } = data;
 
           const promises = [];
@@ -245,157 +248,171 @@ module.exports = {
               )
             );
           }
+          const parseNumber = (val) => {
+            if (val === "" || val === null || val === undefined) return null;
+            return Number(val);
+          };
 
           if (Array.isArray(budgets) && budgets.length) {
-            promises.push(
-              db.projectBudgetsObj.bulkCreate(
-                budgets.map((item) => ({
-                  budget_books_id: budgetBook.id || null,
-                  site_name: item.site_name || "",
-                  misc: item.misc || "",
-                  posts: item.posts || "",
-                  sill_plate: item.sill_plate || "",
-                  tie_down: item.tie_down || "",
-                  sw_misc: item.sw_misc || "",
-                  up_lift: item.up_lift || "",
-                  roof: item.roof || "",
-                  coridor: item.coridor || "",
-                  deck: item.deck || "",
-                  stair_wells: item.stair_wells || "",
-                  beam: item.beam || "",
-                  cmu: item.cmu || "",
-                  stl: item.stl || "",
-                  rtu: item.rtu || "",
-                  budget_total: item.budget_total || "",
-                  sqft_sw_tiedown: item.sqft_sw_tiedown || "",
-                  sqft_up_lift: item.sqft_up_lift || "",
-                  sqft_sill_plate: item.sqft_sill_plate || "",
-                  sqft_misc_hardware: item.sqft_misc_hardware || "",
-                  cost_sw_tiedown: item.cost_sw_tiedown || "",
-                  cost_up_lift: item.cost_up_lift || "",
-                  cost_sill_plate: item.cost_sill_plate || "",
-                  cost_misc_hardware: item.cost_misc_hardware || "",
-                  total: item.total || "",
-                  price_sill_plate: item.price_sill_plate || "",
-                  price_sw_tiedown: item.price_sw_tiedown || "",
-                  price_up_lift: item.price_up_lift || "",
-                  price_misc_hardware: item.price_misc_hardware || "",
-                  price_total: item.price_total || "",
-                  costType_sw_tiedown: item.costType_sw_tiedown || "",
-                  costType_up_lift: item.costType_up_lift || "",
-                  costType_sill_plate: item.costType_sill_plate || "",
-                  costType_misc_hardware: item.costType_misc_hardware || "",
-                  costType_Total: item.costType_Total || "",
-                  priceType_sw_tiedown: item.priceType_sw_tiedown || "",
-                  priceType_up_lift: item.priceType_up_lift || "",
-                  priceType_sill_plate: item.priceType_sill_plate || "",
-                  priceType_misc_hardware: item.priceType_misc_hardware || "",
-                  priceType_total: item.priceType_total || "",
-                  cost_roof: item.cost_roof || "",
-                  cost_coridor: item.cost_coridor || "",
-                  cost_deck: item.cost_deck || "",
-                  cost_stair_wells: item.cost_stair_wells || "",
-                  cost_beam: item.cost_beam || "",
-                  cost_posts: item.cost_posts || "",
-                  cost_smu: item.cost_smu || "",
-                  cost_stl: item.cost_stl || "",
-                  cost_misc: item.cost_misc || "",
-                  cost_rtu: item.cost_rtu || "",
-                  costType_roof: item.costType_roof || "",
-                  costType_coridor: item.costType_coridor || "",
-                  costType_deck: item.costType_deck || "",
-                  costType_stair_wells: item.costType_stair_wells || "",
-                  costType_beam: item.costType_beam || "",
-                  costType_posts: item.costType_posts || "",
-                  costType_smu: item.costType_smu || "",
-                  costType_stl: item.costType_stl || "",
-                  costType_misc: item.costType_misc || "",
-                  costType_rtu: item.costType_rtu || "",
-                  price_roof: item.price_roof || "",
-                  price_coridor: item.price_coridor || "",
-                  price_deck: item.price_deck || "",
-                  price_stair_wells: item.price_stair_wells || "",
-                  price_beam: item.price_beam || "",
-                  price_posts: item.price_posts || "",
-                  price_smu: item.price_smu || "",
-                  price_stl: item.price_stl || "",
-                  price_misc: item.price_misc || "",
-                  price_rtu: item.price_rtu || "",
-                  priceType_roof: item.priceType_roof || "",
-                  priceType_coridor: item.priceType_coridor || "",
-                  priceType_deck: item.priceType_deck || "",
-                  priceType_stair_wells: item.priceType_stair_wells || "",
-                  priceType_beam: item.priceType_beam || "",
-                  priceType_posts: item.priceType_posts || "",
-                  priceType_smu: item.priceType_smu || "",
-                  priceType_stl: item.priceType_stl || "",
-                  priceType_misc: item.priceType_misc || "",
-                  priceType_rtu: item.priceType_rtu || "",
-                  category1: item.category1 || "",
-                  ssd: item.ssd || "",
-                  undefined: item.undefined || "",
-                }))
-              )
-            );
+            const budgetRecords = budgets.map((item) => {
+              return {
+                budget_books_id: budgetBook.id ?? null,
+                site_name: item.site_name || null,
+                misc: item.misc || null,
+                posts: item.posts || null,
+                sill_plate: parseNumber(item.sill_plate),
+                tie_down: parseNumber(item.tie_down),
+                sw_misc: parseNumber(item.sw_misc),
+                up_lift: parseNumber(item.up_lift),
+                roof: parseNumber(item.roof),
+                coridor: parseNumber(item.coridor),
+                deck: parseNumber(item.deck),
+                stair_wells: parseNumber(item.stair_wells),
+                beam: parseNumber(item.beam),
+                cmu: parseNumber(item.cmu),
+                stl: parseNumber(item.stl),
+                rtu: parseNumber(item.rtu),
+                budget_total: parseNumber(item.budget_total),
+                sqft_sw_tiedown: parseNumber(item.sqft_sw_tiedown),
+                sqft_up_lift: parseNumber(item.sqft_up_lift),
+                sqft_sill_plate: parseNumber(item.sqft_sill_plate),
+                sqft_misc_hardware: parseNumber(item.sqft_misc_hardware),
+                cost_sw_tiedown: parseNumber(item.cost_sw_tiedown),
+                cost_up_lift: parseNumber(item.cost_up_lift),
+                cost_sill_plate: parseNumber(item.cost_sill_plate),
+                cost_misc_hardware: parseNumber(item.cost_misc_hardware),
+                total: parseNumber(item.total),
+                price_sill_plate: parseNumber(item.price_sill_plate),
+                price_sw_tiedown: parseNumber(item.price_sw_tiedown),
+                price_up_lift: parseNumber(item.price_up_lift),
+                price_misc_hardware: parseNumber(item.price_misc_hardware),
+                price_total: parseNumber(item.price_total),
+                costType_sw_tiedown: parseNumber(item.costType_sw_tiedown),
+                costType_up_lift: parseNumber(item.costType_up_lift),
+                costType_sill_plate: parseNumber(item.costType_sill_plate),
+                costType_misc_hardware: parseNumber(
+                  item.costType_misc_hardware
+                ),
+                costType_Total: parseNumber(item.costType_Total),
+                priceType_sw_tiedown: parseNumber(item.priceType_sw_tiedown),
+                priceType_up_lift: parseNumber(item.priceType_up_lift),
+                priceType_sill_plate: parseNumber(item.priceType_sill_plate),
+                priceType_misc_hardware: parseNumber(
+                  item.priceType_misc_hardware
+                ),
+                priceType_total: parseNumber(item.priceType_total),
+                cost_roof: parseNumber(item.cost_roof),
+                cost_coridor: parseNumber(item.cost_coridor),
+                cost_deck: parseNumber(item.cost_deck),
+                cost_stair_wells: parseNumber(item.cost_stair_wells),
+                cost_beam: parseNumber(item.cost_beam),
+                cost_posts: parseNumber(item.cost_posts),
+                cost_smu: parseNumber(item.cost_smu),
+                cost_stl: parseNumber(item.cost_stl),
+                cost_misc: parseNumber(item.cost_misc),
+                cost_rtu: parseNumber(item.cost_rtu),
+                costType_roof: parseNumber(item.costType_roof),
+                costType_coridor: parseNumber(item.costType_coridor),
+                costType_deck: parseNumber(item.costType_deck),
+                costType_stair_wells: parseNumber(item.costType_stair_wells),
+                costType_beam: parseNumber(item.costType_beam),
+                costType_posts: parseNumber(item.costType_posts),
+                costType_smu: parseNumber(item.costType_smu),
+                costType_stl: parseNumber(item.costType_stl),
+                costType_misc: parseNumber(item.costType_misc),
+                costType_rtu: parseNumber(item.costType_rtu),
+                price_roof: parseNumber(item.price_roof),
+                price_coridor: parseNumber(item.price_coridor),
+                price_deck: parseNumber(item.price_deck),
+                price_stair_wells: parseNumber(item.price_stair_wells),
+                price_beam: parseNumber(item.price_beam),
+                price_posts: parseNumber(item.price_posts),
+                price_smu: parseNumber(item.price_smu),
+                price_stl: parseNumber(item.price_stl),
+                price_misc: parseNumber(item.price_misc),
+                price_rtu: parseNumber(item.price_rtu),
+                priceType_roof: parseNumber(item.priceType_roof),
+                priceType_coridor: parseNumber(item.priceType_coridor),
+                priceType_deck: parseNumber(item.priceType_deck),
+                priceType_stair_wells: parseNumber(item.priceType_stair_wells),
+                priceType_beam: parseNumber(item.priceType_beam),
+                priceType_posts: parseNumber(item.priceType_posts),
+                priceType_smu: parseNumber(item.priceType_smu),
+                priceType_stl: parseNumber(item.priceType_stl),
+                priceType_misc: parseNumber(item.priceType_misc),
+                priceType_rtu: parseNumber(item.priceType_rtu),
+              };
+            });
+
+            await db.projectBudgetsObj.bulkCreate(budgetRecords);
           }
+          const sitePlanMap = [];
 
           if (Array.isArray(sitePlan) && sitePlan.length) {
-            promises.push(
-              db.sitePlansObj.bulkCreate(
-                sitePlan.map((item) => ({
-                  budget_books_id: budgetBook.id,
-                  site_index: item.site_index || null,
-                  bldg_id: item.bldg_id || null,
-                  site_plan_name: item.sitePlan_name || null,
-                  sov_sp: item.sov_sp || null,
-                  sov_td: item.sov_td || null,
-                  sov_up: item.sov_up || null,
-                  sov_mc: item.sov_mc || null,
-                  sov_total: item.sov_total || null,
-                  order_no: item.order_no || null,
-                }))
-              )
+            // Convert numeric fields and handle nulls
+            const sitePlanRecords = sitePlan.map((item) => ({
+              budget_books_id: budgetBook.id,
+              site_index: item.site_index ?? null,
+              bldg_id: item.bldg_id ?? null,
+              site_plan_name: item.sitePlan_name ?? null,
+              sov_sp: item.sov_sp !== "" ? Number(item.sov_sp) : null,
+              sov_td: item.sov_td !== "" ? Number(item.sov_td) : null,
+              sov_up: item.sov_up !== "" ? Number(item.sov_up) : null,
+              sov_mc: item.sov_mc !== "" ? Number(item.sov_mc) : null,
+              sov_total: item.sov_total !== "" ? Number(item.sov_total) : null,
+              order_no: item.order_no ?? null,
+            }));
+
+            const createdSitePlans = await db.sitePlansObj.bulkCreate(
+              sitePlanRecords
             );
+            // store created IDs
+            createdSitePlans.forEach((plan, index) => {
+              sitePlanMap[index] = plan.id;
+            });
           }
+
           if (Array.isArray(scopeOther) && scopeOther.length) {
             for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
-              // Loop each site block
               for (const [budgetCatKey, budgetCatArray] of Object.entries(
                 siteGroup
               )) {
-                // Skip invalid keys or empty data
                 if (budgetCatKey === "data" || !Array.isArray(budgetCatArray))
                   continue;
 
                 for (const item of budgetCatArray) {
-                  const siteId = item.siteId || null;
-                  const budgetCatId = item.budget_Cat_Id || null;
+                  const siteId = item.siteId ?? null;
+                  const budgetCatId = item.budget_Cat_Id ?? null;
 
                   if (!item.data || !Array.isArray(item.data)) continue;
 
-                  // Filter only valid (non-empty) entries
-                  const validDataEntries = item.data.filter((data) =>
-                    Object.values(data || {}).some(
-                      (v) => v !== null && v !== ""
-                    )
+                  const validDataEntries = item.data.filter((d) =>
+                    Object.values(d || {}).some((v) => v !== null && v !== "")
                   );
 
                   if (validDataEntries.length) {
-                    const insertData = validDataEntries.map((data) => ({
-                      title: data.title || "Other",
-                      budget_id: budgetBook.id, // your current main budgetBook record
+                    const insertData = validDataEntries.map((d) => ({
+                      title: d.title || "Other",
+                      budget_id: budgetBook.id,
                       site_id: siteId,
-                      scopeId: data.scopeId || null,
-                      site_plan_id: sitePlanMap?.[nestedIndex] || null,
+                      scopeId: d.scopeId ?? null,
+                      site_plan_id: sitePlanMap[nestedIndex] ?? null,
                       budget_cat_id: budgetCatId,
-                      is_include: data.is_include || null,
-                      total: data.total || null,
-                      price_sqft: data.pricePerSqft || null,
-                      additionals: data.additional || null,
-                      cost: data.cost || null,
-                      price_w_additional: data.priceWithAdditional || null,
-                      costSqft: data.costSqft || null,
-                      optionPercentage: data.optionPercentage || null,
+                      is_include: d.is_include ?? null,
+                      total: d.total !== "" ? Number(d.total) : null,
+                      price_sqft:
+                        d.pricePerSqft !== "" ? Number(d.pricePerSqft) : null,
+                      additionals: d.additional ?? null,
+                      cost: d.cost !== "" ? Number(d.cost) : null,
+                      price_w_additional:
+                        d.priceWithAdditional !== ""
+                          ? Number(d.priceWithAdditional)
+                          : null,
+                      costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
+                      optionPercentage:
+                        d.optionPercentage !== ""
+                          ? Number(d.optionPercentage)
+                          : null,
                     }));
 
                     if (insertData.length) {
@@ -450,79 +467,158 @@ module.exports = {
               )
             );
           }
+
           if (Array.isArray(scopes) && scopes.length) {
-            for (const group of scopes) {
-              const otherItems = group.other || [];
+            for (const budgetCat of scopes) {
+              if (!Array.isArray(budgetCat.scopes)) continue;
 
-              for (const [key, scope] of Object.entries(group)) {
-                if (!scope || !scope.scope_id) continue;
-
+              for (const scope of budgetCat.scopes) {
                 // ---- Create budgetBooksScopes ----
                 const budgetBooksScope = await db.budgetBooksScopesObj.create({
                   budget_books_id: budgetBook.id,
-                  is_include: scope.inc || null,
+                  is_include: scope.is_include ?? null,
                   scope_id: scope.scope_id,
-                  title: scope.scope_name || "",
+                  title: scope.title || "",
                 });
 
-                // ---- Create budgetBooksScopeCategories ----
-                const budgetBooksScopeCategory =
-                  await db.budgetBooksScopeCategoriesObj.create({
-                    budget_books_scope_id: budgetBooksScope.id,
-                    scope_category_id: scope.scope_category_id || null,
-                    title: scope.category_name || "",
-                  });
+                if (!Array.isArray(scope.categories)) continue;
 
-                // ---- Create budgetBooksScopeGroups ----
-                const budgetBooksScopeGroup =
-                  await db.budgetBooksScopeGroupsObj.create({
-                    budget_books_scope_category_id: budgetBooksScopeCategory.id,
-                    scope_group_id: scope.group_id || null,
-                    title: scope.group_name || "",
-                  });
+                for (const category of scope.categories) {
+                  // ---- Create budgetBooksScopeCategories ----
+                  const budgetBooksScopeCategory =
+                    await db.budgetBooksScopeCategoriesObj.create({
+                      budget_books_scope_id: budgetBooksScope.id,
+                      scope_category_id: category.scope_category_id || null,
+                      title: category.title || "",
+                    });
 
-                const segmentId = scope.segment_id || null;
+                  if (!Array.isArray(category.groups)) continue;
 
-                if (segmentId) {
-                  let priceWithAdditional = scope.priceWithAdditional || 0;
-                  if (
-                    isNaN(priceWithAdditional) ||
-                    ["infinity", "nan"].includes(
-                      String(priceWithAdditional).toLowerCase()
-                    )
-                  ) {
-                    priceWithAdditional = 0.0;
+                  for (const group of category.groups) {
+                    // ---- Create budgetBooksScopeGroups ----
+                    const budgetBooksScopeGroup =
+                      await db.budgetBooksScopeGroupsObj.create({
+                        budget_books_scope_category_id:
+                          budgetBooksScopeCategory.id,
+                        scope_group_id: group.scope_group_id || null,
+                        title: group.title || "",
+                      });
+
+                    if (!Array.isArray(group.sagments)) continue;
+
+                    for (const segment of group.sagments) {
+                      if (!Array.isArray(segment.data) || !segment.data.length)
+                        continue;
+
+                      for (const dataItem of segment.data) {
+                        const siteId = dataItem.site_id || null;
+
+                        if (
+                          !Array.isArray(dataItem.segments) ||
+                          !dataItem.segments.length
+                        )
+                          continue;
+
+                        for (const seg of dataItem.segments) {
+                          let priceWithAdditional =
+                            Number(seg.price_w_additional) || 0;
+                          if (
+                            isNaN(priceWithAdditional) ||
+                            !isFinite(priceWithAdditional)
+                          )
+                            priceWithAdditional = 0.0;
+
+                          // ---- Create budgetBooksScopeSegments ----
+                          await db.budgetBooksScopeSegmentsObj.create({
+                            budget_books_scope_group_id:
+                              budgetBooksScopeGroup.id,
+                            scope_sagment_id: segment.scope_sagment_id,
+                            title: segment.title || "",
+                            notes: segment.notes || "",
+                            client_notes: segment.client_notes || "",
+                            is_include: seg.is_include ?? null,
+                            acc: seg.acc ?? null,
+                            internal_notes: seg.internal_notes ?? null,
+                            price_sqft: Number(seg.price_sqft) || 0,
+                            additionals: Number(seg.additionals) || 0,
+                            price_w_additional: priceWithAdditional,
+                            budget_Cat_Id: category.scope_category_id || null,
+                            cost: Number(seg.cost) || 0,
+                            costSqft: Number(seg.costSqft) || 0,
+                            total: Number(seg.total) || 0,
+                            conditions: Array.isArray(segment.option)
+                              ? segment.option.join(", ")
+                              : segment.option || null,
+                            site_id: siteId,
+                            scopeId: scope.scope_id || null,
+                            optionPercentage: seg.optionPercentage ?? null,
+                            budgetIndex: seg.budgetIndex ?? null,
+                          });
+                        }
+                      }
+                    }
                   }
-
-                  // ---- Create budgetBooksScopeSegments ----
-                  await db.budgetBooksScopeSegmentsObj.create({
-                    budget_books_scope_group_id: budgetBooksScopeGroup.id,
-                    scope_sagment_id: segmentId,
-                    title: scope.segment_name || "",
-                    notes: scope.notes || "",
-                    client_notes: scope.client_notes || "",
-                    is_include: scope.is_include || "",
-                    acc: scope.acc || "",
-                    internal_notes: scope.internal_notes || "",
-                    price_sqft: scope.pricePerSqft || 0,
-                    additionals: scope.additional || 0,
-                    price_w_additional: priceWithAdditional,
-                    budget_Cat_Id: scope.scope_category_id || null,
-                    cost: scope.cost || 0,
-                    costSqft: scope.costSqft || 0,
-                    total: scope.total || 0,
-                    conditions: Array.isArray(scope.condition)
-                      ? scope.condition.join(", ")
-                      : scope.condition || null,
-                    site_id: scope.site_id || null,
-                    scopeId: scope.scope_id || null,
-                    optionPercentage: scope.optionPercentage || null,
-                    budgetIndex: scope.budgetIndex || null,
-                  });
                 }
               }
             }
           }
+
+          // if (Array.isArray(uploadDocument) && uploadDocument.length) {
+          //   for (const document of uploadDocument) {
+          //     let fileName = null;
+          //     let originalName = null;
+
+          //     // --- Case 1: New file upload ---
+          //     if (document.file && document.file.path) {
+          //       const uploadedFile = document.file;
+          //       const extension = path.extname(uploadedFile.originalname);
+          //       originalName = uploadedFile.originalname.replace(
+          //         /[^A-Za-z0-9.\-_]/g,
+          //         ""
+          //       );
+          //       fileName = `${Math.floor(
+          //         Math.random() * 90 + 10
+          //       )}${Date.now()}${extension}`;
+
+          //       const uploadDir = path.resolve("public/uploadDocument");
+          //       if (!fs.existsSync(uploadDir))
+          //         fs.mkdirSync(uploadDir, { recursive: true });
+
+          //       fs.renameSync(
+          //         uploadedFile.path,
+          //         path.join(uploadDir, fileName)
+          //       );
+
+          //       await db.budgetBookDocumentsObj.create({
+          //         budget_book_id: budgetBook.id,
+          //         file_name: fileName,
+          //         type: document.type || null,
+          //         notes: document.note || null,
+          //         is_display: document.displayToCustomer ? 1 : 0,
+          //       });
+
+          //       // --- Case 2: Update existing document ---
+          //     } else if (document.file && document.file.id) {
+          //       const existing = await db.budgetBookDocumentsObj.findOne({
+          //         where: {
+          //           id: document.file.id,
+          //           budget_book_id: budgetBook.id,
+          //         },
+          //       });
+
+          //       if (existing) {
+          //         await existing.update({
+          //           file_name: existing.file_name,
+          //           type: document.type || existing.type,
+          //           notes: document.note || existing.notes,
+          //           is_display: document.displayToCustomer
+          //             ? parseInt(document.displayToCustomer)
+          //             : existing.is_display,
+          //         });
+          //       }
+          //     }
+          //   }
+          // }
 
           await Promise.all(promises);
 
@@ -532,6 +628,7 @@ module.exports = {
           );
         } catch (err) {
           console.error("❌ Background insert error:", err.message);
+          console.error(err.stack);
         }
       });
     } catch (error) {
@@ -543,6 +640,7 @@ module.exports = {
       });
     }
   },
+
   async getAllBudgetBooks(req, res) {
     try {
       let { page = "1", per_page = "10", take_all = "" } = req.query;

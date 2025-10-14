@@ -233,6 +233,10 @@ db.budgetBooksScopeSegmentsObj = require("./budgetBooksScopeSegments.models")(
   dbObj,
   Sequelize
 );
+db.budgetBookDocumentsObj = require("./budgetBookDocuments.models")(
+  dbObj,
+  Sequelize
+);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {

@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },

@@ -29,4 +29,4 @@ package-lock.json
 !.vscode/extensions.json
 .env
 credentials.json 
-../../../config/credentials.json 
+../../../config/credentials.json config/credentials.json

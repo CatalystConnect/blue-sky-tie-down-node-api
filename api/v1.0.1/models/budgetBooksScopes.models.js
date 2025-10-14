@@ -1,48 +1,44 @@
 module.exports = (sequelize, Sequelize) => {
   const projectScopes = sequelize.define(
-    "project_scopes",
+    "budget_books_scopes",
     {
       id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
       },
-      project_id: {
+      budget_books_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       scope_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: true,
       },
       is_include: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.STRING(255),
         allowNull: true,
-        defaultValue: false
       },
       short_title: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
     },
     {

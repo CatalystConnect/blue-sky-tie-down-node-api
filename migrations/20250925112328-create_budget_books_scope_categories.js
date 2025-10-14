@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('project_scope_categories', {
+    await queryInterface.createTable('budget_books_scope_categories', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_scope_id: {
+      budget_books_scope_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -20,7 +20,7 @@ module.exports = {
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: true
       },
       created_at: {
         type: Sequelize.DATE,
@@ -38,6 +38,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('project_scope_categories');
+    await queryInterface.dropTable('budget_books_scope_categories');
   }
 };

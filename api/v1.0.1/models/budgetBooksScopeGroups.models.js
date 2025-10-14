@@ -1,36 +1,36 @@
 module.exports = (sequelize, Sequelize) => {
   const projectScopeGroups = sequelize.define(
-    "project_scope_groups",
+    "budget_books_scope_groups",
     {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
       },
-      project_scope_category_id: {
+      budget_books_scope_category_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       scope_group_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
     },
     {

@@ -312,7 +312,7 @@ module.exports = {
       const segmentIds = segments.map((s) => s.id);
 
       const projectSegments = segmentIds.length
-        ? await db.projectScopeSegmentsObj.findAll({
+        ? await db.budgetBooksScopeSegmentsObj.findAll({
             where: {
               [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
             },

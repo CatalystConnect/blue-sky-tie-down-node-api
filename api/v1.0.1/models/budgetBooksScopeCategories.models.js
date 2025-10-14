@@ -1,36 +1,36 @@
 module.exports = (sequelize, Sequelize) => {
-  const projectScopeCategories = sequelize.define(
-    "project_scope_categories",
+  const budgetBooksScopeCategories = sequelize.define(
+    "budget_books_scope_categories",
     {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
       },
-      project_scope_id: {
+      budget_books_scope_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       scope_category_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
     },
     {
@@ -43,5 +43,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return projectScopeCategories;
+  return budgetBooksScopeCategories;
 };

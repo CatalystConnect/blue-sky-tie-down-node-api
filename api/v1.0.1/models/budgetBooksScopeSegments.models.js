@@ -1,115 +1,119 @@
-'use strict';
-
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('project_scope_segments', {
+module.exports = (sequelize, Sequelize) => {
+  const projectScopeSegments = sequelize.define(
+    "budget_books_scope_segments",
+    {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
       site_plan_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
-      project_scope_group_id: {
+      budget_books_scope_group_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       scope_sagment_id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       scopeId: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       budget_Cat_Id: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       budgetIndex: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       site_id: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       is_include: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       client_notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       acc: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       internal_notes: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       price_sqft: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       additionals: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       price_w_additional: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       cost: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       costSqft: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       conditions: {
         type: Sequelize.TEXT,
-        allowNull: true
+        allowNull: true,
       },
       total: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       optionPercentage: {
         type: Sequelize.STRING(255),
-        allowNull: true
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
-      }
-    });
-  },
+        allowNull: true,
+      },
+    },
+    {
+      timestamps: true,
+      freezeTableName: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+    }
+  );
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('project_scope_segments');
-  }
+  return projectScopeSegments;
 };

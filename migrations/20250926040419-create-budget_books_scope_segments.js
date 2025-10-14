@@ -1,7 +1,9 @@
-module.exports = (sequelize, Sequelize) => {
-  const projectScopeSegments = sequelize.define(
-    "project_scope_segments",
-    {
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('budget_books_scope_segments', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -12,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      project_scope_group_id: {
+      budget_books_scope_group_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
@@ -103,17 +105,11 @@ module.exports = (sequelize, Sequelize) => {
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
-      },
-    },
-    {
-      timestamps: true,
-      freezeTableName: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-    }
-  );
+      }
+    });
+  },
 
-  return projectScopeSegments;
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('budget_books_scope_segments');
+  }
 };

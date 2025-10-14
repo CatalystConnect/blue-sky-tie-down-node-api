@@ -123,6 +123,9 @@ module.exports = {
             sitePlan,
             scopeOther,
             sitePlan2,
+            veOptions,
+            optionPackages,
+            scopes,
           } = data;
 
           const promises = [];
@@ -410,7 +413,7 @@ module.exports = {
             promises.push(
               db.sitePlanItemsObj.bulkCreate(
                 sitePlan2.map((item) => ({
-                  budget_books_id: budgetBook.id, 
+                  budget_books_id: budgetBook.id,
                   sitePlan_name2: item.sitePlan_name2 || null,
                   site_qty: item.site_qty || null,
                   sov_qa: item.sov_qa || null,
@@ -419,7 +422,107 @@ module.exports = {
               )
             );
           }
-          
+
+          if (Array.isArray(veOptions) && veOptions.length) {
+            promises.push(
+              db.veOptionsObj.bulkCreate(
+                veOptions.map((item) => ({
+                  budget_books_id: budgetBook.id,
+                  subject: item.subject || null,
+                  description: item.description || null,
+                  amount: item.amount || null,
+                  optionDate: item.optionDate || null,
+                  groups: item.groups || null,
+                }))
+              )
+            );
+          }
+          if (Array.isArray(optionPackages) && optionPackages.length) {
+            promises.push(
+              db.optionPackageObj.bulkCreate(
+                optionPackages.map((item) => ({
+                  budget_books_id: budgetBook.id,
+                  subject: item.subject || null,
+                  description: item.description || null,
+                  amount: item.amount || null,
+                  groups: item.groups || null,
+                }))
+              )
+            );
+          }
+          if (Array.isArray(scopes) && scopes.length) {
+            for (const group of scopes) {
+              const otherItems = group.other || [];
+
+              for (const [key, scope] of Object.entries(group)) {
+                if (!scope || !scope.scope_id) continue;
+
+                // ---- Create budgetBooksScopes ----
+                const budgetBooksScope = await db.budgetBooksScopesObj.create({
+                  budget_books_id: budgetBook.id,
+                  is_include: scope.inc || null,
+                  scope_id: scope.scope_id,
+                  title: scope.scope_name || "",
+                });
+
+                // ---- Create budgetBooksScopeCategories ----
+                const budgetBooksScopeCategory =
+                  await db.budgetBooksScopeCategoriesObj.create({
+                    budget_books_scope_id: budgetBooksScope.id,
+                    scope_category_id: scope.scope_category_id || null,
+                    title: scope.category_name || "",
+                  });
+
+                // ---- Create budgetBooksScopeGroups ----
+                const budgetBooksScopeGroup =
+                  await db.budgetBooksScopeGroupsObj.create({
+                    budget_books_scope_category_id: budgetBooksScopeCategory.id,
+                    scope_group_id: scope.group_id || null,
+                    title: scope.group_name || "",
+                  });
+
+                const segmentId = scope.segment_id || null;
+
+                if (segmentId) {
+                  let priceWithAdditional = scope.priceWithAdditional || 0;
+                  if (
+                    isNaN(priceWithAdditional) ||
+                    ["infinity", "nan"].includes(
+                      String(priceWithAdditional).toLowerCase()
+                    )
+                  ) {
+                    priceWithAdditional = 0.0;
+                  }
+
+                  // ---- Create budgetBooksScopeSegments ----
+                  await db.budgetBooksScopeSegmentsObj.create({
+                    budget_books_scope_group_id: budgetBooksScopeGroup.id,
+                    scope_sagment_id: segmentId,
+                    title: scope.segment_name || "",
+                    notes: scope.notes || "",
+                    client_notes: scope.client_notes || "",
+                    is_include: scope.is_include || "",
+                    acc: scope.acc || "",
+                    internal_notes: scope.internal_notes || "",
+                    price_sqft: scope.pricePerSqft || 0,
+                    additionals: scope.additional || 0,
+                    price_w_additional: priceWithAdditional,
+                    budget_Cat_Id: scope.scope_category_id || null,
+                    cost: scope.cost || 0,
+                    costSqft: scope.costSqft || 0,
+                    total: scope.total || 0,
+                    conditions: Array.isArray(scope.condition)
+                      ? scope.condition.join(", ")
+                      : scope.condition || null,
+                    site_id: scope.site_id || null,
+                    scopeId: scope.scope_id || null,
+                    optionPercentage: scope.optionPercentage || null,
+                    budgetIndex: scope.budgetIndex || null,
+                  });
+                }
+              }
+            }
+          }
 
           await Promise.all(promises);
 

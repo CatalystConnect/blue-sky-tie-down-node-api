@@ -3,44 +3,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('project_scopes', {
+    await queryInterface.createTable('budget_books_scope_groups', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      project_id: {
+      budget_books_scope_category_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      scope_id: {
+      scope_group_id: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: false
-      },
-      is_include: {
-        type: Sequelize.BOOLEAN,
-        allowNull: true,
-        defaultValue: false
-      },
-      short_title: {
-        type: Sequelize.STRING(255),
         allowNull: true
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        allowNull: true
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
+        allowNull: true
       },
       deleted_at: {
         type: Sequelize.DATE,
@@ -50,6 +38,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-   await queryInterface.dropTable('project_scopes');
+    await queryInterface.dropTable('budget_books_scope_groups');
   }
 };

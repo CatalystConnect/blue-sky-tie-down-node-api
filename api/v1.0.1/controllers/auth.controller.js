@@ -11,6 +11,9 @@ const myValidationResult = validationResult.withDefaults({
     return error.msg;
   },
 });
+const { uploadFileToDrive } = require("../helper/googleDrive");
+const path = require("path");
+const fs = require("fs");
 
 module.exports = {
   /*user register*/
@@ -23,7 +26,11 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
+
       const data = req.body;
+
+
+      // console.log("avatarUrl", avatarUrl);  
       let postData = {
         name: data.name,
         email: data.email,
@@ -35,10 +42,16 @@ module.exports = {
         address: data.address,
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
-        avatar: req.files.avatar
-          ? `files/${req.files.avatar[0].filename}`
-          : null,
+        // avatar: req.files.avatar
+        //   ? `files/${req.files.avatar[0].filename}`
+        //   : null,
+        // avatar: avatarUrl,
       };
+      if (req.files && req.files.avatar && req.files.avatar[0]) {
+        const file = req.files.avatar[0];
+        const uploaded = await uploadFileToDrive(file.path, file.originalname, file.mimetype);
+        postData.avatar = uploaded.webViewLink;
+      }
 
       commonHelper.removeFalsyKeys(postData);
       await authServices.register(postData);
@@ -81,10 +94,10 @@ module.exports = {
         id: getUserInfo.id,
         name: getUserInfo.name,
         role: getUserInfo.role,
-        roleName:roleName,
-        roleAccess:roleAccess
+        roleName: roleName,
+        roleAccess: roleAccess
       };
-      
+
       var accessToken = jwt.sign(payload, config.secret, {
         expiresIn: "1d", // 24x7 hours
       });
@@ -207,9 +220,9 @@ module.exports = {
         avatar: user.avatar,
         departments: user.department
           ? {
-              id: user.department.id,
-              name: user.department.name,
-            }
+            id: user.department.id,
+            name: user.department.name,
+          }
           : null,
         userType: user.userType,
         userHourlyRate: user.userHourlyRate,

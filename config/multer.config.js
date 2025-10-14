@@ -35,7 +35,7 @@ const imageFileFilter = (req, file, cb) => {
   }
 
   // Check if file count exceeds the limit (5 files)
-  if (req.files && req.files.length > 5) {
+  if (req.files && req.files.length > 10) {
     cb(new Error("File limit exceeded"), false);
     return req.res.status(400).json({
       status: false,

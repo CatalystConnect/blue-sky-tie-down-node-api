@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 // };
 const imageFileFilter = (req, file, cb) => {
   // Allowed file extensions
-  const allowedExtensions = /\.(png|jpg|jpeg|webp|jpegh|heic|gif|csv|xlsx)$/i;
+  const allowedExtensions = /\.(png|jpg|jpeg|webp|jpegh|heic|gif|csv|xlsx|pdf)$/i;
   // Check for invalid file extension
   if (!allowedExtensions.test(file.originalname)) {
     cb(new Error("Invalid file extensions"), false);
@@ -58,6 +58,7 @@ const upload = multer({
 const multiUpload = multer({
   storage,
 }).fields([
+  { name: "planSets[0][planFiles]", maxCount: 5 },
   { name: "completedFiles[0]", maxCount: 5 },
   { name: "completedFiles[1]", maxCount: 5 },
   { name: "completedFiles[2]", maxCount: 5 },

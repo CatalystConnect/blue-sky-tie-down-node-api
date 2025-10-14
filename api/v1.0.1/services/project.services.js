@@ -63,7 +63,7 @@ module.exports = {
           "submissionType",
           "planFiles",
           "projectTags",
-          "projectFiles",
+          "project_file",
           "architecture",
           "takeoffactualtime",
           "dueDate",

@@ -28,4 +28,5 @@ package-lock.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .env
+credentials.json 
 ../../../config/credentials.json 

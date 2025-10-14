@@ -9,23 +9,23 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       budget_books_id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       subject: {
-        type: DataTypes.STRING(255),
+        type: Sequelize.STRING(255),
         allowNull: true,
       },
       amount: {
-        type: DataTypes.STRING(255),
+        type: Sequelize.STRING(255),
         allowNull: true,
       },
       description: {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       groups: {
-        type: DataTypes.TEXT("long"),
+        type: Sequelize.TEXT("long"),
         allowNull: true,
       },
     },

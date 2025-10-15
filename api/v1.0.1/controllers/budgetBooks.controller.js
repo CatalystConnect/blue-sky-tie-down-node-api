@@ -468,107 +468,10 @@ module.exports = {
             );
           }
 
-          // if (Array.isArray(scopes) && scopes.length) {
-          //   for (const budgetCat of scopes) {
-          //     if (!Array.isArray(budgetCat.scopes)) continue;
-
-          //     for (const scope of budgetCat.scopes) {
-          //       // ---- Create budgetBooksScopes ----
-          //       const budgetBooksScope = await db.budgetBooksScopesObj.create({
-          //         budget_books_id: budgetBook.id,
-          //         is_include: scope.is_include ?? null,
-          //         scope_id: scope.scope_id,
-          //         title: scope.title || "",
-          //       });
-
-          //       if (!Array.isArray(scope.categories)) continue;
-
-          //       for (const category of scope.categories) {
-          //         // ---- Create budgetBooksScopeCategories ----
-          //         const budgetBooksScopeCategory =
-          //           await db.budgetBooksScopeCategoriesObj.create({
-          //             budget_books_scope_id: budgetBooksScope.id,
-          //             scope_category_id: category.scope_category_id || null,
-          //             title: category.title || "",
-          //           });
-
-          //         if (!Array.isArray(category.groups)) continue;
-
-          //         for (const group of category.groups) {
-          //           // ---- Create budgetBooksScopeGroups ----
-          //           const budgetBooksScopeGroup =
-          //             await db.budgetBooksScopeGroupsObj.create({
-          //               budget_books_scope_category_id:
-          //                 budgetBooksScopeCategory.id,
-          //               scope_group_id: group.scope_group_id || null,
-          //               title: group.title || "",
-          //             });
-
-          //           if (!Array.isArray(group.sagments)) continue;
-
-          //           for (const segment of group.sagments) {
-          //             if (!Array.isArray(segment.data) || !segment.data.length)
-          //               continue;
-
-          //             for (const dataItem of segment.data) {
-          //               const siteId = dataItem.site_id || null;
-
-          //               if (
-          //                 !Array.isArray(dataItem.segments) ||
-          //                 !dataItem.segments.length
-          //               )
-          //                 continue;
-
-          //               for (const seg of dataItem.segments) {
-          //                 let priceWithAdditional =
-          //                   Number(seg.price_w_additional) || 0;
-          //                 if (
-          //                   isNaN(priceWithAdditional) ||
-          //                   !isFinite(priceWithAdditional)
-          //                 )
-          //                   priceWithAdditional = 0.0;
-
-          //                 // ---- Create budgetBooksScopeSegments ----
-          //                 await db.budgetBooksScopeSegmentsObj.create({
-          //                   budget_books_scope_group_id:
-          //                     budgetBooksScopeGroup.id,
-          //                   scope_sagment_id: segment.scope_sagment_id,
-          //                   title: segment.title || "",
-          //                   notes: segment.notes || "",
-          //                   client_notes: segment.client_notes || "",
-          //                   is_include: seg.is_include ?? null,
-          //                   acc: seg.acc ?? null,
-          //                   internal_notes: seg.internal_notes ?? null,
-          //                   price_sqft: Number(seg.price_sqft) || 0,
-          //                   additionals: Number(seg.additionals) || 0,
-          //                   price_w_additional: priceWithAdditional,
-          //                   budget_Cat_Id: category.scope_category_id || null,
-          //                   cost: Number(seg.cost) || 0,
-          //                   costSqft: Number(seg.costSqft) || 0,
-          //                   total: Number(seg.total) || 0,
-          //                   conditions: Array.isArray(segment.option)
-          //                     ? segment.option.join(", ")
-          //                     : segment.option || null,
-          //                   site_id: siteId,
-          //                   scopeId: scope.scope_id || null,
-          //                   optionPercentage: seg.optionPercentage ?? null,
-          //                   budgetIndex: seg.budgetIndex ?? null,
-          //                 });
-          //               }
-          //             }
-          //           }
-          //         }
-          //       }
-          //     }
-          //   }
-          // }
-
-
           if (Array.isArray(scopes) && scopes.length) {
             for (const scopeGroup of scopes) {
-              // Each item in scopes is an object like { "siteId_scopeId_segmentId": { ... } }
               const entries = Object.values(scopeGroup);
-          
+
               for (const item of entries) {
                 const {
                   scope_id,
@@ -593,7 +496,7 @@ module.exports = {
                   budgetIndex,
                   budget_Cat_Id,
                 } = item;
-          
+
                 // --- Create budgetBooksScopes ---
                 const budgetBooksScope = await db.budgetBooksScopesObj.create({
                   budget_books_id: budgetBook.id,
@@ -601,21 +504,23 @@ module.exports = {
                   scope_id: scope_id,
                   title: scope_name || "",
                 });
-          
+
                 // --- Create budgetBooksScopeCategories ---
-                const budgetBooksScopeCategory = await db.budgetBooksScopeCategoriesObj.create({
-                  budget_books_scope_id: budgetBooksScope.id,
-                  scope_category_id: scope_category_id || null,
-                  title: category_name || "",
-                });
-          
+                const budgetBooksScopeCategory =
+                  await db.budgetBooksScopeCategoriesObj.create({
+                    budget_books_scope_id: budgetBooksScope.id,
+                    scope_category_id: scope_category_id || null,
+                    title: category_name || "",
+                  });
+
                 // --- Create budgetBooksScopeGroups ---
-                const budgetBooksScopeGroup = await db.budgetBooksScopeGroupsObj.create({
-                  budget_books_scope_category_id: budgetBooksScopeCategory.id,
-                  scope_group_id: group_id || null,
-                  title: group_name || "",
-                });
-          
+                const budgetBooksScopeGroup =
+                  await db.budgetBooksScopeGroupsObj.create({
+                    budget_books_scope_category_id: budgetBooksScopeCategory.id,
+                    scope_group_id: group_id || null,
+                    title: group_name || "",
+                  });
+
                 // --- Create budgetBooksScopeSegments ---
                 await db.budgetBooksScopeSegmentsObj.create({
                   budget_books_scope_group_id: budgetBooksScopeGroup.id,
@@ -633,7 +538,9 @@ module.exports = {
                   cost: Number(cost) || 0,
                   costSqft: Number(costSqft) || 0,
                   total: Number(total) || 0,
-                  conditions: Array.isArray(condition) ? condition.join(", ") : condition || null,
+                  conditions: Array.isArray(condition)
+                    ? condition.join(", ")
+                    : condition || null,
                   site_id: site_id || null,
                   scopeId: scope_id || null,
                   optionPercentage: optionPercentage ?? null,
@@ -642,65 +549,6 @@ module.exports = {
               }
             }
           }
-          
-          
-
-          // if (Array.isArray(uploadDocument) && uploadDocument.length) {
-          //   for (const document of uploadDocument) {
-          //     let fileName = null;
-          //     let originalName = null;
-
-          //     // --- Case 1: New file upload ---
-          //     if (document.file && document.file.path) {
-          //       const uploadedFile = document.file;
-          //       const extension = path.extname(uploadedFile.originalname);
-          //       originalName = uploadedFile.originalname.replace(
-          //         /[^A-Za-z0-9.\-_]/g,
-          //         ""
-          //       );
-          //       fileName = `${Math.floor(
-          //         Math.random() * 90 + 10
-          //       )}${Date.now()}${extension}`;
-
-          //       const uploadDir = path.resolve("public/uploadDocument");
-          //       if (!fs.existsSync(uploadDir))
-          //         fs.mkdirSync(uploadDir, { recursive: true });
-
-          //       fs.renameSync(
-          //         uploadedFile.path,
-          //         path.join(uploadDir, fileName)
-          //       );
-
-          //       await db.budgetBookDocumentsObj.create({
-          //         budget_book_id: budgetBook.id,
-          //         file_name: fileName,
-          //         type: document.type || null,
-          //         notes: document.note || null,
-          //         is_display: document.displayToCustomer ? 1 : 0,
-          //       });
-
-          //       // --- Case 2: Update existing document ---
-          //     } else if (document.file && document.file.id) {
-          //       const existing = await db.budgetBookDocumentsObj.findOne({
-          //         where: {
-          //           id: document.file.id,
-          //           budget_book_id: budgetBook.id,
-          //         },
-          //       });
-
-          //       if (existing) {
-          //         await existing.update({
-          //           file_name: existing.file_name,
-          //           type: document.type || existing.type,
-          //           notes: document.note || existing.notes,
-          //           is_display: document.displayToCustomer
-          //             ? parseInt(document.displayToCustomer)
-          //             : existing.is_display,
-          //         });
-          //       }
-          //     }
-          //   }
-          // }
 
           await Promise.all(promises);
 
@@ -931,6 +779,7 @@ module.exports = {
       });
     }
   },
+
 
   async deleteBudgetBooks(req, res) {
     try {

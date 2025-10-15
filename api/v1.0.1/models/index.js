@@ -249,15 +249,30 @@ db.projectObj.belongsTo(db.taxesObj, {
   as: "stateDetails",
 });
 
-db.budgetBooksObj.belongsTo(db.projectObj, {
-  foreignKey: "project_id",
-  as: "budgetProject",
-});
+// db.budgetBooksObj.belongsTo(db.projectObj, {
+//   foreignKey: "project_id",
+//   as: "budgetProject",
+// });
 
-db.budgetBooksObj.belongsTo(db.leadsObj, {
-  foreignKey: "lead_id",
-  as: "budgetLead",
-});
+// db.budgetBooksObj.belongsTo(db.leadsObj, {
+//   foreignKey: "lead_id",
+//   as: "budgetLead",
+// });
+
+// budgetBooksObj model
+db.budgetBooksObj.belongsTo(db.companyObj, { foreignKey: "engineer_id", as: "engineer" });
+db.budgetBooksObj.belongsTo(db.projectObj, { foreignKey: "project_id", as: "budgetProject" });
+db.budgetBooksObj.belongsTo(db.leadsObj, { foreignKey: "lead_id", as: "budgetLead" });
+db.budgetBooksObj.hasMany(db.sitePlansObj, { foreignKey: "budget_books_id", as: "sitePlan" });
+db.budgetBooksObj.hasMany(db.sitePlanItemsObj, { foreignKey: "budget_books_id", as: "sitePlan2" });
+db.budgetBooksObj.hasMany(db.projectBudgetsObj, { foreignKey: "budget_books_id", as: "budgets" });
+db.budgetBooksObj.hasMany(db.budgetBooksSitesObj, { foreignKey: "budget_books_id", as: "sites" });
+db.budgetBooksObj.hasMany(db.budgetBooksScopesObj, { foreignKey: "budget_books_id", as: "projectScopes" });
+db.budgetBooksScopesObj.hasMany(db.budgetBooksScopeCategoriesObj, { foreignKey: "budget_books_scope_id", as: "categories" });
+db.budgetBooksScopeCategoriesObj.hasMany(db.budgetBooksScopeGroupsObj, { foreignKey: "budget_books_scope_category_id", as: "groups" });
+db.budgetBooksScopeGroupsObj.hasMany(db.budgetBooksScopeSegmentsObj, { foreignKey: "budget_books_scope_group_id", as: "segments" });
+db.budgetBooksScopeSegmentsObj.belongsTo(db.scopeSegmentObj, { foreignKey: "scope_sagment_id", as: "scopeSagment" });
+
 
 db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
   foreignKey: "budget_books_id",
@@ -837,10 +852,10 @@ db.companyObj.hasMany(db.contactsObj, {
 });
 
 // Project belongs to Company in multiple roles
-db.projectObj.belongsTo(db.companyObj, {
-  foreignKey: "engineer_id",
-  as: "engineer",
-});
+// db.projectObj.belongsTo(db.companyObj, {
+//   foreignKey: "engineer_id",
+//   as: "engineer",
+// });
 db.projectObj.belongsTo(db.companyObj, {
   foreignKey: "architecture",
   as: "architect",

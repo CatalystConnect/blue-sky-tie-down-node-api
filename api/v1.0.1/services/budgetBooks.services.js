@@ -17,76 +17,190 @@ module.exports = {
       throw error;
     }
   },
-
   async getAllBudgetBooks(query) {
     try {
       let { page = 1, per_page = 10, take_all = false } = query;
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
+      const offset = (page - 1) * per_page;
 
-      if (take_all) {
-        // Fetch all records
-        const allRecords = await db.budgetBooksObj.findAll({
-          order: [["created_at", "DESC"]],
+      // -------------------------
+      // Define reusable include
+      // -------------------------
+      const budgetBookIncludes = [
+        {
+          model: db.companyObj,
+          as: "engineer",
+          attributes: ["id", "name"],
+          required: false,
+        },
+        {
+          model: db.projectObj,
+          as: "budgetProject",
+          attributes: ["id", "name"],
+          required: false,
+        },
+        {
+          model: db.leadsObj,
+          as: "budgetLead",
+          required: false,
           include: [
             {
-              model: db.budgetBooksScopeIncludesObj,
-              as: "budgetBooksScopeIncludes",
+              model: db.projectObj,
+              as: "project",
+              attributes: ["id", "name"],
+              required: false,
             },
-            { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
-            { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
-            { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
-            { model: db.projectObj, as: "budgetProject" },
-            { model: db.leadsObj, as: "budgetLead" },
+            {
+              model: db.leadTeamsMemberObj,
+              as: "leadTeamMembers",
+              required: false,
+              separate: true,
+            },
           ],
-        });
+        },
+        {
+          model: db.budgetBooksScopeIncludesObj,
+          as: "budgetBooksScopeIncludes",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.budgetBooksDrawingsObj,
+          as: "budgetBooksDrawings",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.budgetBooksKeyAreasObj,
+          as: "budgetBooksKeyAreas",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.budgetBooksContractsObj,
+          as: "budgetBooksContracts",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.sitePlansObj,
+          as: "sitePlan",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.sitePlanItemsObj,
+          as: "sitePlan2",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.projectBudgetsObj,
+          as: "budgets",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.budgetBooksSitesObj,
+          as: "sites",
+          required: false,
+          separate: true,
+        },
+        {
+          model: db.budgetBooksScopesObj,
+          as: "projectScopes",
+          required: false,
+          separate: true,
+          include: [
+            {
+              model: db.budgetBooksScopeCategoriesObj,
+              as: "categories",
+              required: false,
+              separate: true,
+              include: [
+                {
+                  model: db.budgetBooksScopeGroupsObj,
+                  as: "groups",
+                  required: false,
+                  separate: true,
+                  include: [
+                    {
+                      model: db.budgetBooksScopeSegmentsObj,
+                      as: "segments",
+                      required: false,
+                      separate: true,
+                      include: [
+                        {
+                          model: db.scopeSegmentObj,
+                          as: "scopeSagment",
+                          required: false,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
 
-        return {
-          data: allRecords,
-          meta: {
-            current_page: 1,
-            from: 1,
-            last_page: 1,
-            per_page: allRecords.length,
-            to: allRecords.length,
-            total: allRecords.length,
-          },
-        };
-      }
-
-      // Pagination logic
-      const offset = (page - 1) * per_page;
-      const total = await db.budgetBooksObj.count();
-
+      // -------------------------
+      // Fetch budgetBooks
+      // -------------------------
       const budgetBooks = await db.budgetBooksObj.findAll({
-        limit: per_page,
-        offset,
+        limit: take_all ? undefined : per_page,
+        offset: take_all ? undefined : offset,
         order: [["created_at", "DESC"]],
-        include: [
-          {
-            model: db.budgetBooksScopeIncludesObj,
-            as: "budgetBooksScopeIncludes",
-          },
-          { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
-          { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
-          { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
-          { model: db.projectObj, as: "budgetProject" },
-          { model: db.leadsObj, as: "budgetLead" },
-        ],
+        include: budgetBookIncludes,
       });
 
+      // Total count for pagination
+      const total = await db.budgetBooksObj.count();
+
+      // -------------------------
+      // Pagination meta
+      // -------------------------
       const last_page = Math.ceil(total / per_page);
       const from = total > 0 ? offset + 1 : 0;
       const to = Math.min(offset + per_page, total);
 
+      // -------------------------
+      // Optional: Normalize data to guarantee null for missing relations
+      // -------------------------
+      const normalizeBudgetBooks = (items) =>
+        items.map((b) => {
+          const data = b.toJSON();
+          data.budgetLead = data.budgetLead || null;
+          data.budgetProject = data.budgetProject || null;
+          data.engineer = data.engineer || null;
+
+          data.projectScopes =
+            data.projectScopes?.map((scope) => {
+              scope.categories =
+                scope.categories?.map((cat) => {
+                  cat.groups =
+                    cat.groups?.map((group) => {
+                      group.segments = group.segments || [];
+                      return group;
+                    }) || [];
+                  return cat;
+                }) || [];
+              return scope;
+            }) || [];
+
+          return data;
+        });
+
       return {
-        data: budgetBooks,
+        data: normalizeBudgetBooks(budgetBooks),
         meta: {
           current_page: page,
           from,
           last_page,
-          per_page,
-          to,
+          per_page: take_all ? total : per_page,
+          to: take_all ? total : to,
           total,
         },
       };
@@ -96,20 +210,374 @@ module.exports = {
     }
   },
 
+  // async getAllBudgetBooks(query) {
+  //   try {
+  //     let { page = 1, per_page = 10, take_all = false } = query;
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+
+  //     if (take_all) {
+  //       // Fetch all records
+  //       const allRecords = await db.budgetBooksObj.findAll({
+  //         order: [["created_at", "DESC"]],
+  //         include: [
+  //           { model: db.companyObj, as: "engineer", required: false },
+  //           { model: db.projectObj, as: "budgetProject", required: false },
+  //           {
+  //             model: db.leadsObj,
+  //             as: "budgetLead",
+  //             required: false,
+  //             include: [
+  //               { model: db.projectObj, as: "project", required: false },
+  //               {
+  //                 model: db.leadTeamsMemberObj,
+  //                 as: "leadTeamMembers",
+  //                 required: false,
+  //                 separate: true,
+  //               },
+  //             ],
+  //           },
+  //           {
+  //             model: db.budgetBooksScopeIncludesObj,
+  //             as: "budgetBooksScopeIncludes",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.budgetBooksDrawingsObj,
+  //             as: "budgetBooksDrawings",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.budgetBooksKeyAreasObj,
+  //             as: "budgetBooksKeyAreas",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.budgetBooksContractsObj,
+  //             as: "budgetBooksContracts",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.sitePlansObj,
+  //             as: "sitePlan",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.sitePlanItemsObj,
+  //             as: "sitePlan2",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.projectBudgetsObj,
+  //             as: "budgets",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.budgetBooksSitesObj,
+  //             as: "sites",
+  //             required: false,
+  //             separate: true,
+  //           },
+  //           {
+  //             model: db.budgetBooksScopesObj,
+  //             as: "projectScopes",
+  //             required: false,
+  //             include: [
+  //               {
+  //                 model: db.budgetBooksScopeCategoriesObj,
+  //                 as: "categories",
+  //                 required: false,
+  //                 include: [
+  //                   {
+  //                     model: db.budgetBooksScopeGroupsObj,
+  //                     as: "groups",
+  //                     required: false,
+  //                     include: [
+  //                       {
+  //                         model: db.budgetBooksScopeSegmentsObj,
+  //                         as: "segments",
+  //                         required: false,
+  //                         include: [
+  //                           {
+  //                             model: db.scopeSegmentObj,
+  //                             as: "scopeSagment",
+  //                             required: false,
+  //                           },
+  //                         ],
+  //                         separate: true,
+  //                       },
+  //                     ],
+  //                     separate: true,
+  //                   },
+  //                 ],
+  //                 separate: true,
+  //               },
+  //             ],
+  //             separate: true,
+  //           },
+  //         ],
+  //       });
+
+  //       return {
+  //         data: allRecords,
+  //         meta: {
+  //           current_page: 1,
+  //           from: 1,
+  //           last_page: 1,
+  //           per_page: allRecords.length,
+  //           to: allRecords.length,
+  //           total: allRecords.length,
+  //         },
+  //       };
+  //     }
+
+  //     // Pagination logic
+  //     const offset = (page - 1) * per_page;
+  //     const total = await db.budgetBooksObj.count();
+
+  //     const budgetBooks = await db.budgetBooksObj.findAll({
+  //       limit: per_page,
+  //       offset,
+  //       order: [["created_at", "DESC"]],
+  //       include: [
+  //         { model: db.companyObj, as: "engineer", required: false },
+  //         { model: db.projectObj, as: "budgetProject", required: false },
+  //         {
+  //           model: db.leadsObj,
+  //           as: "budgetLead",
+  //           required: false,
+  //           include: [
+  //             { model: db.projectObj, as: "project", required: false },
+  //             {
+  //               model: db.leadTeamsMemberObj,
+  //               as: "leadTeamMembers",
+  //               required: false,
+  //               separate: true,
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.budgetBooksScopeIncludesObj,
+  //           as: "budgetBooksScopeIncludes",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.budgetBooksDrawingsObj,
+  //           as: "budgetBooksDrawings",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.budgetBooksKeyAreasObj,
+  //           as: "budgetBooksKeyAreas",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.budgetBooksContractsObj,
+  //           as: "budgetBooksContracts",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.sitePlansObj,
+  //           as: "sitePlan",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.sitePlanItemsObj,
+  //           as: "sitePlan2",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.projectBudgetsObj,
+  //           as: "budgets",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.budgetBooksSitesObj,
+  //           as: "sites",
+  //           required: false,
+  //           separate: true,
+  //         },
+  //         {
+  //           model: db.budgetBooksScopesObj,
+  //           as: "projectScopes",
+  //           required: false,
+  //           include: [
+  //             {
+  //               model: db.budgetBooksScopeCategoriesObj,
+  //               as: "categories",
+  //               required: false,
+  //               include: [
+  //                 {
+  //                   model: db.budgetBooksScopeGroupsObj,
+  //                   as: "groups",
+  //                   required: false,
+  //                   include: [
+  //                     {
+  //                       model: db.budgetBooksScopeSegmentsObj,
+  //                       as: "segments",
+  //                       required: false,
+  //                       include: [
+  //                         {
+  //                           model: db.scopeSegmentObj,
+  //                           as: "scopeSagment",
+  //                           required: false,
+  //                         },
+  //                       ],
+  //                       separate: true,
+  //                     },
+  //                   ],
+  //                   separate: true,
+  //                 },
+  //               ],
+  //               separate: true,
+  //             },
+  //           ],
+  //           separate: true,
+  //         },
+  //       ],
+  //     });
+
+  //     const last_page = Math.ceil(total / per_page);
+  //     const from = total > 0 ? offset + 1 : 0;
+  //     const to = Math.min(offset + per_page, total);
+
+  //     return {
+  //       data: budgetBooks,
+  //       meta: {
+  //         current_page: page,
+  //         from,
+  //         last_page,
+  //         per_page,
+  //         to,
+  //         total,
+  //       },
+  //     };
+  //   } catch (error) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+  //     throw error;
+  //   }
+  // },
+
   async getBudgetBooksById(budgetBooksId) {
     try {
       const budgetBook = await db.budgetBooksObj.findOne({
         where: { id: budgetBooksId },
         include: [
+          { model: db.companyObj, as: "engineer", required: false },
+          { model: db.projectObj, as: "budgetProject", required: false },
+          {
+            model: db.leadsObj,
+            as: "budgetLead",
+            required: false,
+            include: [
+              { model: db.projectObj, as: "project", required: false },
+              {
+                model: db.leadTeamsMemberObj,
+                as: "leadTeamMembers",
+                required: false,
+                separate: true,
+              },
+            ],
+          },
           {
             model: db.budgetBooksScopeIncludesObj,
             as: "budgetBooksScopeIncludes",
+            required: false,
+            separate: true,
           },
-          { model: db.budgetBooksDrawingsObj, as: "budgetBooksDrawings" },
-          { model: db.budgetBooksKeyAreasObj, as: "budgetBooksKeyAreas" },
-          { model: db.budgetBooksContractsObj, as: "budgetBooksContracts" },
-          { model: db.projectObj, as: "budgetProject" },
-          { model: db.leadsObj, as: "budgetLead" },
+          {
+            model: db.budgetBooksDrawingsObj,
+            as: "budgetBooksDrawings",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.budgetBooksKeyAreasObj,
+            as: "budgetBooksKeyAreas",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.budgetBooksContractsObj,
+            as: "budgetBooksContracts",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.sitePlansObj,
+            as: "sitePlan",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.sitePlanItemsObj,
+            as: "sitePlan2",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.projectBudgetsObj,
+            as: "budgets",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.budgetBooksSitesObj,
+            as: "sites",
+            required: false,
+            separate: true,
+          },
+          {
+            model: db.budgetBooksScopesObj,
+            as: "projectScopes",
+            required: false,
+            include: [
+              {
+                model: db.budgetBooksScopeCategoriesObj,
+                as: "categories",
+                required: false,
+                include: [
+                  {
+                    model: db.budgetBooksScopeGroupsObj,
+                    as: "groups",
+                    required: false,
+                    include: [
+                      {
+                        model: db.budgetBooksScopeSegmentsObj,
+                        as: "segments",
+                        required: false,
+                        include: [
+                          {
+                            model: db.scopeSegmentObj,
+                            as: "scopeSagment",
+                            required: false,
+                          },
+                        ],
+                        separate: true,
+                      },
+                    ],
+                    separate: true,
+                  },
+                ],
+                separate: true,
+              },
+            ],
+            separate: true,
+          },
         ],
       });
 
@@ -146,9 +614,9 @@ module.exports = {
     budgetBooksId,
     {
       budgetBooksScopeIncludes,
-        budgetBooksDrawings,
-        budgetBooksKeyAreas,
-        budgetBooksContracts,
+      budgetBooksDrawings,
+      budgetBooksKeyAreas,
+      budgetBooksContracts,
     }
   ) {
     try {
@@ -169,7 +637,10 @@ module.exports = {
 
       const promises = [];
 
-      if (Array.isArray(budgetBooksScopeIncludes) && budgetBooksScopeIncludes.length) {
+      if (
+        Array.isArray(budgetBooksScopeIncludes) &&
+        budgetBooksScopeIncludes.length
+      ) {
         promises.push(
           db.budgetBooksScopeIncludesObj.bulkCreate(
             budgetBooksScopeIncludes.map((item) => ({

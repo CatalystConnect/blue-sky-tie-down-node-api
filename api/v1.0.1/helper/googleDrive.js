@@ -76,8 +76,8 @@ const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 // });
 
 const auth = new google.auth.JWT({
-  email: credentialsPath.client_email,
-  key: credentialsPath.private_key,
+  email: credentialsPath?.client_email,
+  key: credentialsPath?.private_key,
   scopes: SCOPES,
 });
 const drive = google.drive({ version: "v3", auth });

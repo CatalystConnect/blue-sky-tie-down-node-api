@@ -1106,7 +1106,6 @@ module.exports = {
       throw error;
     }
   },
-
   async deleteBudgetBooks(budgetBooksId) {
     try {
       const budgetBook = await db.budgetBooksObj.findOne({
@@ -1117,6 +1116,7 @@ module.exports = {
         return null;
       }
 
+      // Delete all related associations
       await Promise.all([
         db.budgetBooksScopeIncludesObj.destroy({
           where: { budget_books_id: budgetBooksId },
@@ -1130,8 +1130,54 @@ module.exports = {
         db.budgetBooksContractsObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
+        db.budgetBooksSitesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.projectBudgetsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.sitePlanItemsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.optionPackageObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
+        db.budgetBooksScopesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeCategoriesObj.destroy({
+          where: {
+            budget_books_scope_id: db.Sequelize.literal(`(
+              SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+            )`),
+          },
+        }),
+        db.budgetBooksScopeGroupsObj.destroy({
+          where: {
+            budget_books_scope_category_id: db.Sequelize.literal(`(
+              SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
+                SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+              )
+            )`),
+          },
+        }),
+        db.budgetBooksScopeSegmentsObj.destroy({
+          where: {
+            budget_books_scope_group_id: db.Sequelize.literal(`(
+              SELECT id FROM "budget_books_scope_groups" WHERE budget_books_scope_category_id IN (
+                SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
+                  SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+                )
+              )
+            )`),
+          },
+        }),
       ]);
 
+      // Delete the main budget book
       await db.budgetBooksObj.destroy({
         where: { id: budgetBooksId },
       });
@@ -1142,6 +1188,119 @@ module.exports = {
       throw error;
     }
   },
+
+  async deleteBudgetBooks(budgetBooksId) {
+    try {
+      const budgetBook = await db.budgetBooksObj.findOne({
+        where: { id: budgetBooksId },
+      });
+
+      if (!budgetBook) return null;
+
+      // Delete simple related tables
+      await Promise.all([
+        db.budgetBooksScopeIncludesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksDrawingsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksKeyAreasObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksContractsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksSitesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.projectBudgetsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.sitePlanItemsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.optionPackageObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
+      ]);
+
+      // Delete nested scope hierarchy
+      const scopes = await db.budgetBooksScopesObj.findAll({
+        where: { budget_books_id: budgetBooksId },
+        attributes: ["id"],
+      });
+      const scopeIds = scopes.map((s) => s.id);
+
+      const categories = await db.budgetBooksScopeCategoriesObj.findAll({
+        where: { budget_books_scope_id: scopeIds },
+        attributes: ["id"],
+      });
+      const categoryIds = categories.map((c) => c.id);
+
+      const groups = await db.budgetBooksScopeGroupsObj.findAll({
+        where: { budget_books_scope_category_id: categoryIds },
+        attributes: ["id"],
+      });
+      const groupIds = groups.map((g) => g.id);
+
+      await db.budgetBooksScopeSegmentsObj.destroy({
+        where: { budget_books_scope_group_id: groupIds },
+      });
+      await db.budgetBooksScopeGroupsObj.destroy({ where: { id: groupIds } });
+      await db.budgetBooksScopeCategoriesObj.destroy({
+        where: { id: categoryIds },
+      });
+      await db.budgetBooksScopesObj.destroy({ where: { id: scopeIds } });
+
+      // Delete the main budget book
+      await db.budgetBooksObj.destroy({ where: { id: budgetBooksId } });
+
+      return true;
+    } catch (error) {
+      console.error("Delete Budget Book Error:", error);
+      throw error;
+    }
+  },
+
+  // async deleteBudgetBooks(budgetBooksId) {
+  //   try {
+  //     const budgetBook = await db.budgetBooksObj.findOne({
+  //       where: { id: budgetBooksId },
+  //     });
+
+  //     if (!budgetBook) {
+  //       return null;
+  //     }
+
+  //     await Promise.all([
+  //       db.budgetBooksScopeIncludesObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksDrawingsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksKeyAreasObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksContractsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //     ]);
+
+  //     await db.budgetBooksObj.destroy({
+  //       where: { id: budgetBooksId },
+  //     });
+
+  //     return true;
+  //   } catch (error) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+  //     throw error;
+  //   }
+  // },
   async getAllBudgetCategory() {
     try {
       const budgetCategories = await db.budgetCategoryObj.findAll({

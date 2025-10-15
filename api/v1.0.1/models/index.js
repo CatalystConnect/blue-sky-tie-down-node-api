@@ -852,10 +852,10 @@ db.companyObj.hasMany(db.contactsObj, {
 });
 
 // Project belongs to Company in multiple roles
-// db.projectObj.belongsTo(db.companyObj, {
-//   foreignKey: "engineer_id",
-//   as: "engineer",
-// });
+db.projectObj.belongsTo(db.companyObj, {
+  foreignKey: "engineer_id",
+  as: "engineer",
+});
 db.projectObj.belongsTo(db.companyObj, {
   foreignKey: "architecture",
   as: "architect",

@@ -3,8 +3,8 @@ const path = require("path");
 const { google } = require("googleapis");
 require("dotenv").config();
 
-  // const credentialsPath = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-const credentialsPath = JSON.parse(Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString());
+  const credentialsPath = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+// const credentialsPath = JSON.parse(Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString());
 // console.log('===', credentialsPath)
 
 // const credentialsPath = JSON.parse(decoded);

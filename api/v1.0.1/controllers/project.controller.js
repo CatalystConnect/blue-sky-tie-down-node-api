@@ -9,9 +9,9 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
-// const { uploadFileToDrive } = require("../helper/googleDrive");
-// const path = require("path");
-// const fs = require("fs");
+const { uploadFileToDrive } = require("../helper/googleDrive");
+const path = require("path");
+const fs = require("fs");
 module.exports = {
   /*addProject*/
   // async addProject(req, res) {

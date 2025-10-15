@@ -114,17 +114,39 @@ module.exports = {
           separate: true,
           include: [
             {
+              model: db.budgetScopeObj,
+              as: "scope",
+              required: false,
+              include: [
+                {
+                  model: db.budgetCategoryObj,
+                  as: "budgetCategory",
+                  required: false,
+                },
+              ],
+            },
+            {
               model: db.budgetBooksScopeCategoriesObj,
               as: "categories",
               required: false,
               separate: true,
               include: [
                 {
+                  model: db.scopeCategoryObj,
+                  as: "scopeCategory",
+                  required: false,
+                },
+                {
                   model: db.budgetBooksScopeGroupsObj,
                   as: "groups",
                   required: false,
                   separate: true,
                   include: [
+                    {
+                      model: db.scopeGroupObj,
+                      as: "scopeGroup",
+                      required: false,
+                    },
                     {
                       model: db.budgetBooksScopeSegmentsObj,
                       as: "segments",
@@ -547,15 +569,37 @@ module.exports = {
             required: false,
             include: [
               {
+                model: db.budgetScopeObj,
+                as: "scope",
+                required: false,
+                include: [
+                  {
+                    model: db.budgetCategoryObj,
+                    as: "budgetCategory",
+                    required: false,
+                  },
+                ],
+              },
+              {
                 model: db.budgetBooksScopeCategoriesObj,
                 as: "categories",
                 required: false,
                 include: [
                   {
+                    model: db.scopeCategoryObj,
+                    as: "scopeCategory",
+                    required: false,
+                  },
+                  {
                     model: db.budgetBooksScopeGroupsObj,
                     as: "groups",
                     required: false,
                     include: [
+                      {
+                        model: db.scopeGroupObj,
+                        as: "scopeGroup",
+                        required: false,
+                      },
                       {
                         model: db.budgetBooksScopeSegmentsObj,
                         as: "segments",
@@ -1106,88 +1150,88 @@ module.exports = {
       throw error;
     }
   },
-  async deleteBudgetBooks(budgetBooksId) {
-    try {
-      const budgetBook = await db.budgetBooksObj.findOne({
-        where: { id: budgetBooksId },
-      });
+  // async deleteBudgetBooks(budgetBooksId) {
+  //   try {
+  //     const budgetBook = await db.budgetBooksObj.findOne({
+  //       where: { id: budgetBooksId },
+  //     });
 
-      if (!budgetBook) {
-        return null;
-      }
+  //     if (!budgetBook) {
+  //       return null;
+  //     }
 
-      // Delete all related associations
-      await Promise.all([
-        db.budgetBooksScopeIncludesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksDrawingsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksKeyAreasObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksContractsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksSitesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.projectBudgetsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
-        db.sitePlanItemsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
-        db.optionPackageObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
-        db.budgetBooksScopesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeCategoriesObj.destroy({
-          where: {
-            budget_books_scope_id: db.Sequelize.literal(`(
-              SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
-            )`),
-          },
-        }),
-        db.budgetBooksScopeGroupsObj.destroy({
-          where: {
-            budget_books_scope_category_id: db.Sequelize.literal(`(
-              SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
-                SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
-              )
-            )`),
-          },
-        }),
-        db.budgetBooksScopeSegmentsObj.destroy({
-          where: {
-            budget_books_scope_group_id: db.Sequelize.literal(`(
-              SELECT id FROM "budget_books_scope_groups" WHERE budget_books_scope_category_id IN (
-                SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
-                  SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
-                )
-              )
-            )`),
-          },
-        }),
-      ]);
+  //     // Delete all related associations
+  //     await Promise.all([
+  //       db.budgetBooksScopeIncludesObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksDrawingsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksKeyAreasObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksContractsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksSitesObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.projectBudgetsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+  //       db.sitePlanItemsObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+  //       db.optionPackageObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
+  //       db.budgetBooksScopesObj.destroy({
+  //         where: { budget_books_id: budgetBooksId },
+  //       }),
+  //       db.budgetBooksScopeCategoriesObj.destroy({
+  //         where: {
+  //           budget_books_scope_id: db.Sequelize.literal(`(
+  //             SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+  //           )`),
+  //         },
+  //       }),
+  //       db.budgetBooksScopeGroupsObj.destroy({
+  //         where: {
+  //           budget_books_scope_category_id: db.Sequelize.literal(`(
+  //             SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
+  //               SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+  //             )
+  //           )`),
+  //         },
+  //       }),
+  //       db.budgetBooksScopeSegmentsObj.destroy({
+  //         where: {
+  //           budget_books_scope_group_id: db.Sequelize.literal(`(
+  //             SELECT id FROM "budget_books_scope_groups" WHERE budget_books_scope_category_id IN (
+  //               SELECT id FROM "budget_books_scope_categories" WHERE budget_books_scope_id IN (
+  //                 SELECT id FROM "budget_books_scopes" WHERE budget_books_id = '${budgetBooksId}'
+  //               )
+  //             )
+  //           )`),
+  //         },
+  //       }),
+  //     ]);
 
-      // Delete the main budget book
-      await db.budgetBooksObj.destroy({
-        where: { id: budgetBooksId },
-      });
+  //     // Delete the main budget book
+  //     await db.budgetBooksObj.destroy({
+  //       where: { id: budgetBooksId },
+  //     });
 
-      return true;
-    } catch (error) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
-      throw error;
-    }
-  },
+  //     return true;
+  //   } catch (error) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
+  //     throw error;
+  //   }
+  // },
 
   async deleteBudgetBooks(budgetBooksId) {
     try {

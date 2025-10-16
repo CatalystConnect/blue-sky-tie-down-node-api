@@ -97,6 +97,10 @@ module.exports = {
             model: db.taxesObj,
             as: "stateDetails",
           },
+          {
+            model: db.stateObj,
+            as: "states",
+          },
         ],
         order: [["id", "DESC"]],
       });
@@ -189,6 +193,10 @@ module.exports = {
           {
             model: db.taxesObj,
             as: "stateDetails",
+          },
+          {
+            model: db.stateObj,
+            as: "states",
           },
           {
             model: db.leadsObj,
@@ -497,6 +505,10 @@ module.exports = {
           { model: db.companyObj, as: "general_contractor" },
           { model: db.userObj, as: "planReviewer" },
           { model: db.projectplanSetsObj, as: "planSets" },
+          {
+            model: db.stateObj,
+            as: "states",
+          },
         ],
         order: [
           [
@@ -657,6 +669,10 @@ module.exports = {
           { model: db.userObj, as: "planReviewer" },
           { model: db.projectplanSetsObj, as: "planSets" },
           { model: db.leadTeamsObj, as: "takeoff_team" },
+          {
+            model: db.stateObj,
+            as: "states",
+          },
         ],
         order: [
           [
@@ -873,6 +889,10 @@ module.exports = {
           { model: db.userObj, as: "planReviewer" },
           { model: db.projectplanSetsObj, as: "planSets" },
           { model: db.leadTeamsObj, as: "takeoff_team" },
+          {
+            model: db.stateObj,
+            as: "states",
+          },
         ],
         order: [
           [
@@ -1047,6 +1067,10 @@ module.exports = {
           { model: db.userObj, as: "planReviewer" },
           { model: db.projectplanSetsObj, as: "planSets" },
           { model: db.leadTeamsObj, as: "takeoff_team" },
+          {
+            model: db.stateObj,
+            as: "states",
+          },
         ],
         order: [
           [

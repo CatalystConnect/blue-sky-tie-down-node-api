@@ -64,7 +64,7 @@
           allowNull: true,
         },
         project_tags: {
-         type: Sequelize.STRING(255),
+         type: Sequelize.INTEGER,
           allowNull: true,
         },
         project_file: {
@@ -112,7 +112,7 @@
           allowNull: true,
         },
         project_phase: {
-           type: Sequelize.STRING(255),
+           type: Sequelize.INTEGER,
           allowNull: true,
         },
         date_received: {

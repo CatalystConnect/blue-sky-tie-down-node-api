@@ -441,7 +441,7 @@ module.exports = {
         takeoff_status: data.takeoff_status || null,
       };
       commonHelper.removeFalsyKeys(postData);
-
+ 
       let updateProject = await projectServices.updateProject(
         postData,
         projectId
@@ -454,6 +454,7 @@ module.exports = {
         data.planSets = JSON.parse(data.planSets);
       }
 
+      
       if (data.planSets && Array.isArray(data.planSets)) {
         for (let plan of data.planSets) {
           let planData = {

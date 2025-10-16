@@ -1094,4 +1094,15 @@ db.projectObj.belongsTo(db.stateObj, {
   as: "states",
 });
 
+db.projectObj.belongsTo(db.projectPhasesObj, {
+  foreignKey: "project_phase",
+  as: "projectPhase",
+});
+db.projectObj.belongsTo(db.projectTagsObj, {
+  foreignKey: "project_tags",
+  as: "projectTag",
+});
+
+
+
 module.exports = db;

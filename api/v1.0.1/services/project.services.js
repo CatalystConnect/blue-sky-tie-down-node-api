@@ -62,7 +62,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -100,6 +100,14 @@ module.exports = {
           {
             model: db.stateObj,
             as: "states",
+          },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
           },
         ],
         order: [["id", "DESC"]],
@@ -159,7 +167,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -197,6 +205,14 @@ module.exports = {
           {
             model: db.stateObj,
             as: "states",
+          },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
           },
           {
             model: db.leadsObj,
@@ -480,7 +496,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -508,6 +524,14 @@ module.exports = {
           {
             model: db.stateObj,
             as: "states",
+          },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
           },
         ],
         order: [
@@ -643,7 +667,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -672,6 +696,14 @@ module.exports = {
           {
             model: db.stateObj,
             as: "states",
+          },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
           },
         ],
         order: [
@@ -863,7 +895,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -892,6 +924,14 @@ module.exports = {
           {
             model: db.stateObj,
             as: "states",
+          },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
           },
         ],
         order: [
@@ -1041,7 +1081,7 @@ module.exports = {
           "plan_link",
           "submissionType",
           "planFiles",
-          "projectTags",
+          "project_tags",
           "projectFiles",
           "architecture",
           "takeoffactualtime",
@@ -1071,6 +1111,14 @@ module.exports = {
             model: db.stateObj,
             as: "states",
           },
+          {
+            model: db.projectPhasesObj,
+            as: "projectPhase",
+          },
+          {
+            model: db.projectTagsObj,
+            as: "projectTag",
+          },
         ],
         order: [
           [
@@ -1098,5 +1146,6 @@ module.exports = {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
+    
   },
 };

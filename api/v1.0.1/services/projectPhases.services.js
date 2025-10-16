@@ -15,8 +15,8 @@ module.exports = {
     }
   },
 
-  /*getAllProductTags*/
-  async getAllProductTags({ page, per_page, search }) {
+  /*getAllProductPhases*/
+  async getAllProductPhases({ page, per_page, search }) {
     try {
        const limit = per_page
       const offset = (page - 1) * limit;

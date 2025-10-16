@@ -3,23 +3,13 @@ const path = require("path");
 const { google } = require("googleapis");
 require("dotenv").config();
 
-const credentialsVars = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-console.log('============= credentialsVars : ', credentialsVars);
-
-const credentialsPath = {
-  "client_email" : credentialsVars.client_email ?? null,
-  "private_key" : credentialsVars.private_key ?? null
-}
-console.log('============= private_key : ', credentialsPath.private_key.replace(/\\n/g, '\n'));
+const credentialsPath = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
-
 const auth = new google.auth.JWT({
   email: credentialsPath.client_email,
   key: credentialsPath.private_key,
   scopes: SCOPES,
 });
-console.log('============= auth : ', auth);
-
 const drive = google.drive({ version: "v3", auth });
 
 /**

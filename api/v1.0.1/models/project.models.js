@@ -140,6 +140,15 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true,
       },
+       takeoffDueDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+       takeoffStartDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+
       bldgs: {
         type: Sequelize.INTEGER,
         allowNull: true,

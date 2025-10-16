@@ -237,6 +237,8 @@ db.budgetBookDocumentsObj = require("./budgetBookDocuments.models")(
   dbObj,
   Sequelize
 );
+db.projectPhasesObj = require("./projectPhases.models")(dbObj, Sequelize);
+db.projectTagsObj = require("./projectTags.models")(dbObj, Sequelize);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {

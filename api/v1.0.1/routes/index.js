@@ -57,5 +57,6 @@ router.use(require("./submittals.routes"));
 router.use(require("./contractComponents.routes"));
 router.use(require("./proejctPhases.routes"));
 router.use(require("./proejctTags.routes"));
+router.use(require("./state.routes"));
 
 module.exports = router;

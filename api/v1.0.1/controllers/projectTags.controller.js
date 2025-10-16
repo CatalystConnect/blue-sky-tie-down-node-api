@@ -46,7 +46,7 @@ module.exports = {
             const { page = 1, per_page = 10, search = "" } = req.query;
 
             
-            let ProductTags = await projectPhasesServices.getAllProductTags({
+            let ProductTags = await projectTagsServices.getAllProductTags({
                 page: parseInt(page),
                 per_page: parseInt(per_page),
                 search,

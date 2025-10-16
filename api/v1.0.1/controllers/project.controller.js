@@ -441,7 +441,7 @@ module.exports = {
         takeoff_status: data.takeoff_status || null,
       };
       commonHelper.removeFalsyKeys(postData);
-
+ 
       let updateProject = await projectServices.updateProject(
         postData,
         projectId

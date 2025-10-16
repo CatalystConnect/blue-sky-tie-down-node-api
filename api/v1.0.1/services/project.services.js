@@ -78,6 +78,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+          "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -183,6 +185,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+           "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -513,6 +517,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+           "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -684,6 +690,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+           "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -912,6 +920,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+           "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1098,6 +1108,8 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
+           "takeoffStartDate",
+          "takeoffDueDate"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },

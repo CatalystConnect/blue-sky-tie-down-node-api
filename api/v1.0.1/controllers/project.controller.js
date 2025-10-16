@@ -114,7 +114,7 @@ module.exports = {
             data_collocated_date: sanitizeDate(plan.data_collocated_date),
             plan_revision_notes: plan.plan_revision_notes || null,
           };
-
+          
           await projectServices.projectplanSets(planData);
         }
       }
@@ -469,7 +469,8 @@ module.exports = {
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
-        projectTags: data.projectTags || null,
+        // projectTags: data.projectTags || null,
+        project_tags: data.project_tags || null,
         projectFiles: data.projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,

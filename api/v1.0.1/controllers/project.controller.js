@@ -327,6 +327,7 @@ module.exports = {
           submissionType: plan.submissionType || null,
           date_received: sanitizeDate(plan.date_received),
           plan_link: plan.plan_link || null,
+          planType: plan.planType || null,
           planFiles: JSON.stringify(uploadedFiles),
           plan_date: sanitizeDate(plan.plan_date),
           rev_status: plan.rev_status || null,

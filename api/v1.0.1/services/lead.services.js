@@ -78,7 +78,10 @@ module.exports = {
             required: false,
             where: projectWhere, 
            include: [{ model: db.taxesObj, as: "stateDetails" },
-            { model: db.taxesObj, as: "zipCodeDetails" }
+            { model: db.taxesObj, as: "zipCodeDetails" },
+            {
+              model: db.stateObj, as: "states",
+            },
            ],
           },
 
@@ -175,7 +178,14 @@ module.exports = {
           },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
-          { model: db.projectObj, as: "project" },
+          { model: db.projectObj, as: "project",
+            include: [{ model: db.taxesObj, as: "stateDetails" },
+            { model: db.taxesObj, as: "zipCodeDetails" },
+            {
+              model: db.stateObj, as: "states",
+            },
+           ],
+           },
           {
             model: db.leadTagsObj,
             as: "lead_tags",

@@ -36,6 +36,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true
       },
+      planType: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       plan_reviewed_date: {
         type: Sequelize.DATE,
         allowNull: true

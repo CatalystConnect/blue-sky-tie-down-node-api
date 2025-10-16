@@ -474,7 +474,7 @@ module.exports = {
         takeoffDueDate: sanitizeInteger(data.takeoffDueDate) || null,
         takeoffStartDate: sanitizeInteger(data.takeoffStartDate) || null,
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
-        project_tags: data.project_tags || null,
+        project_tags: sanitizeInteger(data.project_tags) || null,
         project_tags: data.project_tags || null,
         projectFiles: data.projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,

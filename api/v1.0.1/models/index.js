@@ -1015,6 +1015,9 @@ db.leadTeamsObj.hasMany(db.projectObj, {
   as: "projects",
 });
 
-
+db.projectObj.belongsTo(db.stateObj, {
+  foreignKey: "state",
+  as: "states",
+});
 
 module.exports = db;

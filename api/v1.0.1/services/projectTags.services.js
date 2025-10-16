@@ -30,9 +30,9 @@ module.exports = {
         ];
       }
 
-      const { rows, count } = await db.projectPhasesObj.findAndCountAll({
+      const { rows, count } = await db.projectTagsObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "ASC"]],
+        order: [["id", "DESC"]],
         limit,
         offset,
       });

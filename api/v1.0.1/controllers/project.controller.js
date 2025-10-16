@@ -71,6 +71,7 @@ module.exports = {
         assign_to_budget: sanitizeInteger(data.assign_to_budget),
         take_off_team_id: sanitizeInteger(data.take_off_team_id),
         take_off_type: data.take_off_type || null,
+        project_tags: data.project_tags || null,   
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
         projectTags: data.projectTags || null,
@@ -93,73 +94,74 @@ module.exports = {
 
       let project = await projectServices.addProject(postData);
 
-      // if (data.planSets && typeof data.planSets === "string") {
-      //   data.planSets = JSON.parse(data.planSets);
-      // }
-
-      // if (data.planSets && Array.isArray(data.planSets)) {
-      //   for (let plan of data.planSets) {
-      //     let planData = {
-      //       project_id: project.id,
-      //       submissionType: plan.submissionType || null,
-      //       date_received: sanitizeDate(plan.date_received),
-      //       plan_link: plan.plan_link || null,
-      //       planFiles: plan.planFiles || null,
-      //       plan_date: sanitizeDate(plan.plan_date),
-      //       rev_status: plan.rev_status || null,
-      //       plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
-      //       plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by) || null,
-      //       data_collocated_date: sanitizeDate(plan.data_collocated_date),
-      //       plan_revision_notes: plan.plan_revision_notes || null,
-      //     };
-
-      //     await projectServices.projectplanSets(planData);
-      //   }
-      // }
-
-      const planSets = Array.isArray(data.planSets)
-        ? data.planSets
-        : JSON.parse(data.planSets || "[]");
-
-      for (let index = 0; index < planSets.length; index++) {
-        const plan = planSets[index];
-        // let uploadedFiles = [];
-
-        // const planFiles = req.files.filter(
-        //   f => f.fieldname === `planSets[${index}][planFiles]`
-        // );
-
-        // for (let file of planFiles) {
-        //   const driveFile = await uploadFileToDrive(
-        //     file.path,
-        //     file.originalname,
-        //     file.mimetype,
-        //     ["projectFiles", "Plan Files"]
-        //   );
-
-        //   uploadedFiles.push({
-        //     name: file.originalname,
-        //     link: driveFile.webViewLink,
-        //   });
-        // }
-
-        const planData = {
-          project_id: project.id,
-          submissionType: plan.submissionType || null,
-          date_received: sanitizeDate(plan.date_received),
-          plan_link: plan.plan_link || null,
-          planType: plan.planType || null,
-          planFiles:  null,
-          plan_date: sanitizeDate(plan.plan_date),
-          rev_status: plan.rev_status || null,
-          plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
-          plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by),
-          data_collocated_date: sanitizeDate(plan.data_collocated_date),
-          plan_revision_notes: plan.plan_revision_notes || null,
-        };
-
-        await projectServices.projectplanSets(planData);
+      if (data.planSets && typeof data.planSets === "string") {
+        data.planSets = JSON.parse(data.planSets);
       }
+
+      if (data.planSets && Array.isArray(data.planSets)) {
+        for (let plan of data.planSets) {
+          let planData = {
+            project_id: project.id,
+            submissionType: plan.submissionType || null,
+            date_received: sanitizeDate(plan.date_received),
+            plan_link: plan.plan_link || null,
+            planType: plan.planType || null,
+            planFiles: plan.planFiles || null,
+            plan_date: sanitizeDate(plan.plan_date),
+            rev_status: plan.rev_status || null,
+            plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
+            plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by) || null,
+            data_collocated_date: sanitizeDate(plan.data_collocated_date),
+            plan_revision_notes: plan.plan_revision_notes || null,
+          };
+
+          await projectServices.projectplanSets(planData);
+        }
+      }
+
+      // const planSets = Array.isArray(data.planSets)
+      //   ? data.planSets
+      //   : JSON.parse(data.planSets || "[]");
+
+      // for (let index = 0; index < planSets.length; index++) {
+      //   const plan = planSets[index];
+      //   // let uploadedFiles = [];
+
+      //   // const planFiles = req.files.filter(
+      //   //   f => f.fieldname === `planSets[${index}][planFiles]`
+      //   // );
+
+      //   // for (let file of planFiles) {
+      //   //   const driveFile = await uploadFileToDrive(
+      //   //     file.path,
+      //   //     file.originalname,
+      //   //     file.mimetype,
+      //   //     ["projectFiles", "Plan Files"]
+      //   //   );
+
+      //   //   uploadedFiles.push({
+      //   //     name: file.originalname,
+      //   //     link: driveFile.webViewLink,
+      //   //   });
+      //   // }
+
+      //   const planData = {
+      //     project_id: project.id,
+      //     submissionType: plan.submissionType || null,
+      //     date_received: sanitizeDate(plan.date_received),
+      //     plan_link: plan.plan_link || null,
+      //     planType: plan.planType || null,
+      //     planFiles:  null,
+      //     plan_date: sanitizeDate(plan.plan_date),
+      //     rev_status: plan.rev_status || null,
+      //     plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
+      //     plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by),
+      //     data_collocated_date: sanitizeDate(plan.data_collocated_date),
+      //     plan_revision_notes: plan.plan_revision_notes || null,
+      //   };
+
+      //   await projectServices.projectplanSets(planData);
+      // }
       return res
         .status(200)
         .send(

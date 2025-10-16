@@ -271,7 +271,7 @@ module.exports = {
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date),
-        project_tags: data.project_tags || null,
+        project_tags: sanitizeInteger(data.project_tags)|| null,
         project_file: projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,

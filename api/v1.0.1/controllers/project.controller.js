@@ -271,7 +271,7 @@ module.exports = {
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date),
-        project_tags: sanitizeInteger(data.project_tags) || null,
+        // project_tags: sanitizeInteger(data.project_tags) || null,
         project_file: projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
@@ -294,6 +294,15 @@ module.exports = {
 
 
       const project = await projectServices.addProject(postData);
+
+      if (data.project_tags) {
+
+        const tagIds = Array.isArray(data.project_tags)
+          ? data.project_tags
+          : String(data.project_tags).split(",").map(id => parseInt(id));
+
+        await projectServices.addProjectTags(project.id, tagIds);
+      }
 
 
       const planSets = Array.isArray(data.planSets)
@@ -523,8 +532,8 @@ module.exports = {
         takeoffDueDate: sanitizeDate(data.takeoffDueDate) || null,
         takeoffStartDate: sanitizeDate(data.takeoffStartDate) || null,
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
-        project_tags: sanitizeInteger(data.project_tags) || null,
-        project_tags: data.project_tags || null,
+        // project_tags: sanitizeInteger(data.project_tags) || null,
+        // project_tags: data.project_tags || null,
         projectFiles: projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
@@ -542,6 +551,19 @@ module.exports = {
         takeoff_status: data.takeoff_status || null,
       };
       commonHelper.removeFalsyKeys(postData);
+
+      if (data.project_tags) {
+        const tagIds = Array.isArray(data.project_tags)
+          ? data.project_tags
+          : String(data.project_tags).split(",").map(id => parseInt(id));
+
+        
+        await projectServices.removeProjectTags(projectId);
+
+   
+        await projectServices.addProjectTags(projectId, tagIds);
+      }
+
 
       let updateProject = await projectServices.updateProject(
         postData,

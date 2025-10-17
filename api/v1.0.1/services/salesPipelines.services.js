@@ -24,92 +24,6 @@ module.exports = {
     }
   },
 
-  /*getAllSalesPipelines*/
-  // async getAllSalesPipelines(query) {
-  //   try {
-  //     let { page, per_page, limit, take_all, search, id } = query;
-
-  //     page = parseInt(page) || 1;
-  //     per_page = parseInt(per_page) || 10;
-  //     limit = parseInt(limit) || null;
-  //     const offset = (page - 1) * per_page;
-
-  //     const whereCondition = {};
-  //     if (search) {
-  //       whereCondition.name = { [Op.like]: `%${search}%` };
-  //     }
-
-  //     let order = [["id", "DESC"]];
-  //     if (id) {
-  //       order = [
-  //         [
-  //           Sequelize.literal(
-  //             `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
-  //           ),
-  //           "ASC",
-  //         ],
-  //         ["id", "DESC"],
-  //       ];
-  //     }
-
-  //     const includeRelations = [
-  //       {
-  //         model: db.salesPipelineGroupsObj,
-  //         as: "salesPipelineGroups",
-  //       },
-  //       {
-  //         model: db.salesPipelinesStatusesObj,
-  //         as: "salesPipelinesStatuses",
-  //       },
-  //       {
-  //         model: db.salesPipelinesTriggersObj,
-  //         as: "salesPipelinesTriggers",
-  //       },
-  //       {
-  //         model: db.salesPipelinesDelayIndicatorsObj,
-  //         as: "salesPipelinesDelayIndicators",
-  //       },
-  //     ];
-
-  //     let pipelinesData;
-  //     let total;
-
-  //     if (take_all === "all") {
-  //       pipelinesData = await db.salesPipelinesObj.findAll({
-  //         where: whereCondition,
-  //         order,
-  //         include: includeRelations,
-  //         ...(limit ? { limit } : {}),
-  //       });
-  //       total = pipelinesData.length;
-  //     } else {
-  //       const { rows, count } = await db.salesPipelinesObj.findAndCountAll({
-  //         where: whereCondition,
-  //         order,
-  //         include: includeRelations,
-  //         limit: per_page,
-  //         offset,
-  //       });
-  //       pipelinesData = rows;
-  //       total = count;
-  //     }
-
-  //     return {
-  //       data: pipelinesData,
-  //       total,
-  //       current_page: page,
-  //       per_page,
-  //       last_page: Math.ceil(total / per_page),
-  //     };
-  //   } catch (e) {
-  //     console.error(
-  //       "getAllSalesPipelines Error:",
-  //       commonHelper.customizeCatchMsg(e)
-  //     );
-  //     throw e;
-  //   }
-  // },
-
   async getAllSalesPipelines(query) {
     try {
       let { page, per_page, limit, take_all, search, id } = query;
@@ -181,7 +95,7 @@ module.exports = {
                 : "0",
             hide_status: status.hide_status,
             expectedDays: status.expectedDays,
-            rules: [], 
+            rules: [],
           })) || [];
 
         return {
@@ -216,41 +130,6 @@ module.exports = {
     }
   },
 
-  /*getSalesPipelinesById*/
-  // async getSalesPipelinesById(id) {
-  //   try {
-  //     return await db.salesPipelinesObj.findOne({
-  //       where: { id: id },
-  //       include: [
-  //         {
-  //           model: db.salesPipelineGroupsObj,
-  //           as: "salesPipelineGroups",
-  //         },
-  //         {
-  //           model: db.salesPipelinesStatusesObj,
-  //           as: "salesPipelinesStatuses",
-  //         },
-  //         {
-  //           model: db.salesPipelinesTriggersObj,
-  //           as: "salesPipelinesTriggers",
-  //           include: [
-  //             {
-  //               model: db.salesPipelinesStatusesObj,
-  //               as: "pipelinesStatuses",
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.salesPipelinesDelayIndicatorsObj,
-  //           as: "salesPipelinesDelayIndicators",
-  //         },
-  //       ],
-  //     });
-  //   } catch (e) {
-  //     console.error("Service Update Company Error:", e.message);
-  //     throw e;
-  //   }
-  // },
   async getSalesPipelinesById(pipelineId) {
     try {
       const pipeline = await db.salesPipelinesObj.findOne({
@@ -421,5 +300,20 @@ module.exports = {
       console.error("deleteSalesPipelines Service Error:", e.message);
       throw e;
     }
+  },
+
+  async getSalesPipelinesLeads(pipelineId) {
+    const whereCondition = {};
+
+    if (pipelineId) {
+      whereCondition.id = pipelineId;
+    }
+
+    return await db.salesPipelinesObj.findOne({
+      where: whereCondition,
+      include: [
+        { model: db.salesPipelinesTriggersObj, as: "salesPipelinesTriggers" },
+      ],
+    });
   },
 };

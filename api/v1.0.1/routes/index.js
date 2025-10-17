@@ -58,5 +58,6 @@ router.use(require("./contractComponents.routes"));
 router.use(require("./proejctPhases.routes"));
 router.use(require("./proejctTags.routes"));
 router.use(require("./state.routes"));
+router.use(require("./salesPipelinesLeads.routes"));
 
 module.exports = router;

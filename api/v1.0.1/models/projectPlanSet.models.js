@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       planFiles: {
-        type: Sequelize.STRING,  
+        type: Sequelize.TEXT,  
         allowNull: true
       },
       plan_date: {

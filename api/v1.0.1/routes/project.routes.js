@@ -15,7 +15,7 @@ router.get("/project/getAllProject",[authJwt.verifyToken],  controller.getAllPro
  router.get("/project/getProjectById",[authJwt.verifyToken], controller.getProjectById);
 //  [controller.validate("updateProject")],
 // /*updateProject*/
-router.put("/project/updateProject",[authJwt.verifyToken, multiUpload],  controller.updateProject);
+router.put("/project/updateProject",[authJwt.verifyToken,upload.any()],  controller.updateProject);
 
 // /*deleteRole*/
 router.delete("/project/deleteProject",[authJwt.verifyToken],  controller.deleteProject);

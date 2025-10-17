@@ -65,7 +65,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       project_file: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       project_manager: {
@@ -218,7 +218,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       projectFiles: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       architecture: {

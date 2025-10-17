@@ -88,9 +88,11 @@ module.exports = {
           { model: db.companyObj, as: "developer" },
           { model: db.companyObj, as: "general_contractor" },
           { model: db.userObj, as: "planReviewer" },
-          { model: db.projectplanSetsObj, as: "planSets",include:[
-            { model: db.userObj, as: "planReviewerUers" },
-          ]},
+          {
+            model: db.projectplanSetsObj, as: "planSets", include: [
+              { model: db.userObj, as: "planReviewerUers" },
+            ]
+          },
           { model: db.leadTeamsObj, as: "takeoff_team" },
           {
             model: db.taxesObj,
@@ -111,6 +113,16 @@ module.exports = {
           {
             model: db.projectTagsObj,
             as: "projectTag",
+          },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
           },
         ],
         order: [["id", "DESC"]],
@@ -187,7 +199,7 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
-           "takeoffStartDate",
+          "takeoffStartDate",
           "takeoffDueDate"
         ],
         include: [
@@ -197,9 +209,11 @@ module.exports = {
           { model: db.companyObj, as: "general_contractor" },
           { model: db.userObj, as: "planReviewer" },
           { model: db.leadTeamsObj, as: "takeoff_team" },
-          { model: db.projectplanSetsObj, as: "planSets",include:[
-            { model: db.userObj, as: "planReviewerUers" },
-          ]},
+          {
+            model: db.projectplanSetsObj, as: "planSets", include: [
+              { model: db.userObj, as: "planReviewerUers" },
+            ]
+          },
           {
             model: db.taxesObj,
             as: "zipCodeDetails",
@@ -219,6 +233,16 @@ module.exports = {
           {
             model: db.projectTagsObj,
             as: "projectTag",
+          },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
           },
           {
             model: db.leadsObj,
@@ -520,7 +544,7 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
-           "takeoffStartDate",
+          "takeoffStartDate",
           "takeoffDueDate"
         ],
         include: [
@@ -694,7 +718,7 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
-           "takeoffStartDate",
+          "takeoffStartDate",
           "takeoffDueDate"
         ],
         include: [
@@ -925,7 +949,7 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
-           "takeoffStartDate",
+          "takeoffStartDate",
           "takeoffDueDate"
         ],
         include: [
@@ -1114,7 +1138,7 @@ module.exports = {
           "takeoff_status",
           "project_status",
           "priority",
-           "takeoffStartDate",
+          "takeoffStartDate",
           "takeoffDueDate"
         ],
         include: [
@@ -1164,6 +1188,39 @@ module.exports = {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
-    
+
   },
+
+  async addProjectTags(projectId, tagIds) {
+    try {
+      if (!Array.isArray(tagIds)) {
+        tagIds = [tagIds];
+      }
+
+      const records = tagIds.map(tagId => ({
+        project_id: projectId,
+        tag_id: tagId,
+      }));
+
+
+      await db.projectTagMappingsObj.bulkCreate(records);
+
+      return true;
+    } catch (error) {
+      console.error("Error adding project tags:", error);
+      throw error;
+    }
+  },
+  async removeProjectTags(projectId) {
+    try {
+      await db.projectTagMappingsObj.destroy({
+        where: { project_id: projectId },
+      });
+      return true;
+    } catch (error) {
+      throw new Error("Failed to remove project tags: " + error.message);
+    }
+  },
+
+
 };

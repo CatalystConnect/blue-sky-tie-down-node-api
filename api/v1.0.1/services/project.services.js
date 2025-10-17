@@ -566,6 +566,16 @@ module.exports = {
             model: db.projectTagsObj,
             as: "projectTag",
           },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
+          },
         ],
         order: [
           [
@@ -740,6 +750,16 @@ module.exports = {
           {
             model: db.projectTagsObj,
             as: "projectTag",
+          },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
           },
         ],
         order: [
@@ -972,6 +992,16 @@ module.exports = {
             model: db.projectTagsObj,
             as: "projectTag",
           },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
+          },
         ],
         order: [
           [
@@ -1160,6 +1190,16 @@ module.exports = {
           {
             model: db.projectTagsObj,
             as: "projectTag",
+          },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [
+              {
+                model: db.projectTagsObj,
+                as: "tags",
+              },
+            ]
           },
         ],
         order: [

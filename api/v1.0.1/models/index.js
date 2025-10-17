@@ -1,54 +1,14 @@
 require("dotenv").config();
-const config = require("../../../config/db.config");
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../../../config/config')[env];
 const { Sequelize, Op } = require("sequelize");
-let connnection;
-let DATABASE_URL = process.env.DB_URL;
-if (DATABASE_URL) {
-  connnection = {
-    logging: false,
-    ssl: true,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
-  };
-} else {
-  connnection = {
-    logging: false,
-  };
-}
-
-// const dbObj = new Sequelize(
-//   DATABASE_URL,
-//   connnection
-// )
-const dbObj = new Sequelize(DATABASE_URL, {
-  logging: false,
-  dialect: "postgres",
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000, // disconnect faster to free connections
-  },
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-    // keepAlive: true, // optional: helps on some hosts
-  },
-});
-
+const dbObj = new Sequelize(config.url, config);
 const db = {};
-
 db.Sequelize = Sequelize;
 db.dbObj = dbObj;
 db.Op = Op;
 
-dbObj
+db.dbObj
   .authenticate()
   .then(() => {
     console.log(
@@ -60,193 +20,193 @@ dbObj
   });
 
 /*Models defined*/
-db.userObj = require("./users.models")(dbObj, Sequelize);
-db.leadsObj = require("./leads.models")(dbObj, Sequelize);
-db.leadNotesObj = require("./leadNotes.models")(dbObj, Sequelize);
-db.rolesObj = require("./roles.model")(dbObj, Sequelize);
-db.contractObj = require("./contract.models")(dbObj, Sequelize);
-db.workOrderObj = require("./workOrders.models")(dbObj, Sequelize);
-db.workOrderImagesObj = require("./workOrderImages.models")(dbObj, Sequelize);
-db.contractRegionObj = require("./contractorRegion.models")(dbObj, Sequelize);
+db.userObj = require("./users.models")(db.dbObj, Sequelize);
+db.leadsObj = require("./leads.models")(db.dbObj, Sequelize);
+db.leadNotesObj = require("./leadNotes.models")(db.dbObj, Sequelize);
+db.rolesObj = require("./roles.model")(db.dbObj, Sequelize);
+db.contractObj = require("./contract.models")(db.dbObj, Sequelize);
+db.workOrderObj = require("./workOrders.models")(db.dbObj, Sequelize);
+db.workOrderImagesObj = require("./workOrderImages.models")(db.dbObj, Sequelize);
+db.contractRegionObj = require("./contractorRegion.models")(db.dbObj, Sequelize);
 db.workOrderCategoriesObj = require("./workOrderCategories.model")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.mergeContractsObj = require("./mergeContracts.models")(dbObj, Sequelize);
-db.mergeContractsObj = require("./mergeContracts.models")(dbObj, Sequelize);
-db.notesObj = require("./notes.models")(dbObj, Sequelize);
-db.activitiesObj = require("./activities.models")(dbObj, Sequelize);
+db.mergeContractsObj = require("./mergeContracts.models")(db.dbObj, Sequelize);
+db.mergeContractsObj = require("./mergeContracts.models")(db.dbObj, Sequelize);
+db.notesObj = require("./notes.models")(db.dbObj, Sequelize);
+db.activitiesObj = require("./activities.models")(db.dbObj, Sequelize);
 db.contractorVerificationObj = require("./contractorVerification.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.leadInteractionsObj = require("./leadInteractions.models")(dbObj, Sequelize);
-db.catalogObj = require("./catalog.models")(dbObj, Sequelize);
+db.leadInteractionsObj = require("./leadInteractions.models")(db.dbObj, Sequelize);
+db.catalogObj = require("./catalog.models")(db.dbObj, Sequelize);
 db.catalogVariationsObj = require("./catalogVariations.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.manufacturerObj = require("./manufacturer.models")(dbObj, Sequelize);
-db.materialObj = require("./material.models")(dbObj, Sequelize);
-db.materialQuotesObj = require("./materialQuotes")(dbObj, Sequelize);
-db.additionalQuotesObj = require("./additionalQuotes")(dbObj, Sequelize);
-db.attributeObj = require("./attribute.models")(dbObj, Sequelize);
+db.manufacturerObj = require("./manufacturer.models")(db.dbObj, Sequelize);
+db.materialObj = require("./material.models")(db.dbObj, Sequelize);
+db.materialQuotesObj = require("./materialQuotes")(db.dbObj, Sequelize);
+db.additionalQuotesObj = require("./additionalQuotes")(db.dbObj, Sequelize);
+db.attributeObj = require("./attribute.models")(db.dbObj, Sequelize);
 db.configureAttributeObj = require("./configureAttribute.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.productAttributeObj = require("./productAttribute.models")(dbObj, Sequelize);
-db.productCategoryObj = require("./productCategory.models")(dbObj, Sequelize);
+db.productAttributeObj = require("./productAttribute.models")(db.dbObj, Sequelize);
+db.productCategoryObj = require("./productCategory.models")(db.dbObj, Sequelize);
 db.productCategoryAssociationObj = require("./productCategoryAsso.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.inventoryObj = require("./inventory.models")(dbObj, Sequelize);
-db.inventoryImagesObj = require("./inventoryImages.models")(dbObj, Sequelize);
-db.applyWorkOrderObj = require("./applyWorkOrder.models")(dbObj, Sequelize);
+db.inventoryObj = require("./inventory.models")(db.dbObj, Sequelize);
+db.inventoryImagesObj = require("./inventoryImages.models")(db.dbObj, Sequelize);
+db.applyWorkOrderObj = require("./applyWorkOrder.models")(db.dbObj, Sequelize);
 db.catalogAttributeObj = require("./catalologAttributes.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.customerObj = require("./customer.models")(dbObj, Sequelize);
-db.jwtTokenObj = require("./jwtToken.models")(dbObj, Sequelize);
-db.projectObj = require("./project.models")(dbObj, Sequelize);
-db.projectNotesObj = require("./projectNotes.models")(dbObj, Sequelize);
-db.projectplanSetsObj = require("./projectPlanSet.models")(dbObj, Sequelize);
+db.customerObj = require("./customer.models")(db.dbObj, Sequelize);
+db.jwtTokenObj = require("./jwtToken.models")(db.dbObj, Sequelize);
+db.projectObj = require("./project.models")(db.dbObj, Sequelize);
+db.projectNotesObj = require("./projectNotes.models")(db.dbObj, Sequelize);
+db.projectplanSetsObj = require("./projectPlanSet.models")(db.dbObj, Sequelize);
 
-db.roofMeasureObj = require("./roofMeasure.models")(dbObj, Sequelize);
+db.roofMeasureObj = require("./roofMeasure.models")(db.dbObj, Sequelize);
 db.takeOffQuotesItemsObj = require("./takeOffQuotesItems.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.takeOffQuotesObj = require("./takeOffQuotes.models")(dbObj, Sequelize);
-db.chatObj = require("./chat.models")(dbObj, Sequelize);
-db.brandObj = require("./brands.models")(dbObj, Sequelize);
-db.unitObj = require("./units.models")(dbObj, Sequelize);
-db.vendorsObj = require("./vendors.models")(dbObj, Sequelize);
+db.takeOffQuotesObj = require("./takeOffQuotes.models")(db.dbObj, Sequelize);
+db.chatObj = require("./chat.models")(db.dbObj, Sequelize);
+db.brandObj = require("./brands.models")(db.dbObj, Sequelize);
+db.unitObj = require("./units.models")(db.dbObj, Sequelize);
+db.vendorsObj = require("./vendors.models")(db.dbObj, Sequelize);
 db.productCategoriesObj = require("./productCategories.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.tagsObj = require("./tags.models")(dbObj, Sequelize);
-db.itemObj = require("./item.models")(dbObj, Sequelize);
-db.companyObj = require("./company.models")(dbObj, Sequelize);
-db.brandItemObj = require("./itemBrands.models")(dbObj, Sequelize);
-db.itemImagesObj = require("./itemImages.models")(dbObj, Sequelize);
-db.itemTagObj = require("./itemTags.models")(dbObj, Sequelize);
-db.itemCategoriesObj = require("./itemCategories.models")(dbObj, Sequelize);
-db.itemUnitsObj = require("./itemUnits.models")(dbObj, Sequelize);
-db.itemVendorObj = require("./itemVendors.models")(dbObj, Sequelize);
-db.itemWebsObj = require("./itemWebs.models")(dbObj, Sequelize);
+db.tagsObj = require("./tags.models")(db.dbObj, Sequelize);
+db.itemObj = require("./item.models")(db.dbObj, Sequelize);
+db.companyObj = require("./company.models")(db.dbObj, Sequelize);
+db.brandItemObj = require("./itemBrands.models")(db.dbObj, Sequelize);
+db.itemImagesObj = require("./itemImages.models")(db.dbObj, Sequelize);
+db.itemTagObj = require("./itemTags.models")(db.dbObj, Sequelize);
+db.itemCategoriesObj = require("./itemCategories.models")(db.dbObj, Sequelize);
+db.itemUnitsObj = require("./itemUnits.models")(db.dbObj, Sequelize);
+db.itemVendorObj = require("./itemVendors.models")(db.dbObj, Sequelize);
+db.itemWebsObj = require("./itemWebs.models")(db.dbObj, Sequelize);
 db.saleMaterialQuotesObj = require("./saleMaterialQuotes.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.SaleMaterialQuoteHeaderTabsObj =
-  require("./saleMaterialQuoteHeaderTabs.models")(dbObj, Sequelize);
-db.companyTypeObj = require("./companyType.models")(dbObj, Sequelize);
+  require("./saleMaterialQuoteHeaderTabs.models")(db.dbObj, Sequelize);
+db.companyTypeObj = require("./companyType.models")(db.dbObj, Sequelize);
 db.saleAdditionalQuotesObj = require("./saleMaterialQuoteAdditionals.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.saleAdditionalQuotesitemObj = require("./saleMaterialQuoteItems.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.generatedContractorsObj = require("./generatedContractors.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.wareHouseObj = require("./wareHouse.models")(dbObj, Sequelize);
-db.taxesObj = require("./taxes.models")(dbObj, Sequelize);
-db.serviceTypeitemsObj = require("./serviceTypeItem.models")(dbObj, Sequelize);
-db.projectImagesObj = require("./projectImages.models")(dbObj, Sequelize);
-db.warehouseItemsObj = require("./warehouseItems.models")(dbObj, Sequelize);
-db.departmentObj = require("./departments.models")(dbObj, Sequelize);
-db.leadStatusesObj = require("./leadStatuses.models")(dbObj, Sequelize);
-db.leadTagsObj = require("./leadTags.models")(dbObj, Sequelize);
-db.projectTypesObj = require("./projectTypes.models")(dbObj, Sequelize);
-db.ticketsObj = require("./tickets.models")(dbObj, Sequelize);
+db.wareHouseObj = require("./wareHouse.models")(db.dbObj, Sequelize);
+db.taxesObj = require("./taxes.models")(db.dbObj, Sequelize);
+db.serviceTypeitemsObj = require("./serviceTypeItem.models")(db.dbObj, Sequelize);
+db.projectImagesObj = require("./projectImages.models")(db.dbObj, Sequelize);
+db.warehouseItemsObj = require("./warehouseItems.models")(db.dbObj, Sequelize);
+db.departmentObj = require("./departments.models")(db.dbObj, Sequelize);
+db.leadStatusesObj = require("./leadStatuses.models")(db.dbObj, Sequelize);
+db.leadTagsObj = require("./leadTags.models")(db.dbObj, Sequelize);
+db.projectTypesObj = require("./projectTypes.models")(db.dbObj, Sequelize);
+db.ticketsObj = require("./tickets.models")(db.dbObj, Sequelize);
 
-db.leadTeamsObj = require("./leadTeams.models")(dbObj, Sequelize);
-db.leadTeamsMemberObj = require("./leadTeamMembers.models")(dbObj, Sequelize);
-db.leadTypesObj = require("./leadTypes.models")(dbObj, Sequelize);
-db.teamsCodesObj = require("./termsCodes.models")(dbObj, Sequelize);
+db.leadTeamsObj = require("./leadTeams.models")(db.dbObj, Sequelize);
+db.leadTeamsMemberObj = require("./leadTeamMembers.models")(db.dbObj, Sequelize);
+db.leadTypesObj = require("./leadTypes.models")(db.dbObj, Sequelize);
+db.teamsCodesObj = require("./termsCodes.models")(db.dbObj, Sequelize);
 
-db.interactionTypesObj = require("./interactionTypes.models")(dbObj, Sequelize);
-db.contactsObj = require("./contacts.models")(dbObj, Sequelize);
+db.interactionTypesObj = require("./interactionTypes.models")(db.dbObj, Sequelize);
+db.contactsObj = require("./contacts.models")(db.dbObj, Sequelize);
 db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.salesPipelinesObj = require("./salesPipelines.models")(dbObj, Sequelize);
+db.salesPipelinesObj = require("./salesPipelines.models")(db.dbObj, Sequelize);
 db.salesPipelinesStatusesObj = require("./salesPipelineStatuses.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.salesPipelinesTriggersObj = require("./salesPipelineTriggers.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.salesPipelinesDelayIndicatorsObj =
-  require("./salesPipelineDelayIndicators.models")(dbObj, Sequelize);
+  require("./salesPipelineDelayIndicators.models")(db.dbObj, Sequelize);
 
-db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(dbObj, Sequelize);
-db.budgetCategoryObj = require("./budgetCategory.models")(dbObj, Sequelize);
-db.budgetScopeObj = require("./budgetScope.models")(dbObj, Sequelize);
-db.scopeCategoryObj = require("./scopeCategory.models")(dbObj, Sequelize);
-db.scopeGroupObj = require("./scopeGroup.models")(dbObj, Sequelize);
-db.scopeSegmentObj = require("./scopeSegment.models")(dbObj, Sequelize);
+db.budgetKeyAreasObj = require("./budgetKeyAreas.models")(db.dbObj, Sequelize);
+db.budgetCategoryObj = require("./budgetCategory.models")(db.dbObj, Sequelize);
+db.budgetScopeObj = require("./budgetScope.models")(db.dbObj, Sequelize);
+db.scopeCategoryObj = require("./scopeCategory.models")(db.dbObj, Sequelize);
+db.scopeGroupObj = require("./scopeGroup.models")(db.dbObj, Sequelize);
+db.scopeSegmentObj = require("./scopeSegment.models")(db.dbObj, Sequelize);
 db.budgetBooksScopeIncludesObj = require("./budgetBooksScopeIncludes.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksContractsObj = require("./budgetBooksContracts.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksKeyAreasObj = require("./budgetBooksKeyAreas.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.budgetBooksObj = require("./budgetBooks.models")(dbObj, Sequelize);
-db.sitePlansObj = require("./sitePlans.models")(dbObj, Sequelize);
-db.budgetBooksSitesObj = require("./budgetBooksSites.models")(dbObj, Sequelize);
-db.projectBudgetsObj = require("./projectBudgets.models")(dbObj, Sequelize);
-db.budgetBookOthersObj = require("./budgetBookOthers.models")(dbObj, Sequelize);
-db.sitePlanItemsObj = require("./sitePlanItems.models")(dbObj, Sequelize);
-db.veOptionsObj = require("./veOptions.models")(dbObj, Sequelize);
-db.optionPackageObj = require("./optionPackage.models")(dbObj, Sequelize);
-db.submittalsObj = require("./submittals.models")(dbObj, Sequelize);
+db.budgetBooksObj = require("./budgetBooks.models")(db.dbObj, Sequelize);
+db.sitePlansObj = require("./sitePlans.models")(db.dbObj, Sequelize);
+db.budgetBooksSitesObj = require("./budgetBooksSites.models")(db.dbObj, Sequelize);
+db.projectBudgetsObj = require("./projectBudgets.models")(db.dbObj, Sequelize);
+db.budgetBookOthersObj = require("./budgetBookOthers.models")(db.dbObj, Sequelize);
+db.sitePlanItemsObj = require("./sitePlanItems.models")(db.dbObj, Sequelize);
+db.veOptionsObj = require("./veOptions.models")(db.dbObj, Sequelize);
+db.optionPackageObj = require("./optionPackage.models")(db.dbObj, Sequelize);
+db.submittalsObj = require("./submittals.models")(db.dbObj, Sequelize);
 db.contractComponentsObj = require("./contractComponents.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksScopesObj = require("./budgetBooksScopes.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksScopeCategoriesObj =
-  require("./budgetBooksScopeCategories.models")(dbObj, Sequelize);
+  require("./budgetBooksScopeCategories.models")(db.dbObj, Sequelize);
 db.budgetBooksScopeGroupsObj = require("./budgetBooksScopeGroups.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBooksScopeSegmentsObj = require("./budgetBooksScopeSegments.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
 db.budgetBookDocumentsObj = require("./budgetBookDocuments.models")(
-  dbObj,
+  db.dbObj,
   Sequelize
 );
-db.projectPhasesObj = require("./projectPhases.models")(dbObj, Sequelize);
-db.projectTagsObj = require("./projectTags.models")(dbObj, Sequelize);
-db.stateObj = require("./state.models")(dbObj, Sequelize);
+db.projectPhasesObj = require("./projectPhases.models")(db.dbObj, Sequelize);
+db.projectTagsObj = require("./projectTags.models")(db.dbObj, Sequelize);
+db.stateObj = require("./state.models")(db.dbObj, Sequelize);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {

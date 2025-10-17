@@ -300,6 +300,7 @@ module.exports = {
         ? data.planSets
         : JSON.parse(data.planSets || "[]");
 
+
       for (let index = 0; index < planSets.length; index++) {
         const plan = planSets[index];
         let uploadedFiles = [];
@@ -424,6 +425,7 @@ module.exports = {
       // }
       let projectId = req.query.projectId;
       let getProjectById = await projectServices.getProjectById(projectId);
+      
 
       if (!getProjectById) throw new Error("Project not found");
       let data = req.body;
@@ -472,8 +474,8 @@ module.exports = {
         take_off_team_id: sanitizeInteger(data.take_off_team_id),
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
-        takeoffDueDate: sanitizeInteger(data.takeoffDueDate) || null,
-        takeoffStartDate: sanitizeInteger(data.takeoffStartDate) || null,
+        takeoffDueDate: sanitizeDate(data.takeoffDueDate) || null,
+        takeoffStartDate: sanitizeDate(data.takeoffStartDate) || null,
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
         project_tags: sanitizeInteger(data.project_tags) || null,
         project_tags: data.project_tags || null,
@@ -493,8 +495,8 @@ module.exports = {
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
       };
-      commonHelper.removeFalsyKeys(postData);
-
+       commonHelper.removeFalsyKeys(postData);
+     
       let updateProject = await projectServices.updateProject(
         postData,
         projectId

@@ -1,35 +1,49 @@
 require("dotenv").config();
-console.log("DB_URL:", process.env.DB_URL); // Debugging
-module.exports = {
 
+module.exports = {
   development: {
     url: process.env.DB_URL,
+    logging: false,
     dialect: "postgres",
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 10000,
+      idle: 30000,
+    },
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
-      }
-    }
+        rejectUnauthorized: false,
+      },
+    },
   },
+
   test: {
     url: process.env.DB_URL,
     dialect: "postgres",
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
-      }
-    }
+        rejectUnauthorized: false,
+      },
+    },
   },
+
   production: {
     url: process.env.DB_URL,
     dialect: "postgres",
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 10000,
+      idle: 30000,
+    },
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
-      }
-    }
-  }
+        rejectUnauthorized: false,
+      },
+    },
+  },
 };

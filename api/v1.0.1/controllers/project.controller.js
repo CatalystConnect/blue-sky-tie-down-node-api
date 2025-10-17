@@ -114,7 +114,7 @@ module.exports = {
   //           data_collocated_date: sanitizeDate(plan.data_collocated_date),
   //           plan_revision_notes: plan.plan_revision_notes || null,
   //         };
-          
+
   //         await projectServices.projectplanSets(planData);
   //       }
   //     }
@@ -187,7 +187,7 @@ module.exports = {
       }
 
       const data = req.body;
-      
+
 
       let completedFiles = [];
       if (Array.isArray(req.files)) {
@@ -271,7 +271,7 @@ module.exports = {
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date),
-        project_tags: sanitizeInteger(data.project_tags)|| null,
+        project_tags: sanitizeInteger(data.project_tags) || null,
         project_file: projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
@@ -290,8 +290,8 @@ module.exports = {
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
       };
-       
-      
+
+
 
       const project = await projectServices.addProject(postData);
 
@@ -425,24 +425,70 @@ module.exports = {
       // }
       let projectId = req.query.projectId;
       let getProjectById = await projectServices.getProjectById(projectId);
-      
+
 
       if (!getProjectById) throw new Error("Project not found");
       let data = req.body;
-      let completedFiles = [];
-      if (req.files) {
-        Object.keys(req.files).forEach((key) => {
-          req.files[key].forEach((file) => {
-            completedFiles.push({
-              fileName: file.originalname,
-              path: `files/${file.filename}`,
-              size: file.size,
-            });
-          });
-        });
-      }
+      // let completedFiles = [];
+      // if (req.files) {
+      //   Object.keys(req.files).forEach((key) => {
+      //     req.files[key].forEach((file) => {
+      //       completedFiles.push({
+      //         fileName: file.originalname,
+      //         path: `files/${file.filename}`,
+      //         size: file.size,
+      //       });
+      //     });
+      //   });
+      // }
 
+      // completedFiles = JSON.stringify(completedFiles);
+      let completedFiles = [];
+      if (Array.isArray(req.files)) {
+        const completedFileUploads = req.files.filter(f =>
+          f.fieldname.startsWith("completedFiles")
+        );
+
+        for (let file of completedFileUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            ["projectFiles", "Completed Files"]
+          );
+
+          completedFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
+        }
+      }
       completedFiles = JSON.stringify(completedFiles);
+
+      let projectFiles = [];
+      if (Array.isArray(req.files)) {
+        const projectFilesUploads = req.files.filter(f =>
+          f.fieldname.startsWith("projectFiles")
+        );
+
+        for (let file of projectFilesUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            ["projectFiles"]
+          );
+
+          projectFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
+        }
+      }
+      projectFiles = JSON.stringify(projectFiles);
+
       const sanitizeInteger = (value) => {
         if (value === "" || value === null || value === undefined) return null;
         return Number(value);
@@ -479,7 +525,7 @@ module.exports = {
         assign_date: sanitizeDate(data.assign_date), // returns null if invalid
         project_tags: sanitizeInteger(data.project_tags) || null,
         project_tags: data.project_tags || null,
-        projectFiles: data.projectFiles || null,
+        projectFiles: projectFiles || null,
         architecture: sanitizeInteger(data.architecture) || null,
         takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
         dueDate: sanitizeDate(data.dueDate),
@@ -495,8 +541,8 @@ module.exports = {
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
       };
-       commonHelper.removeFalsyKeys(postData);
-     
+      commonHelper.removeFalsyKeys(postData);
+
       let updateProject = await projectServices.updateProject(
         postData,
         projectId

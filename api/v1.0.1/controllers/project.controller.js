@@ -683,7 +683,7 @@ module.exports = {
   //   }
   // },
 
-  async updateProject(req, res) {
+async updateProject(req, res) {
   try {
     const projectId = req.query.projectId;
     const getProjectById = await projectServices.getProjectById(projectId);
@@ -691,8 +691,8 @@ module.exports = {
 
     const data = req.body;
 
-    // ✅ Helper: delete from Google Drive
-    const deleteFilesFromDrive = async (fileLinks) => {
+    // 🔹 Helper: delete from Google Drive
+    const deleteFilesFromDrive = async (fileLinks = []) => {
       for (const link of fileLinks) {
         try {
           const match = link.match(/\/d\/([^/]+)\//);
@@ -707,43 +707,58 @@ module.exports = {
       }
     };
 
-    // ✅ Parse deleted file arrays
-    const deletedCompletedFiles = data.deletedCompletedFiles
-      ? (typeof data.deletedCompletedFiles === "string"
-          ? JSON.parse(data.deletedCompletedFiles)
-          : data.deletedCompletedFiles)
-      : [];
+    // 🔹 Parse deleted files arrays
+    const deletedCompletedFiles =
+      typeof data.deletedCompletedFiles === "string"
+        ? JSON.parse(data.deletedCompletedFiles || "[]")
+        : data.deletedCompletedFiles || [];
 
-    const deletedProjectFiles = data.deletedProjectFiles
-      ? (typeof data.deletedProjectFiles === "string"
-          ? JSON.parse(data.deletedProjectFiles)
-          : data.deletedProjectFiles)
-      : [];
+    const deletedProjectFiles =
+      typeof data.deletedProjectFiles === "string"
+        ? JSON.parse(data.deletedProjectFiles || "[]")
+        : data.deletedProjectFiles || [];
 
-    // ✅ Perform deletion from Google Drive
+    // 🔹 Delete files from Drive
     if (deletedCompletedFiles.length) await deleteFilesFromDrive(deletedCompletedFiles);
     if (deletedProjectFiles.length) await deleteFilesFromDrive(deletedProjectFiles);
 
-    // ✅ Remove deleted file entries from DB JSON (if exist)
-    let existingCompleted = JSON.parse(getProjectById.completedFiles || "[]");
-    let existingProject = JSON.parse(getProjectById.projectFiles || "[]");
+    // 🔹 Parse existing DB JSON
+    let existingCompleted = [];
+    let existingProject = [];
 
+    try {
+      existingCompleted = JSON.parse(getProjectById.completedFiles || "[]");
+    } catch {
+      existingCompleted = [];
+    }
+
+    try {
+      existingProject = JSON.parse(getProjectById.project_file || "[]");
+    } catch {
+      existingProject = [];
+    }
+
+    // 🔹 Remove deleted entries from existing arrays
     if (deletedCompletedFiles.length) {
       existingCompleted = existingCompleted.filter(
-        (file) => !deletedCompletedFiles.some(url => file.link === url)
+        (file) => !deletedCompletedFiles.includes(file.link)
       );
     }
-
     if (deletedProjectFiles.length) {
       existingProject = existingProject.filter(
-        (file) => !deletedProjectFiles.some(url => file.link === url)
+        (file) => !deletedProjectFiles.includes(file.link)
       );
     }
 
-    // ✅ Handle uploads
+    // 🔹 Handle uploads
     let completedFiles = [];
+    let projectFiles = [];
+
     if (Array.isArray(req.files)) {
-      const completedUploads = req.files.filter(f => f.fieldname.startsWith("completedFiles"));
+      // Completed Files
+      const completedUploads = req.files.filter((f) =>
+        f.fieldname.startsWith("completedFiles")
+      );
       for (const file of completedUploads) {
         const driveFile = await uploadFileToDrive(
           file.path,
@@ -757,12 +772,12 @@ module.exports = {
           size: file.size,
         });
       }
-    }
-    existingCompleted.push(...completedFiles);
 
-    let projectFiles = [];
-    if (Array.isArray(req.files)) {
-      const projectUploads = req.files.filter(f => f.fieldname.startsWith("projectFiles"));
+      // Project Files
+      const projectUploads = req.files.filter((f) =>
+        f.fieldname.startsWith("projectFiles")
+      );
+      console.log("📂 projectUploads:", projectUploads.length);
       for (const file of projectUploads) {
         const driveFile = await uploadFileToDrive(
           file.path,
@@ -777,13 +792,21 @@ module.exports = {
         });
       }
     }
+
+    // 🔹 Merge existing + new uploads
+    existingCompleted.push(...completedFiles);
     existingProject.push(...projectFiles);
 
-    // ✅ Sanitize helpers
-    const sanitizeInteger = (v) => (v === "" || v == null ? null : Number(v));
-    const sanitizeDate = (v) => (!v ? null : isNaN(new Date(v)) ? null : new Date(v));
+    // 🔹 Convert to escaped JSON string
+    const completedFilesString = JSON.stringify(existingCompleted);
+    const projectFilesString = JSON.stringify(existingProject);
 
-    // ✅ Prepare final update payload
+    // 🔹 Sanitizers
+    const sanitizeInteger = (v) => (v === "" || v == null ? null : Number(v));
+    const sanitizeDate = (v) =>
+      !v ? null : isNaN(new Date(v)) ? null : new Date(v);
+
+    // 🔹 Prepare final update payload
     const postData = {
       user_id: req.userId,
       engineer_id: sanitizeInteger(data.engineer_id),
@@ -808,8 +831,8 @@ module.exports = {
       takeoffDueDate: sanitizeDate(data.takeoffDueDate),
       takeoffStartDate: sanitizeDate(data.takeoffStartDate),
       assign_date: sanitizeDate(data.assign_date),
-      projectFiles: JSON.stringify(existingProject),
-      completedFiles: JSON.stringify(existingCompleted),
+      project_file: projectFilesString,   // 🔹 updated column
+      completedFiles: completedFilesString,
       architecture: sanitizeInteger(data.architecture),
       takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
       dueDate: sanitizeDate(data.dueDate),
@@ -824,13 +847,17 @@ module.exports = {
       project_status: data.project_status || "active",
       takeoff_status: data.takeoff_status || null,
     };
+
     commonHelper.removeFalsyKeys(postData);
 
-    // ✅ Update DB
+    // 🔹 Update DB
     const updateProject = await projectServices.updateProject(postData, projectId);
 
     return res.status(200).send(
-      commonHelper.parseSuccessRespose(updateProject, "Project updated successfully (files synced)")
+      commonHelper.parseSuccessRespose(
+        updateProject,
+        "✅ Project updated successfully (files synced)"
+      )
     );
   } catch (error) {
     console.error("❌ Update project failed:", error);
@@ -842,6 +869,7 @@ module.exports = {
     });
   }
 },
+
 
   // /*deleteProject*/
   async deleteProject(req, res) {

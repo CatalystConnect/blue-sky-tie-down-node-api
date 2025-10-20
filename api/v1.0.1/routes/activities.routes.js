@@ -7,5 +7,4 @@ var { authJwt } = require("../middleware");
 /*getUserById*/
 router.get("/activities/getActivitiesById", [authJwt.verifyToken],[controller.validate("getActivitiesById")], controller.getActivitiesById);
 
-
 module.exports = router;

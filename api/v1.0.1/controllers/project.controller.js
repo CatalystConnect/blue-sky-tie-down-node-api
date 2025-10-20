@@ -394,84 +394,35 @@ module.exports = {
   },
   /*getProjectById*/
   async getProjectById(req, res) {
-  try {
-    const errors = myValidationResult(req);
-    if (!errors.isEmpty()) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+      let projectId = req.query.projectId;
+      let getProjectById = await projectServices.getProjectById(projectId);
+      if (!getProjectById) throw new Error("Project not found");
       return res
         .status(200)
-        .send(commonHelper.parseErrorRespose(errors.mapped()));
+        .send(
+          commonHelper.parseSuccessRespose(
+            getProjectById,
+            "Project displayed successfully"
+          )
+        );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Getting project failed",
+        data: error.response?.data || {},
+      });
     }
-
-    const projectId = req.query.projectId;
-    let project = await projectServices.getProjectById(projectId);
-
-    if (!project) throw new Error("Project not found");
-
-    // ✅ Transform project_file links
-    if (project.project_file) {
-      try {
-        const parsedFiles = JSON.parse(project.project_file);
-        project.project_file = parsedFiles.map((file) => {
-          if (file.link) {
-            // extract Google Drive file ID from /d/<id>/
-            const match = file.link.match(/\/d\/([^/]+)\//);
-            if (match && match[1]) {
-              const fileId = match[1];
-              file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
-            }
-          }
-          return file;
-        });
-      } catch (e) {
-        project.project_file = [];
-      }
-    }
-
-    return res.status(200).send(
-      commonHelper.parseSuccessRespose(project, "Project displayed successfully")
-    );
-  } catch (error) {
-    return res.status(400).json({
-      status: false,
-      message:
-        error.response?.data?.error ||
-        error.message ||
-        "Getting project failed",
-      data: error.response?.data || {},
-    });
-  }
-},
-
-  // async getProjectById(req, res) {
-  //   try {
-  //     const errors = myValidationResult(req);
-  //     if (!errors.isEmpty()) {
-  //       return res
-  //         .status(200)
-  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
-  //     }
-  //     let projectId = req.query.projectId;
-  //     let getProjectById = await projectServices.getProjectById(projectId);
-  //     if (!getProjectById) throw new Error("Project not found");
-  //     return res
-  //       .status(200)
-  //       .send(
-  //         commonHelper.parseSuccessRespose(
-  //           getProjectById,
-  //           "Project displayed successfully"
-  //         )
-  //       );
-  //   } catch (error) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message:
-  //         error.response?.data?.error ||
-  //         error.message ||
-  //         "Getting project failed",
-  //       data: error.response?.data || {},
-  //     });
-  //   }
-  // },
+  },
   // /*updateProject*/
   
 //   async getProjectById(req, res) {

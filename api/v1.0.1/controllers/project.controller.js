@@ -407,12 +407,24 @@ module.exports = {
 
     if (!project) throw new Error("Project not found");
 
-    // ✅ Only modify the string, do NOT parse it
-    if (project.project_file && typeof project.project_file === "string") {
-      project.project_file = project.project_file.replaceAll(
-        "/view?usp=drivesdk",
-        ""
-      );
+    // ✅ Transform project_file links
+    if (project.project_file) {
+      try {
+        const parsedFiles = JSON.parse(project.project_file);
+        project.project_file = parsedFiles.map((file) => {
+          if (file.link) {
+            // extract Google Drive file ID from /d/<id>/
+            const match = file.link.match(/\/d\/([^/]+)\//);
+            if (match && match[1]) {
+              const fileId = match[1];
+              file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+          }
+          return file;
+        });
+      } catch (e) {
+        project.project_file = [];
+      }
     }
 
     return res.status(200).send(
@@ -461,6 +473,71 @@ module.exports = {
   //   }
   // },
   // /*updateProject*/
+  
+//   async getProjectById(req, res) {
+//   try {
+//     const errors = myValidationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res
+//         .status(200)
+//         .send(commonHelper.parseErrorRespose(errors.mapped()));
+//     }
+
+//     const projectId = req.query.projectId;
+//     let project = await projectServices.getProjectById(projectId);
+
+//     if (!project) throw new Error("Project not found");
+
+//     // ✅ Convert project_file links
+//     if (project.project_file) {
+//       try {
+//         const parsedFiles = JSON.parse(project.project_file);
+//         project.project_file = parsedFiles.map((file) => {
+//           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
+//           let fileId = fileIdMatch ? fileIdMatch[1] : null;
+
+//           if (fileId) {
+//             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
+//           }
+//           return file;
+//         });
+//       } catch (e) {
+//         project.project_file = [];
+//       }
+//     }
+
+//     // ✅ Same conversion for projectFiles if needed
+//     if (project.projectFiles) {
+//       try {
+//         const parsedFiles = JSON.parse(project.projectFiles);
+//         project.projectFiles = parsedFiles.map((file) => {
+//           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
+//           let fileId = fileIdMatch ? fileIdMatch[1] : null;
+
+//           if (fileId) {
+//             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
+//           }
+//           return file;
+//         });
+//       } catch (e) {
+//         project.projectFiles = [];
+//       }
+//     }
+
+//     return res.status(200).send(
+//       commonHelper.parseSuccessRespose(project, "Project displayed successfully")
+//     );
+//   } catch (error) {
+//     return res.status(400).json({
+//       status: false,
+//       message:
+//         error.response?.data?.error ||
+//         error.message ||
+//         "Getting project failed",
+//       data: error.response?.data || {},
+//     });
+//   }
+// },
 
   async updateProject(req, res) {
     try {

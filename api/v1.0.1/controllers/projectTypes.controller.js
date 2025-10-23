@@ -55,13 +55,16 @@ module.exports = {
       }
 
       let { page = 1, per_page = 10, search = "" } = req.query;
-      page = parseInt(page);
-      per_page = parseInt(per_page);
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+      const offset = (page - 1) * per_page;
+
 
       const result = await projectTypesServices.getAllProjectTypes({
         page,
         per_page,
         search,
+        offset,
       });
 
       return res

@@ -26,38 +26,68 @@ module.exports = {
   },
 
 
-  /*getAllProjectTypes*/
-  async getAllProjectTypes({ page, per_page, search }) {
-    try {
-      const offset = (page - 1) * per_page;
+  // /*getAllProjectTypes*/
+  // async getAllProjectTypes({ page, per_page, search,offset }) {
+  //   try {
+  //     const offset = (page - 1) * per_page;
 
-      const whereCondition = {};
+  //     const whereCondition = {};
 
-      if (search) {
-        whereCondition[Op.or] = [
-          { title: { [Op.iLike]: `%${search}%` } },
-          { color: { [Op.iLike]: `%${search}%` } },
-        ];
-      }
+  //     if (search) {
+  //       whereCondition[Op.or] = [
+  //         { title: { [Op.iLike]: `%${search}%` } },
+  //         { color: { [Op.iLike]: `%${search}%` } },
+  //       ];
+  //     }
 
-      const { rows, count } = await db.projectTypesObj.findAndCountAll({
-        where: whereCondition,
-        order: [["id", "DESC"]],
-        per_page,
-        offset,
-      });
+  //     const { rows, count } = await db.projectTypesObj.findAndCountAll({
+  //       where: whereCondition,
+  //       order: [["id", "DESC"]],
+  //       per_page,
+  //       offset,
+  //     });
 
-      return {
-        total: count,
-        page,
-        per_page,
-        data: rows,
-      };
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
+  //     return {
+  //       total: count,
+  //       page,
+  //       per_page,
+  //       data: rows,
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
+async getAllProjectTypes({ page, per_page, search, offset }) {
+  try {
+    const whereCondition = {};
+
+    if (search && search.trim() !== "") {
+      whereCondition[Op.or] = [
+        { title: { [Op.iLike]: `%${search.trim()}%` } },
+      ];
     }
-  },
+
+    const { rows, count } = await db.projectTypesObj.findAndCountAll({
+      where: whereCondition,
+      order: [["id", "DESC"]],
+      limit: per_page,  
+      offset,           
+    });
+
+    return {
+      total: count,
+      page,
+      per_page,
+      data: rows,
+    };
+  } catch (e) {
+    console.error("Error in getAllProjectTypes:", e.message);
+    throw e;
+  }
+},
+
 
   /*getProjectTypesById*/
   async getProjectTypesById(id) {

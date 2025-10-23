@@ -1290,13 +1290,19 @@ module.exports = {
     }
   },
 
-  async addDriveAssociation({ parent, module, module_id, drive_id,file_name }) {
+  async addDriveAssociation({
+    parent,
+    module,
+    module_id,
+    drive_id,
+    file_name,
+  }) {
     return await db.gDriveAssociationObj.create({
       parent,
       module,
       module_id,
       drive_id,
-      file_name
+      file_name,
     });
   },
 
@@ -1311,5 +1317,18 @@ module.exports = {
     return await db.projectObj.update(updateData, {
       where: { id: projectId },
     });
+  },
+
+  async deleteDriveAssociation(driveId) {
+    try {
+      return await db.gDriveAssociationObj.destroy({
+        where: {
+          drive_id: driveId, 
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete drive association:", error);
+      throw error;
+    }
   },
 };

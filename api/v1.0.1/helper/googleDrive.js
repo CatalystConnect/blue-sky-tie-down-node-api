@@ -65,28 +65,60 @@ async function getOrCreateNestedFolders(parentFolderId, folderPathArray) {
  * @param {string} mimeType - MIME type of the file
  * @param {string[]|string} folderPath - array of folder names (nested) or single folder name
  */
-async function uploadFileToDrive(filePath, fileName, mimeType, folderPath = null) {
-  let folderId = process.env.GOOGLE_DRIVE_FOLDER_ID; // main folder (blueSkyFiles)
+// async function uploadFileToDrive(filePath, fileName, mimeType, folderPath = null) {
+//   let folderId = process.env.GOOGLE_DRIVE_FOLDER_ID; // main folder (blueSkyFiles)
+
+//   if (folderPath) {
+//     if (Array.isArray(folderPath)) {
+//       // Nested folders
+//       folderId = await getOrCreateNestedFolders(folderId, folderPath);
+//     } else {
+//       // Single folder
+//       folderId = await getOrCreateSubfolder(folderId, folderPath);
+//     }
+//   }
+//   const fileMetadata = {
+//     name: fileName,
+//     parents: [folderId],
+//   };
+
+//   const media = {
+//     mimeType,
+//     body: fs.createReadStream(filePath),
+//   };
+
+//   const file = await drive.files.create({
+//     requestBody: fileMetadata,
+//     media,
+//     fields: "id, webViewLink",
+//     supportsAllDrives: true,
+//   });
+
+//   return file.data;
+// }
+async function uploadFileToDrive(
+  filePath,
+  fileName,
+  mimeType,
+  folderPath = null
+) {
+  let folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   if (folderPath) {
-    if (Array.isArray(folderPath)) {
-      // Nested folders
+    if (typeof folderPath === "string") {
+      // folderPath is already ID
+      folderId = folderPath;
+    } else if (Array.isArray(folderPath)) {
+      // Nested folders by name
       folderId = await getOrCreateNestedFolders(folderId, folderPath);
     } else {
-      // Single folder
+      // Single folder name
       folderId = await getOrCreateSubfolder(folderId, folderPath);
     }
   }
 
-  const fileMetadata = {
-    name: fileName,
-    parents: [folderId],
-  };
-
-  const media = {
-    mimeType,
-    body: fs.createReadStream(filePath),
-  };
+  const fileMetadata = { name: fileName, parents: [folderId] };
+  const media = { mimeType, body: fs.createReadStream(filePath) };
 
   const file = await drive.files.create({
     requestBody: fileMetadata,
@@ -98,4 +130,8 @@ async function uploadFileToDrive(filePath, fileName, mimeType, folderPath = null
   return file.data;
 }
 
-module.exports = { uploadFileToDrive, getOrCreateSubfolder, getOrCreateNestedFolders };
+module.exports = {
+  uploadFileToDrive,
+  getOrCreateSubfolder,
+  getOrCreateNestedFolders,
+};

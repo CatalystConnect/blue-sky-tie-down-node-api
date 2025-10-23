@@ -1290,12 +1290,13 @@ module.exports = {
     }
   },
 
-  async addDriveAssociation({ parent, module, module_id, drive_id }) {
+  async addDriveAssociation({ parent, module, module_id, drive_id,file_name }) {
     return await db.gDriveAssociationObj.create({
       parent,
       module,
       module_id,
       drive_id,
+      file_name
     });
   },
 

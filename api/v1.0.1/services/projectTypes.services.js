@@ -15,6 +15,17 @@ module.exports = {
     }
   },
 
+    /* Get Project Types by Name (for validation) */
+ async getProjectTypesByName(title) {
+    try {
+      return await db.projectTypesObj.findOne({ where: { title } });
+    } catch (e) {
+      console.error("Error in getProjectTypesByName:", e.message);
+      throw e;
+    }
+  },
+
+
   /*getAllProjectTypes*/
   async getAllProjectTypes({ page, per_page, search }) {
     try {

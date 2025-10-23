@@ -212,4 +212,35 @@ module.exports = {
       });
     }
   },
+ validate(method) {
+    switch (method) {
+      case "addProjectTypes": {
+        return [
+          check("title")
+            .notEmpty()
+            .withMessage("Title is required")
+            .custom(async (value) => {
+              const existing = await projectTypesServices.getProjectTypesByName(value);
+              if (existing) throw new Error("Project type title already exists");
+              return true;
+            }),
+        ];
+      }
+
+      case "updateProjectTypes": {
+        return [
+          check("title")
+            .notEmpty()
+            .withMessage("Title is required")
+            .custom(async (value, { req }) => {
+              const existing = await projectTypesServices.getProjectTypesByName(value);
+              if (existing && existing.id !== parseInt(req.query.id)) {
+                throw new Error("Project type title already exists");
+              }
+              return true;
+            }),
+        ];
+      }
+    }
+  },
 };

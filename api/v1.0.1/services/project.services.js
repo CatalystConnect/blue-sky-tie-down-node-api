@@ -81,6 +81,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -206,6 +207,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -555,6 +557,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -743,6 +746,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -988,6 +992,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1191,6 +1196,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
+          "work_hours"
         ],
         include: [
           { model: db.companyObj, as: "engineer" },

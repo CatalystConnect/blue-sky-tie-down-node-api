@@ -16,9 +16,9 @@ module.exports = {
   },
 
   /*getAllProjectTypes*/
-  async getAllProjectTypes({ page, limit, search }) {
+  async getAllProjectTypes({ page, per_page, search }) {
     try {
-      const offset = (page - 1) * limit;
+      const offset = (page - 1) * per_page;
 
       const whereCondition = {};
 
@@ -31,15 +31,15 @@ module.exports = {
 
       const { rows, count } = await db.projectTypesObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "ASC"]],
-        limit,
+        order: [["id", "DESC"]],
+        per_page,
         offset,
       });
 
       return {
         total: count,
         page,
-        limit,
+        per_page,
         data: rows,
       };
     } catch (e) {

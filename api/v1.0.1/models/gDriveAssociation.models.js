@@ -23,15 +23,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-     
+
+      file_name: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     },
     {
-      timestamps: true,          
-      freezeTableName: true,     
-      createdAt: "createdAt", 
-      updatedAt: "updatedAt",  
-      paranoid: false,         
-      
+      timestamps: true,
+      freezeTableName: true,
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+      paranoid: false,
     }
   );
 

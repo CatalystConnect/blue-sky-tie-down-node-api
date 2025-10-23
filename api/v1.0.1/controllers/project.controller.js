@@ -442,12 +442,13 @@ module.exports = {
       // );
 
       // --- Step 4: Save folders in gDriveAssociation ---
-      const saveFolder = async (module, module_id, drive_id) =>
+      const saveFolder = async (module, module_id, drive_id,file_name) =>
         await projectServices.addDriveAssociation({
           parent: project.id,
           module,
           module_id,
           drive_id,
+          file_name
         });
 
       // await saveFolder("projectFiles", project.id, projectFilesFolder);
@@ -475,7 +476,7 @@ module.exports = {
             size: file.size,
           });
          
-          await saveFolder("projectFiles", project.id, driveFile.id);
+          await saveFolder("projectFiles", project.id, driveFile.id,file.originalname);
         }
       }
 
@@ -503,7 +504,7 @@ module.exports = {
             link: driveFile.webViewLink,
             size: file.size,
           });
-          await saveFolder("completedFiles", project.id, driveFile.id);
+          await saveFolder("completedFiles", project.id, driveFile.id,file.originalname);
         }
       }
        
@@ -582,7 +583,7 @@ module.exports = {
             name: file.originalname,
             link: driveFile.webViewLink,
           });
-          await saveFolder("planSetFiles", createdPlan.id, driveFile.id);
+          await saveFolder("planSetFiles", createdPlan.id, driveFile.id,file.originalname);
         }
 
         // --- Step 4: Update planFiles field in DB ---

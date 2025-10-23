@@ -412,7 +412,7 @@ module.exports = {
         takeoffStartDate: sanitizeDate(data.takeoffStartDate),
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
-        work_hours:data.work_hours || null
+        work_hours: data.work_hours || null,
       };
 
       const project = await projectServices.addProject(postData);
@@ -474,8 +474,15 @@ module.exports = {
             link: driveFile.webViewLink,
             size: file.size,
           });
+         
           await saveFolder("projectFiles", project.id, driveFile.id);
         }
+      }
+
+      if (projectFiles.length > 0) {
+        await projectServices.updateProject(project.id, {
+          project_file: JSON.stringify(projectFiles),
+        });
       }
 
       // --- Step 6: Upload Completed Files ---
@@ -499,7 +506,13 @@ module.exports = {
           await saveFolder("completedFiles", project.id, driveFile.id);
         }
       }
-
+       
+       if (completedFiles.length > 0) {
+        await projectServices.updateProject(project.id, {
+          completedFiles: JSON.stringify(completedFiles),
+          
+        });
+      }
       // --- Step 7: Upload Plan Sets ---
       const planSets = Array.isArray(data.planSets)
         ? data.planSets
@@ -1083,7 +1096,7 @@ module.exports = {
         takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
-        work_hours:data.work_hours || null
+        work_hours: data.work_hours || null,
       };
 
       commonHelper.removeFalsyKeys(postData);

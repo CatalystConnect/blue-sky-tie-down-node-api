@@ -81,7 +81,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -129,7 +129,6 @@ module.exports = {
             model: db.gDriveAssociationObj,
             as: "googleDrive",
           },
-
         ],
         order: [["id", "DESC"]],
       });
@@ -207,7 +206,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -269,7 +268,7 @@ module.exports = {
               },
             ],
           },
-           {
+          {
             model: db.gDriveAssociationObj,
             as: "googleDrive",
           },
@@ -557,7 +556,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -746,7 +745,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -992,7 +991,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1196,7 +1195,7 @@ module.exports = {
           "priority",
           "takeoffStartDate",
           "takeoffDueDate",
-          "work_hours"
+          "work_hours",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1305,5 +1304,11 @@ module.exports = {
       { planFiles: planFilesJson },
       { where: { id: planId } }
     );
+  },
+
+  async updateProject(projectId, updateData) {
+    return await db.projectObj.update(updateData, {
+      where: { id: projectId },
+    });
   },
 };

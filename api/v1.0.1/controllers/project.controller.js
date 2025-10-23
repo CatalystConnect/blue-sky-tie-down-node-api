@@ -883,6 +883,7 @@ module.exports = {
         takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime) || null,
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
+        work_hours: data.work_hours || null,
       };
       commonHelper.removeFalsyKeys(postData);
 

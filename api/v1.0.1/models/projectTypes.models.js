@@ -19,6 +19,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+        order: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true,

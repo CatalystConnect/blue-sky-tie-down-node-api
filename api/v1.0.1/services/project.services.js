@@ -1313,11 +1313,11 @@ module.exports = {
     );
   },
 
-  async updateProject(projectId, updateData) {
-    return await db.projectObj.update(updateData, {
-      where: { id: projectId },
-    });
-  },
+  // async updateProject(projectId, updateData) {
+  //   return await db.projectObj.update(updateData, {
+  //     where: { id: projectId },
+  //   });
+  // },
 
   async deleteDriveAssociation(driveId) {
     try {

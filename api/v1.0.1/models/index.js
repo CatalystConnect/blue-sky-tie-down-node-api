@@ -208,6 +208,8 @@ db.projectPhasesObj = require("./projectPhases.models")(db.dbObj, Sequelize);
 db.projectTagsObj = require("./projectTags.models")(db.dbObj, Sequelize);
 db.stateObj = require("./state.models")(db.dbObj, Sequelize);
 db.projectTagMappingsObj = require("./projectTagMappings.models")(db.dbObj, Sequelize);
+db.gDriveAssociationObj = require("./gDriveAssociation.models")(db.dbObj, Sequelize);
+
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {
   foreignKey: "zip",

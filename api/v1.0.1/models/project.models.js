@@ -124,11 +124,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true,
       },
-        plan_reviewed_by: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-        },
-       assign_team: {
+      plan_reviewed_by: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      assign_team: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
@@ -140,11 +140,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true,
       },
-       takeoffDueDate: {
+      takeoffDueDate: {
         type: Sequelize.DATE,
         allowNull: true,
       },
-       takeoffStartDate: {
+      takeoffStartDate: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -161,7 +161,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
-       takeoff_status: {
+      work_hours: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      takeoff_status: {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
@@ -189,7 +193,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
-       priority: {
+      priority: {
         type: Sequelize.STRING(255),
         defaultValue: "false",
       },

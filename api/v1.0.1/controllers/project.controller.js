@@ -412,6 +412,7 @@ module.exports = {
         takeoffStartDate: data.takeoffStartDate,
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
+        work_hours:data.work_hours || null
       };
 
       const project = await projectServices.addProject(postData);
@@ -449,9 +450,9 @@ module.exports = {
           drive_id,
         });
 
-      await saveFolder("projectFiles", project.id, projectFilesFolder);
-      await saveFolder("completedFiles", project.id, completedFolder);
-      await saveFolder("planSets", project.id, planSetsFolder);
+      // await saveFolder("projectFiles", project.id, projectFilesFolder);
+      // await saveFolder("completedFiles", project.id, completedFolder);
+      // await saveFolder("planSets", project.id, planSetsFolder);
       // await saveFolder("leadFiles", project.id, leadFilesFolder);
 
       // --- Step 5: Upload Project Files ---
@@ -1082,6 +1083,7 @@ module.exports = {
         takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
+        work_hours:data.work_hours || null
       };
 
       commonHelper.removeFalsyKeys(postData);

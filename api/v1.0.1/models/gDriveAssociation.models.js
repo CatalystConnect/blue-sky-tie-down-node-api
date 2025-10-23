@@ -28,8 +28,8 @@ module.exports = (sequelize, Sequelize) => {
     {
       timestamps: true,          
       freezeTableName: true,     
-      createdAt: "created_at",   
-      updatedAt: "updated_at",   
+      createdAt: "createdAt", 
+      updatedAt: "updatedAt",  
       paranoid: false,         
       
     }

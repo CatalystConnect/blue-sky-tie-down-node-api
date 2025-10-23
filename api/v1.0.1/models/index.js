@@ -1076,4 +1076,10 @@ db.projectTagMappingsObj.belongsTo(db.projectTagsObj, {
   as: "tags",
 });
 
+
+db.projectObj.hasMany(db.gDriveAssociationObj, {
+  foreignKey: "parent",
+  as: "googleDrive",
+});
+
 module.exports = db;

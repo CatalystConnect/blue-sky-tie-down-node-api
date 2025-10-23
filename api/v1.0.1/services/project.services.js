@@ -80,7 +80,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -89,9 +89,9 @@ module.exports = {
           { model: db.companyObj, as: "general_contractor" },
           { model: db.userObj, as: "planReviewer" },
           {
-            model: db.projectplanSetsObj, as: "planSets", include: [
-              { model: db.userObj, as: "planReviewerUers" },
-            ]
+            model: db.projectplanSetsObj,
+            as: "planSets",
+            include: [{ model: db.userObj, as: "planReviewerUers" }],
           },
           { model: db.leadTeamsObj, as: "takeoff_team" },
           {
@@ -122,8 +122,13 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
           },
+          {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
+          },
+
         ],
         order: [["id", "DESC"]],
       });
@@ -200,7 +205,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -210,9 +215,9 @@ module.exports = {
           { model: db.userObj, as: "planReviewer" },
           { model: db.leadTeamsObj, as: "takeoff_team" },
           {
-            model: db.projectplanSetsObj, as: "planSets", include: [
-              { model: db.userObj, as: "planReviewerUers" },
-            ]
+            model: db.projectplanSetsObj,
+            as: "planSets",
+            include: [{ model: db.userObj, as: "planReviewerUers" }],
           },
           {
             model: db.taxesObj,
@@ -242,7 +247,7 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
           },
           {
             model: db.leadsObj,
@@ -261,6 +266,10 @@ module.exports = {
                 as: "project",
               },
             ],
+          },
+           {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
           },
         ],
       });
@@ -545,7 +554,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -574,7 +583,11 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
+          },
+          {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
           },
         ],
         order: [
@@ -729,7 +742,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -759,7 +772,11 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
+          },
+          {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
           },
         ],
         order: [
@@ -970,7 +987,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1000,7 +1017,11 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
+          },
+          {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
           },
         ],
         order: [
@@ -1169,7 +1190,7 @@ module.exports = {
           "project_status",
           "priority",
           "takeoffStartDate",
-          "takeoffDueDate"
+          "takeoffDueDate",
         ],
         include: [
           { model: db.companyObj, as: "engineer" },
@@ -1199,7 +1220,11 @@ module.exports = {
                 model: db.projectTagsObj,
                 as: "tags",
               },
-            ]
+            ],
+          },
+          {
+            model: db.gDriveAssociationObj,
+            as: "googleDrive",
           },
         ],
         order: [
@@ -1228,7 +1253,6 @@ module.exports = {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
-
   },
 
   async addProjectTags(projectId, tagIds) {
@@ -1237,11 +1261,10 @@ module.exports = {
         tagIds = [tagIds];
       }
 
-      const records = tagIds.map(tagId => ({
+      const records = tagIds.map((tagId) => ({
         project_id: projectId,
         tag_id: tagId,
       }));
-
 
       await db.projectTagMappingsObj.bulkCreate(records);
 
@@ -1262,5 +1285,19 @@ module.exports = {
     }
   },
 
+  async addDriveAssociation({ parent, module, module_id, drive_id }) {
+    return await db.gDriveAssociationObj.create({
+      parent,
+      module,
+      module_id,
+      drive_id,
+    });
+  },
 
+  async updatePlanFiles(planId, planFilesJson) {
+    return await db.projectplanSetsObj.update(
+      { planFiles: planFilesJson },
+      { where: { id: planId } }
+    );
+  },
 };

@@ -9,7 +9,10 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
-const { uploadFileToDrive } = require("../helper/googleDrive");
+const {
+  uploadFileToDrive,
+  getOrCreateSubfolder,
+} = require("../helper/googleDrive");
 const path = require("path");
 const fs = require("fs");
 
@@ -71,7 +74,7 @@ module.exports = {
   //       assign_to_budget: sanitizeInteger(data.assign_to_budget),
   //       take_off_team_id: sanitizeInteger(data.take_off_team_id),
   //       take_off_type: data.take_off_type || null,
-  //       project_tags: data.project_tags || null,   
+  //       project_tags: data.project_tags || null,
   //       take_off_scope: data.take_off_scope || null,
   //       assign_date: sanitizeDate(data.assign_date), // returns null if invalid
   //       project_tags: data.project_tags || null,
@@ -177,6 +180,184 @@ module.exports = {
   //   }
   // },
   /*getAllProject*/
+  // async addProject(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     const data = req.body;
+
+  //     let completedFiles = [];
+  //     if (Array.isArray(req.files)) {
+  //       const completedFileUploads = req.files.filter(f =>
+  //         f.fieldname.startsWith("completedFiles")
+  //       );
+
+  //       for (let file of completedFileUploads) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           ["projectFiles", "Completed Files"]
+  //         );
+
+  //         completedFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //           size: file.size,
+  //         });
+  //       }
+  //     }
+  //     completedFiles = JSON.stringify(completedFiles);
+
+  //     let projectFiles = [];
+  //     if (Array.isArray(req.files)) {
+  //       const projectFilesUploads = req.files.filter(f =>
+  //         f.fieldname.startsWith("projectFiles")
+  //       );
+
+  //       for (let file of projectFilesUploads) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           ["projectFiles"]
+  //         );
+
+  //         projectFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //           size: file.size,
+  //         });
+  //       }
+  //     }
+  //     projectFiles = JSON.stringify(projectFiles);
+
+  //     const sanitizeInteger = value => {
+  //       if (value === "" || value === null || value === undefined) return null;
+  //       return Number(value);
+  //     };
+
+  //     const sanitizeDate = value => {
+  //       if (!value) return null;
+  //       const date = new Date(value);
+  //       return isNaN(date.getTime()) ? null : date;
+  //     };
+
+  //     const postData = {
+  //       user_id: req.userId,
+  //       engineer_id: sanitizeInteger(data.engineer_id),
+  //       name: data.name || null,
+  //       city: data.city || null,
+  //       state: sanitizeInteger(data.state) || null,
+  //       bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
+  //       address: data.address || null,
+  //       zip: sanitizeInteger(data.zip),
+  //       units: sanitizeInteger(data.units),
+  //       projectType: data.projectType || null,
+  //       project_phase: data.project_phase || null,
+  //       bldgs: sanitizeInteger(data.bldgs),
+  //       wind_zone: data.wind_zone || null,
+  //       seismic_zone: data.seismic_zone || null,
+  //       developer_id: sanitizeInteger(data.developer_id),
+  //       general_contractor_id: sanitizeInteger(data.general_contractor_id),
+  //       assign_to_budget: sanitizeInteger(data.assign_to_budget),
+  //       take_off_team_id: sanitizeInteger(data.take_off_team_id),
+  //       take_off_type: data.take_off_type || null,
+  //       take_off_scope: data.take_off_scope || null,
+  //       assign_date: sanitizeDate(data.assign_date),
+  //       // project_tags: sanitizeInteger(data.project_tags) || null,
+  //       project_file: projectFiles || null,
+  //       architecture: sanitizeInteger(data.architecture) || null,
+  //       takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
+  //       dueDate: sanitizeDate(data.dueDate),
+  //       projectAttachmentUrls: data.projectAttachmentUrls || null,
+  //       attachmentsLink: data.attachmentsLink || null,
+  //       projectRifFields: data.projectRifFields || null,
+  //       status: "new",
+  //       takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
+  //       connectplan: data.connectplan || null,
+  //       surveyorNotes: data.surveyorNotes || null,
+  //       completedFiles: completedFiles || null,
+  //       takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime) || null,
+  //       takeoffDueDate: data.takeoffDueDate || null,
+  //       takeoffStartDate: data.takeoffStartDate || null,
+  //       project_status: data.project_status || "active",
+  //       takeoff_status: data.takeoff_status || null,
+  //     };
+
+  //     const project = await projectServices.addProject(postData);
+
+  //     if (data.project_tags) {
+
+  //       const tagIds = Array.isArray(data.project_tags)
+  //         ? data.project_tags
+  //         : String(data.project_tags).split(",").map(id => parseInt(id));
+
+  //       await projectServices.addProjectTags(project.id, tagIds);
+  //     }
+
+  //     const planSets = Array.isArray(data.planSets)
+  //       ? data.planSets
+  //       : JSON.parse(data.planSets || "[]");
+
+  //     for (let index = 0; index < planSets.length; index++) {
+  //       const plan = planSets[index];
+  //       let uploadedFiles = [];
+
+  //       const planFiles = req.files.filter(
+  //         f => f.fieldname === `planSets[${index}][planFiles]`
+  //       );
+
+  //       for (let file of planFiles) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           ["projectFiles", "Plan Files"]
+  //         );
+
+  //         uploadedFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //         });
+  //       }
+
+  //       const planData = {
+  //         project_id: project.id,
+  //         submissionType: plan.submissionType || null,
+  //         date_received: sanitizeDate(plan.date_received),
+  //         plan_link: plan.plan_link || null,
+  //         planType: plan.planType || null,
+  //         planFiles: JSON.stringify(uploadedFiles),
+  //         plan_date: sanitizeDate(plan.plan_date),
+  //         rev_status: plan.rev_status || null,
+  //         plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
+  //         plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by),
+  //         data_collocated_date: sanitizeDate(plan.data_collocated_date),
+  //         plan_revision_notes: plan.plan_revision_notes || null,
+  //       };
+
+  //       await projectServices.projectplanSets(planData);
+  //     }
+
+  //     return res
+  //       .status(200)
+  //       .send(commonHelper.parseSuccessRespose("", "Project added successfully"));
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error || error.message || "Project failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+
   async addProject(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -188,73 +369,21 @@ module.exports = {
 
       const data = req.body;
 
-
-      let completedFiles = [];
-      if (Array.isArray(req.files)) {
-        const completedFileUploads = req.files.filter(f =>
-          f.fieldname.startsWith("completedFiles")
-        );
-
-        for (let file of completedFileUploads) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            ["projectFiles", "Completed Files"]
-          );
-
-          completedFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-        }
-      }
-      completedFiles = JSON.stringify(completedFiles);
-
-
-      let projectFiles = [];
-      if (Array.isArray(req.files)) {
-        const projectFilesUploads = req.files.filter(f =>
-          f.fieldname.startsWith("projectFiles")
-        );
-
-        for (let file of projectFilesUploads) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            ["projectFiles"]
-          );
-
-          projectFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-        }
-      }
-      projectFiles = JSON.stringify(projectFiles);
-
-
-      const sanitizeInteger = value => {
-        if (value === "" || value === null || value === undefined) return null;
-        return Number(value);
-      };
-
-      const sanitizeDate = value => {
+      // --- Sanitize helpers ---
+      const sanitizeInteger = (value) => (value ? Number(value) : null);
+      const sanitizeDate = (value) => {
         if (!value) return null;
         const date = new Date(value);
         return isNaN(date.getTime()) ? null : date;
       };
 
-
+      // --- Step 1: Add project to DB ---
       const postData = {
         user_id: req.userId,
         engineer_id: sanitizeInteger(data.engineer_id),
         name: data.name || null,
         city: data.city || null,
-        state: sanitizeInteger(data.state) || null,
+        state: sanitizeInteger(data.state),
         bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
         address: data.address || null,
         zip: sanitizeInteger(data.zip),
@@ -271,66 +400,134 @@ module.exports = {
         take_off_type: data.take_off_type || null,
         take_off_scope: data.take_off_scope || null,
         assign_date: sanitizeDate(data.assign_date),
-        // project_tags: sanitizeInteger(data.project_tags) || null,
-        project_file: projectFiles || null,
-        architecture: sanitizeInteger(data.architecture) || null,
-        takeoffactualtime: sanitizeInteger(data.takeoffactualtime) || null,
+        architecture: sanitizeInteger(data.architecture),
+        takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
         dueDate: sanitizeDate(data.dueDate),
-        projectAttachmentUrls: data.projectAttachmentUrls || null,
-        attachmentsLink: data.attachmentsLink || null,
-        projectRifFields: data.projectRifFields || null,
         status: "new",
         takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
         connectplan: data.connectplan || null,
         surveyorNotes: data.surveyorNotes || null,
-        completedFiles: completedFiles || null,
-        takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime) || null,
-        takeoffDueDate: data.takeoffDueDate || null,
-        takeoffStartDate: data.takeoffStartDate || null,
+        takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
+        takeoffDueDate: data.takeoffDueDate,
+        takeoffStartDate: data.takeoffStartDate,
         project_status: data.project_status || "active",
         takeoff_status: data.takeoff_status || null,
       };
 
-
-
       const project = await projectServices.addProject(postData);
 
-      if (data.project_tags) {
+      // --- Step 2: Create Project root folder ---
+      const rootFolder = await getOrCreateSubfolder(
+        process.env.GOOGLE_DRIVE_FOLDER_ID,
+        `${project.id}. ${project.name}`
+      );
 
-        const tagIds = Array.isArray(data.project_tags)
-          ? data.project_tags
-          : String(data.project_tags).split(",").map(id => parseInt(id));
+      // --- Step 3: Create subfolders ---
+      const projectFilesFolder = await getOrCreateSubfolder(
+        rootFolder,
+        "projectFiles"
+      );
+      const planSetsFolder = await getOrCreateSubfolder(
+        rootFolder,
+        "Plan Sets"
+      );
+      const completedFolder = await getOrCreateSubfolder(
+        rootFolder,
+        "Completed Files"
+      );
+      // const leadFilesFolder = await getOrCreateSubfolder(
+      //   rootFolder,
+      //   "Lead Files"
+      // );
 
-        await projectServices.addProjectTags(project.id, tagIds);
-      }
+      // --- Step 4: Save folders in gDriveAssociation ---
+      const saveFolder = async (module, module_id, drive_id) =>
+        await projectServices.addDriveAssociation({
+          parent: project.id,
+          module,
+          module_id,
+          drive_id,
+        });
 
+      await saveFolder("projectFiles", project.id, projectFilesFolder);
+      await saveFolder("completedFiles", project.id, completedFolder);
+      await saveFolder("planSets", project.id, planSetsFolder);
+      // await saveFolder("leadFiles", project.id, leadFilesFolder);
 
-      const planSets = Array.isArray(data.planSets)
-        ? data.planSets
-        : JSON.parse(data.planSets || "[]");
-
-
-      for (let index = 0; index < planSets.length; index++) {
-        const plan = planSets[index];
-        let uploadedFiles = [];
-
-        const planFiles = req.files.filter(
-          f => f.fieldname === `planSets[${index}][planFiles]`
+      // --- Step 5: Upload Project Files ---
+      let projectFiles = [];
+      if (Array.isArray(req.files)) {
+        const projectUploads = req.files.filter((f) =>
+          f.fieldname.startsWith("projectFiles")
         );
 
-        for (let file of planFiles) {
+        for (let file of projectUploads) {
           const driveFile = await uploadFileToDrive(
             file.path,
             file.originalname,
             file.mimetype,
-            ["projectFiles", "Plan Files"]
+            projectFilesFolder
           );
-
-          uploadedFiles.push({
+          projectFiles.push({
             name: file.originalname,
             link: driveFile.webViewLink,
+            size: file.size,
           });
+          await saveFolder("projectFiles", project.id, driveFile.id);
         }
+      }
+
+      // --- Step 6: Upload Completed Files ---
+      let completedFiles = [];
+      if (Array.isArray(req.files)) {
+        const completedUploads = req.files.filter((f) =>
+          f.fieldname.startsWith("completedFiles")
+        );
+        for (let file of completedUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            completedFolder
+          );
+          completedFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
+          await saveFolder("completedFiles", project.id, driveFile.id);
+        }
+      }
+
+      // --- Step 7: Upload Plan Sets ---
+      const planSets = Array.isArray(data.planSets)
+        ? data.planSets
+        : JSON.parse(data.planSets || "[]");
+      for (let index = 0; index < planSets.length; index++) {
+        const plan = planSets[index];
+        // const planSetFolder = await getOrCreateSubfolder(
+        //   planSetsFolder,
+        //   `${index + 1}`
+        // );
+        // await saveFolder("planSetFiles", index + 1, planSetFolder);
+
+        // const planFiles = req.files.filter(
+        //   (f) => f.fieldname === `planSets[${index}][planFiles]`
+        // );
+        // let uploadedFiles = [];
+        // for (let file of planFiles) {
+        //   const driveFile = await uploadFileToDrive(
+        //     file.path,
+        //     file.originalname,
+        //     file.mimetype,
+        //     planSetFolder
+        //   );
+        //   uploadedFiles.push({
+        //     name: file.originalname,
+        //     link: driveFile.webViewLink,
+        //   });
+        //   await saveFolder("planSetFiles", index + 1, driveFile.id);
+        // }
 
         const planData = {
           project_id: project.id,
@@ -338,7 +535,7 @@ module.exports = {
           date_received: sanitizeDate(plan.date_received),
           plan_link: plan.plan_link || null,
           planType: plan.planType || null,
-          planFiles: JSON.stringify(uploadedFiles),
+          planFiles: null,
           plan_date: sanitizeDate(plan.plan_date),
           rev_status: plan.rev_status || null,
           plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
@@ -346,13 +543,56 @@ module.exports = {
           data_collocated_date: sanitizeDate(plan.data_collocated_date),
           plan_revision_notes: plan.plan_revision_notes || null,
         };
+        // await projectServices.projectplanSets(planData);
 
-        await projectServices.projectplanSets(planData);
+        const createdPlan = await projectServices.projectplanSets(planData);
+
+        const planSetFolder = await getOrCreateSubfolder(
+          planSetsFolder,
+          `${createdPlan.id}` // use DB ID
+        );
+
+        const planFiles = req.files.filter(
+          (f) => f.fieldname === `planSets[${index}][planFiles]`
+        );
+
+        let uploadedFiles = [];
+        for (let file of planFiles) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            planSetFolder
+          );
+          uploadedFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+          });
+          await saveFolder("planSetFiles", createdPlan.id, driveFile.id);
+        }
+
+        // --- Step 4: Update planFiles field in DB ---
+        await projectServices.updatePlanFiles(
+          createdPlan.id,
+          JSON.stringify(uploadedFiles)
+        );
+      }
+
+      // --- Step 8: Handle project tags ---
+      if (data.project_tags) {
+        const tagIds = Array.isArray(data.project_tags)
+          ? data.project_tags
+          : String(data.project_tags)
+              .split(",")
+              .map((id) => parseInt(id));
+        await projectServices.addProjectTags(project.id, tagIds);
       }
 
       return res
         .status(200)
-        .send(commonHelper.parseSuccessRespose("", "Project added successfully"));
+        .send(
+          commonHelper.parseSuccessRespose("", "Project added successfully")
+        );
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -362,7 +602,6 @@ module.exports = {
       });
     }
   },
-
   async getAllProject(req, res) {
     try {
       let { page, per_page, search } = req.query;
@@ -424,71 +663,71 @@ module.exports = {
     }
   },
   // /*updateProject*/
-  
-//   async getProjectById(req, res) {
-//   try {
-//     const errors = myValidationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res
-//         .status(200)
-//         .send(commonHelper.parseErrorRespose(errors.mapped()));
-//     }
 
-//     const projectId = req.query.projectId;
-//     let project = await projectServices.getProjectById(projectId);
+  //   async getProjectById(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
 
-//     if (!project) throw new Error("Project not found");
+  //     const projectId = req.query.projectId;
+  //     let project = await projectServices.getProjectById(projectId);
 
-//     // ✅ Convert project_file links
-//     if (project.project_file) {
-//       try {
-//         const parsedFiles = JSON.parse(project.project_file);
-//         project.project_file = parsedFiles.map((file) => {
-//           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
-//           let fileId = fileIdMatch ? fileIdMatch[1] : null;
+  //     if (!project) throw new Error("Project not found");
 
-//           if (fileId) {
-//             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
-//           }
-//           return file;
-//         });
-//       } catch (e) {
-//         project.project_file = [];
-//       }
-//     }
+  //     // ✅ Convert project_file links
+  //     if (project.project_file) {
+  //       try {
+  //         const parsedFiles = JSON.parse(project.project_file);
+  //         project.project_file = parsedFiles.map((file) => {
+  //           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
+  //           let fileId = fileIdMatch ? fileIdMatch[1] : null;
 
-//     // ✅ Same conversion for projectFiles if needed
-//     if (project.projectFiles) {
-//       try {
-//         const parsedFiles = JSON.parse(project.projectFiles);
-//         project.projectFiles = parsedFiles.map((file) => {
-//           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
-//           let fileId = fileIdMatch ? fileIdMatch[1] : null;
+  //           if (fileId) {
+  //             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  //           }
+  //           return file;
+  //         });
+  //       } catch (e) {
+  //         project.project_file = [];
+  //       }
+  //     }
 
-//           if (fileId) {
-//             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
-//           }
-//           return file;
-//         });
-//       } catch (e) {
-//         project.projectFiles = [];
-//       }
-//     }
+  //     // ✅ Same conversion for projectFiles if needed
+  //     if (project.projectFiles) {
+  //       try {
+  //         const parsedFiles = JSON.parse(project.projectFiles);
+  //         project.projectFiles = parsedFiles.map((file) => {
+  //           let fileIdMatch = file.link?.match(/\/d\/(.*?)\//);
+  //           let fileId = fileIdMatch ? fileIdMatch[1] : null;
 
-//     return res.status(200).send(
-//       commonHelper.parseSuccessRespose(project, "Project displayed successfully")
-//     );
-//   } catch (error) {
-//     return res.status(400).json({
-//       status: false,
-//       message:
-//         error.response?.data?.error ||
-//         error.message ||
-//         "Getting project failed",
-//       data: error.response?.data || {},
-//     });
-//   }
-// },
+  //           if (fileId) {
+  //             file.link = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  //           }
+  //           return file;
+  //         });
+  //       } catch (e) {
+  //         project.projectFiles = [];
+  //       }
+  //     }
+
+  //     return res.status(200).send(
+  //       commonHelper.parseSuccessRespose(project, "Project displayed successfully")
+  //     );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Getting project failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
 
   // async updateProject(req, res) {
   //   try {
@@ -500,7 +739,6 @@ module.exports = {
   //     // }
   //     let projectId = req.query.projectId;
   //     let getProjectById = await projectServices.getProjectById(projectId);
-
 
   //     if (!getProjectById) throw new Error("Project not found");
   //     let data = req.body;
@@ -623,13 +861,10 @@ module.exports = {
   //         ? data.project_tags
   //         : String(data.project_tags).split(",").map(id => parseInt(id));
 
-        
   //       await projectServices.removeProjectTags(projectId);
 
-   
   //       await projectServices.addProjectTags(projectId, tagIds);
   //     }
-
 
   //     let updateProject = await projectServices.updateProject(
   //       postData,
@@ -642,7 +877,6 @@ module.exports = {
   //     if (data.planSets && typeof data.planSets === "string") {
   //       data.planSets = JSON.parse(data.planSets);
   //     }
-
 
   //     if (data.planSets && Array.isArray(data.planSets)) {
   //       for (let plan of data.planSets) {
@@ -683,193 +917,201 @@ module.exports = {
   //   }
   // },
 
-async updateProject(req, res) {
-  try {
-    const projectId = req.query.projectId;
-    const getProjectById = await projectServices.getProjectById(projectId);
-    if (!getProjectById) throw new Error("Project not found");
+  async updateProject(req, res) {
+    try {
+      const projectId = req.query.projectId;
+      const getProjectById = await projectServices.getProjectById(projectId);
+      if (!getProjectById) throw new Error("Project not found");
 
-    const data = req.body;
+      const data = req.body;
 
-    // 🔹 Helper: delete from Google Drive
-    const deleteFilesFromDrive = async (fileLinks = []) => {
-      for (const link of fileLinks) {
-        try {
-          const match = link.match(/\/d\/([^/]+)\//);
-          if (match && match[1]) {
-            const fileId = match[1];
-            await drive.files.delete({ fileId, supportsAllDrives: true });
-            console.log(`🗑️ Deleted from Drive: ${fileId}`);
+      // 🔹 Helper: delete from Google Drive
+      const deleteFilesFromDrive = async (fileLinks = []) => {
+        for (const link of fileLinks) {
+          try {
+            const match = link.match(/\/d\/([^/]+)\//);
+            if (match && match[1]) {
+              const fileId = match[1];
+              await drive.files.delete({ fileId, supportsAllDrives: true });
+              console.log(`🗑️ Deleted from Drive: ${fileId}`);
+            }
+          } catch (err) {
+            console.error(`⚠️ Drive deletion failed for: ${link}`, err.message);
           }
-        } catch (err) {
-          console.error(`⚠️ Drive deletion failed for: ${link}`, err.message);
+        }
+      };
+
+      // 🔹 Parse deleted files arrays
+      const deletedCompletedFiles =
+        typeof data.deletedCompletedFiles === "string"
+          ? JSON.parse(data.deletedCompletedFiles || "[]")
+          : data.deletedCompletedFiles || [];
+
+      const deletedProjectFiles =
+        typeof data.deletedProjectFiles === "string"
+          ? JSON.parse(data.deletedProjectFiles || "[]")
+          : data.deletedProjectFiles || [];
+
+      // 🔹 Delete files from Drive
+      if (deletedCompletedFiles.length)
+        await deleteFilesFromDrive(deletedCompletedFiles);
+      if (deletedProjectFiles.length)
+        await deleteFilesFromDrive(deletedProjectFiles);
+
+      // 🔹 Parse existing DB JSON
+      let existingCompleted = [];
+      let existingProject = [];
+
+      try {
+        existingCompleted = JSON.parse(getProjectById.completedFiles || "[]");
+      } catch {
+        existingCompleted = [];
+      }
+
+      try {
+        existingProject = JSON.parse(getProjectById.project_file || "[]");
+      } catch {
+        existingProject = [];
+      }
+
+      // 🔹 Remove deleted entries from existing arrays
+      if (deletedCompletedFiles.length) {
+        existingCompleted = existingCompleted.filter(
+          (file) => !deletedCompletedFiles.includes(file.link)
+        );
+      }
+      if (deletedProjectFiles.length) {
+        existingProject = existingProject.filter(
+          (file) => !deletedProjectFiles.includes(file.link)
+        );
+      }
+
+      // 🔹 Handle uploads
+      let completedFiles = [];
+      let projectFiles = [];
+
+      if (Array.isArray(req.files)) {
+        // Completed Files
+        const completedUploads = req.files.filter((f) =>
+          f.fieldname.startsWith("completedFiles")
+        );
+        for (const file of completedUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            ["projectFiles", "Completed Files"]
+          );
+          completedFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
+        }
+
+        // Project Files
+        const projectUploads = req.files.filter((f) =>
+          f.fieldname.startsWith("projectFiles")
+        );
+        console.log("📂 projectUploads:", projectUploads.length);
+        for (const file of projectUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            ["projectFiles"]
+          );
+          projectFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
         }
       }
-    };
 
-    // 🔹 Parse deleted files arrays
-    const deletedCompletedFiles =
-      typeof data.deletedCompletedFiles === "string"
-        ? JSON.parse(data.deletedCompletedFiles || "[]")
-        : data.deletedCompletedFiles || [];
+      // 🔹 Merge existing + new uploads
+      existingCompleted.push(...completedFiles);
+      existingProject.push(...projectFiles);
 
-    const deletedProjectFiles =
-      typeof data.deletedProjectFiles === "string"
-        ? JSON.parse(data.deletedProjectFiles || "[]")
-        : data.deletedProjectFiles || [];
+      // 🔹 Convert to escaped JSON string
+      const completedFilesString = JSON.stringify(existingCompleted);
+      const projectFilesString = JSON.stringify(existingProject);
 
-    // 🔹 Delete files from Drive
-    if (deletedCompletedFiles.length) await deleteFilesFromDrive(deletedCompletedFiles);
-    if (deletedProjectFiles.length) await deleteFilesFromDrive(deletedProjectFiles);
+      // 🔹 Sanitizers
+      const sanitizeInteger = (v) => (v === "" || v == null ? null : Number(v));
+      const sanitizeDate = (v) =>
+        !v ? null : isNaN(new Date(v)) ? null : new Date(v);
 
-    // 🔹 Parse existing DB JSON
-    let existingCompleted = [];
-    let existingProject = [];
+      // 🔹 Prepare final update payload
+      const postData = {
+        user_id: req.userId,
+        engineer_id: sanitizeInteger(data.engineer_id),
+        name: data.name || null,
+        city: data.city || null,
+        state: sanitizeInteger(data.state),
+        bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
+        address: data.address || null,
+        zip: sanitizeInteger(data.zip),
+        units: sanitizeInteger(data.units),
+        projectType: data.projectType || null,
+        project_phase: data.project_phase || null,
+        bldgs: sanitizeInteger(data.bldgs),
+        wind_zone: data.wind_zone || null,
+        seismic_zone: data.seismic_zone || null,
+        developer_id: sanitizeInteger(data.developer_id),
+        general_contractor_id: sanitizeInteger(data.general_contractor_id),
+        assign_to_budget: sanitizeInteger(data.assign_to_budget),
+        take_off_team_id: sanitizeInteger(data.take_off_team_id),
+        take_off_type: data.take_off_type || null,
+        take_off_scope: data.take_off_scope || null,
+        takeoffDueDate: sanitizeDate(data.takeoffDueDate),
+        takeoffStartDate: sanitizeDate(data.takeoffStartDate),
+        assign_date: sanitizeDate(data.assign_date),
+        project_file: projectFilesString, // 🔹 updated column
+        completedFiles: completedFilesString,
+        architecture: sanitizeInteger(data.architecture),
+        takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
+        dueDate: sanitizeDate(data.dueDate),
+        projectAttachmentUrls: data.projectAttachmentUrls || null,
+        attachmentsLink: data.attachmentsLink || null,
+        projectRifFields: data.projectRifFields || null,
+        status: "new",
+        takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
+        connectplan: data.connectplan || null,
+        surveyorNotes: data.surveyorNotes || null,
+        takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
+        project_status: data.project_status || "active",
+        takeoff_status: data.takeoff_status || null,
+      };
 
-    try {
-      existingCompleted = JSON.parse(getProjectById.completedFiles || "[]");
-    } catch {
-      existingCompleted = [];
-    }
+      commonHelper.removeFalsyKeys(postData);
 
-    try {
-      existingProject = JSON.parse(getProjectById.project_file || "[]");
-    } catch {
-      existingProject = [];
-    }
-
-    // 🔹 Remove deleted entries from existing arrays
-    if (deletedCompletedFiles.length) {
-      existingCompleted = existingCompleted.filter(
-        (file) => !deletedCompletedFiles.includes(file.link)
+      // 🔹 Update DB
+      const updateProject = await projectServices.updateProject(
+        postData,
+        projectId
       );
-    }
-    if (deletedProjectFiles.length) {
-      existingProject = existingProject.filter(
-        (file) => !deletedProjectFiles.includes(file.link)
-      );
-    }
 
-    // 🔹 Handle uploads
-    let completedFiles = [];
-    let projectFiles = [];
-
-    if (Array.isArray(req.files)) {
-      // Completed Files
-      const completedUploads = req.files.filter((f) =>
-        f.fieldname.startsWith("completedFiles")
-      );
-      for (const file of completedUploads) {
-        const driveFile = await uploadFileToDrive(
-          file.path,
-          file.originalname,
-          file.mimetype,
-          ["projectFiles", "Completed Files"]
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            updateProject,
+            "✅ Project updated successfully (files synced)"
+          )
         );
-        completedFiles.push({
-          name: file.originalname,
-          link: driveFile.webViewLink,
-          size: file.size,
-        });
-      }
-
-      // Project Files
-      const projectUploads = req.files.filter((f) =>
-        f.fieldname.startsWith("projectFiles")
-      );
-      console.log("📂 projectUploads:", projectUploads.length);
-      for (const file of projectUploads) {
-        const driveFile = await uploadFileToDrive(
-          file.path,
-          file.originalname,
-          file.mimetype,
-          ["projectFiles"]
-        );
-        projectFiles.push({
-          name: file.originalname,
-          link: driveFile.webViewLink,
-          size: file.size,
-        });
-      }
+    } catch (error) {
+      console.error("❌ Update project failed:", error);
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Project updation failed",
+        data: error.response?.data || {},
+      });
     }
-
-    // 🔹 Merge existing + new uploads
-    existingCompleted.push(...completedFiles);
-    existingProject.push(...projectFiles);
-
-    // 🔹 Convert to escaped JSON string
-    const completedFilesString = JSON.stringify(existingCompleted);
-    const projectFilesString = JSON.stringify(existingProject);
-
-    // 🔹 Sanitizers
-    const sanitizeInteger = (v) => (v === "" || v == null ? null : Number(v));
-    const sanitizeDate = (v) =>
-      !v ? null : isNaN(new Date(v)) ? null : new Date(v);
-
-    // 🔹 Prepare final update payload
-    const postData = {
-      user_id: req.userId,
-      engineer_id: sanitizeInteger(data.engineer_id),
-      name: data.name || null,
-      city: data.city || null,
-      state: sanitizeInteger(data.state),
-      bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
-      address: data.address || null,
-      zip: sanitizeInteger(data.zip),
-      units: sanitizeInteger(data.units),
-      projectType: data.projectType || null,
-      project_phase: data.project_phase || null,
-      bldgs: sanitizeInteger(data.bldgs),
-      wind_zone: data.wind_zone || null,
-      seismic_zone: data.seismic_zone || null,
-      developer_id: sanitizeInteger(data.developer_id),
-      general_contractor_id: sanitizeInteger(data.general_contractor_id),
-      assign_to_budget: sanitizeInteger(data.assign_to_budget),
-      take_off_team_id: sanitizeInteger(data.take_off_team_id),
-      take_off_type: data.take_off_type || null,
-      take_off_scope: data.take_off_scope || null,
-      takeoffDueDate: sanitizeDate(data.takeoffDueDate),
-      takeoffStartDate: sanitizeDate(data.takeoffStartDate),
-      assign_date: sanitizeDate(data.assign_date),
-      project_file: projectFilesString,   // 🔹 updated column
-      completedFiles: completedFilesString,
-      architecture: sanitizeInteger(data.architecture),
-      takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
-      dueDate: sanitizeDate(data.dueDate),
-      projectAttachmentUrls: data.projectAttachmentUrls || null,
-      attachmentsLink: data.attachmentsLink || null,
-      projectRifFields: data.projectRifFields || null,
-      status: "new",
-      takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
-      connectplan: data.connectplan || null,
-      surveyorNotes: data.surveyorNotes || null,
-      takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
-      project_status: data.project_status || "active",
-      takeoff_status: data.takeoff_status || null,
-    };
-
-    commonHelper.removeFalsyKeys(postData);
-
-    // 🔹 Update DB
-    const updateProject = await projectServices.updateProject(postData, projectId);
-
-    return res.status(200).send(
-      commonHelper.parseSuccessRespose(
-        updateProject,
-        "✅ Project updated successfully (files synced)"
-      )
-    );
-  } catch (error) {
-    console.error("❌ Update project failed:", error);
-    return res.status(400).json({
-      status: false,
-      message:
-        error.response?.data?.error || error.message || "Project updation failed",
-      data: error.response?.data || {},
-    });
-  }
-},
-
+  },
 
   // /*deleteProject*/
   async deleteProject(req, res) {

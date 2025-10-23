@@ -24,6 +24,7 @@ module.exports = {
         user_id: req.userId,
         title: data.title,
         color: data.color,
+        order:data.order,
       };
       await projectTypesServices.addProjectTypes(postData);
       return res
@@ -184,6 +185,7 @@ module.exports = {
         title: data.title,
         color: data.color,
         user_id: req.userId,
+        order:data.order,
       };
 
       const result = await projectTypesServices.updateProjectTypes(

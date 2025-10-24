@@ -24,7 +24,7 @@ router.delete("/project/deleteProject",[authJwt.verifyToken],  controller.delete
 router.put("/project/setDefaultLead",[authJwt.verifyToken],  controller.setDefaultLead);
 
 router.put("/project/updateProjectPlanSet",[authJwt.verifyToken, upload.none()],  controller.updateProjectPlanSet);
-router.post("/project/addProjectPlanSet", [authJwt.verifyToken, upload.none()], controller.addProjectPlanSet);
+router.post("/project/addProjectPlanSet", [authJwt.verifyToken, upload.any()], controller.addProjectPlanSet);
 
 // Add Project Notes
 router.post("/project/addProjectNotes", [authJwt.verifyToken], controller.addProjectNotes);

@@ -45,7 +45,47 @@ module.exports = {
   },
 
   /*getAllProjectTypes*/
- async getAllProjectTypes(req, res) {
+//  async getAllProjectTypes(req, res) {
+//   try {
+//     const errors = myValidationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res
+//         .status(200)
+//         .send(commonHelper.parseErrorRespose(errors.mapped()));
+//     }
+
+//     let { page = 1, per_page = 10, search = "", id = "" } = req.query;
+//     page = parseInt(page) || 1;
+//     per_page = parseInt(per_page) || 10;
+//     const offset = (page - 1) * per_page;
+
+//     const result = await projectTypesServices.getAllProjectTypes({
+//       page,
+//       per_page,
+//       search,
+//       offset,
+//       id,
+//     });
+
+//     return res.status(200).send(
+//       commonHelper.parseSuccessRespose(
+//         result,
+//         "Project types fetched successfully"
+//       )
+//     );
+//   } catch (error) {
+//     console.error("Error in getAllProjectTypes controller:", error.message);
+//     return res.status(400).json({
+//       status: false,
+//       message:
+//         error.response?.data?.error ||
+//         error.message ||
+//         "Get project types failed",
+//       data: error.response?.data || {},
+//     });
+//   }
+// },
+async getAllProjectTypes(req, res) {
   try {
     const errors = myValidationResult(req);
     if (!errors.isEmpty()) {
@@ -54,7 +94,13 @@ module.exports = {
         .send(commonHelper.parseErrorRespose(errors.mapped()));
     }
 
-    let { page = 1, per_page = 10, search = "", id = "" } = req.query;
+    let { page = 1, per_page = 10, search = "", ids = [] } = req.query;
+
+    // Parse comma-separated ids from query string like "1,2,3"
+    if (typeof ids === "string" && ids.trim() !== "") {
+      ids = ids.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
+    }
+
     page = parseInt(page) || 1;
     per_page = parseInt(per_page) || 10;
     const offset = (page - 1) * per_page;
@@ -64,7 +110,7 @@ module.exports = {
       per_page,
       search,
       offset,
-      id,
+      ids,
     });
 
     return res.status(200).send(

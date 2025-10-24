@@ -428,10 +428,7 @@ module.exports = {
         rootFolder,
         "projectFiles"
       );
-      const planSetsFolder = await getOrCreateSubfolder(
-        rootFolder,
-        "PlanSets"
-      );
+      const planSetsFolder = await getOrCreateSubfolder(rootFolder, "PlanSets");
       const completedFolder = await getOrCreateSubfolder(
         rootFolder,
         "CompletedFiles"
@@ -485,10 +482,17 @@ module.exports = {
         }
       }
 
-      if (projectFiles.length > 0) {
-        await projectServices.updateProject(project.id, {
-          project_file: JSON.stringify(projectFiles),
-        });
+      
+
+        if (projectFiles.length > 0) {
+        const updateData = { project_file: JSON.stringify(projectFiles) };
+        const updateResult = await projectServices.updateProject(
+          updateData,
+          project.id
+        );
+
+      } else {
+        console.log("No completed files found to update.");
       }
 
       // --- Step 6: Upload Completed Files ---
@@ -517,12 +521,20 @@ module.exports = {
           );
         }
       }
+    
 
       if (completedFiles.length > 0) {
-        await projectServices.updateProject(project.id, {
-          completedFiles: JSON.stringify(completedFiles),
-        });
+        const updateData = { completedFiles: JSON.stringify(completedFiles) };
+        const updateResult = await projectServices.updateProject(
+          updateData,
+          project.id
+         
+        );
+
+      } else {
+        console.log("No completed files found to update.");
       }
+
       // --- Step 7: Upload Plan Sets ---
       const planSets = Array.isArray(data.planSets)
         ? data.planSets
@@ -1283,7 +1295,6 @@ module.exports = {
           "projectFiles"
         );
 
-       
         // const projectFilesFolder = await getOrCreateSubfolder(
         //   process.env.GOOGLE_DRIVE_FOLDER_ID,
         //   `${projectId}. ${getProjectById.name}`,

@@ -274,7 +274,30 @@ module.exports = {
           },
         ],
       });
-      return getProjectById;
+
+      let project = getProjectById.toJSON();
+
+      // --- Google Drive grouping ---
+      const googleDriveData = project.googleDrive || [];
+
+      const googleDrive = {
+        projectFiles: [],
+        completedFiles: [],
+        planSet: [],
+      };
+
+      googleDriveData.forEach((item) => {
+        const file = item.dataValues || item;
+
+        if (file.module === "projectFiles") googleDrive.projectFiles.push(file);
+        else if (file.module === "completedFiles")
+          googleDrive.completedFiles.push(file);
+        else if (file.module === "planSetFiles") googleDrive.planSet.push(file);
+      });
+
+      project.googleDrive = googleDrive;
+
+      return project;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
@@ -1323,7 +1346,7 @@ module.exports = {
     try {
       return await db.gDriveAssociationObj.destroy({
         where: {
-          drive_id: driveId, 
+          drive_id: driveId,
         },
       });
     } catch (error) {

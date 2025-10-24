@@ -94,11 +94,15 @@ async getAllProjectTypes(req, res) {
         .send(commonHelper.parseErrorRespose(errors.mapped()));
     }
 
-    let { page = 1, per_page = 10, search = "", ids = [] } = req.query;
+    let { page = 1, per_page = 10, search = "", id = [] } = req.query;
 
-    // Parse comma-separated ids from query string like "1,2,3"
-    if (typeof ids === "string" && ids.trim() !== "") {
-      ids = ids.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
+    // 🧠 Support both: id[]=1&id[]=4 OR id=1,4
+    let ids = [];
+
+    if (Array.isArray(id)) {
+      ids = id.map((x) => parseInt(x)).filter(Boolean);
+    } else if (typeof id === "string" && id.trim() !== "") {
+      ids = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
     }
 
     page = parseInt(page) || 1;
@@ -131,6 +135,7 @@ async getAllProjectTypes(req, res) {
     });
   }
 },
+
 
 
   /*getProjectTypesById*/

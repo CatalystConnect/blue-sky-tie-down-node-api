@@ -482,15 +482,12 @@ module.exports = {
         }
       }
 
-      
-
-        if (projectFiles.length > 0) {
+      if (projectFiles.length > 0) {
         const updateData = { project_file: JSON.stringify(projectFiles) };
         const updateResult = await projectServices.updateProject(
           updateData,
           project.id
         );
-
       } else {
         console.log("No completed files found to update.");
       }
@@ -521,16 +518,13 @@ module.exports = {
           );
         }
       }
-    
 
       if (completedFiles.length > 0) {
         const updateData = { completedFiles: JSON.stringify(completedFiles) };
         const updateResult = await projectServices.updateProject(
           updateData,
           project.id
-         
         );
-
       } else {
         console.log("No completed files found to update.");
       }
@@ -2401,6 +2395,97 @@ module.exports = {
       return res.status(400).json({
         status: false,
         message: error.message || "Getting projects failed",
+        data: {},
+      });
+    }
+  },
+  async uploadProjectFile(req, res) {
+    try {
+      const projectId = req.query.projectId
+      if (!projectId) throw new Error("Project ID is required");
+
+      const project = await projectServices.getProjectById(projectId);
+      if (!project) throw new Error("Project not found");
+
+      if (!req.files || req.files.length === 0)
+        throw new Error("No files uploaded");
+
+      // --- Step 1: Get or create root folder ---
+      const rootFolder = await getOrCreateSubfolder(
+        process.env.GOOGLE_DRIVE_FOLDER_ID,
+        `${project.id}. ${project.name}`
+      );
+
+      // --- Step 2: Get or create projectFiles folder ---
+      const projectFilesFolder = await getOrCreateSubfolder(
+        rootFolder,
+        "projectFiles"
+      );
+
+      // --- Step 3: Save file to Google Drive ---
+      const saveFolder = async (module, module_id, drive_id, file_name) =>
+        await projectServices.addDriveAssociation({
+          parent: project.id,
+          module,
+          module_id,
+          drive_id,
+          file_name,
+        });
+
+      let uploadedFiles = [];
+      for (const file of req.files) {
+        const driveFile = await uploadFileToDrive(
+          file.path,
+          file.originalname,
+          file.mimetype,
+          projectFilesFolder
+        );
+
+        uploadedFiles.push({
+          name: file.originalname,
+          link: driveFile.webViewLink,
+          size: file.size,
+        });
+
+        await saveFolder(
+          "projectFiles",
+          project.id,
+          driveFile.id,
+          file.originalname
+        );
+      }
+
+      // --- Step 4: Merge with existing project_file ---
+      let existingFiles = [];
+      try {
+        existingFiles = JSON.parse(project.project_file || "[]");
+      } catch (e) {
+        existingFiles = [];
+      }
+
+      const allFiles = [...existingFiles, ...uploadedFiles];
+
+
+       if (allFiles.length > 0) {
+        const updateData = { project_file: JSON.stringify(allFiles) };
+        const updateResult = await projectServices.updateProject(
+          updateData,
+          project.id
+        );
+      } else {
+        console.log("No completed files found to update.");
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "Files uploaded and project_file updated successfully",
+        data: allFiles,
+      });
+    } catch (error) {
+      console.error("Upload project file failed:", error);
+      return res.status(400).json({
+        status: false,
+        message: error.message || "File upload failed",
         data: {},
       });
     }

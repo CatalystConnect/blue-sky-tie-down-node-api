@@ -58,6 +58,9 @@ router.put("/updateProjecttakeOffStatus", [authJwt.verifyToken], controller.upda
 
 router.get("/getAllProjectDatatakeoffLead", [authJwt.verifyToken], controller.getAllProjectDatatakeoffLead);
 
+router.put("/project/uploadProjectFiles",upload.any(),controller.uploadProjectFile);
+
+
 
 module.exports = router
 

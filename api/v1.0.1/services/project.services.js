@@ -283,16 +283,42 @@ module.exports = {
       const googleDrive = {
         projectFiles: [],
         completedFiles: [],
-        planSet: [],
+        planSet: {}, // key = folder module_id
       };
 
+      // Helper to group files by folder for planSetFiles
       googleDriveData.forEach((item) => {
         const file = item.dataValues || item;
 
-        if (file.module === "projectFiles") googleDrive.projectFiles.push(file);
-        else if (file.module === "completedFiles")
+        if (file.module === "projectFiles") {
+          googleDrive.projectFiles.push(file);
+        } else if (file.module === "completedFiles") {
           googleDrive.completedFiles.push(file);
-        else if (file.module === "planSetFiles") googleDrive.planSet.push(file);
+        } else if (file.module === "planSetFiles") {
+          const folderId = file.module_id; // folder id
+
+          if (!googleDrive.planSet[folderId]) {
+            googleDrive.planSet[folderId] = {
+              folder: null,
+              files: [],
+            };
+          }
+
+          if (!file.file_name) {
+            // This is folder record
+            googleDrive.planSet[folderId].folder = {
+              drive_id: file.drive_id,
+              createdAt: file.createdAt,
+            };
+          } else {
+            // This is file inside the folder
+            googleDrive.planSet[folderId].files.push({
+              drive_id: file.drive_id,
+              file_name: file.file_name,
+              createdAt: file.createdAt,
+            });
+          }
+        }
       });
 
       project.googleDrive = googleDrive;

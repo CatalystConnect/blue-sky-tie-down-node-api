@@ -1,7 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op } = require("sequelize");
+const { Op,Sequelize } = require("sequelize");
 
 module.exports = {
   /*addProjectTypes*/
@@ -59,25 +59,43 @@ module.exports = {
   //   }
   // },
 
-async getAllProjectTypes({ page, per_page, search, offset }) {
+async getAllProjectTypes({ page, per_page, search, offset, id }) {
   try {
     const whereCondition = {};
 
+    // 🔹 Search condition
     if (search && search.trim() !== "") {
       whereCondition[Op.or] = [
         { title: { [Op.iLike]: `%${search.trim()}%` } },
       ];
     }
 
-    const { rows, count } = await db.projectTypesObj.findAndCountAll({
+    // 🔹 Order condition (default and prioritized by ID)
+    let order = [["id", "DESC"]];
+
+    if (id) {
+      order = [
+        [
+          Sequelize.literal(`CASE WHEN "project_types"."id" = ${parseInt(id)} THEN 0 ELSE 1 END`),
+          "ASC",
+        ],
+        ["id", "DESC"],
+      ];
+    }
+
+    // 🔹 Separate count to ensure total records are correct
+    const total = await db.projectTypesObj.count({ where: whereCondition });
+
+    // 🔹 Fetch paginated data
+    const rows = await db.projectTypesObj.findAll({
       where: whereCondition,
-      order: [["id", "DESC"]],
-      limit: per_page,  
-      offset,           
+      order,
+      limit: per_page,
+      offset,
     });
 
     return {
-      total: count,
+      total,
       page,
       per_page,
       data: rows,
@@ -87,6 +105,7 @@ async getAllProjectTypes({ page, per_page, search, offset }) {
     throw e;
   }
 },
+
 
 
   /*getProjectTypesById*/

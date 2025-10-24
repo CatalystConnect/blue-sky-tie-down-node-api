@@ -626,8 +626,35 @@ module.exports = {
         ],
       });
 
+      const projects = rows.map((projectInstance) => {
+        const project = projectInstance.toJSON();
+
+        const googleDriveData = project.googleDrive || [];
+
+        const googleDrive = {
+          projectFiles: [],
+          completedFiles: [],
+          planSet: [],
+        };
+
+        googleDriveData.forEach((item) => {
+          const file = item.dataValues || item;
+
+          if (file.module === "projectFiles")
+            googleDrive.projectFiles.push(file);
+          else if (file.module === "completedFiles")
+            googleDrive.completedFiles.push(file);
+          else if (file.module === "planSetFiles")
+            googleDrive.planSet.push(file);
+        });
+
+        project.googleDrive = googleDrive;
+
+        return project;
+      });
+
       return {
-        data: rows,
+        data: projects,
         meta: {
           current_page: parseInt(page),
           from: offset + 1,

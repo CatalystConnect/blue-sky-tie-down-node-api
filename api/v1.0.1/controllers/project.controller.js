@@ -539,7 +539,7 @@ module.exports = {
           planSetsFolder,
           `${index + 1}`
         );
-        await saveFolder("planSetFiles", index + 1, planSetFolder);
+        // await saveFolder("planSetFiles", index + 1, planSetFolder);
 
         const planFiles = req.files.filter(
           (f) => f.fieldname === `planSets[${index}][planFiles]`
@@ -1585,6 +1585,7 @@ module.exports = {
   //   }
   // },
 
+  
   // async addProjectPlanSet(req, res) {
   //   try {
   //     let projectId = req.query.projectId;
@@ -1592,6 +1593,7 @@ module.exports = {
 
   //     if (!getProjectById) throw new Error("Project not found");
 
+  //     // Helper to save Google Drive association
   //     const saveFolder = async (module, module_id, drive_id, file_name) =>
   //       await projectServices.addDriveAssociation({
   //         parent: projectId,
@@ -1601,19 +1603,22 @@ module.exports = {
   //         file_name,
   //       });
 
+  //     // Get main project folder
   //     const mainFolder = await getOrCreateSubfolder(
   //       process.env.GOOGLE_DRIVE_FOLDER_ID,
   //       `${projectId}. ${getProjectById.name}`
   //     );
 
+  //     // Get or create "planSets" folder inside main folder
   //     const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
 
+  //     // Count existing plan sets to determine new folder number
   //     const existingPlanSets = await db.projectplanSetsObj.count({
   //       where: { project_id: projectId },
   //     });
-
   //     const newPlanSetNumber = existingPlanSets + 1;
 
+  //     // Create numbered folder inside planSets
   //     const planSetNumberFolder = await getOrCreateSubfolder(
   //       planSetsFolder,
   //       `${newPlanSetNumber}`
@@ -1621,28 +1626,20 @@ module.exports = {
 
   //     const planSetFiles = [];
 
+  //     // Upload files if any
   //     if (Array.isArray(req.files) && req.files.length > 0) {
-  //       // Filter files belonging to planSets
+  //       // Filter files with fieldname "planFiles"
   //       const planFilesUploads = req.files.filter(
   //         (f) => f.fieldname === "planFiles"
   //       );
 
-  //       const mainFolderId = await getOrCreateSubfolder(
-  //         process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //         `${projectId}. ${getProjectById.name}`
-  //       );
-
-  //       const planSetFolderId = await getOrCreateSubfolder(
-  //         mainFolderId,
-  //         "planSets"
-  //       );
-
   //       for (const file of planFilesUploads) {
+  //         // Upload each file into the numbered folder
   //         const driveFile = await uploadFileToDrive(
   //           file.path,
   //           file.originalname,
   //           file.mimetype,
-  //           planSetFolderId
+  //           planSetNumberFolder // ✅ new folder
   //         );
 
   //         planSetFiles.push({
@@ -1651,6 +1648,7 @@ module.exports = {
   //           size: file.size,
   //         });
 
+  //         // Save association
   //         await saveFolder(
   //           "planSetFiles",
   //           projectId,
@@ -1660,13 +1658,14 @@ module.exports = {
   //       }
   //     }
 
+  //     // Prepare data to save in DB
   //     const data = req.body;
   //     const postData = {
   //       project_id: projectId,
   //       submissionType: data.submissionType,
   //       date_received: data.date_received,
   //       plan_link: data.plan_link,
-  //       planFiles: JSON.stringify(planSetFiles),
+  //       planFiles: JSON.stringify(planSetFiles), // store as string
   //       plan_date: data.plan_date,
   //       rev_status: data.rev_status,
   //       plan_reviewed_date: data.plan_reviewed_date,
@@ -1697,114 +1696,114 @@ module.exports = {
   //   }
   // },
   async addProjectPlanSet(req, res) {
-    try {
-      let projectId = req.query.projectId;
-      let getProjectById = await projectServices.getProjectById(projectId);
+  try {
+    const projectId = req.query.projectId;
+    const getProjectById = await projectServices.getProjectById(projectId);
 
-      if (!getProjectById) throw new Error("Project not found");
+    if (!getProjectById) throw new Error("Project not found");
 
-      // Helper to save Google Drive association
-      const saveFolder = async (module, module_id, drive_id, file_name) =>
-        await projectServices.addDriveAssociation({
-          parent: projectId,
-          module,
-          module_id,
-          drive_id,
-          file_name,
+    // Helper to save Google Drive association (folder or file)
+    const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+      await projectServices.addDriveAssociation({
+        parent: projectId,
+        module,
+        module_id,
+        drive_id,
+        file_name,
+      });
+
+    // --- 1. Main project folder ---
+    const mainFolder = await getOrCreateSubfolder(
+      process.env.GOOGLE_DRIVE_FOLDER_ID,
+      `${projectId}. ${getProjectById.name}`
+    );
+
+    // --- 2. PlanSets folder inside main ---
+    const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
+
+    // --- 3. Count existing plan sets to create numbered folder ---
+    const existingPlanSets = await db.projectplanSetsObj.count({
+      where: { project_id: projectId },
+    });
+    const newPlanSetNumber = existingPlanSets + 1;
+
+    // --- 4. Numbered folder inside PlanSets ---
+    const planSetNumberFolder = await getOrCreateSubfolder(
+      planSetsFolder,
+      `${newPlanSetNumber}`
+    );
+
+    // Save folder association in DB (file_name = null)
+    await saveFolder("planSetFiles", newPlanSetNumber, planSetNumberFolder);
+
+    // --- 5. Upload files inside the numbered folder ---
+    const planSetFiles = [];
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      const planFilesUploads = req.files.filter(
+        (f) => f.fieldname === "planFiles"
+      );
+
+      for (const file of planFilesUploads) {
+        const driveFile = await uploadFileToDrive(
+          file.path,
+          file.originalname,
+          file.mimetype,
+          planSetNumberFolder // ✅ Upload inside numbered folder
+        );
+
+        planSetFiles.push({
+          name: file.originalname,
+          link: driveFile.webViewLink,
+          size: file.size,
         });
 
-      // Get main project folder
-      const mainFolder = await getOrCreateSubfolder(
-        process.env.GOOGLE_DRIVE_FOLDER_ID,
-        `${projectId}. ${getProjectById.name}`
-      );
-
-      // Get or create "planSets" folder inside main folder
-      const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
-
-      // Count existing plan sets to determine new folder number
-      const existingPlanSets = await db.projectplanSetsObj.count({
-        where: { project_id: projectId },
-      });
-      const newPlanSetNumber = existingPlanSets + 1;
-
-      // Create numbered folder inside planSets
-      const planSetNumberFolder = await getOrCreateSubfolder(
-        planSetsFolder,
-        `${newPlanSetNumber}`
-      );
-
-      const planSetFiles = [];
-
-      // Upload files if any
-      if (Array.isArray(req.files) && req.files.length > 0) {
-        // Filter files with fieldname "planFiles"
-        const planFilesUploads = req.files.filter(
-          (f) => f.fieldname === "planFiles"
+        // Save file association in DB
+        await saveFolder(
+          "planSetFiles",
+          newPlanSetNumber,
+          driveFile.id,
+          file.originalname
         );
-
-        for (const file of planFilesUploads) {
-          // Upload each file into the numbered folder
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            planSetNumberFolder // ✅ new folder
-          );
-
-          planSetFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-
-          // Save association
-          await saveFolder(
-            "planSetFiles",
-            projectId,
-            driveFile.id,
-            file.originalname
-          );
-        }
       }
-
-      // Prepare data to save in DB
-      const data = req.body;
-      const postData = {
-        project_id: projectId,
-        submissionType: data.submissionType,
-        date_received: data.date_received,
-        plan_link: data.plan_link,
-        planFiles: JSON.stringify(planSetFiles), // store as string
-        plan_date: data.plan_date,
-        rev_status: data.rev_status,
-        plan_reviewed_date: data.plan_reviewed_date,
-        plan_reviewed_by: data.plan_reviewed_by,
-        data_collocated_date: data.data_collocated_date,
-        plan_revision_notes: data.plan_revision_notes,
-      };
-
-      const newPlanSet = await projectServices.projectplanSets(postData);
-
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            newPlanSet,
-            "Project plan set added successfully"
-          )
-        );
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Adding project plan set failed",
-        data: error.response?.data || {},
-      });
     }
-  },
+
+    // --- 6. Save PlanSet record in DB ---
+    const data = req.body;
+    const postData = {
+      project_id: projectId,
+      submissionType: data.submissionType,
+      date_received: data.date_received,
+      plan_link: data.plan_link,
+      planFiles: JSON.stringify(planSetFiles),
+      plan_date: data.plan_date,
+      rev_status: data.rev_status,
+      plan_reviewed_date: data.plan_reviewed_date,
+      plan_reviewed_by: data.plan_reviewed_by,
+      data_collocated_date: data.data_collocated_date,
+      plan_revision_notes: data.plan_revision_notes,
+    };
+
+    const newPlanSet = await projectServices.projectplanSets(postData);
+
+    return res
+      .status(200)
+      .send(
+        commonHelper.parseSuccessRespose(
+          newPlanSet,
+          "Project plan set added successfully"
+        )
+      );
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      message:
+        error.response?.data?.error ||
+        error.message ||
+        "Adding project plan set failed",
+      data: error.response?.data || {},
+    });
+  }
+},
   async getProjectPlanSet(req, res) {
     try {
       const { projectId, search, id, page, per_page } = req.query;

@@ -200,7 +200,7 @@ module.exports = {
                 sites.map((site) => ({
                   budget_books_id: budgetBook.id,
                   name: site.name || "",
-                  site_id: site.site_Id || "",
+                  site_id: site.site_id || "",
                   qty: site.qty || "",
                   gs_qft: site.gs_qft || "",
                   ts_qft: site.ts_qft || "",

@@ -599,7 +599,7 @@ module.exports = {
         order: [
           [
             db.Sequelize.literal(
-              `CASE WHEN project.priority = 'true' THEN 0 ELSE 1 END`
+               `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
             ),
             "ASC",
           ],

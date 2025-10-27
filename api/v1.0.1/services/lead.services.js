@@ -613,6 +613,10 @@ module.exports = {
               as:"tag"
             }
           },
+          {
+            model: db.budgetBooksObj,
+            as: "lead_budget",
+          },
         ],
         limit,
         offset,

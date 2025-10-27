@@ -1082,4 +1082,6 @@ db.projectObj.hasMany(db.gDriveAssociationObj, {
   as: "googleDrive",
 });
 
+db.leadsObj.hasMany(db.budgetBooksObj, { foreignKey: "lead_id", as: "lead_budget" });
+
 module.exports = db;

@@ -56,7 +56,6 @@ router.get("/getAllProjectDatatakeoffAssignToTeam", [authJwt.verifyToken], contr
 router.put("/updateProjecttakeOffStatus", [authJwt.verifyToken], controller.updateProjecttakeOffStatus);
 
 
-router.get("/getAllProjectDatatakeoffLead", [authJwt.verifyToken], controller.getAllProjectDatatakeoffLead);
 
 router.put("/project/uploadProjectFiles",upload.any(),controller.uploadProjectFile);
 

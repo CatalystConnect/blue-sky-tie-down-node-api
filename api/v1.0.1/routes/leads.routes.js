@@ -41,4 +41,7 @@ router.get("/get-lead-team-members", [authJwt.verifyToken], controller.getLeadTe
 
 router.put("/update-lead-dcs", [authJwt.verifyToken], upload.none(), controller.updateLeadDcs); 
 
+router.get("/getAllProjectDatatakeoffLead", [authJwt.verifyToken], controller.getAllProjectDatatakeoffLead);
+
+
 module.exports = router;

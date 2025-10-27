@@ -76,13 +76,13 @@ module.exports = {
             as: "project",
             // attributes: ["id", "name"],
             required: false,
-            where: projectWhere, 
-           include: [{ model: db.taxesObj, as: "stateDetails" },
+            where: projectWhere,
+            include: [{ model: db.taxesObj, as: "stateDetails" },
             { model: db.taxesObj, as: "zipCodeDetails" },
             {
               model: db.stateObj, as: "states",
             },
-           ],
+            ],
           },
 
           { model: db.contactsObj, as: "contact" },
@@ -178,14 +178,15 @@ module.exports = {
           },
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
-          { model: db.projectObj, as: "project",
+          {
+            model: db.projectObj, as: "project",
             include: [{ model: db.taxesObj, as: "stateDetails" },
             { model: db.taxesObj, as: "zipCodeDetails" },
             {
               model: db.stateObj, as: "states",
             },
-           ],
-           },
+            ],
+          },
           {
             model: db.leadTagsObj,
             as: "lead_tags",
@@ -431,4 +432,196 @@ module.exports = {
       throw e;
     }
   },
+
+  // async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
+  //   try {
+  //     const limit = parseInt(per_page) || 10;
+  //     const offset = (parseInt(page) - 1) * limit || 0;
+
+  //     const whereClause = {
+  //       takeoff_status: {
+  //         [Op.in]: ["TAKEOFF COMPLETE", "BUDGET"],
+  //       },
+  //     };
+
+  //     if (search) {
+  //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+  //     }
+  //     const { rows, count } = await db.projectObj.findAndCountAll({
+  //       where: whereClause,
+  //       limit,
+  //       offset,
+  //       attributes: [
+  //         "id",
+  //         "user_id",
+  //         "engineer_id",
+  //         "name",
+  //         "city",
+  //         "state",
+  //         "plan_date",
+  //         "bldg_gsqft",
+  //         "address",
+  //         "zip",
+  //         "units",
+  //         "projectType",
+  //         "project_phase",
+  //         "date_received",
+  //         "rev_status",
+  //         "plan_reviewed_date",
+  //         "plan_reviewed_by",
+  //         "plan_revision_notes",
+  //         "data_collocated_date",
+  //         "bldgs",
+  //         "wind_zone",
+  //         "seismic_zone",
+  //         "developer_id",
+  //         "general_contractor_id",
+  //         "assign_to_budget",
+  //         "take_off_team_id",
+  //         "take_off_type",
+  //         "take_off_scope",
+  //         "assign_date",
+  //         "plan_link",
+  //         "submissionType",
+  //         "project_file",
+  //         "planFiles",
+  //         "project_tags",
+  //         "projectFiles",
+  //         "architecture",
+  //         "takeoffactualtime",
+  //         "dueDate",
+  //         "projectAttachmentUrls",
+  //         "attachmentsLink",
+  //         "projectRifFields",
+  //         "status",
+  //         "takeofCompleteDate",
+  //         "connectplan",
+  //         "surveyorNotes",
+  //         "completedFiles",
+  //         "takeOfEstimateTime",
+  //         "takeoff_status",
+  //         "project_status",
+  //         "priority",
+  //         "takeoffStartDate",
+  //         "takeoffDueDate",
+  //         "work_hours",
+  //       ],
+  //       include: [
+  //         { model: db.companyObj, as: "engineer" },
+  //         { model: db.companyObj, as: "architect" },
+  //         { model: db.companyObj, as: "developer" },
+  //         { model: db.companyObj, as: "general_contractor" },
+  //         { model: db.userObj, as: "planReviewer" },
+  //         { model: db.projectplanSetsObj, as: "planSets" },
+  //         { model: db.leadTeamsObj, as: "takeoff_team" },
+  //         {
+  //           model: db.stateObj,
+  //           as: "states",
+  //         },
+  //         {
+  //           model: db.projectPhasesObj,
+  //           as: "projectPhase",
+  //         },
+  //         {
+  //           model: db.projectTagsObj,
+  //           as: "projectTag",
+  //         },
+  //         {
+  //           model: db.projectTagMappingsObj,
+  //           as: "projectTagsMapping",
+  //           include: [
+  //             {
+  //               model: db.projectTagsObj,
+  //               as: "tags",
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.gDriveAssociationObj,
+  //           as: "googleDrive",
+  //         },
+  //       ],
+  //       order: [
+  //         [
+  //           db.Sequelize.literal(
+  //             `CASE WHEN priority = 'true' THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ],
+  //     });
+
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         current_page: parseInt(page),
+  //         from: offset + 1,
+  //         to: offset + rows.length,
+  //         last_page: Math.ceil(count / limit),
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
+    try {
+      const limit = parseInt(per_page) || 10;
+      const offset = (parseInt(page) - 1) * limit || 0;
+
+
+      const whereClause = {};
+      if (search) {
+        whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+      }
+
+      const { rows, count } = await db.leadsObj.findAndCountAll({
+        where: whereClause,
+        include: [
+          {
+            model: db.projectObj,
+            as: "project",
+            required: true, 
+            where: {
+              takeoff_status: {
+                [db.Sequelize.Op.in]: ["TAKEOFF COMPLETE", "BUDGET"],
+              },
+            },
+           
+          },
+        ],
+        limit,
+        offset,
+        order: [
+          [
+            db.Sequelize.literal(
+              `CASE WHEN project.priority = 'true' THEN 0 ELSE 1 END`
+            ),
+            "ASC",
+          ],
+          ["id", "DESC"],
+        ],
+      });
+
+      return {
+        data: rows,
+        meta: {
+          current_page: parseInt(page),
+          from: offset + 1,
+          to: offset + rows.length,
+          last_page: Math.ceil(count / limit),
+          per_page: limit,
+          total: count,
+        },
+      };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  }
+
 };

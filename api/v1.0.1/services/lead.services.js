@@ -593,13 +593,29 @@ module.exports = {
             },
 
           },
+          {
+            model: db.companyObj,
+            as: "company",  
+          },
+          {
+            model: db.contactsObj,
+            as: "contact",
+          },
+          {
+            model: db.leadStatusesObj,
+            as: "leadStatus",
+          },
+           {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+          },
         ],
         limit,
         offset,
         order: [
           [
             db.Sequelize.literal(
-               `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
+              `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
             ),
             "ASC",
           ],

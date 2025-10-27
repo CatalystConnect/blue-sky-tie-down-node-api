@@ -585,13 +585,13 @@ module.exports = {
           {
             model: db.projectObj,
             as: "project",
-            required: true, 
+            required: true,
             where: {
               takeoff_status: {
                 [db.Sequelize.Op.in]: ["TAKEOFF COMPLETE", "BUDGET"],
               },
             },
-           
+
           },
         ],
         limit,
@@ -622,6 +622,20 @@ module.exports = {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
+  },
+  async updateLeadPriority(id, takeoff_status, priority = false) {
+    const updateData = {};
+
+    updateData.priorty = priority;
+
+    const [updatedRows] = await db.leadsObj.update(updateData, {
+      where: { id },
+    });
+
+
+    return updatedRows;
   }
+
+
 
 };

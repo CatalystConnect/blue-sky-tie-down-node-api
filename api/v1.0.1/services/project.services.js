@@ -275,6 +275,29 @@ module.exports = {
         ],
       });
 
+      // let project = getProjectById.toJSON();
+
+      // // --- Google Drive grouping ---
+      // const googleDriveData = project.googleDrive || [];
+
+      // const googleDrive = {
+      //   projectFiles: [],
+      //   completedFiles: [],
+      //   planSet: [],
+      // };
+
+      // googleDriveData.forEach((item) => {
+      //   const file = item.dataValues || item;
+
+      //   if (file.module === "projectFiles") googleDrive.projectFiles.push(file);
+      //   else if (file.module === "completedFiles")
+      //     googleDrive.completedFiles.push(file);
+      //   else if (file.module === "planSetFiles") googleDrive.planSet.push(file);
+      // });
+
+      // project.googleDrive = googleDrive;
+
+      // return project;
       let project = getProjectById.toJSON();
 
       // --- Google Drive grouping ---
@@ -286,6 +309,7 @@ module.exports = {
         planSet: [],
       };
 
+      // Step 1: Separate modules
       googleDriveData.forEach((item) => {
         const file = item.dataValues || item;
 
@@ -295,6 +319,36 @@ module.exports = {
         else if (file.module === "planSetFiles") googleDrive.planSet.push(file);
       });
 
+      // Step 2: Transform planSet into structured object
+      const planSet = {};
+
+      googleDrive.planSet.forEach((item) => {
+        const moduleId = item.module_id;
+
+        if (!planSet[moduleId]) {
+          planSet[moduleId] = { folder: null, files: [] };
+        }
+
+        // Folder has null file_name
+        if (!item.file_name) {
+          planSet[moduleId].folder = {
+            drive_id: item.drive_id,
+            createdAt: item.createdAt,
+          };
+        } else {
+          // Files have non-null file_name
+          planSet[moduleId].files.push({
+            drive_id: item.drive_id,
+            file_name: item.file_name,
+            createdAt: item.createdAt,
+          });
+        }
+      });
+
+      // Step 3: Assign structured result
+      googleDrive.planSet = planSet;
+
+      // Step 4: Attach back to project
       project.googleDrive = googleDrive;
 
       return project;

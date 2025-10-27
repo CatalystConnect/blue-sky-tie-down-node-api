@@ -868,7 +868,7 @@ module.exports = {
             sites.map((site) => ({
               budget_books_id: budgetBooksId,
               name: site.name || "",
-              site_id: site.site_id || "",
+              site_Id: site.site_Id || "",
               qty: site.qty || 0,
               gs_qft: site.gs_qft || 0,
               ts_qft: site.ts_qft || 0,

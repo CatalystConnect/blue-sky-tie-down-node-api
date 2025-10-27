@@ -26,6 +26,10 @@ module.exports = (sequelize, Sequelize) => {
       nextStepDate: {
         type: Sequelize.STRING(255),
       },
+      
+      priorty: {
+        type: Sequelize.STRING(255),
+      },
       isDelayed: {
         type: Sequelize.STRING(255),
       },

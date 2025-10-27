@@ -652,6 +652,51 @@ module.exports = {
     }
   },
 
+   async getAllProjectDatatakeoffLead(req, res) {
+      try {
+        let { page = 1, per_page = 10, search = "" } = req.query;
+        const userId = req.userId;
+  
+        page = parseInt(page);
+        per_page = parseInt(per_page);
+  
+        if (page <= 0 || per_page <= 0) {
+          return res.status(400).json({
+            status: false,
+            message: "Page and per_page must be greater than 0",
+            data: {},
+          });
+        }
+        const getAllProject = await leadServices.getAllProjectDatatakeoffLead(
+          page,
+          per_page,
+          search,
+          userId
+        );
+  
+        if (!getAllProject || getAllProject.data.length === 0) {
+          return res.status(404).json({
+            status: false,
+            message: "No projects found with takeoff_status 'lead list'",
+            data: [],
+          });
+        }
+  
+        return res.status(200).json({
+          status: true,
+          message: "Projects with takeoff_status 'lead' fetched successfully",
+          data: getAllProject.data,
+          meta: getAllProject.meta,
+        });
+      } catch (error) {
+        return res.status(400).json({
+          status: false,
+          message: error.message || "Getting projects failed",
+          data: {},
+        });
+      }
+    },
+
   /* validate */
   validate(method) {
     switch (method) {

@@ -116,7 +116,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true
       },
-      site_id: {
+      site_Id: {
         type: Sequelize.STRING(255),
         allowNull: false
       },

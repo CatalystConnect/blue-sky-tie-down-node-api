@@ -588,7 +588,7 @@ module.exports = {
             required: true,
             where: {
               takeoff_status: {
-                [db.Sequelize.Op.in]: ["TAKEOFF COMPLETE", "BUDGET"],
+                [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
               },
             },
 

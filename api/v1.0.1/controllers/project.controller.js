@@ -216,7 +216,7 @@ module.exports = {
             name: file.originalname,
             link: driveFile.webViewLink,
           });
-          await saveFolder("planSetFiles", index + 1, driveFile.id);
+          await saveFolder("planSetFiles", index + 1, driveFile.id,file.originalname,);
         }
 
         const planData = {

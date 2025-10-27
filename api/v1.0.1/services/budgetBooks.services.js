@@ -564,6 +564,12 @@ module.exports = {
             separate: true,
           },
           {
+            model: db.budgetBookOthersObj,
+            as: "scopeOther",
+            required: false,
+            separate: true,
+          },
+          {
             model: db.budgetBooksScopesObj,
             as: "projectScopes",
             required: false,
@@ -969,21 +975,31 @@ module.exports = {
         createdSitePlans.forEach((plan, idx) => (sitePlanMap[idx] = plan.id));
       }
 
-      // 9️⃣ Insert ScopeOther
+      // 9️⃣ Insert or Update ScopeOther
       if (Array.isArray(scopeOther) && scopeOther.length) {
         for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
           for (const [budgetCatKey, budgetCatArray] of Object.entries(
             siteGroup
           )) {
-            if (budgetCatKey === "data" || !Array.isArray(budgetCatArray))
+            if (
+              budgetCatKey === "data" ||
+              budgetCatKey === "undefined" ||
+              !Array.isArray(budgetCatArray)
+            )
               continue;
+
             for (const item of budgetCatArray) {
               const siteId = item.siteId ?? null;
               const budgetCatId = item.budget_Cat_Id ?? null;
-              if (!item.data || !Array.isArray(item.data)) continue;
 
-              const validDataEntries = item.data.filter((d) =>
-                Object.values(d || {}).some((v) => v !== null && v !== "")
+              // ✅ Convert object to array
+              const dataEntries = Object.values(item.data || {});
+
+              // ✅ Filter non-empty entries
+              const validDataEntries = dataEntries.filter((d) =>
+                Object.values(d || {}).some(
+                  (v) => v !== null && v !== "" && v !== undefined
+                )
               );
 
               if (validDataEntries.length) {
@@ -1006,13 +1022,32 @@ module.exports = {
                       : null,
                   costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
                   optionPercentage:
-                    d.optionPercentage !== ""
+                    d.optionPercentage !== "" && d.optionPercentage !== null
                       ? Number(d.optionPercentage)
                       : null,
                 }));
 
-                if (insertData.length)
-                  promises.push(db.budgetBookOthersObj.bulkCreate(insertData));
+                if (insertData.length) {
+                  for (const dataRow of insertData) {
+                    // ✅ Try to find existing record first (for update)
+                    const existing = await db.budgetBookOthersObj.findOne({
+                      where: {
+                        budget_id: budgetBooksId,
+                        site_id: dataRow.site_id,
+                        budget_cat_id: dataRow.budget_cat_id,
+                        title: dataRow.title,
+                      },
+                    });
+
+                    if (existing) {
+                      // ✅ Update if found
+                      await existing.update(dataRow);
+                    } else {
+                      // ✅ Create if not found
+                      await db.budgetBookOthersObj.create(dataRow);
+                    }
+                  }
+                }
               }
             }
           }

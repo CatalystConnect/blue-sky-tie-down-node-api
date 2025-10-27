@@ -608,6 +608,10 @@ module.exports = {
            {
             model: db.leadTagsObj,
             as: "lead_tags",
+            include:{
+              model:db.tagsObj,
+              as:"tag"
+            }
           },
         ],
         limit,

@@ -371,23 +371,88 @@ module.exports = {
               sitePlanMap[index] = plan.id;
             });
           }
+          // console.log("scopeOtherscopeOtherscopeOther", scopeOther);
+
+          // if (Array.isArray(scopeOther) && scopeOther.length) {
+          //   for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
+          //     for (const [budgetCatKey, budgetCatArray] of Object.entries(
+          //       siteGroup
+          //     )) {
+          //       if (budgetCatKey === "data" || !Array.isArray(budgetCatArray))
+          //         continue;
+
+          //       for (const item of budgetCatArray) {
+          //         const siteId = item.siteId ?? null;
+          //         const budgetCatId = item.budget_Cat_Id ?? null;
+
+          //         if (!item.data || !Array.isArray(item.data)) continue;
+
+          //         const validDataEntries = item.data.filter((d) =>
+          //           Object.values(d || {}).some((v) => v !== null && v !== "")
+          //         );
+
+          //         if (validDataEntries.length) {
+          //           const insertData = validDataEntries.map((d) => ({
+          //             title: d.title || "Other",
+          //             budget_id: budgetBook.id,
+          //             site_id: siteId,
+          //             scopeId: d.scopeId ?? null,
+          //             site_plan_id: sitePlanMap[nestedIndex] ?? null,
+          //             budget_cat_id: budgetCatId,
+          //             is_include: d.is_include ?? null,
+          //             total: d.total !== "" ? Number(d.total) : null,
+          //             price_sqft:
+          //               d.pricePerSqft !== "" ? Number(d.pricePerSqft) : null,
+          //             additionals: d.additional ?? null,
+          //             cost: d.cost !== "" ? Number(d.cost) : null,
+          //             price_w_additional:
+          //               d.priceWithAdditional !== ""
+          //                 ? Number(d.priceWithAdditional)
+          //                 : null,
+          //             costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
+          //             optionPercentage:
+          //               d.optionPercentage !== ""
+          //                 ? Number(d.optionPercentage)
+          //                 : null,
+          //           }));
+
+          //           if (insertData.length) {
+          //             promises.push(
+          //               db.budgetBookOthersObj.bulkCreate(insertData)
+          //             );
+          //           }
+          //         }
+          //       }
+          //     }
+          //   }
+          // }
+          // console.log("scopeOtherscopeOther", scopeOther);
 
           if (Array.isArray(scopeOther) && scopeOther.length) {
             for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
               for (const [budgetCatKey, budgetCatArray] of Object.entries(
                 siteGroup
               )) {
-                if (budgetCatKey === "data" || !Array.isArray(budgetCatArray))
+                // skip non-category keys
+                if (
+                  budgetCatKey === "data" ||
+                  budgetCatKey === "undefined" ||
+                  !Array.isArray(budgetCatArray)
+                )
                   continue;
 
                 for (const item of budgetCatArray) {
                   const siteId = item.siteId ?? null;
                   const budgetCatId = item.budget_Cat_Id ?? null;
 
-                  if (!item.data || !Array.isArray(item.data)) continue;
+                  // ✅ convert object to array
+                  const dataEntries = Object.values(item.data || {});
 
-                  const validDataEntries = item.data.filter((d) =>
-                    Object.values(d || {}).some((v) => v !== null && v !== "")
+                  // ✅ filter only non-empty entries
+                  const validDataEntries = dataEntries.filter((d) =>
+                    Object.values(d || {}).some(
+                      (v) => v !== null && v !== "" && v !== undefined
+                    )
                   );
 
                   if (validDataEntries.length) {
@@ -410,12 +475,13 @@ module.exports = {
                           : null,
                       costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
                       optionPercentage:
-                        d.optionPercentage !== ""
+                        d.optionPercentage !== "" && d.optionPercentage !== null
                           ? Number(d.optionPercentage)
                           : null,
                     }));
 
                     if (insertData.length) {
+                      console.log("✅ Inserting Other Scope Data:", insertData);
                       promises.push(
                         db.budgetBookOthersObj.bulkCreate(insertData)
                       );
@@ -779,7 +845,6 @@ module.exports = {
       });
     }
   },
-
 
   async deleteBudgetBooks(req, res) {
     try {

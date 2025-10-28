@@ -846,8 +846,11 @@ module.exports = {
             budgetBooksDrawings.map((item) => ({
               budget_books_id: budgetBooksId,
               submittal_id: item.submittal_id,
-              is_include: item.is_include,
-            }))
+              is_include:
+              typeof item.is_include === "boolean"
+                ? item.is_include ? 1 : 0
+                : Number(item.is_include ?? 0),           
+               }))
           )
         );
       }

@@ -1095,6 +1095,11 @@ db.budgetBooksObj.hasMany(db.gDriveAssociationObj, {
   as: "budget_files",
 });
 
+db.budgetBooksObj.hasMany(db.budgetBookDocumentsObj, {
+  foreignKey: "budget_book_id",
+  as: "budgetBookDocuments",
+});
+
 db.leadsObj.hasMany(db.budgetBooksObj, { foreignKey: "lead_id", as: "lead_budget" });
 
 module.exports = db;

@@ -994,61 +994,51 @@ module.exports = {
               const siteId = item.siteId ?? null;
               const budgetCatId = item.budget_Cat_Id ?? null;
 
-              // ✅ Convert object to array
               const dataEntries = Object.values(item.data || {});
-
-              // ✅ Filter non-empty entries
               const validDataEntries = dataEntries.filter((d) =>
                 Object.values(d || {}).some(
                   (v) => v !== null && v !== "" && v !== undefined
                 )
               );
 
-              if (validDataEntries.length) {
-                const insertData = validDataEntries.map((d) => ({
-                  title: d.title || "Other",
-                  budget_id: budgetBooksId,
-                  site_id: siteId,
-                  scopeId: d.scopeId ?? null,
-                  site_plan_id: sitePlanMap[nestedIndex] ?? null,
-                  budget_cat_id: budgetCatId,
-                  is_include: d.is_include ?? null,
-                  total: d.total !== "" ? Number(d.total) : null,
-                  price_sqft:
-                    d.pricePerSqft !== "" ? Number(d.pricePerSqft) : null,
-                  additionals: d.additional ?? null,
-                  cost: d.cost !== "" ? Number(d.cost) : null,
-                  price_w_additional:
-                    d.priceWithAdditional !== ""
-                      ? Number(d.priceWithAdditional)
-                      : null,
-                  costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
-                  optionPercentage:
-                    d.optionPercentage !== "" && d.optionPercentage !== null
-                      ? Number(d.optionPercentage)
-                      : null,
-                }));
+              if (!validDataEntries.length) continue;
 
-                if (insertData.length) {
-                  for (const dataRow of insertData) {
-                    // ✅ Try to find existing record first (for update)
-                    const existing = await db.budgetBookOthersObj.findOne({
-                      where: {
-                        budget_id: budgetBooksId,
-                        site_id: dataRow.site_id,
-                        budget_cat_id: dataRow.budget_cat_id,
-                        title: dataRow.title,
-                      },
-                    });
+              const insertData = validDataEntries.map((d) => ({
+                title: d.title || "Other",
+                budget_id: budgetBooksId,
+                site_id: siteId,
+                site_plan_id: sitePlanMap[nestedIndex] ?? null,
+                scopeId: d.scopeId ?? null,
+                budget_cat_id: budgetCatId,
+                is_include: d.is_include ?? null,
+                total: parseNumber(d.total),
+                price_sqft: parseNumber(d.pricePerSqft),
+                additionals: parseNumber(d.additional),
+                cost: parseNumber(d.cost),
+                price_w_additional: parseNumber(d.priceWithAdditional),
+                costSqft: parseNumber(d.costSqft),
+                optionPercentage: parseNumber(d.optionPercentage),
+                updated_at: new Date(),
+              }));
 
-                    if (existing) {
-                      // ✅ Update if found
-                      await existing.update(dataRow);
-                    } else {
-                      // ✅ Create if not found
-                      await db.budgetBookOthersObj.create(dataRow);
-                    }
-                  }
+              // 🧠 Safe upsert
+              for (const dataRow of insertData) {
+                const existing = await db.budgetBookOthersObj.findOne({
+                  where: {
+                    budget_id: budgetBooksId,
+                    site_id: dataRow.site_id,
+                    budget_cat_id: dataRow.budget_cat_id,
+                    title: dataRow.title,
+                  },
+                });
+
+                if (existing) {
+                  await existing.update(dataRow);
+                  console.log(`🔁 Updated scopeOther: ${dataRow.title}`);
+                } else {
+                  dataRow.created_at = new Date();
+                  await db.budgetBookOthersObj.create(dataRow);
+                  console.log(`✅ Inserted new scopeOther: ${dataRow.title}`);
                 }
               }
             }

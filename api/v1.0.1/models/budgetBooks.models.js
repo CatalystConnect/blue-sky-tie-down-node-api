@@ -87,6 +87,8 @@ module.exports = (sequelize, Sequelize) => {
       tax: Sequelize.STRING,
       commission: Sequelize.STRING,
       commission_rate: Sequelize.STRING,
+      contact_email: Sequelize.STRING,
+
 
       // ---------- Contacts ----------
       customer_id: Sequelize.INTEGER,

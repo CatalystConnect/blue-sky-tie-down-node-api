@@ -10,6 +10,11 @@ const myValidationResult = validationResult.withDefaults({
 const db = require("../models");
 const fs = require("fs");
 const path = require("path");
+const {
+  uploadFileToDrive,
+  getOrCreateSubfolder,
+} = require("../helper/googleDrive");
+const projectServices = require("../services/project.services");
 
 module.exports = {
   /*addBudgetBooks*/
@@ -104,6 +109,56 @@ module.exports = {
 
       // ✅ Create main budget book first
       const budgetBook = await budgetBooksServices.addBudgetBooks(postData);
+
+      const getProjectById = await projectServices.getProjectById(data.project_id);
+      
+      const saveFolder = async (module, module_id, drive_id, file_name) =>
+        await projectServices.addDriveAssociation({
+          parent: data.project_id,
+          module,
+          module_id,
+          drive_id,
+          file_name,
+        });
+
+     
+
+
+      let budgetFiles = [];
+      if (Array.isArray(req.files)) {
+        
+        const budgetUploads = req.files.filter((f) =>
+          f.fieldname.startsWith("budgetFiles")
+        );
+
+        // ✅ Create or get main project folder (e.g., "123. ProjectName")
+        const mainFolder = await getOrCreateSubfolder(
+          process.env.GOOGLE_DRIVE_FOLDER_ID,
+          `${data.project_id}. ${getProjectById.name}`
+        );
+
+
+        const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
+
+        for (const file of budgetUploads) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            budgetFolder
+          );
+
+          
+          budgetFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+            size: file.size,
+          });
+          
+          await saveFolder("budgetFiles", budgetBook.id, driveFile.id, file.originalname);
+        }
+      }
+
 
       // ✅ Send success response IMMEDIATELY (Heroku safe)
       res.status(200).json({

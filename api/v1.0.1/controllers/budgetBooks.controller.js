@@ -187,7 +187,7 @@ module.exports = {
 
           for (const [index, file] of budgetUploads.entries()) {
             try {
-             
+
               const driveFile = await uploadFileToDrive(
                 file.path,
                 file.originalname,
@@ -195,9 +195,9 @@ module.exports = {
                 budgetFolder
               );
 
-    
+
               const uploadMeta = documentData.uploadDocument?.[index] || {};
-           
+
               let doc = await db.budgetBookDocumentsObj.create({
                 budget_book_id: budgetBook.id,
                 file_name: file.originalname,
@@ -206,9 +206,9 @@ module.exports = {
                 is_display: uploadMeta.displayToCustomer || null,
                 file_path: driveFile.webViewLink,
               });
-             await saveFolder("budgetFiles", doc.id, driveFile.id, file.originalname);
+              await saveFolder("budgetFiles", doc.id, driveFile.id, file.originalname);
 
-              
+
             } catch (err) {
               console.error(" File upload failed:", err);
             }
@@ -846,6 +846,10 @@ module.exports = {
       }
 
       let data = req.body;
+      let documentData = req.body;
+
+
+
 
       // Handle form-data JSON string
       if (typeof data.form === "string") {
@@ -938,6 +942,84 @@ module.exports = {
         id,
         postData
       );
+
+      const project = await projectServices.getProjectById(data.project_id);
+
+      const saveFolder = async (module, module_id, drive_id, file_name) =>
+        await projectServices.addDriveAssociation({
+          parent: data.project_id,
+          module,
+          module_id,
+          drive_id,
+          file_name,
+        });
+
+      if (documentData.uploadDocumentDelete && documentData.uploadDocumentDelete.length > 0) {
+        const idsToDelete = Array.isArray(documentData.uploadDocumentDelete)
+          ? documentData.uploadDocumentDelete
+          : JSON.parse(documentData.uploadDocumentDelete);
+
+        for (const docId of idsToDelete) {
+          const doc = await db.budgetBookDocumentsObj.findOne({ where: { id: docId } });
+          if (doc) {
+            try {
+              // ✅ Delete from Google Drive
+              const driveId = doc.file_path?.includes("drive.google.com")
+                ? doc.file_path.split("/d/")[1]?.split("/")[0]
+                : null;
+
+              if (driveId) {
+                await db.gDriveAssociationObj.destroy({ where: { drive_id: driveId } }); 
+              }  
+              await db.budgetBookDocumentsObj.destroy({ where: { id: docId } });
+
+            } catch (delErr) {
+              console.error(" Error deleting file:", delErr);
+            }
+          }
+        }
+      }
+
+
+      if (Array.isArray(req.files) && req.files.length) {
+        const budgetUploads = req.files.filter(f =>
+          f.fieldname.startsWith("uploadDocument")
+        );
+
+        if (budgetUploads.length) {
+          const mainFolder = await getOrCreateSubfolder(
+            process.env.GOOGLE_DRIVE_FOLDER_ID,
+            `${data.project_id}. ${project.name}`
+          );
+
+          const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
+
+          for (const [index, file] of budgetUploads.entries()) {
+            const driveFile = await uploadFileToDrive(
+              file.path,
+              file.originalname,
+              file.mimetype,
+              budgetFolder
+            );
+
+            const uploadMeta = documentData.uploadDocument?.[index] || {};
+
+            let doc = await db.budgetBookDocumentsObj.create({
+              budget_book_id: id,
+              file_name: file.originalname,
+              notes: uploadMeta.note || null,
+              type: uploadMeta.type || null,
+              is_display: uploadMeta.displayToCustomer || null,
+              file_path: driveFile.webViewLink,
+            });
+            await saveFolder("budgetFiles", doc.id, driveFile.id, file.originalname);
+
+
+
+          }
+        }
+      }
+
 
       const {
         budgetBooksScopeIncludes,

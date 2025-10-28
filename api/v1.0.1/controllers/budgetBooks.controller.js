@@ -308,61 +308,6 @@ module.exports = {
               )
             );
           }
-
-          // if (Array.isArray(sites) && sites.length) {
-          //   promises.push(
-          //     db.budgetBooksSitesObj.bulkCreate(
-          //       sites.map((site) => ({
-          //         budget_books_id: budgetBook.id,
-          //         name: site.name || "",
-          //         site_Id: site.site_Id || "",
-          //         qty: site.qty || "",
-          //         gs_qft: site.gs_qft || "",
-          //         ts_qft: site.ts_qft || "",
-          //         cs_qft: site.cs_qft || "",
-          //         ps_qft: site.ps_qft || "",
-          //         cost: site.cost || "",
-          //         c_total: site.c_total || "",
-          //         c_sw: site.c_sw || "",
-          //         c_up: site.c_up || "",
-          //         c_sp: site.c_sp || "",
-          //         c_mc: site.c_mc || "",
-          //         pb_sw: site.pb_sw || "",
-          //         pb_up: site.pb_up || "",
-          //         pb_sp: site.pb_sp || "",
-          //         pb_mc: site.pb_mc || "",
-          //         pb_tot: site.pb_tot || "",
-          //         p_tot: site.p_tot || "",
-          //         p_sw: site.p_sw || "",
-          //         p_up: site.p_up || "",
-          //         p_sp: site.p_sp || "",
-          //         p_mc: site.p_mc || "",
-          //         project_bldg: site.project_bldg || "",
-          //         project_bldg_type: site.project_bldg_type || "",
-          //         site_design: site.site_design || "",
-          //         site_design_sw: site.site_design_sw || "",
-          //         site_design_up: site.site_design_up || "",
-          //         site_engineering: site.site_engineering || "",
-          //         site_engineering_sw: site.site_engineering_sw || "",
-          //         site_engineering_up: site.site_engineering_up || "",
-          //         site_budget: site.site_budget || "",
-          //         site_budget_sp: site.site_budget_sp || "",
-          //         site_budget_sw: site.site_budget_sw || "",
-          //         site_budget_up: site.site_budget_up || "",
-          //         site_budget_mc: site.site_budget_mc || "",
-          //         site_shipping: site.site_shipping || "",
-          //         site_shipping_sp: site.site_shipping_sp || "",
-          //         site_shipping_sw: site.site_shipping_sw || "",
-          //         site_shipping_up: site.site_shipping_up || "",
-          //         site_shipping_mc: site.site_shipping_mc || "",
-          //         site_design_type: site.site_design_type || "",
-          //         site_engineering_type: site.site_engineering_type || "",
-          //         site_budget_type: site.site_budget_type || "",
-          //         site_shipping_type: site.site_shipping_type || "",
-          //       }))
-          //     )
-          //   );
-          // }
           if (Array.isArray(sites) && sites.length) {
             // Filter out empty / invalid entries
             const cleanSites = sites.filter((s) => {
@@ -378,6 +323,9 @@ module.exports = {
 
               return hasValidName && hasValidId && hasMeaningfulData;
             });
+
+            
+            
 
             if (cleanSites.length) {
               const mappedSites = cleanSites.map((site) => ({
@@ -433,7 +381,8 @@ module.exports = {
                 promises.push(db.budgetBooksSitesObj.bulkCreate(mappedSites));
               }
             }
-            if (Array.isArray(budgets) && budgets.length) {
+
+            if (Array.isArray(budgets) && budgets.length > 1) {
               const budgetRecords = budgets.map((item) => {
                 return {
                   budget_books_id: budgetBook.id ?? null,

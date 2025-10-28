@@ -20,12 +20,12 @@ module.exports = {
       let user = await db.userObj.findOne({
         where: { email: email },
         include: [
-        {
-          model: db.rolesObj,
-          as: "roles",
-          attributes: ["id", "name", "access"],
-        },
-      ],
+          {
+            model: db.rolesObj,
+            as: "roles",
+            attributes: ["id", "name", "access"],
+          },
+        ],
         raw: true,
       });
       return user;
@@ -96,7 +96,7 @@ module.exports = {
       const total = await db.userObj.count({ where: whereCondition });
 
       if (!take_all) {
-        queryOptions.per_page = per_page ? parseInt(per_page) : length || 10;
+        queryOptions.limit = per_page ? parseInt(per_page) : length || 10;
         queryOptions.offset = (page - 1) * (length || 10);
       }
 

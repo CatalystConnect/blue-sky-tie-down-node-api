@@ -91,6 +91,7 @@ module.exports = (sequelize, Sequelize) => {
       // ---------- Contacts ----------
       customer_id: Sequelize.INTEGER,
       contact_id: Sequelize.STRING,
+      taxRate: Sequelize.STRING,
 
       // ---------- Limits ----------
       fill_in_limit: Sequelize.STRING,

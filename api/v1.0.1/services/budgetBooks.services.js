@@ -1561,4 +1561,22 @@ module.exports = {
       throw e;
     }
   },
+
+  async deleteBudgetDocument(id) {
+    try {
+      const document = await db.budgetBookDocumentsObj.findByPk(id);
+
+      if (!document) {
+        return { success: false, message: "Document not found" };
+      }
+
+      await db.budgetBookDocumentsObj.destroy({ where: { id } });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error in deleteBudgetDocument service:", error);
+      return { success: false, message: "Internal server error" };
+    }
+  }
+
 };

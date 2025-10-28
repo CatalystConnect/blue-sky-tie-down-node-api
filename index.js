@@ -6,7 +6,7 @@ const app = express();
 const swaggerUi = require("swagger-ui-express");
 const auths = require("basic-auth");
 const swaggerDocumentV_1_0_0 = require("./api/apidocs/apiDoc.v1.0.0.json");
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

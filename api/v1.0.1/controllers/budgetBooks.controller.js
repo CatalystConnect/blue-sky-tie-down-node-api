@@ -194,60 +194,132 @@ module.exports = {
             );
           }
 
+          // if (Array.isArray(sites) && sites.length) {
+          //   promises.push(
+          //     db.budgetBooksSitesObj.bulkCreate(
+          //       sites.map((site) => ({
+          //         budget_books_id: budgetBook.id,
+          //         name: site.name || "",
+          //         site_Id: site.site_Id || "",
+          //         qty: site.qty || "",
+          //         gs_qft: site.gs_qft || "",
+          //         ts_qft: site.ts_qft || "",
+          //         cs_qft: site.cs_qft || "",
+          //         ps_qft: site.ps_qft || "",
+          //         cost: site.cost || "",
+          //         c_total: site.c_total || "",
+          //         c_sw: site.c_sw || "",
+          //         c_up: site.c_up || "",
+          //         c_sp: site.c_sp || "",
+          //         c_mc: site.c_mc || "",
+          //         pb_sw: site.pb_sw || "",
+          //         pb_up: site.pb_up || "",
+          //         pb_sp: site.pb_sp || "",
+          //         pb_mc: site.pb_mc || "",
+          //         pb_tot: site.pb_tot || "",
+          //         p_tot: site.p_tot || "",
+          //         p_sw: site.p_sw || "",
+          //         p_up: site.p_up || "",
+          //         p_sp: site.p_sp || "",
+          //         p_mc: site.p_mc || "",
+          //         project_bldg: site.project_bldg || "",
+          //         project_bldg_type: site.project_bldg_type || "",
+          //         site_design: site.site_design || "",
+          //         site_design_sw: site.site_design_sw || "",
+          //         site_design_up: site.site_design_up || "",
+          //         site_engineering: site.site_engineering || "",
+          //         site_engineering_sw: site.site_engineering_sw || "",
+          //         site_engineering_up: site.site_engineering_up || "",
+          //         site_budget: site.site_budget || "",
+          //         site_budget_sp: site.site_budget_sp || "",
+          //         site_budget_sw: site.site_budget_sw || "",
+          //         site_budget_up: site.site_budget_up || "",
+          //         site_budget_mc: site.site_budget_mc || "",
+          //         site_shipping: site.site_shipping || "",
+          //         site_shipping_sp: site.site_shipping_sp || "",
+          //         site_shipping_sw: site.site_shipping_sw || "",
+          //         site_shipping_up: site.site_shipping_up || "",
+          //         site_shipping_mc: site.site_shipping_mc || "",
+          //         site_design_type: site.site_design_type || "",
+          //         site_engineering_type: site.site_engineering_type || "",
+          //         site_budget_type: site.site_budget_type || "",
+          //         site_shipping_type: site.site_shipping_type || "",
+          //       }))
+          //     )
+          //   );
+          // }
           if (Array.isArray(sites) && sites.length) {
-            promises.push(
-              db.budgetBooksSitesObj.bulkCreate(
-                sites.map((site) => ({
-                  budget_books_id: budgetBook.id,
-                  name: site.name || "",
-                  site_Id: site.site_Id || "",
-                  qty: site.qty || "",
-                  gs_qft: site.gs_qft || "",
-                  ts_qft: site.ts_qft || "",
-                  cs_qft: site.cs_qft || "",
-                  ps_qft: site.ps_qft || "",
-                  cost: site.cost || "",
-                  c_total: site.c_total || "",
-                  c_sw: site.c_sw || "",
-                  c_up: site.c_up || "",
-                  c_sp: site.c_sp || "",
-                  c_mc: site.c_mc || "",
-                  pb_sw: site.pb_sw || "",
-                  pb_up: site.pb_up || "",
-                  pb_sp: site.pb_sp || "",
-                  pb_mc: site.pb_mc || "",
-                  pb_tot: site.pb_tot || "",
-                  p_tot: site.p_tot || "",
-                  p_sw: site.p_sw || "",
-                  p_up: site.p_up || "",
-                  p_sp: site.p_sp || "",
-                  p_mc: site.p_mc || "",
-                  project_bldg: site.project_bldg || "",
-                  project_bldg_type: site.project_bldg_type || "",
-                  site_design: site.site_design || "",
-                  site_design_sw: site.site_design_sw || "",
-                  site_design_up: site.site_design_up || "",
-                  site_engineering: site.site_engineering || "",
-                  site_engineering_sw: site.site_engineering_sw || "",
-                  site_engineering_up: site.site_engineering_up || "",
-                  site_budget: site.site_budget || "",
-                  site_budget_sp: site.site_budget_sp || "",
-                  site_budget_sw: site.site_budget_sw || "",
-                  site_budget_up: site.site_budget_up || "",
-                  site_budget_mc: site.site_budget_mc || "",
-                  site_shipping: site.site_shipping || "",
-                  site_shipping_sp: site.site_shipping_sp || "",
-                  site_shipping_sw: site.site_shipping_sw || "",
-                  site_shipping_up: site.site_shipping_up || "",
-                  site_shipping_mc: site.site_shipping_mc || "",
-                  site_design_type: site.site_design_type || "",
-                  site_engineering_type: site.site_engineering_type || "",
-                  site_budget_type: site.site_budget_type || "",
-                  site_shipping_type: site.site_shipping_type || "",
-                }))
-              )
-            );
+            // Filter out empty / invalid entries
+            const cleanSites = sites.filter((s) => {
+              if (!s || typeof s !== "object") return false;
+
+              const hasValidName = s.name && s.name.trim() !== "";
+              const hasValidId = s.site_Id && s.site_Id.trim() !== "";
+
+              // Check if at least one numeric or meaningful field is filled
+              const hasMeaningfulData = Object.values(s).some(
+                (v) => v !== null && v !== "" && v !== undefined
+              );
+
+              return hasValidName && hasValidId && hasMeaningfulData;
+            });
+
+            if (cleanSites.length) {
+              const mappedSites = cleanSites.map((site) => ({
+                budget_books_id: budgetBook.id,
+                name: site.name || "",
+                site_Id: site.site_Id || "",
+                qty: site.qty || null,
+                gs_qft: site.gs_qft || null,
+                ts_qft: site.ts_qft || null,
+                cs_qft: site.cs_qft || null,
+                ps_qft: site.ps_qft || null,
+                cost: site.cost || null,
+                c_total: site.c_total || null,
+                c_sw: site.c_sw || null,
+                c_up: site.c_up || null,
+                c_sp: site.c_sp || null,
+                c_mc: site.c_mc || null,
+                pb_sw: site.pb_sw || null,
+                pb_up: site.pb_up || null,
+                pb_sp: site.pb_sp || null,
+                pb_mc: site.pb_mc || null,
+                pb_tot: site.pb_tot || null,
+                p_tot: site.p_tot || null,
+                p_sw: site.p_sw || null,
+                p_up: site.p_up || null,
+                p_sp: site.p_sp || null,
+                p_mc: site.p_mc || null,
+                project_bldg: site.project_bldg || null,
+                project_bldg_type: site.project_bldg_type || null,
+                site_design: site.site_design || null,
+                site_design_sw: site.site_design_sw || null,
+                site_design_up: site.site_design_up || null,
+                site_engineering: site.site_engineering || null,
+                site_engineering_sw: site.site_engineering_sw || null,
+                site_engineering_up: site.site_engineering_up || null,
+                site_budget: site.site_budget || null,
+                site_budget_sp: site.site_budget_sp || null,
+                site_budget_sw: site.site_budget_sw || null,
+                site_budget_up: site.site_budget_up || null,
+                site_budget_mc: site.site_budget_mc || null,
+                site_shipping: site.site_shipping || null,
+                site_shipping_sp: site.site_shipping_sp || null,
+                site_shipping_sw: site.site_shipping_sw || null,
+                site_shipping_up: site.site_shipping_up || null,
+                site_shipping_mc: site.site_shipping_mc || null,
+                site_design_type: site.site_design_type || null,
+                site_engineering_type: site.site_engineering_type || null,
+                site_budget_type: site.site_budget_type || null,
+                site_shipping_type: site.site_shipping_type || null,
+              }));
+
+              if (mappedSites.length) {
+                promises.push(db.budgetBooksSitesObj.bulkCreate(mappedSites));
+              }
+            }
           }
+
           const parseNumber = (val) => {
             if (val === "" || val === null || val === undefined) return null;
             return Number(val);
@@ -371,62 +443,6 @@ module.exports = {
               sitePlanMap[index] = plan.id;
             });
           }
-          // console.log("scopeOtherscopeOtherscopeOther", scopeOther);
-
-          // if (Array.isArray(scopeOther) && scopeOther.length) {
-          //   for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
-          //     for (const [budgetCatKey, budgetCatArray] of Object.entries(
-          //       siteGroup
-          //     )) {
-          //       if (budgetCatKey === "data" || !Array.isArray(budgetCatArray))
-          //         continue;
-
-          //       for (const item of budgetCatArray) {
-          //         const siteId = item.siteId ?? null;
-          //         const budgetCatId = item.budget_Cat_Id ?? null;
-
-          //         if (!item.data || !Array.isArray(item.data)) continue;
-
-          //         const validDataEntries = item.data.filter((d) =>
-          //           Object.values(d || {}).some((v) => v !== null && v !== "")
-          //         );
-
-          //         if (validDataEntries.length) {
-          //           const insertData = validDataEntries.map((d) => ({
-          //             title: d.title || "Other",
-          //             budget_id: budgetBook.id,
-          //             site_id: siteId,
-          //             scopeId: d.scopeId ?? null,
-          //             site_plan_id: sitePlanMap[nestedIndex] ?? null,
-          //             budget_cat_id: budgetCatId,
-          //             is_include: d.is_include ?? null,
-          //             total: d.total !== "" ? Number(d.total) : null,
-          //             price_sqft:
-          //               d.pricePerSqft !== "" ? Number(d.pricePerSqft) : null,
-          //             additionals: d.additional ?? null,
-          //             cost: d.cost !== "" ? Number(d.cost) : null,
-          //             price_w_additional:
-          //               d.priceWithAdditional !== ""
-          //                 ? Number(d.priceWithAdditional)
-          //                 : null,
-          //             costSqft: d.costSqft !== "" ? Number(d.costSqft) : null,
-          //             optionPercentage:
-          //               d.optionPercentage !== ""
-          //                 ? Number(d.optionPercentage)
-          //                 : null,
-          //           }));
-
-          //           if (insertData.length) {
-          //             promises.push(
-          //               db.budgetBookOthersObj.bulkCreate(insertData)
-          //             );
-          //           }
-          //         }
-          //       }
-          //     }
-          //   }
-          // }
-          // console.log("scopeOtherscopeOther", scopeOther);
 
           if (Array.isArray(scopeOther) && scopeOther.length) {
             for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
@@ -481,7 +497,6 @@ module.exports = {
                     }));
 
                     if (insertData.length) {
-                      console.log("✅ Inserting Other Scope Data:", insertData);
                       promises.push(
                         db.budgetBookOthersObj.bulkCreate(insertData)
                       );
@@ -617,14 +632,9 @@ module.exports = {
           }
 
           await Promise.all(promises);
-
-          console.log(
-            "✅ Background data saved for budgetBook ID:",
-            budgetBook.id
-          );
+        
         } catch (err) {
-          console.error("❌ Background insert error:", err.message);
-          console.error(err.stack);
+          // console.error(err.stack);
         }
       });
     } catch (error) {

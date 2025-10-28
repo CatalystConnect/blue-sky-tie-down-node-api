@@ -307,16 +307,22 @@ module.exports = {
         projectFiles: [],
         completedFiles: [],
         planSet: [],
+        budgetFiles: [],
       };
 
       // Step 1: Separate modules
       googleDriveData.forEach((item) => {
         const file = item.dataValues || item;
 
-        if (file.module === "projectFiles") googleDrive.projectFiles.push(file);
-        else if (file.module === "completedFiles")
+        if (file.module === "projectFiles") {
+          googleDrive.projectFiles.push(file);
+        } else if (file.module === "completedFiles") {
           googleDrive.completedFiles.push(file);
-        else if (file.module === "planSetFiles") googleDrive.planSet.push(file);
+        } else if (file.module === "planSetFiles") {
+          googleDrive.planSet.push(file);
+        } else if (file.module === "budgetFiles") {
+          googleDrive.budgetFiles.push(file);
+        }
       });
 
       // Step 2: Transform planSet into structured object
@@ -345,13 +351,14 @@ module.exports = {
         }
       });
 
-      // Step 3: Assign structured result
+      // Step 3: Assign structured result for planSet only
       googleDrive.planSet = planSet;
 
       // Step 4: Attach back to project
       project.googleDrive = googleDrive;
 
       return project;
+
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
@@ -1602,7 +1609,7 @@ module.exports = {
 
     return updatedRows;
   },
-  
+
 
   async addProjectTags(projectId, tagIds) {
     try {

@@ -168,8 +168,8 @@ module.exports = {
           ],
         },
         {
-          model: db.gDriveAssociationObj,
-          as: "budget_files",
+          model: db.budgetBookDocumentsObj,
+          as: "budgetBookDocuments",
         }
       ];
 
@@ -574,6 +574,10 @@ module.exports = {
             as: "sites",
             required: false,
             separate: true,
+          },
+          {
+            model: db.budgetBookDocumentsObj,
+            as: "budgetBookDocuments",
           },
 
           {

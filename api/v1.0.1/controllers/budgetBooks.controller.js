@@ -108,6 +108,7 @@ module.exports = {
         tax: data.tax || null,
         projectType: data.projectType || null,
         taxRate: data.taxRate || null,
+        contact_email: data.contact_email || null,
       };
 
       // ✅ Create main budget book first
@@ -935,6 +936,7 @@ module.exports = {
         tax: data.tax || null,
         projectType: data.projectType || null,
         taxRate: data.taxRate || null,
+        contact_email: data.contact_email || null,
       };
 
       // Call service

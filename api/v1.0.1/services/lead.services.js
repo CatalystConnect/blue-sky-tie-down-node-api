@@ -568,169 +568,86 @@ module.exports = {
   //     throw e;
   //   }
   // },
-  // async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
-  //   try {
-  //     const limit = parseInt(per_page) || 10;
-  //     const offset = (parseInt(page) - 1) * limit || 0;
-
-
-  //     const whereClause = {};
-  //     if (search) {
-  //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
-  //     }
-
-  //     const { rows, count } = await db.leadsObj.findAndCountAll({
-  //       where: whereClause,
-  //       include: [
-  //         {
-  //           model: db.projectObj,
-  //           as: "project",
-  //           required: true,
-  //           where: {
-  //             takeoff_status: {
-  //               [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
-  //             },
-  //           },
-
-  //         },
-  //         {
-  //           model: db.companyObj,
-  //           as: "company",  
-  //         },
-  //         {
-  //           model: db.contactsObj,
-  //           as: "contact",
-  //         },
-  //         {
-  //           model: db.leadStatusesObj,
-  //           as: "leadStatus",
-  //         },
-  //          {
-  //           model: db.leadTagsObj,
-  //           as: "lead_tags",
-  //           include:{
-  //             model:db.tagsObj,
-  //             as:"tag"
-  //           }
-  //         },
-  //         {
-  //           model: db.budgetBooksObj,
-  //           as: "lead_budget",
-  //         },
-  //       ],
-  //       limit,
-  //       offset,
-  //       order: [
-  //         [
-  //           db.Sequelize.literal(
-  //             `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
-  //           ),
-  //           "ASC",
-  //         ],
-  //         ["id", "DESC"],
-  //       ],
-  //     });
-
-  //     return {
-  //       data: rows,
-  //       meta: {
-  //         current_page: parseInt(page),
-  //         from: offset + 1,
-  //         to: offset + rows.length,
-  //         last_page: Math.ceil(count / limit),
-  //         per_page: limit,
-  //         total: count,
-  //       },
-  //     };
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
   async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
-  try {
-    const limit = parseInt(per_page) || 10;
-    const offset = (parseInt(page) - 1) * limit || 0;
+    try {
+      const limit = parseInt(per_page) || 10;
+      const offset = (parseInt(page) - 1) * limit || 0;
 
-    // Lead-level filters
-    const whereClause = {};
 
-    // Project-level filter by name
-    const projectWhere = {
-      takeoff_status: {
-        [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
-      },
-    };
+      const whereClause = {};
+      if (search) {
+        whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+      }
 
-    if (search) {
-      // Filter by project name
-      projectWhere.name = { [db.Sequelize.Op.like]: `%${search}%` };
-    }
+      const { rows, count } = await db.leadsObj.findAndCountAll({
+        
+        include: [
+          {
+            model: db.projectObj,
+            as: "project",
+            required: true,
+            where: whereClause,
+            where: {
+              takeoff_status: {
+                [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
+              },
+            },
 
-    const { rows, count } = await db.leadsObj.findAndCountAll({
-      where: whereClause,
-      include: [
-        {
-          model: db.projectObj,
-          as: "project",
-          required: true, // only leads with matching project
-          where: projectWhere, // project filter applied here
-        },
-        {
-          model: db.companyObj,
-          as: "company",
-        },
-        {
-          model: db.contactsObj,
-          as: "contact",
-        },
-        {
-          model: db.leadStatusesObj,
-          as: "leadStatus",
-        },
-        {
-          model: db.leadTagsObj,
-          as: "lead_tags",
-          include: {
-            model: db.tagsObj,
-            as: "tag",
           },
-        },
-        {
-          model: db.budgetBooksObj,
-          as: "lead_budget",
-        },
-      ],
-      limit,
-      offset,
-      distinct: true, // ensures accurate count
-      order: [
-        [
-          db.Sequelize.literal(
-            `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
-          ),
-          "ASC",
+          {
+            model: db.companyObj,
+            as: "company",  
+          },
+          {
+            model: db.contactsObj,
+            as: "contact",
+          },
+          {
+            model: db.leadStatusesObj,
+            as: "leadStatus",
+          },
+           {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            include:{
+              model:db.tagsObj,
+              as:"tag"
+            }
+          },
+          {
+            model: db.budgetBooksObj,
+            as: "lead_budget",
+          },
         ],
-        ["id", "DESC"],
-      ],
-    });
+        limit,
+        offset,
+        order: [
+          [
+            db.Sequelize.literal(
+              `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
+            ),
+            "ASC",
+          ],
+          ["id", "DESC"],
+        ],
+      });
 
-    return {
-      data: rows,
-      meta: {
-        current_page: parseInt(page),
-        from: offset + 1,
-        to: offset + rows.length,
-        last_page: Math.ceil(count / limit),
-        per_page: limit,
-        total: count,
-      },
-    };
-  } catch (e) {
-    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-    throw e;
-  }
-},
+      return {
+        data: rows,
+        meta: {
+          current_page: parseInt(page),
+          from: offset + 1,
+          to: offset + rows.length,
+          last_page: Math.ceil(count / limit),
+          per_page: limit,
+          total: count,
+        },
+      };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
   async updateLeadPriority(id, takeoff_status, priority = false) {
     const updateData = {};
 

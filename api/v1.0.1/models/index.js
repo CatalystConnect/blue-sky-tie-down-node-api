@@ -231,10 +231,14 @@ db.projectObj.belongsTo(db.taxesObj, {
 //   as: "budgetLead",
 // });
 
-db.budgetBooksObj.hasMany(db.budgetBookOthersObj, {
-  foreignKey: "budget_id",
-  as: "scopeOther",
+db.sitePlansObj.hasMany(db.budgetBookOthersObj, {
+  foreignKey: "site_plan_id",
+  as: "budgetBookOthers",
 });
+// db.budgetBookOthersObj.belongsTo(db.sitePlansObj, {
+//   foreignKey: "site_plan_id",
+//   as: "budgetBookOthersData",
+// });
 // budgetBooksObj model
 db.budgetBooksObj.belongsTo(db.companyObj, {
   foreignKey: "engineer_id",

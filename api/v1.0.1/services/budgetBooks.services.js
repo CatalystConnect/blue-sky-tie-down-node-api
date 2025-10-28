@@ -543,6 +543,13 @@ module.exports = {
             model: db.sitePlansObj,
             as: "sitePlan",
             required: false,
+            include: [
+              {
+                model: db.budgetBookOthersObj,
+                as: "budgetBookOthers",
+                required: false,
+              },
+            ],
             separate: true,
           },
           {
@@ -563,12 +570,7 @@ module.exports = {
             required: false,
             separate: true,
           },
-          {
-            model: db.budgetBookOthersObj,
-            as: "scopeOther",
-            required: false,
-            separate: true,
-          },
+
           {
             model: db.budgetBooksScopesObj,
             as: "projectScopes",

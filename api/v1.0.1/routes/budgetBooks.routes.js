@@ -8,7 +8,7 @@ let { upload,multiUpload } = require("../../../config/multer.config");
 router.post("/budget-books", [authJwt.verifyToken], upload.any(), budgetBooksController.addBudgetBooks);
 router.get("/budget-books", [authJwt.verifyToken], budgetBooksController.getAllBudgetBooks);
 router.get("/getBudgetBooksById", [authJwt.verifyToken], budgetBooksController.getBudgetBooksById);
-router.put("/updateBudgetBooks", [authJwt.verifyToken], upload.none(), budgetBooksController.updateBudgetBooks);
+router.put("/updateBudgetBooks", [authJwt.verifyToken], upload.any(), budgetBooksController.updateBudgetBooks);
 router.delete("/deleteBudgetBooks", [authJwt.verifyToken], budgetBooksController.deleteBudgetBooks);
 
 router.get("/budget-category", [authJwt.verifyToken], budgetBooksController.getAllBudgetCategory);

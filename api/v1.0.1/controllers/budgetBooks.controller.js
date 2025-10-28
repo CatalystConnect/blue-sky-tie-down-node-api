@@ -535,8 +535,7 @@ module.exports = {
                   site_plan_id: sitePlanMap[groupIndex] ?? null,
                   scopeId: d.scopeId ?? null,
                   budget_cat_id: budgetCatId,
-                  is_include:
-                    d.is_include === "inc" || d.is_include === "1" ? 1 : 0,
+                  is_include: d.is_include ?? null,
                   total: toNum(d.total),
                   price_sqft: toNum(d.pricePerSqft),
                   additionals: toNum(d.additional),

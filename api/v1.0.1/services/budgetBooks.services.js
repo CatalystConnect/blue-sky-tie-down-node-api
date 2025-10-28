@@ -164,8 +164,13 @@ module.exports = {
                 },
               ],
             },
+
           ],
         },
+        {
+          model: db.gDriveAssociationObj,
+          as: "budget_files",
+        }
       ];
 
       // -------------------------
@@ -1425,10 +1430,10 @@ module.exports = {
 
       const projectSegments = segmentIds.length
         ? await db.budgetBooksScopeSegmentsObj.findAll({
-            where: {
-              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
-            },
-          })
+          where: {
+            [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
+          },
+        })
         : [];
 
       const scopesByCategoryId = {};

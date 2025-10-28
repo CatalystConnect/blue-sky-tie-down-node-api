@@ -28,6 +28,8 @@ module.exports = {
       }
 
       let data = req.body;
+      let documentData = req.body;
+
 
       // ✅ Parse form safely
       if (typeof data.form === "string") {
@@ -110,8 +112,58 @@ module.exports = {
       // ✅ Create main budget book first
       const budgetBook = await budgetBooksServices.addBudgetBooks(postData);
 
-      const getProjectById = await projectServices.getProjectById(data.project_id);
-      
+      // const getProjectById = await projectServices.getProjectById(data.project_id);
+
+      // const saveFolder = async (module, module_id, drive_id, file_name) =>
+      //   await projectServices.addDriveAssociation({
+      //     parent: data.project_id,
+      //     module,
+      //     module_id,
+      //     drive_id,
+      //     file_name,
+      //   });
+
+
+
+
+      // let budgetFiles = [];
+      // console.log('ddddddddd',req.uploadDocument) 
+      // if (Array.isArray(req.files)) {
+
+
+      //   const budgetUploads = req.files.filter((f) =>
+      //     f.fieldname.startsWith("uploadDocument")
+      //   );
+
+      //   // ✅ Create or get main project folder (e.g., "123. ProjectName")
+      //   const mainFolder = await getOrCreateSubfolder(
+      //     process.env.GOOGLE_DRIVE_FOLDER_ID,
+      //     `${data.project_id}. ${getProjectById.name}`
+      //   );
+
+
+      //   const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
+
+      //   for (const file of budgetUploads) {
+      //     const driveFile = await uploadFileToDrive(
+      //       file.path,
+      //       file.originalname,
+      //       file.mimetype,
+      //       budgetFolder
+      //     );
+
+
+      //     budgetFiles.push({
+      //       name: file.originalname,
+      //       link: driveFile.webViewLink,
+      //       size: file.size,
+      //     });
+
+      //     await saveFolder("budgetFiles", budgetBook.id, driveFile.id, file.originalname);
+      //   }
+      // }
+      const project = await projectServices.getProjectById(data.project_id);
+
       const saveFolder = async (module, module_id, drive_id, file_name) =>
         await projectServices.addDriveAssociation({
           parent: data.project_id,
@@ -121,41 +173,45 @@ module.exports = {
           file_name,
         });
 
-     
+      if (Array.isArray(req.files) && req.files.length) {
+        const budgetUploads = req.files.filter(f => f.fieldname.startsWith("uploadDocument"));
 
-
-      let budgetFiles = [];
-      if (Array.isArray(req.files)) {
-        
-        const budgetUploads = req.files.filter((f) =>
-          f.fieldname.startsWith("budgetFiles")
-        );
-
-        // ✅ Create or get main project folder (e.g., "123. ProjectName")
-        const mainFolder = await getOrCreateSubfolder(
-          process.env.GOOGLE_DRIVE_FOLDER_ID,
-          `${data.project_id}. ${getProjectById.name}`
-        );
-
-
-        const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
-
-        for (const file of budgetUploads) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            budgetFolder
+        if (budgetUploads.length) {
+          const mainFolder = await getOrCreateSubfolder(
+            process.env.GOOGLE_DRIVE_FOLDER_ID,
+            `${data.project_id}. ${project.name}`
           );
 
-          
-          budgetFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-          
-          await saveFolder("budgetFiles", budgetBook.id, driveFile.id, file.originalname);
+          const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
+
+          for (const [index, file] of budgetUploads.entries()) {
+            try {
+             
+              const driveFile = await uploadFileToDrive(
+                file.path,
+                file.originalname,
+                file.mimetype,
+                budgetFolder
+              );
+
+    
+              const uploadMeta = documentData.uploadDocument?.[index] || {};
+           
+              let doc = await db.budgetBookDocumentsObj.create({
+                budget_book_id: budgetBook.id,
+                file_name: file.originalname,
+                notes: uploadMeta.note || null,
+                type: uploadMeta.type || null,
+                is_display: uploadMeta.displayToCustomer || null,
+                file_path: driveFile.webViewLink,
+              });
+             await saveFolder("budgetFiles", doc.id, driveFile.id, file.originalname);
+
+              
+            } catch (err) {
+              console.error(" File upload failed:", err);
+            }
+          }
         }
       }
 
@@ -551,15 +607,15 @@ module.exports = {
                 if (
                   insertData.some((row) => Object.values(row).includes(NaN))
                 ) {
-                  
+
                 }
 
                 if (insertData.length) {
                   try {
                     await db.budgetBookOthersObj.bulkCreate(insertData);
-                    
+
                   } catch (error) {
-                   
+
                   }
                 }
               }

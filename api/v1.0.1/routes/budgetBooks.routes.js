@@ -13,4 +13,7 @@ router.delete("/deleteBudgetBooks", [authJwt.verifyToken], budgetBooksController
 
 router.get("/budget-category", [authJwt.verifyToken], budgetBooksController.getAllBudgetCategory);
 
+router.delete("/budget-document-delete/:id", [authJwt.verifyToken], budgetBooksController.budgetDocumentDelete);
+
+
 module.exports = router;

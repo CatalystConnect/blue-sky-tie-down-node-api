@@ -620,66 +620,108 @@ module.exports = {
         createdSitePlans.forEach((plan, idx) => (sitePlanMap[idx] = plan.id));
       }
 
+      // if (Array.isArray(scopeOther) && scopeOther.length) {
+      //   for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
+      //     for (const [budgetCatKey, budgetCatArray] of Object.entries(
+      //       siteGroup
+      //     )) {
+      //       if (
+      //         budgetCatKey === "data" ||
+      //         budgetCatKey === "undefined" ||
+      //         !Array.isArray(budgetCatArray)
+      //       )
+      //         continue;
+
+      //       for (const item of budgetCatArray) {
+      //         const siteId = item.siteId ?? null;
+      //         const budgetCatId = item.budget_Cat_Id ?? null;
+
+      //         const dataEntries = Object.values(item.data || {});
+      //         const validDataEntries = dataEntries.filter((d) =>
+      //           Object.values(d || {}).some(
+      //             (v) => v !== null && v !== "" && v !== undefined
+      //           )
+      //         );
+
+      //         if (!validDataEntries.length) continue;
+
+      //         const insertData = validDataEntries.map((d) => ({
+      //           title: d.title || "Other",
+      //           budget_id: budgetBooksId,
+      //           site_id: siteId,
+      //           site_plan_id: sitePlanMap[nestedIndex] ?? null,
+      //           scopeId: d.scopeId ?? null,
+      //           budget_cat_id: budgetCatId,
+      //           is_include: d.is_include ?? null,
+      //           total: parseNumber(d.total),
+      //           price_sqft: parseNumber(d.pricePerSqft),
+      //           additionals: parseNumber(d.additional),
+      //           cost: parseNumber(d.cost),
+      //           price_w_additional: parseNumber(d.priceWithAdditional),
+      //           costSqft: parseNumber(d.costSqft),
+      //           optionPercentage: parseNumber(d.optionPercentage),
+      //           updated_at: new Date(),
+      //         }));
+
+      //         for (const dataRow of insertData) {
+      //           const existing = await db.budgetBookOthersObj.findOne({
+      //             where: {
+      //               budget_id: budgetBooksId,
+      //               site_id: dataRow.site_id,
+      //               budget_cat_id: dataRow.budget_cat_id,
+      //               title: dataRow.title,
+      //             },
+      //           });
+
+      //           if (existing) {
+      //             await existing.update(dataRow);
+      //           } else {
+      //             dataRow.created_at = new Date();
+      //             await db.budgetBookOthersObj.create(dataRow);
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       if (Array.isArray(scopeOther) && scopeOther.length) {
-        for (const [nestedIndex, siteGroup] of Object.entries(scopeOther)) {
-          for (const [budgetCatKey, budgetCatArray] of Object.entries(
-            siteGroup
-          )) {
-            if (
-              budgetCatKey === "data" ||
-              budgetCatKey === "undefined" ||
-              !Array.isArray(budgetCatArray)
-            )
-              continue;
+        for (let siteIndex = 0; siteIndex < scopeOther.length; siteIndex++) {
+          const siteGroup = scopeOther[siteIndex];
+          if (!siteGroup || !Array.isArray(siteGroup.categories)) continue;
 
-            for (const item of budgetCatArray) {
-              const siteId = item.siteId ?? null;
-              const budgetCatId = item.budget_Cat_Id ?? null;
+          const siteId = siteGroup.siteId ?? null;
+          const site_plan_id = sitePlanMap[siteIndex] ?? null;
 
-              const dataEntries = Object.values(item.data || {});
-              const validDataEntries = dataEntries.filter((d) =>
-                Object.values(d || {}).some(
-                  (v) => v !== null && v !== "" && v !== undefined
-                )
+          for (const category of siteGroup.categories) {
+            const budgetCatId = category?.budget_Cat_Id ?? null;
+            if (!Array.isArray(category.items) || !budgetCatId) continue;
+
+            for (const item of category.items) {
+              // Skip if item has no meaningful data
+              const hasData = Object.values(item || {}).some(
+                (v) => v !== null && v !== "" && v !== undefined
               );
+              if (!hasData) continue;
 
-              if (!validDataEntries.length) continue;
-
-              const insertData = validDataEntries.map((d) => ({
-                title: d.title || "Other",
+              const dataRow = {
+                title: item.title || "Other",
                 budget_id: budgetBooksId,
                 site_id: siteId,
-                site_plan_id: sitePlanMap[nestedIndex] ?? null,
-                scopeId: d.scopeId ?? null,
+                site_plan_id: site_plan_id,
                 budget_cat_id: budgetCatId,
-                is_include: d.is_include ?? null,
-                total: parseNumber(d.total),
-                price_sqft: parseNumber(d.pricePerSqft),
-                additionals: parseNumber(d.additional),
-                cost: parseNumber(d.cost),
-                price_w_additional: parseNumber(d.priceWithAdditional),
-                costSqft: parseNumber(d.costSqft),
-                optionPercentage: parseNumber(d.optionPercentage),
+                is_include: item.is_include ?? null,
+                total: parseNumber(item.total),
+                price_sqft: parseNumber(item.pricePerSqft),
+                additionals: parseNumber(item.additional),
+                cost: parseNumber(item.cost),
+                price_w_additional: parseNumber(item.priceWithAdditional),
+                costSqft: parseNumber(item.costSqft),
+                optionPercentage: parseNumber(item.optionPercentage),
+                created_at: new Date(),
                 updated_at: new Date(),
-              }));
+              };
 
-              for (const dataRow of insertData) {
-                const existing = await db.budgetBookOthersObj.findOne({
-                  where: {
-                    budget_id: budgetBooksId,
-                    site_id: dataRow.site_id,
-                    budget_cat_id: dataRow.budget_cat_id,
-                    title: dataRow.title,
-                  },
-                });
-
-                if (existing) {
-                  await existing.update(dataRow);
-                } else {
-                  dataRow.created_at = new Date();
-                  await db.budgetBookOthersObj.create(dataRow);
-                }
-              }
+              await db.budgetBookOthersObj.create(dataRow);
             }
           }
         }

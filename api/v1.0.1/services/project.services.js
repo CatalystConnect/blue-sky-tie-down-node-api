@@ -1488,8 +1488,14 @@ module.exports = {
 
       // Handle Admin (userId = 1)
       let projects = rows;
+     
+      const user = await db.userObj.findOne({
+        where: { id: userId },
+        attributes: [ 'role']
+      });
+      
 
-      if (parseInt(userId) !== 1) {
+      if (parseInt(user.role) !== 1) {
         const teamIds = rows
           .map((row) => row.take_off_team_id)
           .filter((id) => id !== null && id !== undefined);

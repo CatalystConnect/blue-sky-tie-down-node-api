@@ -24,6 +24,7 @@ module.exports = {
             let postData = {
                 user_id: req.userId,
                 name: data.name,
+                order: data.order
 
             }
             await interactionTypesServices.addinteractionTypes(postData);
@@ -154,6 +155,7 @@ module.exports = {
             const postData = {
                 name: data.name,
                 user_id: req.userId,
+                order: data.order
             };
 
             const result = await interactionTypesServices.updateInteractionType(id, postData);

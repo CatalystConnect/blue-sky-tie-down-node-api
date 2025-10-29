@@ -1488,12 +1488,12 @@ module.exports = {
 
       // Handle Admin (userId = 1)
       let projects = rows;
-     
+
       const user = await db.userObj.findOne({
         where: { id: userId },
-        attributes: [ 'role']
+        attributes: ['role']
       });
-      
+
 
       if (parseInt(user.role) !== 1) {
         const teamIds = rows
@@ -1688,4 +1688,57 @@ module.exports = {
       throw error;
     }
   },
+  async saveProjectTypeMappings(projectId, projectTypeIds) {
+    if (!projectId || !Array.isArray(projectTypeIds)) {
+      throw new Error('Invalid input: projectId and projectTypeIds are required');
+    }
+    console.log('ttttttt', projectTypeIds)
+    const mappings = projectTypeIds.map(typeId => ({
+      project_id: projectId,
+      project_type_id: parseInt(typeId, 10),
+    }));
+
+    try {
+      await db.projectTypeMappingsObj.bulkCreate(mappings);
+      console.log('Project type mappings saved successfully');
+    } catch (error) {
+      console.error('Error saving project type mappings:', error);
+      throw error;
+    }
+  },
+  async addProjectType(projectId, tagIds) {
+    try {
+      if (!Array.isArray(tagIds)) {
+        tagIds = [tagIds];
+      }
+
+      const records = tagIds.map((tagId) => ({
+        project_id: projectId,
+        project_type_id: tagId,
+      }));
+
+      await db.projectTypeMappingsObj.bulkCreate(records);
+
+      return true;
+    } catch (error) {
+      console.error("Error adding project tags:", error);
+      throw error;
+    }
+  },
+   async updateProjectType(projectId, typeIds) {
+    
+    await db.projectTypeMappingsObj.destroy({
+      where: { project_id: projectId },
+    });
+
+    
+    if (Array.isArray(typeIds) && typeIds.length > 0) {
+      const newMappings = typeIds.map((typeId) => ({
+        project_id: projectId,
+        project_type_id: typeId,
+      }));
+      await db.projectTypeMappingsObj.bulkCreate(newMappings);
+    }
+  },
+
 };

@@ -684,44 +684,108 @@ module.exports = {
       //     }
       //   }
       // }
+
+      // if (Array.isArray(scopeOther) && scopeOther.length) {
+      //   for (let siteIndex = 0; siteIndex < scopeOther.length; siteIndex++) {
+      //     const siteGroup = scopeOther[siteIndex];
+      //     if (!siteGroup || !Array.isArray(siteGroup.categories)) continue;
+
+      //     const siteId = siteGroup.siteId ?? null;
+      //     const site_plan_id = sitePlanMap[siteIndex] ?? null;
+
+      //     for (const category of siteGroup.categories) {
+      //       const budgetCatId = category?.budget_Cat_Id ?? null;
+      //       if (!Array.isArray(category.items) || !budgetCatId) continue;
+
+      //       for (const item of category.items) {
+      //         // Skip if item has no meaningful data
+      //         const hasData = Object.values(item || {}).some(
+      //           (v) => v !== null && v !== "" && v !== undefined
+      //         );
+      //         if (!hasData) continue;
+
+      //         const dataRow = {
+      //           title: item.title || "Other",
+      //           budget_id: budgetBooksId,
+      //           site_id: siteId,
+      //           site_plan_id: site_plan_id,
+      //           budget_cat_id: budgetCatId,
+      //           is_include: item.is_include ?? null,
+      //           total: parseNumber(item.total),
+      //           price_sqft: parseNumber(item.pricePerSqft),
+      //           additionals: parseNumber(item.additional),
+      //           cost: parseNumber(item.cost),
+      //           price_w_additional: parseNumber(item.priceWithAdditional),
+      //           costSqft: parseNumber(item.costSqft),
+      //           optionPercentage: parseNumber(item.optionPercentage),
+      //           created_at: new Date(),
+      //           updated_at: new Date(),
+      //         };
+
+      //         await db.budgetBookOthersObj.create(dataRow);
+      //       }
+      //     }
+      //   }
+      // }
+
       if (Array.isArray(scopeOther) && scopeOther.length) {
         for (let siteIndex = 0; siteIndex < scopeOther.length; siteIndex++) {
           const siteGroup = scopeOther[siteIndex];
-          if (!siteGroup || !Array.isArray(siteGroup.categories)) continue;
+          if (!siteGroup || typeof siteGroup !== "object") continue;
 
-          const siteId = siteGroup.siteId ?? null;
+          // Extract the dynamic siteId key (skip 'data' key)
+          const siteIdKey = Object.keys(siteGroup).find((k) => k !== "data");
+          if (!siteIdKey) continue;
+
+          const siteId = siteIdKey;
           const site_plan_id = sitePlanMap[siteIndex] ?? null;
+          const categoryArrays = siteGroup[siteIdKey];
 
-          for (const category of siteGroup.categories) {
-            const budgetCatId = category?.budget_Cat_Id ?? null;
-            if (!Array.isArray(category.items) || !budgetCatId) continue;
+          // Ensure categoryArrays is an array and has nested category data
+          if (!Array.isArray(categoryArrays)) continue;
 
-            for (const item of category.items) {
-              // Skip if item has no meaningful data
-              const hasData = Object.values(item || {}).some(
-                (v) => v !== null && v !== "" && v !== undefined
-              );
-              if (!hasData) continue;
+          // Skip the first null, then loop through category arrays
+          for (const categoryGroup of categoryArrays) {
+            if (!Array.isArray(categoryGroup)) continue;
 
-              const dataRow = {
-                title: item.title || "Other",
-                budget_id: budgetBooksId,
-                site_id: siteId,
-                site_plan_id: site_plan_id,
-                budget_cat_id: budgetCatId,
-                is_include: item.is_include ?? null,
-                total: parseNumber(item.total),
-                price_sqft: parseNumber(item.pricePerSqft),
-                additionals: parseNumber(item.additional),
-                cost: parseNumber(item.cost),
-                price_w_additional: parseNumber(item.priceWithAdditional),
-                costSqft: parseNumber(item.costSqft),
-                optionPercentage: parseNumber(item.optionPercentage),
-                created_at: new Date(),
-                updated_at: new Date(),
-              };
+            for (const category of categoryGroup) {
+              const budgetCatId = category?.budget_Cat_Id ?? null;
+              const dataObj = category?.data ?? {};
 
-              await db.budgetBookOthersObj.create(dataRow);
+              if (!budgetCatId || typeof dataObj !== "object") continue;
+
+              // Loop through each item in data
+              for (const key in dataObj) {
+                const item = dataObj[key];
+                if (!item || typeof item !== "object") continue;
+
+                // Skip empty rows
+                const hasData = Object.values(item).some(
+                  (v) => v !== null && v !== "" && v !== undefined
+                );
+                if (!hasData) continue;
+
+                // Prepare row data
+                const dataRow = {
+                  title: item.title || "Other",
+                  budget_id: budgetBooksId,
+                  site_id: siteId,
+                  site_plan_id: site_plan_id,
+                  budget_cat_id: budgetCatId,
+                  is_include: item.is_include ?? null,
+                  total: parseNumber(item.total),
+                  price_sqft: parseNumber(item.pricePerSqft),
+                  additionals: parseNumber(item.additional),
+                  cost: parseNumber(item.cost),
+                  price_w_additional: parseNumber(item.priceWithAdditional),
+                  costSqft: parseNumber(item.costSqft),
+                  optionPercentage: parseNumber(item.optionPercentage),
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                };
+
+                await db.budgetBookOthersObj.create(dataRow);
+              }
             }
           }
         }

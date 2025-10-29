@@ -274,12 +274,15 @@ module.exports = {
       }
 
       // --- Step 8: Handle project tags ---
+     
       if (data.project_tags) {
         const tagIds = Array.isArray(data.project_tags)
           ? data.project_tags
           : String(data.project_tags)
             .split(",")
             .map((id) => parseInt(id));
+        
+
         await projectServices.addProjectTags(project.id, tagIds);
       }
 
@@ -591,15 +594,25 @@ module.exports = {
         work_hours: data.work_hours || null,
       };
 
-
-      if (data.projectType) {
+       if (data.projectType) {
         const tagIds = Array.isArray(data.projectType)
           ? data.projectType
           : String(data.projectType)
             .split(",")
             .map((id) => parseInt(id));
 
-        await projectServices.updateProjectType(projectId, tagIds);
+        await projectServices.updateProjectTypes(projectId, tagIds);
+      }
+
+
+      if (data.project_tags) {
+        const tagIds = Array.isArray(data.project_tags)
+          ? data.project_tags
+          : String(data.project_tags)
+            .split(",")
+            .map((id) => parseInt(id));
+
+        await projectServices.updateProjectTags(projectId, tagIds);
       }
 
       commonHelper.removeFalsyKeys(postData);

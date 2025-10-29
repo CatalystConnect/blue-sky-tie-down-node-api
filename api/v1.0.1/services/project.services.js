@@ -1775,7 +1775,7 @@ module.exports = {
       throw error;
     }
   },
-   async updateProjectType(projectId, typeIds) {
+   async updateProjectTypes(projectId, typeIds) {
     
     await db.projectTypeMappingsObj.destroy({
       where: { project_id: projectId },
@@ -1788,6 +1788,22 @@ module.exports = {
         project_type_id: typeId,
       }));
       await db.projectTypeMappingsObj.bulkCreate(newMappings);
+    }
+  },
+
+    async updateProjectTags(projectId, typeIds) {
+    
+    await db.projectTagMappingsObj.destroy({
+      where: { project_id: projectId },
+    });
+
+    
+    if (Array.isArray(typeIds) && typeIds.length > 0) {
+      const newMappings = typeIds.map((typeId) => ({
+        project_id: projectId,
+        tag_id: typeId,
+      }));
+      await db.projectTagMappingsObj.bulkCreate(newMappings);
     }
   },
 

@@ -86,7 +86,7 @@ async getAllProjectTypes({ page, per_page, search, offset, ids = [] }) {
       ];
     }
 
-    let order = [["id", "DESC"]];
+    let order =[["order", "ASC"]];
 
     if (Array.isArray(ids) && ids.length > 0) {
       order = [

@@ -259,170 +259,315 @@ module.exports = {
               )
             );
           }
+          // if (Array.isArray(sites) && sites.length) {
+          //   const cleanSites = sites.filter((s) => {
+          //     if (!s || typeof s !== "object") return false;
+
+          //     const hasValidName = s.name && s.name.trim() !== "";
+          //     const hasValidId = s.site_Id && s.site_Id.trim() !== "";
+
+          //     const hasMeaningfulData = Object.values(s).some(
+          //       (v) => v !== null && v !== "" && v !== undefined
+          //     );
+
+          //     return hasValidName && hasValidId && hasMeaningfulData;
+          //   });
+
+          //   if (cleanSites.length) {
+          //     const mappedSites = cleanSites.map((site) => ({
+          //       budget_books_id: budgetBook.id,
+          //       name: site.name || "",
+          //       site_Id: site.site_Id || "",
+          //       qty: site.qty || null,
+          //       gs_qft: site.gs_qft || null,
+          //       ts_qft: site.ts_qft || null,
+          //       cs_qft: site.cs_qft || null,
+          //       ps_qft: site.ps_qft || null,
+          //       cost: site.cost || null,
+          //       c_total: site.c_total || null,
+          //       c_sw: site.c_sw || null,
+          //       c_up: site.c_up || null,
+          //       c_sp: site.c_sp || null,
+          //       c_mc: site.c_mc || null,
+          //       pb_sw: site.pb_sw || null,
+          //       pb_up: site.pb_up || null,
+          //       pb_sp: site.pb_sp || null,
+          //       pb_mc: site.pb_mc || null,
+          //       pb_tot: site.pb_tot || null,
+          //       p_tot: site.p_tot || null,
+          //       p_sw: site.p_sw || null,
+          //       p_up: site.p_up || null,
+          //       p_sp: site.p_sp || null,
+          //       p_mc: site.p_mc || null,
+          //       project_bldg: site.project_bldg || null,
+          //       project_bldg_type: site.project_bldg_type || null,
+          //       site_design: site.site_design || null,
+          //       site_design_sw: site.site_design_sw || null,
+          //       site_design_up: site.site_design_up || null,
+          //       site_engineering: site.site_engineering || null,
+          //       site_engineering_sw: site.site_engineering_sw || null,
+          //       site_engineering_up: site.site_engineering_up || null,
+          //       site_budget: site.site_budget || null,
+          //       site_budget_sp: site.site_budget_sp || null,
+          //       site_budget_sw: site.site_budget_sw || null,
+          //       site_budget_up: site.site_budget_up || null,
+          //       site_budget_mc: site.site_budget_mc || null,
+          //       site_shipping: site.site_shipping || null,
+          //       site_shipping_sp: site.site_shipping_sp || null,
+          //       site_shipping_sw: site.site_shipping_sw || null,
+          //       site_shipping_up: site.site_shipping_up || null,
+          //       site_shipping_mc: site.site_shipping_mc || null,
+          //       site_design_type: site.site_design_type || null,
+          //       site_engineering_type: site.site_engineering_type || null,
+          //       site_budget_type: site.site_budget_type || null,
+          //       site_shipping_type: site.site_shipping_type || null,
+          //     }));
+
+          //     if (mappedSites.length) {
+          //       promises.push(db.budgetBooksSitesObj.bulkCreate(mappedSites));
+          //     }
+          //   }
+
+          // }
+          // if (Array.isArray(budgets) && budgets.length ) {
+          //   const budgetRecords = budgets.map((item) => {
+          //     return {
+          //       budget_books_id: budgetBook.id ?? null,
+          //       site_name: item.site_name || null,
+          //       misc: item.misc || null,
+          //       posts: item.posts || null,
+          //       sill_plate: parseNumber(item.sill_plate),
+          //       tie_down: parseNumber(item.tie_down),
+          //       sw_misc: parseNumber(item.sw_misc),
+          //       up_lift: parseNumber(item.up_lift),
+          //       roof: parseNumber(item.roof),
+          //       coridor: parseNumber(item.coridor),
+          //       deck: parseNumber(item.deck),
+          //       stair_wells: parseNumber(item.stair_wells),
+          //       beam: parseNumber(item.beam),
+          //       cmu: parseNumber(item.cmu),
+          //       stl: parseNumber(item.stl),
+          //       rtu: parseNumber(item.rtu),
+          //       budget_total: parseNumber(item.budget_total),
+          //       sqft_sw_tiedown: parseNumber(item.sqft_sw_tiedown),
+          //       sqft_up_lift: parseNumber(item.sqft_up_lift),
+          //       sqft_sill_plate: parseNumber(item.sqft_sill_plate),
+          //       sqft_misc_hardware: parseNumber(item.sqft_misc_hardware),
+          //       cost_sw_tiedown: parseNumber(item.cost_sw_tiedown),
+          //       cost_up_lift: parseNumber(item.cost_up_lift),
+          //       cost_sill_plate: parseNumber(item.cost_sill_plate),
+          //       cost_misc_hardware: parseNumber(item.cost_misc_hardware),
+          //       total: parseNumber(item.total),
+          //       price_sill_plate: parseNumber(item.price_sill_plate),
+          //       price_sw_tiedown: parseNumber(item.price_sw_tiedown),
+          //       price_up_lift: parseNumber(item.price_up_lift),
+          //       price_misc_hardware: parseNumber(item.price_misc_hardware),
+          //       price_total: parseNumber(item.price_total),
+          //       costType_sw_tiedown: parseNumber(item.costType_sw_tiedown),
+          //       costType_up_lift: parseNumber(item.costType_up_lift),
+          //       costType_sill_plate: parseNumber(item.costType_sill_plate),
+          //       costType_misc_hardware: parseNumber(
+          //         item.costType_misc_hardware
+          //       ),
+          //       costType_Total: parseNumber(item.costType_Total),
+          //       priceType_sw_tiedown: parseNumber(item.priceType_sw_tiedown),
+          //       priceType_up_lift: parseNumber(item.priceType_up_lift),
+          //       priceType_sill_plate: parseNumber(item.priceType_sill_plate),
+          //       priceType_misc_hardware: parseNumber(
+          //         item.priceType_misc_hardware
+          //       ),
+          //       priceType_total: parseNumber(item.priceType_total),
+          //       cost_roof: parseNumber(item.cost_roof),
+          //       cost_coridor: parseNumber(item.cost_coridor),
+          //       cost_deck: parseNumber(item.cost_deck),
+          //       cost_stair_wells: parseNumber(item.cost_stair_wells),
+          //       cost_beam: parseNumber(item.cost_beam),
+          //       cost_posts: parseNumber(item.cost_posts),
+          //       cost_smu: parseNumber(item.cost_smu),
+          //       cost_stl: parseNumber(item.cost_stl),
+          //       cost_misc: parseNumber(item.cost_misc),
+          //       cost_rtu: parseNumber(item.cost_rtu),
+          //       costType_roof: parseNumber(item.costType_roof),
+          //       costType_coridor: parseNumber(item.costType_coridor),
+          //       costType_deck: parseNumber(item.costType_deck),
+          //       costType_stair_wells: parseNumber(item.costType_stair_wells),
+          //       costType_beam: parseNumber(item.costType_beam),
+          //       costType_posts: parseNumber(item.costType_posts),
+          //       costType_smu: parseNumber(item.costType_smu),
+          //       costType_stl: parseNumber(item.costType_stl),
+          //       costType_misc: parseNumber(item.costType_misc),
+          //       costType_rtu: parseNumber(item.costType_rtu),
+          //       price_roof: parseNumber(item.price_roof),
+          //       price_coridor: parseNumber(item.price_coridor),
+          //       price_deck: parseNumber(item.price_deck),
+          //       price_stair_wells: parseNumber(item.price_stair_wells),
+          //       price_beam: parseNumber(item.price_beam),
+          //       price_posts: parseNumber(item.price_posts),
+          //       price_smu: parseNumber(item.price_smu),
+          //       price_stl: parseNumber(item.price_stl),
+          //       price_misc: parseNumber(item.price_misc),
+          //       price_rtu: parseNumber(item.price_rtu),
+          //       priceType_roof: parseNumber(item.priceType_roof),
+          //       priceType_coridor: parseNumber(item.priceType_coridor),
+          //       priceType_deck: parseNumber(item.priceType_deck),
+          //       priceType_stair_wells: parseNumber(
+          //         item.priceType_stair_wells
+          //       ),
+          //       priceType_beam: parseNumber(item.priceType_beam),
+          //       priceType_posts: parseNumber(item.priceType_posts),
+          //       priceType_smu: parseNumber(item.priceType_smu),
+          //       priceType_stl: parseNumber(item.priceType_stl),
+          //       priceType_misc: parseNumber(item.priceType_misc),
+          //       priceType_rtu: parseNumber(item.priceType_rtu),
+          //     };
+          //   });
+
+          //   await db.projectBudgetsObj.bulkCreate(budgetRecords);
+          // }
+
+          // ---- Insert Sites ----
           if (Array.isArray(sites) && sites.length) {
-            const cleanSites = sites.filter((s) => {
-              if (!s || typeof s !== "object") return false;
+            const mappedSites = sites.map((site) => ({
+              budget_books_id: budgetBook.id,
+              name: site.name || "",
+              site_Id: site.site_Id || "",
+              qty: site.qty || null,
+              gs_qft: site.gs_qft || null,
+              ts_qft: site.ts_qft || null,
+              cs_qft: site.cs_qft || null,
+              ps_qft: site.ps_qft || null,
+              cost: site.cost || null,
+              c_total: site.c_total || null,
+              c_sw: site.c_sw || null,
+              c_up: site.c_up || null,
+              c_sp: site.c_sp || null,
+              c_mc: site.c_mc || null,
+              pb_sw: site.pb_sw || null,
+              pb_up: site.pb_up || null,
+              pb_sp: site.pb_sp || null,
+              pb_mc: site.pb_mc || null,
+              pb_tot: site.pb_tot || null,
+              p_tot: site.p_tot || null,
+              p_sw: site.p_sw || null,
+              p_up: site.p_up || null,
+              p_sp: site.p_sp || null,
+              p_mc: site.p_mc || null,
+              project_bldg: site.project_bldg || null,
+              project_bldg_type: site.project_bldg_type || null,
+              site_design: site.site_design || null,
+              site_design_sw: site.site_design_sw || null,
+              site_design_up: site.site_design_up || null,
+              site_engineering: site.site_engineering || null,
+              site_engineering_sw: site.site_engineering_sw || null,
+              site_engineering_up: site.site_engineering_up || null,
+              site_budget: site.site_budget || null,
+              site_budget_sp: site.site_budget_sp || null,
+              site_budget_sw: site.site_budget_sw || null,
+              site_budget_up: site.site_budget_up || null,
+              site_budget_mc: site.site_budget_mc || null,
+              site_shipping: site.site_shipping || null,
+              site_shipping_sp: site.site_shipping_sp || null,
+              site_shipping_sw: site.site_shipping_sw || null,
+              site_shipping_up: site.site_shipping_up || null,
+              site_shipping_mc: site.site_shipping_mc || null,
+              site_design_type: site.site_design_type || null,
+              site_engineering_type: site.site_engineering_type || null,
+              site_budget_type: site.site_budget_type || null,
+              site_shipping_type: site.site_shipping_type || null,
+            }));
 
-              const hasValidName = s.name && s.name.trim() !== "";
-              const hasValidId = s.site_Id && s.site_Id.trim() !== "";
+            await db.budgetBooksSitesObj.bulkCreate(mappedSites);
+          }
 
-              const hasMeaningfulData = Object.values(s).some(
-                (v) => v !== null && v !== "" && v !== undefined
-              );
+          // ---- Insert Budgets ----
+          if (Array.isArray(budgets) && budgets.length) {
+            const budgetRecords = budgets.map((item) => ({
+              budget_books_id: budgetBook.id ?? null,
+              site_name: item.site_name || null,
+              misc: item.misc || null,
+              posts: item.posts || null,
+              sill_plate: parseNumber(item.sill_plate),
+              tie_down: parseNumber(item.tie_down),
+              sw_misc: parseNumber(item.sw_misc),
+              up_lift: parseNumber(item.up_lift),
+              roof: parseNumber(item.roof),
+              coridor: parseNumber(item.coridor),
+              deck: parseNumber(item.deck),
+              stair_wells: parseNumber(item.stair_wells),
+              beam: parseNumber(item.beam),
+              cmu: parseNumber(item.cmu),
+              stl: parseNumber(item.stl),
+              rtu: parseNumber(item.rtu),
+              budget_total: parseNumber(item.budget_total),
+              sqft_sw_tiedown: parseNumber(item.sqft_sw_tiedown),
+              sqft_up_lift: parseNumber(item.sqft_up_lift),
+              sqft_sill_plate: parseNumber(item.sqft_sill_plate),
+              sqft_misc_hardware: parseNumber(item.sqft_misc_hardware),
+              cost_sw_tiedown: parseNumber(item.cost_sw_tiedown),
+              cost_up_lift: parseNumber(item.cost_up_lift),
+              cost_sill_plate: parseNumber(item.cost_sill_plate),
+              cost_misc_hardware: parseNumber(item.cost_misc_hardware),
+              total: parseNumber(item.total),
+              price_sill_plate: parseNumber(item.price_sill_plate),
+              price_sw_tiedown: parseNumber(item.price_sw_tiedown),
+              price_up_lift: parseNumber(item.price_up_lift),
+              price_misc_hardware: parseNumber(item.price_misc_hardware),
+              price_total: parseNumber(item.price_total),
+              costType_sw_tiedown: parseNumber(item.costType_sw_tiedown),
+              costType_up_lift: parseNumber(item.costType_up_lift),
+              costType_sill_plate: parseNumber(item.costType_sill_plate),
+              costType_misc_hardware: parseNumber(item.costType_misc_hardware),
+              costType_Total: parseNumber(item.costType_Total),
+              priceType_sw_tiedown: parseNumber(item.priceType_sw_tiedown),
+              priceType_up_lift: parseNumber(item.priceType_up_lift),
+              priceType_sill_plate: parseNumber(item.priceType_sill_plate),
+              priceType_misc_hardware: parseNumber(
+                item.priceType_misc_hardware
+              ),
+              priceType_total: parseNumber(item.priceType_total),
+              cost_roof: parseNumber(item.cost_roof),
+              cost_coridor: parseNumber(item.cost_coridor),
+              cost_deck: parseNumber(item.cost_deck),
+              cost_stair_wells: parseNumber(item.cost_stair_wells),
+              cost_beam: parseNumber(item.cost_beam),
+              cost_posts: parseNumber(item.cost_posts),
+              cost_smu: parseNumber(item.cost_smu),
+              cost_stl: parseNumber(item.cost_stl),
+              cost_misc: parseNumber(item.cost_misc),
+              cost_rtu: parseNumber(item.cost_rtu),
+              costType_roof: parseNumber(item.costType_roof),
+              costType_coridor: parseNumber(item.costType_coridor),
+              costType_deck: parseNumber(item.costType_deck),
+              costType_stair_wells: parseNumber(item.costType_stair_wells),
+              costType_beam: parseNumber(item.costType_beam),
+              costType_posts: parseNumber(item.costType_posts),
+              costType_smu: parseNumber(item.costType_smu),
+              costType_stl: parseNumber(item.costType_stl),
+              costType_misc: parseNumber(item.costType_misc),
+              costType_rtu: parseNumber(item.costType_rtu),
+              price_roof: parseNumber(item.price_roof),
+              price_coridor: parseNumber(item.price_coridor),
+              price_deck: parseNumber(item.price_deck),
+              price_stair_wells: parseNumber(item.price_stair_wells),
+              price_beam: parseNumber(item.price_beam),
+              price_posts: parseNumber(item.price_posts),
+              price_smu: parseNumber(item.price_smu),
+              price_stl: parseNumber(item.price_stl),
+              price_misc: parseNumber(item.price_misc),
+              price_rtu: parseNumber(item.price_rtu),
+              priceType_roof: parseNumber(item.priceType_roof),
+              priceType_coridor: parseNumber(item.priceType_coridor),
+              priceType_deck: parseNumber(item.priceType_deck),
+              priceType_stair_wells: parseNumber(item.priceType_stair_wells),
+              priceType_beam: parseNumber(item.priceType_beam),
+              priceType_posts: parseNumber(item.priceType_posts),
+              priceType_smu: parseNumber(item.priceType_smu),
+              priceType_stl: parseNumber(item.priceType_stl),
+              priceType_misc: parseNumber(item.priceType_misc),
+              priceType_rtu: parseNumber(item.priceType_rtu),
+            }));
 
-              return hasValidName && hasValidId && hasMeaningfulData;
-            });
-
-            if (cleanSites.length) {
-              const mappedSites = cleanSites.map((site) => ({
-                budget_books_id: budgetBook.id,
-                name: site.name || "",
-                site_Id: site.site_Id || "",
-                qty: site.qty || null,
-                gs_qft: site.gs_qft || null,
-                ts_qft: site.ts_qft || null,
-                cs_qft: site.cs_qft || null,
-                ps_qft: site.ps_qft || null,
-                cost: site.cost || null,
-                c_total: site.c_total || null,
-                c_sw: site.c_sw || null,
-                c_up: site.c_up || null,
-                c_sp: site.c_sp || null,
-                c_mc: site.c_mc || null,
-                pb_sw: site.pb_sw || null,
-                pb_up: site.pb_up || null,
-                pb_sp: site.pb_sp || null,
-                pb_mc: site.pb_mc || null,
-                pb_tot: site.pb_tot || null,
-                p_tot: site.p_tot || null,
-                p_sw: site.p_sw || null,
-                p_up: site.p_up || null,
-                p_sp: site.p_sp || null,
-                p_mc: site.p_mc || null,
-                project_bldg: site.project_bldg || null,
-                project_bldg_type: site.project_bldg_type || null,
-                site_design: site.site_design || null,
-                site_design_sw: site.site_design_sw || null,
-                site_design_up: site.site_design_up || null,
-                site_engineering: site.site_engineering || null,
-                site_engineering_sw: site.site_engineering_sw || null,
-                site_engineering_up: site.site_engineering_up || null,
-                site_budget: site.site_budget || null,
-                site_budget_sp: site.site_budget_sp || null,
-                site_budget_sw: site.site_budget_sw || null,
-                site_budget_up: site.site_budget_up || null,
-                site_budget_mc: site.site_budget_mc || null,
-                site_shipping: site.site_shipping || null,
-                site_shipping_sp: site.site_shipping_sp || null,
-                site_shipping_sw: site.site_shipping_sw || null,
-                site_shipping_up: site.site_shipping_up || null,
-                site_shipping_mc: site.site_shipping_mc || null,
-                site_design_type: site.site_design_type || null,
-                site_engineering_type: site.site_engineering_type || null,
-                site_budget_type: site.site_budget_type || null,
-                site_shipping_type: site.site_shipping_type || null,
-              }));
-
-              if (mappedSites.length) {
-                promises.push(db.budgetBooksSitesObj.bulkCreate(mappedSites));
-              }
-            }
-
-            if (Array.isArray(budgets) && budgets.length > 1) {
-              const budgetRecords = budgets.map((item) => {
-                return {
-                  budget_books_id: budgetBook.id ?? null,
-                  site_name: item.site_name || null,
-                  misc: item.misc || null,
-                  posts: item.posts || null,
-                  sill_plate: parseNumber(item.sill_plate),
-                  tie_down: parseNumber(item.tie_down),
-                  sw_misc: parseNumber(item.sw_misc),
-                  up_lift: parseNumber(item.up_lift),
-                  roof: parseNumber(item.roof),
-                  coridor: parseNumber(item.coridor),
-                  deck: parseNumber(item.deck),
-                  stair_wells: parseNumber(item.stair_wells),
-                  beam: parseNumber(item.beam),
-                  cmu: parseNumber(item.cmu),
-                  stl: parseNumber(item.stl),
-                  rtu: parseNumber(item.rtu),
-                  budget_total: parseNumber(item.budget_total),
-                  sqft_sw_tiedown: parseNumber(item.sqft_sw_tiedown),
-                  sqft_up_lift: parseNumber(item.sqft_up_lift),
-                  sqft_sill_plate: parseNumber(item.sqft_sill_plate),
-                  sqft_misc_hardware: parseNumber(item.sqft_misc_hardware),
-                  cost_sw_tiedown: parseNumber(item.cost_sw_tiedown),
-                  cost_up_lift: parseNumber(item.cost_up_lift),
-                  cost_sill_plate: parseNumber(item.cost_sill_plate),
-                  cost_misc_hardware: parseNumber(item.cost_misc_hardware),
-                  total: parseNumber(item.total),
-                  price_sill_plate: parseNumber(item.price_sill_plate),
-                  price_sw_tiedown: parseNumber(item.price_sw_tiedown),
-                  price_up_lift: parseNumber(item.price_up_lift),
-                  price_misc_hardware: parseNumber(item.price_misc_hardware),
-                  price_total: parseNumber(item.price_total),
-                  costType_sw_tiedown: parseNumber(item.costType_sw_tiedown),
-                  costType_up_lift: parseNumber(item.costType_up_lift),
-                  costType_sill_plate: parseNumber(item.costType_sill_plate),
-                  costType_misc_hardware: parseNumber(
-                    item.costType_misc_hardware
-                  ),
-                  costType_Total: parseNumber(item.costType_Total),
-                  priceType_sw_tiedown: parseNumber(item.priceType_sw_tiedown),
-                  priceType_up_lift: parseNumber(item.priceType_up_lift),
-                  priceType_sill_plate: parseNumber(item.priceType_sill_plate),
-                  priceType_misc_hardware: parseNumber(
-                    item.priceType_misc_hardware
-                  ),
-                  priceType_total: parseNumber(item.priceType_total),
-                  cost_roof: parseNumber(item.cost_roof),
-                  cost_coridor: parseNumber(item.cost_coridor),
-                  cost_deck: parseNumber(item.cost_deck),
-                  cost_stair_wells: parseNumber(item.cost_stair_wells),
-                  cost_beam: parseNumber(item.cost_beam),
-                  cost_posts: parseNumber(item.cost_posts),
-                  cost_smu: parseNumber(item.cost_smu),
-                  cost_stl: parseNumber(item.cost_stl),
-                  cost_misc: parseNumber(item.cost_misc),
-                  cost_rtu: parseNumber(item.cost_rtu),
-                  costType_roof: parseNumber(item.costType_roof),
-                  costType_coridor: parseNumber(item.costType_coridor),
-                  costType_deck: parseNumber(item.costType_deck),
-                  costType_stair_wells: parseNumber(item.costType_stair_wells),
-                  costType_beam: parseNumber(item.costType_beam),
-                  costType_posts: parseNumber(item.costType_posts),
-                  costType_smu: parseNumber(item.costType_smu),
-                  costType_stl: parseNumber(item.costType_stl),
-                  costType_misc: parseNumber(item.costType_misc),
-                  costType_rtu: parseNumber(item.costType_rtu),
-                  price_roof: parseNumber(item.price_roof),
-                  price_coridor: parseNumber(item.price_coridor),
-                  price_deck: parseNumber(item.price_deck),
-                  price_stair_wells: parseNumber(item.price_stair_wells),
-                  price_beam: parseNumber(item.price_beam),
-                  price_posts: parseNumber(item.price_posts),
-                  price_smu: parseNumber(item.price_smu),
-                  price_stl: parseNumber(item.price_stl),
-                  price_misc: parseNumber(item.price_misc),
-                  price_rtu: parseNumber(item.price_rtu),
-                  priceType_roof: parseNumber(item.priceType_roof),
-                  priceType_coridor: parseNumber(item.priceType_coridor),
-                  priceType_deck: parseNumber(item.priceType_deck),
-                  priceType_stair_wells: parseNumber(
-                    item.priceType_stair_wells
-                  ),
-                  priceType_beam: parseNumber(item.priceType_beam),
-                  priceType_posts: parseNumber(item.priceType_posts),
-                  priceType_smu: parseNumber(item.priceType_smu),
-                  priceType_stl: parseNumber(item.priceType_stl),
-                  priceType_misc: parseNumber(item.priceType_misc),
-                  priceType_rtu: parseNumber(item.priceType_rtu),
-                };
-              });
-
-              await db.projectBudgetsObj.bulkCreate(budgetRecords);
-            }
+            await db.projectBudgetsObj.bulkCreate(budgetRecords);
           }
 
           const sitePlanMap = [];

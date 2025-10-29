@@ -30,7 +30,6 @@ module.exports = {
       let data = req.body;
       let documentData = req.body;
 
-      // ✅ Parse form safely
       if (typeof data.form === "string") {
         try {
           data = JSON.parse(data.form);
@@ -42,7 +41,6 @@ module.exports = {
         }
       }
 
-      // ✅ Prepare post data
       const postData = {
         user_id: req.userId || null,
         name: data.name || null,
@@ -110,53 +108,8 @@ module.exports = {
         contact_email: data.contact_email || null,
       };
 
-      // ✅ Create main budget book first
       const budgetBook = await budgetBooksServices.addBudgetBooks(postData);
 
-      // const getProjectById = await projectServices.getProjectById(data.project_id);
-
-      // const saveFolder = async (module, module_id, drive_id, file_name) =>
-      //   await projectServices.addDriveAssociation({
-      //     parent: data.project_id,
-      //     module,
-      //     module_id,
-      //     drive_id,
-      //     file_name,
-      //   });
-
-      // let budgetFiles = [];
-      // console.log('ddddddddd',req.uploadDocument)
-      // if (Array.isArray(req.files)) {
-
-      //   const budgetUploads = req.files.filter((f) =>
-      //     f.fieldname.startsWith("uploadDocument")
-      //   );
-
-      //   // ✅ Create or get main project folder (e.g., "123. ProjectName")
-      //   const mainFolder = await getOrCreateSubfolder(
-      //     process.env.GOOGLE_DRIVE_FOLDER_ID,
-      //     `${data.project_id}. ${getProjectById.name}`
-      //   );
-
-      //   const budgetFolder = await getOrCreateSubfolder(mainFolder, "budgetFiles");
-
-      //   for (const file of budgetUploads) {
-      //     const driveFile = await uploadFileToDrive(
-      //       file.path,
-      //       file.originalname,
-      //       file.mimetype,
-      //       budgetFolder
-      //     );
-
-      //     budgetFiles.push({
-      //       name: file.originalname,
-      //       link: driveFile.webViewLink,
-      //       size: file.size,
-      //     });
-
-      //     await saveFolder("budgetFiles", budgetBook.id, driveFile.id, file.originalname);
-      //   }
-      // }
       const project = await projectServices.getProjectById(data.project_id);
 
       const saveFolder = async (module, module_id, drive_id, file_name) =>
@@ -216,14 +169,12 @@ module.exports = {
         }
       }
 
-      // ✅ Send success response IMMEDIATELY (Heroku safe)
       res.status(200).json({
         status: true,
         message: "Budget Book creation started",
         budgetBook,
       });
 
-      // ✅ Now process related inserts in background
       setImmediate(async () => {
         try {
           const {
@@ -309,23 +260,18 @@ module.exports = {
             );
           }
           if (Array.isArray(sites) && sites.length) {
-            // Filter out empty / invalid entries
             const cleanSites = sites.filter((s) => {
               if (!s || typeof s !== "object") return false;
 
               const hasValidName = s.name && s.name.trim() !== "";
               const hasValidId = s.site_Id && s.site_Id.trim() !== "";
 
-              // Check if at least one numeric or meaningful field is filled
               const hasMeaningfulData = Object.values(s).some(
                 (v) => v !== null && v !== "" && v !== undefined
               );
 
               return hasValidName && hasValidId && hasMeaningfulData;
             });
-
-            
-            
 
             if (cleanSites.length) {
               const mappedSites = cleanSites.map((site) => ({
@@ -482,7 +428,6 @@ module.exports = {
           const sitePlanMap = [];
 
           if (Array.isArray(sitePlan) && sitePlan.length) {
-            // Convert numeric fields and handle nulls
             const sitePlanRecords = sitePlan.map((item) => ({
               budget_books_id: budgetBook.id,
               site_index: item.site_index ?? null,
@@ -499,7 +444,6 @@ module.exports = {
             const createdSitePlans = await db.sitePlansObj.bulkCreate(
               sitePlanRecords
             );
-            // store created IDs
             createdSitePlans.forEach((plan, index) => {
               sitePlanMap[index] = plan.id;
             });
@@ -553,7 +497,6 @@ module.exports = {
                   updated_at: new Date(),
                 }));
 
-                // 🧠 Safety check — log any invalid data
                 if (
                   insertData.some((row) => Object.values(row).includes(NaN))
                 ) {
@@ -639,7 +582,6 @@ module.exports = {
                   budget_Cat_Id,
                 } = item;
 
-                // --- Create budgetBooksScopes ---
                 const budgetBooksScope = await db.budgetBooksScopesObj.create({
                   budget_books_id: budgetBook.id,
                   is_include: is_include ?? null,
@@ -647,7 +589,6 @@ module.exports = {
                   title: scope_name || "",
                 });
 
-                // --- Create budgetBooksScopeCategories ---
                 const budgetBooksScopeCategory =
                   await db.budgetBooksScopeCategoriesObj.create({
                     budget_books_scope_id: budgetBooksScope.id,
@@ -655,7 +596,6 @@ module.exports = {
                     title: category_name || "",
                   });
 
-                // --- Create budgetBooksScopeGroups ---
                 const budgetBooksScopeGroup =
                   await db.budgetBooksScopeGroupsObj.create({
                     budget_books_scope_category_id: budgetBooksScopeCategory.id,
@@ -663,7 +603,6 @@ module.exports = {
                     title: group_name || "",
                   });
 
-                // --- Create budgetBooksScopeSegments ---
                 await db.budgetBooksScopeSegmentsObj.create({
                   budget_books_scope_group_id: budgetBooksScopeGroup.id,
                   scope_sagment_id: segment_id,
@@ -693,9 +632,7 @@ module.exports = {
           }
 
           await Promise.all(promises);
-        } catch (err) {
-          // console.error(err.stack);
-        }
+        } catch (err) {}
       });
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
@@ -711,14 +648,11 @@ module.exports = {
     try {
       let { page = "1", per_page = "10", take_all = "" } = req.query;
 
-      // Convert page and per_page to integers
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
 
-      // Handle take_all="all"
       take_all = take_all === "all";
 
-      // Call service
       const { data: budgetBooks, meta } =
         await budgetBooksServices.getAllBudgetBooks({
           page,
@@ -783,17 +717,9 @@ module.exports = {
 
   async updateBudgetBooks(req, res) {
     try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(422)
-          .json(commonHelper.parseErrorRespose(errors.mapped()));
-      }
-
       let data = req.body;
       let documentData = req.body;
 
-      // Handle form-data JSON string
       if (typeof data.form === "string") {
         try {
           data = JSON.parse(data.form);
@@ -805,7 +731,7 @@ module.exports = {
         }
       }
 
-      const id = req.query.id; // Use ?id=2
+      const id = req.query.id;
       if (!id) {
         return res.status(400).json({
           status: false,
@@ -880,7 +806,6 @@ module.exports = {
         contact_email: data.contact_email || null,
       };
 
-      // Call service
       const updatedBudgetBook = await budgetBooksServices.updateBudgetBooks(
         id,
         postData
@@ -911,7 +836,6 @@ module.exports = {
           });
           if (doc) {
             try {
-              // ✅ Delete from Google Drive
               const driveId = doc.file_path?.includes("drive.google.com")
                 ? doc.file_path.split("/d/")[1]?.split("/")[0]
                 : null;
@@ -978,14 +902,29 @@ module.exports = {
         budgetBooksDrawings,
         budgetBooksKeyAreas,
         budgetBooksContracts,
+        sites,
+        budgets,
+        sitePlan,
+        scopeOther,
+        sitePlan2,
+        veOptions,
+        optionPackages,
+        scopes,
       } = data;
 
-      // Delete old associations and insert new ones
       await budgetBooksServices.replaceAssociations(id, {
         budgetBooksScopeIncludes,
         budgetBooksDrawings,
         budgetBooksKeyAreas,
         budgetBooksContracts,
+        sites,
+        budgets,
+        sitePlan,
+        scopeOther,
+        sitePlan2,
+        veOptions,
+        optionPackages,
+        scopes,
       });
 
       return res
@@ -1094,7 +1033,4 @@ module.exports = {
       });
     }
   },
-
-
-  
 };

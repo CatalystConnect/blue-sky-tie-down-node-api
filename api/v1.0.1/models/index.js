@@ -1102,4 +1102,14 @@ db.budgetBooksObj.hasMany(db.budgetBookDocumentsObj, {
 
 db.leadsObj.hasMany(db.budgetBooksObj, { foreignKey: "lead_id", as: "lead_budget" });
 
+
+db.projectObj.hasMany(db.projectTypeMappingsObj, {
+  foreignKey: "project_id",
+  as: "projectTypeMapping",
+});
+db.projectTypeMappingsObj.belongsTo(db.projectTypesObj, {
+  foreignKey: "project_type_id",
+  as: "projectType",
+});
+
 module.exports = db;

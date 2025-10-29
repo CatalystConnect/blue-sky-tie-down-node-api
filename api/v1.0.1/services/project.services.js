@@ -126,6 +126,16 @@ module.exports = {
             ],
           },
           {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [
+              {
+                model: db.projectTypesObj,
+                as: "projectType",
+              },
+            ],
+          },
+          {
             model: db.gDriveAssociationObj,
             as: "googleDrive",
           },
@@ -247,6 +257,16 @@ module.exports = {
               {
                 model: db.projectTagsObj,
                 as: "tags",
+              },
+            ],
+          },
+          {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [
+              {
+                model: db.projectTypesObj,
+                as: "projectType",
               },
             ],
           },
@@ -655,6 +675,16 @@ module.exports = {
             as: "projectTagsMapping",
             include: [{ model: db.projectTagsObj, as: "tags" }],
           },
+          {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [
+              {
+                model: db.projectTypesObj,
+                as: "projectType",
+              },
+            ],
+          },
           { model: db.gDriveAssociationObj, as: "googleDrive" },
         ],
         order: [
@@ -1048,6 +1078,16 @@ module.exports = {
               {
                 model: db.projectTagsObj,
                 as: "tags",
+              },
+            ],
+          },
+          {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [
+              {
+                model: db.projectTypesObj,
+                as: "projectType",
               },
             ],
           },
@@ -1472,6 +1512,16 @@ module.exports = {
             model: db.projectTagMappingsObj,
             as: "projectTagsMapping",
             include: [{ model: db.projectTagsObj, as: "tags" }],
+          },
+          {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [
+              {
+                model: db.projectTypesObj,
+                as: "projectType",
+              },
+            ],
           },
           { model: db.gDriveAssociationObj, as: "googleDrive" },
         ],

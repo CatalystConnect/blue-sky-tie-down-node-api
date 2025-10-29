@@ -15,17 +15,21 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      order: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },
     },
     {
-      timestamps: true,          
-      freezeTableName: true,     
-      createdAt: "created_at",   
-      updatedAt: "updated_at",   
-      paranoid: true,            
+      timestamps: true,
+      freezeTableName: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
       deletedAt: "deleted_at",
     }
   );

@@ -182,7 +182,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       assign_to_budget: {
-        type: Sequelize.STRING(255),
+        type:  Sequelize.DATE,
         allowNull: true,
       },
       take_off_team_id: {

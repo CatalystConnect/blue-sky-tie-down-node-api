@@ -655,6 +655,111 @@ module.exports = {
           //     }
           //   }
           // }
+          // const sitePlanMap = [];
+
+          // if (Array.isArray(sitePlan) && sitePlan.length) {
+          //   const sitePlanRecords = sitePlan.map((item) => ({
+          //     budget_books_id: budgetBook.id,
+          //     site_index: item.site_index ?? null,
+          //     bldg_id: item.bldg_id ?? null,
+          //     site_plan_name: item.sitePlan_name ?? null,
+          //     sov_sp: item.sov_sp !== "" ? Number(item.sov_sp) : null,
+          //     sov_td: item.sov_td !== "" ? Number(item.sov_td) : null,
+          //     sov_up: item.sov_up !== "" ? Number(item.sov_up) : null,
+          //     sov_mc: item.sov_mc !== "" ? Number(item.sov_mc) : null,
+          //     sov_total: item.sov_total !== "" ? Number(item.sov_total) : null,
+          //     order_no: item.order_no ?? null,
+          //   }));
+
+          //   const createdSitePlans = await db.sitePlansObj.bulkCreate(
+          //     sitePlanRecords
+          //   );
+
+          //   // Store site plan IDs in map (by index order)
+          //   createdSitePlans.forEach((plan, index) => {
+          //     sitePlanMap[index] = plan.id;
+          //   });
+          // }
+
+          // // -------------------------------
+          // // 2️⃣ Insert ScopeOther Data
+          // // -------------------------------
+          // if (Array.isArray(scopeOther) && scopeOther.length) {
+          //   const toNum = (val) => {
+          //     const num = Number(val);
+          //     return isFinite(num) ? num : null;
+          //   };
+
+          //   for (
+          //     let groupIndex = 0;
+          //     groupIndex < scopeOther.length;
+          //     groupIndex++
+          //   ) {
+          //     const siteGroup = scopeOther[groupIndex];
+          //     if (!siteGroup || typeof siteGroup !== "object") continue;
+
+          //     const siteKey = Object.keys(siteGroup)[0];
+          //     const siteDataArray = siteGroup[siteKey]; // like [null, [..], [..], ...]
+
+          //     if (!Array.isArray(siteDataArray)) continue;
+
+          //     // loop through each category array (ignore the first null)
+          //     for (
+          //       let catIndex = 1;
+          //       catIndex < siteDataArray.length;
+          //       catIndex++
+          //     ) {
+          //       const siteArray = Array.isArray(siteDataArray[catIndex])
+          //         ? siteDataArray[catIndex]
+          //         : [];
+
+          //       for (const item of siteArray) {
+          //         const siteId = item?.siteId ?? null;
+          //         const budgetCatId = item?.budget_Cat_Id ?? null;
+          //         const dataEntries = Object.values(item?.data || {});
+
+          //         const validEntries = dataEntries.filter((d) =>
+          //           Object.values(d || {}).some(
+          //             (v) => v !== null && v !== "" && v !== undefined
+          //           )
+          //         );
+
+          //         if (!validEntries.length) continue;
+
+          //         const insertData = validEntries.map((d) => ({
+          //           title: d.title || "Other",
+          //           budget_id: budgetBook.id,
+          //           site_id: siteId,
+          //           site_plan_id: sitePlanMap[groupIndex] ?? null,
+          //           scopeId: d.scopeId ?? null,
+          //           budget_cat_id: budgetCatId,
+          //           is_include: d.is_include ?? null,
+          //           total: toNum(d.total),
+          //           price_sqft: toNum(d.pricePerSqft),
+          //           additionals: toNum(d.additional),
+          //           cost: toNum(d.cost),
+          //           price_w_additional: toNum(d.priceWithAdditional),
+          //           costSqft: toNum(d.costSqft),
+          //           optionPercentage: toNum(d.optionPercentage),
+          //           created_at: new Date(),
+          //           updated_at: new Date(),
+          //         }));
+
+          //         if (insertData.length) {
+          //           try {
+          //             await db.budgetBookOthersObj.bulkCreate(insertData);
+          //           } catch (error) {
+          //             console.error(
+          //               `❌ Error inserting scopeOther for site ${siteId}, category ${budgetCatId}:`,
+          //               error
+          //             );
+          //           }
+          //         }
+          //       }
+          //     }
+          //   }
+          // }
+
           const sitePlanMap = [];
 
           if (Array.isArray(sitePlan) && sitePlan.length) {
@@ -669,21 +774,22 @@ module.exports = {
               sov_mc: item.sov_mc !== "" ? Number(item.sov_mc) : null,
               sov_total: item.sov_total !== "" ? Number(item.sov_total) : null,
               order_no: item.order_no ?? null,
+              created_at: new Date(),
+              updated_at: new Date(),
             }));
 
             const createdSitePlans = await db.sitePlansObj.bulkCreate(
               sitePlanRecords
             );
 
-            // Store site plan IDs in map (by index order)
             createdSitePlans.forEach((plan, index) => {
               sitePlanMap[index] = plan.id;
             });
           }
 
-          // -------------------------------
-          // 2️⃣ Insert ScopeOther Data
-          // -------------------------------
+          // ----------------------------------------
+          // 2️⃣ Insert ScopeOther
+          // ----------------------------------------
           if (Array.isArray(scopeOther) && scopeOther.length) {
             const toNum = (val) => {
               const num = Number(val);
@@ -691,33 +797,37 @@ module.exports = {
             };
 
             for (
-              let groupIndex = 0;
-              groupIndex < scopeOther.length;
-              groupIndex++
+              let siteIndex = 0;
+              siteIndex < scopeOther.length;
+              siteIndex++
             ) {
-              const siteGroup = scopeOther[groupIndex];
+              const siteGroup = scopeOther[siteIndex];
+
               if (!siteGroup || typeof siteGroup !== "object") continue;
 
+              // Extract the single site key (UUID)
               const siteKey = Object.keys(siteGroup)[0];
-              const siteDataArray = siteGroup[siteKey]; // like [null, [..], [..], ...]
+              const siteDataArray = siteGroup[siteKey]; // like [null, [cat1Items], [cat2Items]]
 
               if (!Array.isArray(siteDataArray)) continue;
 
-              // loop through each category array (ignore the first null)
+              // Loop over all categories (ignore first null index)
               for (
                 let catIndex = 1;
                 catIndex < siteDataArray.length;
                 catIndex++
               ) {
-                const siteArray = Array.isArray(siteDataArray[catIndex])
-                  ? siteDataArray[catIndex]
-                  : [];
+                const categoryArray = siteDataArray[catIndex];
 
-                for (const item of siteArray) {
+                if (!Array.isArray(categoryArray)) continue;
+
+                // Each category array contains multiple items
+                for (const item of categoryArray) {
                   const siteId = item?.siteId ?? null;
                   const budgetCatId = item?.budget_Cat_Id ?? null;
                   const dataEntries = Object.values(item?.data || {});
 
+                  // Filter out empty or invalid data objects
                   const validEntries = dataEntries.filter((d) =>
                     Object.values(d || {}).some(
                       (v) => v !== null && v !== "" && v !== undefined
@@ -726,11 +836,12 @@ module.exports = {
 
                   if (!validEntries.length) continue;
 
+                  // Prepare records for bulk insert
                   const insertData = validEntries.map((d) => ({
                     title: d.title || "Other",
                     budget_id: budgetBook.id,
                     site_id: siteId,
-                    site_plan_id: sitePlanMap[groupIndex] ?? null,
+                    site_plan_id: sitePlanMap[siteIndex] ?? null, // map by site index
                     scopeId: d.scopeId ?? null,
                     budget_cat_id: budgetCatId,
                     is_include: d.is_include ?? null,
@@ -745,15 +856,15 @@ module.exports = {
                     updated_at: new Date(),
                   }));
 
-                  if (insertData.length) {
-                    try {
-                      await db.budgetBookOthersObj.bulkCreate(insertData);
-                    } catch (error) {
-                      console.error(
-                        `❌ Error inserting scopeOther for site ${siteId}, category ${budgetCatId}:`,
-                        error
-                      );
-                    }
+                  if (!insertData.length) continue;
+
+                  try {
+                    await db.budgetBookOthersObj.bulkCreate(insertData);
+                  } catch (error) {
+                    console.error(
+                      `❌ Error inserting scopeOther (site: ${siteId}, cat: ${budgetCatId}):`,
+                      error
+                    );
                   }
                 }
               }

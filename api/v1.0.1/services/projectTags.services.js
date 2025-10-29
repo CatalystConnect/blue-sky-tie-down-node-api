@@ -32,7 +32,7 @@ module.exports = {
 
       const { rows, count } = await db.projectTagsObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "DESC"]],
+        order: [["order", "ASC"]],
         limit,
         offset,
       });

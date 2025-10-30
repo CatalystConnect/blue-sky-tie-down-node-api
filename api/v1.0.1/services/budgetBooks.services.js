@@ -249,6 +249,12 @@ module.exports = {
             separate: true,
           },
           {
+            model: db.veOptionsObj,
+            as: "veOptions",
+            required: false,
+            separate: true,
+          },
+          {
             model: db.budgetBooksDrawingsObj,
             as: "budgetBooksDrawings",
             required: false,

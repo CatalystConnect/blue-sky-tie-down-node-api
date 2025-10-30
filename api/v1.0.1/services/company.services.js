@@ -56,6 +56,14 @@ module.exports = {
         ];
       }
 
+       const includeRelation = [
+      {
+        model: db.companyTypeObj,
+        as: "companyType",
+       
+      },
+    ];
+
       if (take_all === "all") {
         const companies = await db.companyObj.findAll({
           where: whereCondition,
@@ -70,6 +78,7 @@ module.exports = {
         order: order,
         limit: per_page,
         offset: offset,
+        include: includeRelation,
       });
 
       return {

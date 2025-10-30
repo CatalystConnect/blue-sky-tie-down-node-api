@@ -33,8 +33,8 @@ module.exports = {
                 include: [
                     { model: db.companyObj, as: "company" }
                 ],
-                per_page,
-                offset,
+                limit: per_page,   
+                offset: offset,
             });
 
             return {

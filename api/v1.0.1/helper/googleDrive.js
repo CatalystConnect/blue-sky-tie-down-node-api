@@ -125,6 +125,7 @@ async function uploadFileToDrive(
     media,
     fields: "id, webViewLink",
     supportsAllDrives: true,
+    uploadType: "resumable", 
   });
 
   return file.data;

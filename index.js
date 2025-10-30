@@ -8,8 +8,10 @@ const auths = require("basic-auth");
 const swaggerDocumentV_1_0_0 = require("./api/apidocs/apiDoc.v1.0.0.json");
 const PORT = process.env.PORT || 8001;
 app.use(cors({ origin: "*" }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(

@@ -790,6 +790,89 @@ module.exports = {
           // ----------------------------------------
           // 2️⃣ Insert ScopeOther
           // ----------------------------------------
+          // if (Array.isArray(scopeOther) && scopeOther.length) {
+          //   const toNum = (val) => {
+          //     const num = Number(val);
+          //     return isFinite(num) ? num : null;
+          //   };
+
+          //   for (
+          //     let siteIndex = 0;
+          //     siteIndex < scopeOther.length;
+          //     siteIndex++
+          //   ) {
+          //     const siteGroup = scopeOther[siteIndex];
+
+          //     if (!siteGroup || typeof siteGroup !== "object") continue;
+
+          //     // Extract the single site key (UUID)
+          //     const siteKey = Object.keys(siteGroup)[0];
+          //     const siteDataArray = siteGroup[siteKey]; // like [null, [cat1Items], [cat2Items]]
+
+          //     if (!Array.isArray(siteDataArray)) continue;
+
+          //     // Loop over all categories (ignore first null index)
+          //     for (
+          //       let catIndex = 1;
+          //       catIndex < siteDataArray.length;
+          //       catIndex++
+          //     ) {
+          //       const categoryArray = siteDataArray[catIndex];
+
+          //       if (!Array.isArray(categoryArray)) continue;
+
+          //       // Each category array contains multiple items
+          //       for (const item of categoryArray) {
+          //         const siteId = item?.siteId ?? null;
+          //         const budgetCatId = item?.budget_Cat_Id ?? null;
+          //         const dataEntries = Object.values(item?.data || {});
+
+          //         // Filter out empty or invalid data objects
+          //         const validEntries = dataEntries.filter((d) =>
+          //           Object.values(d || {}).some(
+          //             (v) => v !== null && v !== "" && v !== undefined
+          //           )
+          //         );
+
+          //         if (!validEntries.length) continue;
+
+          //         // Prepare records for bulk insert
+          //         const insertData = validEntries.map((d) => ({
+          //           title: d.title || "Other",
+          //           budget_id: budgetBook.id,
+          //           site_id: siteId,
+          //           site_plan_id: sitePlanMap[siteIndex] ?? null, // map by site index
+          //           scopeId: d.scopeId ?? null,
+          //           budget_cat_id: budgetCatId,
+          //           is_include: d.is_include ?? null,
+          //           total: toNum(d.total),
+          //           price_sqft: toNum(d.pricePerSqft),
+          //           additionals: toNum(d.additional),
+          //           cost: toNum(d.cost),
+          //           price_w_additional: toNum(d.priceWithAdditional),
+          //           costSqft: toNum(d.costSqft),
+          //           optionPercentage: toNum(d.optionPercentage),
+          //           created_at: new Date(),
+          //           updated_at: new Date(),
+          //         }));
+
+          //         if (!insertData.length) continue;
+
+          //         try {
+          //           await db.budgetBookOthersObj.bulkCreate(insertData);
+          //         } catch (error) {
+          //           console.error(
+          //             `❌ Error inserting scopeOther (site: ${siteId}, cat: ${budgetCatId}):`,
+          //             error
+          //           );
+          //         }
+          //       }
+          //     }
+          //   }
+          // }
+          // ----------------------------------------
+          // 2️⃣ Insert ScopeOther
+          // ----------------------------------------
           if (Array.isArray(scopeOther) && scopeOther.length) {
             const toNum = (val) => {
               const num = Number(val);
@@ -803,31 +886,21 @@ module.exports = {
             ) {
               const siteGroup = scopeOther[siteIndex];
 
-              if (!siteGroup || typeof siteGroup !== "object") continue;
+              // Each siteGroup is an array: [null, [cat1Items], [cat2Items], ...]
+              if (!Array.isArray(siteGroup)) continue;
 
-              // Extract the single site key (UUID)
-              const siteKey = Object.keys(siteGroup)[0];
-              const siteDataArray = siteGroup[siteKey]; // like [null, [cat1Items], [cat2Items]]
-
-              if (!Array.isArray(siteDataArray)) continue;
-
-              // Loop over all categories (ignore first null index)
-              for (
-                let catIndex = 1;
-                catIndex < siteDataArray.length;
-                catIndex++
-              ) {
-                const categoryArray = siteDataArray[catIndex];
-
+              // Iterate over each category (skip the first null)
+              for (let catIndex = 1; catIndex < siteGroup.length; catIndex++) {
+                const categoryArray = siteGroup[catIndex];
                 if (!Array.isArray(categoryArray)) continue;
 
-                // Each category array contains multiple items
+                // Each categoryArray contains multiple item objects
                 for (const item of categoryArray) {
                   const siteId = item?.siteId ?? null;
                   const budgetCatId = item?.budget_Cat_Id ?? null;
                   const dataEntries = Object.values(item?.data || {});
 
-                  // Filter out empty or invalid data objects
+                  // Filter only valid, non-empty entries
                   const validEntries = dataEntries.filter((d) =>
                     Object.values(d || {}).some(
                       (v) => v !== null && v !== "" && v !== undefined
@@ -836,12 +909,12 @@ module.exports = {
 
                   if (!validEntries.length) continue;
 
-                  // Prepare records for bulk insert
+                  // Build insertable records
                   const insertData = validEntries.map((d) => ({
                     title: d.title || "Other",
                     budget_id: budgetBook.id,
                     site_id: siteId,
-                    site_plan_id: sitePlanMap[siteIndex] ?? null, // map by site index
+                    site_plan_id: sitePlanMap[siteIndex] ?? null,
                     scopeId: d.scopeId ?? null,
                     budget_cat_id: budgetCatId,
                     is_include: d.is_include ?? null,
@@ -852,6 +925,7 @@ module.exports = {
                     price_w_additional: toNum(d.priceWithAdditional),
                     costSqft: toNum(d.costSqft),
                     optionPercentage: toNum(d.optionPercentage),
+                    condition: d.condition ?? null, // ✅ Added condition support
                     created_at: new Date(),
                     updated_at: new Date(),
                   }));

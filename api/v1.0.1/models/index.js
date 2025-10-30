@@ -1116,4 +1116,9 @@ db.projectTypeMappingsObj.belongsTo(db.projectTypesObj, {
   as: "projectType",
 });
 
+db.companyObj.belongsTo(db.companyTypeObj, {
+  foreignKey: "company_type",
+  as: "companyType",
+});
+
 module.exports = db;

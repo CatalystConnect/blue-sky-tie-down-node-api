@@ -599,209 +599,92 @@ module.exports = {
         }));
         promises.push(db.projectBudgetsObj.bulkCreate(budgetRecords));
       }
+
       const sitePlanMap = [];
+
       if (Array.isArray(sitePlan) && sitePlan.length) {
         const sitePlanRecords = sitePlan.map((item) => ({
           budget_books_id: budgetBooksId,
           site_index: item.site_index ?? null,
           bldg_id: item.bldg_id ?? null,
           site_plan_name: item.sitePlan_name ?? null,
-          sov_sp: parseNumber(item.sov_sp),
-          sov_td: parseNumber(item.sov_td),
-          sov_up: parseNumber(item.sov_up),
-          sov_mc: parseNumber(item.sov_mc),
-          sov_total: parseNumber(item.sov_total),
+          sov_sp: item.sov_sp !== "" ? Number(item.sov_sp) : null,
+          sov_td: item.sov_td !== "" ? Number(item.sov_td) : null,
+          sov_up: item.sov_up !== "" ? Number(item.sov_up) : null,
+          sov_mc: item.sov_mc !== "" ? Number(item.sov_mc) : null,
+          sov_total: item.sov_total !== "" ? Number(item.sov_total) : null,
           order_no: item.order_no ?? null,
+          created_at: new Date(),
+          updated_at: new Date(),
         }));
 
         const createdSitePlans = await db.sitePlansObj.bulkCreate(
           sitePlanRecords
         );
-        createdSitePlans.forEach((plan, idx) => (sitePlanMap[idx] = plan.id));
+
+        createdSitePlans.forEach((plan, index) => {
+          sitePlanMap[index] = plan.id;
+        });
       }
-      // console.log("scopeOtherscopeOther", scopeOther);
-
-      // if (Array.isArray(scopeOther) && scopeOther.length) {
-      //   for (const siteGroup of scopeOther) {
-      //     // 🧩 Case 1: siteGroup is an object (normal structured)
-      //     if (
-      //       siteGroup &&
-      //       typeof siteGroup === "object" &&
-      //       !Array.isArray(siteGroup)
-      //     ) {
-      //       for (const [catKey, categoryArray] of Object.entries(siteGroup)) {
-      //         if (catKey === "data" || !Array.isArray(categoryArray)) continue; // skip junk keys
-
-      //         for (const item of categoryArray) {
-      //           if (!item || typeof item !== "object" || !item.data) continue;
-
-      //           const siteId = item.siteId ?? null;
-      //           const sitePlanId = item.site_plan_id ?? null;
-      //           const budgetCatId = item.budget_Cat_Id ?? null;
-      //           const otherReapterId = item.otherReapterId ?? null;
-
-      //           const dataEntries = Object.values(item.data || {});
-      //           if (!dataEntries.length) continue;
-
-      //           for (const entry of dataEntries) {
-      //             if (!entry || typeof entry !== "object") continue;
-
-      //             await db.budgetBookOthersObj.create({
-      //               budget_id: budgetBooksId,
-      //               site_id: siteId,
-      //               site_plan_id: sitePlanId,
-      //               budget_category_id: budgetCatId,
-      //               other_repeater_id: otherReapterId,
-      //               title: entry.title ?? null,
-      //               notes: entry.notes ?? null,
-      //               is_include: entry.is_include ?? null,
-      //               condition: entry.condition ?? null,
-      //               price_per_sqft: entry.pricePerSqft ?? null,
-      //               additional: entry.additional ?? null,
-      //               price_with_additional: entry.priceWithAdditional ?? null,
-      //               cost: entry.cost ?? null,
-      //               cost_sqft: entry.costSqft ?? null,
-      //               total_price: entry.total ?? null,
-      //               option_percentage: entry.optionPercentage ?? null,
-      //             });
-      //           }
-      //         }
-      //       }
-      //     }
-
-      //     // 🧩 Case 2: siteGroup is an array (nested arrays with null start)
-      //     else if (Array.isArray(siteGroup)) {
-      //       for (const categoryArray of siteGroup) {
-      //         if (!Array.isArray(categoryArray)) continue;
-
-      //         for (const item of categoryArray) {
-      //           if (!item || typeof item !== "object" || !item.data) continue;
-
-      //           const siteId = item.siteId ?? null;
-      //           const sitePlanId = item.site_plan_id ?? null;
-      //           const budgetCatId = item.budget_Cat_Id ?? null;
-      //           const otherReapterId = item.otherReapterId ?? null;
-
-      //           const dataEntries = Object.values(item.data || {});
-      //           if (!dataEntries.length) continue;
-
-      //           for (const entry of dataEntries) {
-      //             if (!entry || typeof entry !== "object") continue;
-
-      //             await db.budgetBookOthersObj.create({
-      //               budget_id: budgetBooksId,
-      //               site_id: siteId,
-      //               site_plan_id: sitePlanId,
-      //               budget_category_id: budgetCatId,
-      //               other_repeater_id: otherReapterId,
-      //               title: entry.title ?? null,
-      //               notes: entry.notes ?? null,
-      //               is_include: entry.is_include ?? null,
-      //               condition: entry.condition ?? null,
-      //               price_per_sqft: entry.pricePerSqft ?? null,
-      //               additional: entry.additional ?? null,
-      //               price_with_additional: entry.priceWithAdditional ?? null,
-      //               cost: entry.cost ?? null,
-      //               cost_sqft: entry.costSqft ?? null,
-      //               total_price: entry.total ?? null,
-      //               option_percentage: entry.optionPercentage ?? null,
-      //             });
-      //           }
-      //         }
-      //       }
-      //     }
-
-      //     // 🧩 Otherwise, skip
-      //     else {
-      //       continue;
-      //     }
-      //   }
-      // }
-
-      // 🧩 Debug: Pretty-print scopeOther without breaking structure
-
-      // 🧩 Process scopeOther and insert into DB
       if (Array.isArray(scopeOther) && scopeOther.length) {
-        for (const siteGroup of scopeOther) {
-          // 🧩 Case 1: Object structure like { "1": [...], "2": [...] }
-          if (
-            siteGroup &&
-            typeof siteGroup === "object" &&
-            !Array.isArray(siteGroup)
-          ) {
-            for (const [catKey, categoryArray] of Object.entries(siteGroup)) {
-              if (catKey === "data" || !Array.isArray(categoryArray)) continue;
+        const toNum = (val) => {
+          const num = Number(val);
+          return isFinite(num) ? num : null;
+        };
 
-              for (const item of categoryArray) {
-                if (!item || typeof item !== "object" || !item.data) continue;
+        let totalInserted = 0;
 
-                const dataEntries = Object.values(item.data || {});
-                if (!dataEntries.length) continue;
+        for (let siteIndex = 0; siteIndex < scopeOther.length; siteIndex++) {
+          const siteObj = scopeOther[siteIndex];
+          if (!siteObj || typeof siteObj !== "object") continue;
 
-                for (const entry of dataEntries) {
-                  await db.budgetBookOthersObj.create({
-                    budget_id: budgetBooksId,
-                    site_id: item.siteId ?? null,
-                    site_plan_id: item.site_plan_id ?? null,
-                    budget_category_id: item.budget_Cat_Id ?? null,
-                    other_repeater_id: item.otherReapterId ?? null,
-                    title: entry.title ?? null,
-                    notes: entry.notes ?? null,
-                    is_include: entry.is_include ?? null,
-                    condition: entry.condition ?? null,
-                    price_per_sqft: entry.pricePerSqft ?? null,
-                    additional: entry.additional ?? null,
-                    price_with_additional: entry.priceWithAdditional ?? null,
-                    cost: entry.cost ?? null,
-                    cost_sqft: entry.costSqft ?? null,
-                    total_price: entry.total ?? null,
-                    option_percentage: entry.optionPercentage ?? null,
-                  });
-                }
-              }
-            }
-          }
+          const currentSitePlanId = sitePlanMap[siteIndex] ?? null;
 
-          // 🧩 Case 2: Nested array structure like [null, [...], [...]]
-          else if (Array.isArray(siteGroup)) {
-            // Filter valid category arrays only (skip nulls or non-arrays)
-            const validCategories = siteGroup.filter((cat) =>
-              Array.isArray(cat)
-            );
+          for (const [catKey, catItems] of Object.entries(siteObj)) {
+            if (catKey === "data" || !Array.isArray(catItems)) continue;
 
-            for (const categoryArray of validCategories) {
-              for (const item of categoryArray) {
-                if (!item || typeof item !== "object" || !item.data) continue;
+            const budgetCatId = Number(catKey);
 
-                const dataEntries = Object.values(item.data || {});
-                if (!dataEntries.length) continue;
+            for (const item of catItems) {
+              const siteId = item?.siteId ?? null;
+              const dataEntries = Object.values(item?.data || {});
 
-                for (const entry of dataEntries) {
-                  await db.budgetBookOthersObj.create({
-                    budget_id: budgetBooksId,
-                    site_id: item.siteId ?? null,
-                    site_plan_id: item.site_plan_id ?? null,
-                    budget_category_id: item.budget_Cat_Id ?? null,
-                    other_repeater_id: item.otherReapterId ?? null,
-                    title: entry.title ?? null,
-                    notes: entry.notes ?? null,
-                    is_include: entry.is_include ?? null,
-                    condition: entry.condition ?? null,
-                    price_per_sqft: entry.pricePerSqft ?? null,
-                    additional: entry.additional ?? null,
-                    price_with_additional: entry.priceWithAdditional ?? null,
-                    cost: entry.cost ?? null,
-                    cost_sqft: entry.costSqft ?? null,
-                    total_price: entry.total ?? null,
-                    option_percentage: entry.optionPercentage ?? null,
-                  });
-                }
+              const validEntries = dataEntries.filter((d) =>
+                Object.values(d || {}).some(
+                  (v) => v !== null && v !== "" && v !== undefined
+                )
+              );
+
+              if (!validEntries.length) continue;
+
+              const insertData = validEntries.map((d) => ({
+                title: d.title || "Other",
+                budget_id: budgetBooksId,
+                site_id: siteId,
+                site_plan_id: currentSitePlanId,
+                scopeId: d.scopeId ?? null,
+                budget_cat_id: budgetCatId,
+                is_include: d.is_include ?? null,
+                total: toNum(d.total),
+                price_sqft: toNum(d.pricePerSqft),
+                additionals: toNum(d.additional),
+                cost: toNum(d.cost),
+                price_w_additional: toNum(d.priceWithAdditional),
+                costSqft: toNum(d.costSqft),
+                optionPercentage: toNum(d.optionPercentage),
+                condition: d.condition ?? null,
+                created_at: new Date(),
+                updated_at: new Date(),
+              }));
+
+              if (insertData.length) {
+                await db.budgetBookOthersObj.bulkCreate(insertData);
+                totalInserted += insertData.length;
               }
             }
           }
         }
       }
-
 
       if (Array.isArray(sitePlan2) && sitePlan2.length) {
         promises.push(

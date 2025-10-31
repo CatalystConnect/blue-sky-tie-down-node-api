@@ -255,6 +255,12 @@ module.exports = {
             separate: true,
           },
           {
+            model: db.optionPackageObj,
+            as: "optionPackages",
+            required: false,
+            separate: true,
+          },
+          {
             model: db.budgetBooksDrawingsObj,
             as: "budgetBooksDrawings",
             required: false,

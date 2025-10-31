@@ -1174,33 +1174,33 @@ module.exports = {
     }
   },
 
-  async getAllBudgetBooksHistory(budget_id, page, per_page) {
-    const limit = parseInt(per_page) || 10;
-    const offset = (parseInt(page) - 1) * limit;
+  // async getAllBudgetBooksHistory(budget_id, page, per_page) {
+  //   const limit = parseInt(per_page) || 10;
+  //   const offset = (parseInt(page) - 1) * limit;
 
-    const { count, rows } = await db.budgetHistoryObj.findAndCountAll({
-      where: { budget_id },
-      include: [
+  //   const { count, rows } = await db.budgetHistoryObj.findAndCountAll({
+  //     where: { budget_id },
+  //     include: [
        
-      ],
-      order: [["id", "DESC"]],
-      limit,
-      offset,
-    });
+  //     ],
+  //     order: [["id", "DESC"]],
+  //     limit,
+  //     offset,
+  //   });
 
-    const totalPages = Math.ceil(count / limit);
+  //   const totalPages = Math.ceil(count / limit);
 
-    return {
-      count,
-      rows,
-      pagination: {
-        total: count,
-        current_page: parseInt(page),
-        per_page: limit,
-        total_pages: totalPages,
-      },
-    };
-  }
+  //   return {
+  //     count,
+  //     rows,
+  //     pagination: {
+  //       total: count,
+  //       current_page: parseInt(page),
+  //       per_page: limit,
+  //       total_pages: totalPages,
+  //     },
+  //   };
+  // }
 
 
 };

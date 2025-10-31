@@ -1192,32 +1192,32 @@ module.exports = {
     }
   },
 
-  async getAllBudgetBooksHistory(req, res) {
-  try {
-    const { budgetId, page = 1, per_page = 10 } = req.query;
+//   async getAllBudgetBooksHistory(req, res) {
+//   try {
+//     const { budgetId, page = 1, per_page = 10 } = req.query;
 
-    if (!budgetId) {
-      return res
-        .status(400)
-        .json(commonHelper.errorResponse("budget_book_id is required"));
-    }
+//     if (!budgetId) {
+//       return res
+//         .status(400)
+//         .json(commonHelper.errorResponse("budget_book_id is required"));
+//     }
 
-    const result = await budgetBooksServices.getAllBudgetBooksHistory(
-      budgetId,
-      page,
-      per_page
-    );
+//     const result = await budgetBooksServices.getAllBudgetBooksHistory(
+//       budgetId,
+//       page,
+//       per_page
+//     );
 
-     return res.status(200).json({
-        success: true,
-        message: "Budget book history fetched successfully",
-         data: result.rows,
-        pagination: result.pagination,
-      });
-  } catch (error) {
-    console.error("Error in getAllBudgetBooksHistory:", error);
-    return res.status(500).json(commonHelper.errorResponse(error.message));
-  }
-}
+//      return res.status(200).json({
+//         success: true,
+//         message: "Budget book history fetched successfully",
+//          data: result.rows,
+//         pagination: result.pagination,
+//       });
+//   } catch (error) {
+//     console.error("Error in getAllBudgetBooksHistory:", error);
+//     return res.status(500).json(commonHelper.errorResponse(error.message));
+//   }
+// }
 
 };

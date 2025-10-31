@@ -605,6 +605,7 @@ module.exports = {
         where: whereClause,
         limit,
         offset,
+        distinct: true,
         attributes: [
           "id",
           "user_id",

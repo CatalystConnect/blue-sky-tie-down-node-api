@@ -804,7 +804,7 @@ module.exports = {
 
   async getAllBudgetBooks(req, res) {
     try {
-      let { page = "1", per_page = "10", take_all = "" } = req.query;
+      let { page = "1", per_page = "10", take_all = "" ,id} = req.query;
 
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
@@ -816,6 +816,7 @@ module.exports = {
           page,
           per_page,
           take_all,
+          id
         });
 
       return res.status(200).json({

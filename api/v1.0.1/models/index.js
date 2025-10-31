@@ -1175,4 +1175,10 @@ db.companyObj.belongsTo(db.companyTypeObj, {
   as: "companyType",
 });
 
+db.budgetHistoryObj.belongsTo(db.projectObj, {
+  foreignKey: "project_id",
+  as: "budgetProject",
+});
+
+
 module.exports = db;

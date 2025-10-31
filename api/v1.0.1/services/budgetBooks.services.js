@@ -1,7 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, literal } = require("sequelize");
 const slugify = require("slugify");
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
   },
   async getAllBudgetBooks(query) {
     try {
-      let { page = 1, per_page = 10, take_all = false } = query;
+      let { page = 1, per_page = 10, take_all = false, id } = query;
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
       const offset = (page - 1) * per_page;
@@ -167,11 +167,30 @@ module.exports = {
           as: "budgetBookDocuments",
         },
       ];
+
+
+      let order = [["id", "DESC"]];
+
+      if (id) {
+        const parsedId = parseInt(id);
+        order = [
+          [
+            db.Sequelize.literal(
+              `CASE WHEN "budget_books"."project_id" = ${parsedId} THEN 0 ELSE 1 END`
+            ),
+            "ASC",
+          ],
+          ["id", "DESC"],
+        ];
+      }
+      console.log(db.budgetBooksObj.getTableName());
+
       const budgetBooks = await db.budgetBooksObj.findAll({
         limit: take_all ? undefined : per_page,
         offset: take_all ? undefined : offset,
-        order: [["created_at", "DESC"]],
         include: budgetBookIncludes,
+        order,
+         
       });
 
       const total = await db.budgetBooksObj.count();
@@ -1038,10 +1057,10 @@ module.exports = {
 
       const projectSegments = segmentIds.length
         ? await db.budgetBooksScopeSegmentsObj.findAll({
-            where: {
-              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
-            },
-          })
+          where: {
+            [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
+          },
+        })
         : [];
 
       const scopesByCategoryId = {};

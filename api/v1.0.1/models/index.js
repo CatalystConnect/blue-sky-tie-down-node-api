@@ -1,6 +1,6 @@
 require("dotenv").config();
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../../../config/config')[env];
+const env = process.env.NODE_ENV || "development";
+const config = require(__dirname + "/../../../config/config")[env];
 const { Sequelize, Op } = require("sequelize");
 const dbObj = new Sequelize(config.url, config);
 const db = {};
@@ -26,8 +26,15 @@ db.leadNotesObj = require("./leadNotes.models")(db.dbObj, Sequelize);
 db.rolesObj = require("./roles.model")(db.dbObj, Sequelize);
 db.contractObj = require("./contract.models")(db.dbObj, Sequelize);
 db.workOrderObj = require("./workOrders.models")(db.dbObj, Sequelize);
-db.workOrderImagesObj = require("./workOrderImages.models")(db.dbObj, Sequelize);
-db.contractRegionObj = require("./contractorRegion.models")(db.dbObj, Sequelize);
+db.budgetHistoryObj = require("./budgetHistory.models")(db.dbObj, Sequelize);
+db.workOrderImagesObj = require("./workOrderImages.models")(
+  db.dbObj,
+  Sequelize
+);
+db.contractRegionObj = require("./contractorRegion.models")(
+  db.dbObj,
+  Sequelize
+);
 db.workOrderCategoriesObj = require("./workOrderCategories.model")(
   db.dbObj,
   Sequelize
@@ -40,7 +47,10 @@ db.contractorVerificationObj = require("./contractorVerification.models")(
   db.dbObj,
   Sequelize
 );
-db.leadInteractionsObj = require("./leadInteractions.models")(db.dbObj, Sequelize);
+db.leadInteractionsObj = require("./leadInteractions.models")(
+  db.dbObj,
+  Sequelize
+);
 db.catalogObj = require("./catalog.models")(db.dbObj, Sequelize);
 db.catalogVariationsObj = require("./catalogVariations.models")(
   db.dbObj,
@@ -55,14 +65,23 @@ db.configureAttributeObj = require("./configureAttribute.models")(
   db.dbObj,
   Sequelize
 );
-db.productAttributeObj = require("./productAttribute.models")(db.dbObj, Sequelize);
-db.productCategoryObj = require("./productCategory.models")(db.dbObj, Sequelize);
+db.productAttributeObj = require("./productAttribute.models")(
+  db.dbObj,
+  Sequelize
+);
+db.productCategoryObj = require("./productCategory.models")(
+  db.dbObj,
+  Sequelize
+);
 db.productCategoryAssociationObj = require("./productCategoryAsso.models")(
   db.dbObj,
   Sequelize
 );
 db.inventoryObj = require("./inventory.models")(db.dbObj, Sequelize);
-db.inventoryImagesObj = require("./inventoryImages.models")(db.dbObj, Sequelize);
+db.inventoryImagesObj = require("./inventoryImages.models")(
+  db.dbObj,
+  Sequelize
+);
 db.applyWorkOrderObj = require("./applyWorkOrder.models")(db.dbObj, Sequelize);
 db.catalogAttributeObj = require("./catalologAttributes.models")(
   db.dbObj,
@@ -119,7 +138,10 @@ db.generatedContractorsObj = require("./generatedContractors.models")(
 );
 db.wareHouseObj = require("./wareHouse.models")(db.dbObj, Sequelize);
 db.taxesObj = require("./taxes.models")(db.dbObj, Sequelize);
-db.serviceTypeitemsObj = require("./serviceTypeItem.models")(db.dbObj, Sequelize);
+db.serviceTypeitemsObj = require("./serviceTypeItem.models")(
+  db.dbObj,
+  Sequelize
+);
 db.projectImagesObj = require("./projectImages.models")(db.dbObj, Sequelize);
 db.warehouseItemsObj = require("./warehouseItems.models")(db.dbObj, Sequelize);
 db.departmentObj = require("./departments.models")(db.dbObj, Sequelize);
@@ -129,11 +151,17 @@ db.projectTypesObj = require("./projectTypes.models")(db.dbObj, Sequelize);
 db.ticketsObj = require("./tickets.models")(db.dbObj, Sequelize);
 
 db.leadTeamsObj = require("./leadTeams.models")(db.dbObj, Sequelize);
-db.leadTeamsMemberObj = require("./leadTeamMembers.models")(db.dbObj, Sequelize);
+db.leadTeamsMemberObj = require("./leadTeamMembers.models")(
+  db.dbObj,
+  Sequelize
+);
 db.leadTypesObj = require("./leadTypes.models")(db.dbObj, Sequelize);
 db.teamsCodesObj = require("./termsCodes.models")(db.dbObj, Sequelize);
 
-db.interactionTypesObj = require("./interactionTypes.models")(db.dbObj, Sequelize);
+db.interactionTypesObj = require("./interactionTypes.models")(
+  db.dbObj,
+  Sequelize
+);
 db.contactsObj = require("./contacts.models")(db.dbObj, Sequelize);
 db.salesPipelineGroupsObj = require("./salesPipelineGroups.models")(
   db.dbObj,
@@ -175,9 +203,15 @@ db.budgetBooksDrawingsObj = require("./budgetBooksDrawings.models")(
 );
 db.budgetBooksObj = require("./budgetBooks.models")(db.dbObj, Sequelize);
 db.sitePlansObj = require("./sitePlans.models")(db.dbObj, Sequelize);
-db.budgetBooksSitesObj = require("./budgetBooksSites.models")(db.dbObj, Sequelize);
+db.budgetBooksSitesObj = require("./budgetBooksSites.models")(
+  db.dbObj,
+  Sequelize
+);
 db.projectBudgetsObj = require("./projectBudgets.models")(db.dbObj, Sequelize);
-db.budgetBookOthersObj = require("./budgetBookOthers.models")(db.dbObj, Sequelize);
+db.budgetBookOthersObj = require("./budgetBookOthers.models")(
+  db.dbObj,
+  Sequelize
+);
 db.sitePlanItemsObj = require("./sitePlanItems.models")(db.dbObj, Sequelize);
 db.veOptionsObj = require("./veOptions.models")(db.dbObj, Sequelize);
 db.optionPackageObj = require("./optionPackage.models")(db.dbObj, Sequelize);
@@ -259,6 +293,10 @@ db.budgetBooksObj.hasMany(db.veOptionsObj, {
   foreignKey: "budget_books_id",
   as: "veOptions",
 });
+db.budgetBooksObj.hasMany(db.optionPackageObj, {
+  foreignKey: "budget_books_id",
+  as: "optionPackages",
+});
 db.budgetBooksObj.hasMany(db.sitePlansObj, {
   foreignKey: "budget_books_id",
   as: "sitePlan",
@@ -279,6 +317,7 @@ db.budgetBooksObj.hasMany(db.budgetBooksScopesObj, {
   foreignKey: "budget_books_id",
   as: "projectScopes",
 });
+
 db.budgetBooksScopesObj.hasMany(db.budgetBooksScopeCategoriesObj, {
   foreignKey: "budget_books_scope_id",
   as: "categories",
@@ -321,6 +360,18 @@ db.budgetBooksObj.hasMany(db.budgetBooksScopeIncludesObj, {
 db.budgetBooksObj.hasMany(db.budgetBooksContractsObj, {
   foreignKey: "budget_books_id",
   as: "budgetBooksContracts",
+});
+db.budgetBooksContractsObj.belongsTo(db.contractComponentsObj, {
+  foreignKey: "contract_component_id",
+  as: "contractComponents",
+});
+db.budgetBooksKeyAreasObj.belongsTo(db.budgetKeyAreasObj, {
+  foreignKey: "key_area_id",
+  as: "budgetKeyAreas",
+});
+db.budgetBooksDrawingsObj.belongsTo(db.submittalsObj, {
+  foreignKey: "submittal_id",
+  as: "submittals",
 });
 db.budgetBooksObj.hasMany(db.budgetBooksKeyAreasObj, {
   foreignKey: "budget_books_id",
@@ -1080,7 +1131,6 @@ db.projectObj.belongsTo(db.projectTagsObj, {
   as: "projectTag",
 });
 
-
 db.projectObj.hasMany(db.projectTagMappingsObj, {
   foreignKey: "project_id",
   as: "projectTagsMapping",
@@ -1090,7 +1140,6 @@ db.projectTagMappingsObj.belongsTo(db.projectTagsObj, {
   foreignKey: "tag_id",
   as: "tags",
 });
-
 
 db.projectObj.hasMany(db.gDriveAssociationObj, {
   foreignKey: "parent",
@@ -1107,8 +1156,10 @@ db.budgetBooksObj.hasMany(db.budgetBookDocumentsObj, {
   as: "budgetBookDocuments",
 });
 
-db.leadsObj.hasMany(db.budgetBooksObj, { foreignKey: "lead_id", as: "lead_budget" });
-
+db.leadsObj.hasMany(db.budgetBooksObj, {
+  foreignKey: "lead_id",
+  as: "lead_budget",
+});
 
 db.projectObj.hasMany(db.projectTypeMappingsObj, {
   foreignKey: "project_id",

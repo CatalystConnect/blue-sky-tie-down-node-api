@@ -1032,10 +1032,10 @@ module.exports = {
 
       const projectSegments = segmentIds.length
         ? await db.budgetBooksScopeSegmentsObj.findAll({
-            where: {
-              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
-            },
-          })
+          where: {
+            [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
+          },
+        })
         : [];
 
       const scopesByCategoryId = {};
@@ -1173,4 +1173,34 @@ module.exports = {
       return { success: false, message: "Internal server error" };
     }
   },
+
+  async getAllBudgetBooksHistory(budget_id, page, per_page) {
+    const limit = parseInt(per_page) || 10;
+    const offset = (parseInt(page) - 1) * limit;
+
+    const { count, rows } = await db.budgetHistoryObj.findAndCountAll({
+      where: { budget_id },
+      include: [
+       
+      ],
+      order: [["id", "DESC"]],
+      limit,
+      offset,
+    });
+
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      count,
+      rows,
+      pagination: {
+        total: count,
+        current_page: parseInt(page),
+        per_page: limit,
+        total_pages: totalPages,
+      },
+    };
+  }
+
+
 };

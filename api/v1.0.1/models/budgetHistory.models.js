@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const budgetHistory = sequelize.define(
-    "budget_book_documents",
+    "budget_history",
     {
       id: {
         type: Sequelize.INTEGER,

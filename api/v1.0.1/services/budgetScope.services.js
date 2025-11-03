@@ -62,6 +62,7 @@ module.exports = {
           {
             model: db.scopeCategoryObj,
             as: "categories",
+            order: [["order_index", "ASC"]],
             include: [
               {
                 model: db.scopeGroupObj,

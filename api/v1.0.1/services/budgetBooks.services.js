@@ -1199,9 +1199,23 @@ module.exports = {
     }
   },
 
-  async getAllBudgetBooksHistory(budget_book_id, page, per_page) {
+  async getAllBudgetBooksHistory(budget_book_id,revision_id, revision_status, page, per_page) {
     const limit = parseInt(per_page) || 10;
     const offset = (parseInt(page) - 1) * limit;
+
+    if (revision_id && revision_status !== undefined) {
+    
+       await db.budgetHistoryObj.update(
+        { revision_status },
+        {
+          where: {
+            budget_book_id: budget_book_id,
+            id: revision_id,
+          },
+        }
+      );
+     
+    }
 
     const { count, rows } = await db.budgetHistoryObj.findAndCountAll({
       where: { budget_book_id },

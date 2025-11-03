@@ -1905,7 +1905,7 @@ module.exports = {
 
   async getAllBudgetBooksHistory(req, res) {
     try {
-      const { budgetId, page = 1, per_page = 10 } = req.query;
+      const { budgetId,revision_id, revision_status, page = 1, per_page = 10 } = req.query;
 
       if (!budgetId) {
         return res
@@ -1915,6 +1915,8 @@ module.exports = {
 
       const result = await budgetBooksServices.getAllBudgetBooksHistory(
         budgetId,
+        revision_id, 
+        revision_status,
         page,
         per_page
       );

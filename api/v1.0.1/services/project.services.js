@@ -177,6 +177,7 @@ module.exports = {
       // ✅ If `take_all` is true, ignore pagination
       const queryOptions = {
         where: whereClause,
+        distinct: true,
         attributes: [
           "id",
           "user_id",
@@ -276,6 +277,7 @@ module.exports = {
       }
 
       const { rows, count } = await db.projectObj.findAndCountAll(queryOptions);
+      
 
       return {
         data: rows,

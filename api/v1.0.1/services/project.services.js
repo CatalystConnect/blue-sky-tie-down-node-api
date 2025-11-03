@@ -1120,7 +1120,7 @@ module.exports = {
       const limit = parseInt(per_page) || 10;
       const offset = (parseInt(page) - 1) * limit || 0;
       const whereClause = {
-        takeoff_status: "PROJECT DATA COLLECTED",
+        takeoff_status: "project_data_collected",
       };
 
       if (search) {
@@ -1568,7 +1568,7 @@ module.exports = {
       const limit = parseInt(per_page) || 10;
       const offset = (parseInt(page) - 1) * limit || 0;
 
-      const whereClause = { takeoff_status: "TAKEOFF ASSIGNED" };
+      const whereClause = { takeoff_status: "takeoff_assigned" };
 
       if (search) {
         whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };

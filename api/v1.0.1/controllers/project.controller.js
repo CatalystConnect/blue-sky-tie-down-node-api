@@ -311,14 +311,19 @@ module.exports = {
   },
   async getAllProject(req, res) {
     try {
-      let { page, per_page, search } = req.query;
+      let { page, per_page, search,take_all,id } = req.query;
       if (page <= 0 || per_page <= 0) {
         throw new Error("Page and length must be greater than 0");
       }
+
+      take_all = take_all === "all";
+
       let getAllProject = await projectServices.getAllProject(
         page,
         per_page,
-        search
+        search,
+        take_all,
+        id
       );
       if (!getAllProject) throw new Error("Projects not found");
       return res.status(200).send({

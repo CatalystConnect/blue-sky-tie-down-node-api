@@ -1777,7 +1777,7 @@ module.exports = {
           to: offset + formattedProjects.length,
           last_page: Math.ceil(count / limit),
           per_page: limit,
-          total: count,
+          total: projects.length,
         },
       };
     } catch (e) {

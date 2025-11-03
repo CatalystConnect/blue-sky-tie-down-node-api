@@ -41,7 +41,8 @@ module.exports = {
         const catPostData = {
           user_id : req.userId,
           scope_id : scopeId,
-          title : category.title
+          title : category.title,
+          order_index: i,
         }
         const categoryObj = await scopeCategoryServices.add(catPostData);
         const categoryId = categoryObj.id;
@@ -262,14 +263,16 @@ module.exports = {
         if( category?.id ){
           categoryId = category.id;
           const catPostData = {
-            title : category.title
+            title : category.title,
+             order_index: i,
           }
           await scopeCategoryServices.update(categoryId, catPostData);
         }else{
           const catPostData = {
             user_id : req.userId,
             scope_id : scopeId,
-            title : category.title
+            title : category.title,
+            order_index: i, 
           }
           const categoryObj = await scopeCategoryServices.add(catPostData);
           categoryId = categoryObj.id;

@@ -661,7 +661,12 @@ module.exports = {
       };
 
       if (search && search.trim() !== "") {
-        projectWhere.name = { [db.Sequelize.Op.like]: `%${search}%` };
+        projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
+          db.Sequelize.fn('LOWER', db.Sequelize.col('project.name')),
+          {
+            [db.Sequelize.Op.like]: `%${search.toLowerCase()}%`
+          }
+        );
       }
 
       // ✅ 1️⃣ Main query with pagination

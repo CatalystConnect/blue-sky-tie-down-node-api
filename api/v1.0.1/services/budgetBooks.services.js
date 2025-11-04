@@ -168,7 +168,6 @@ module.exports = {
         },
       ];
 
-
       let order = [["id", "DESC"]];
 
       if (id) {
@@ -190,7 +189,6 @@ module.exports = {
         offset: take_all ? undefined : offset,
         include: budgetBookIncludes,
         order,
-         
       });
 
       const total = await db.budgetBooksObj.count();
@@ -1057,10 +1055,10 @@ module.exports = {
 
       const projectSegments = segmentIds.length
         ? await db.budgetBooksScopeSegmentsObj.findAll({
-          where: {
-            [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
-          },
-        })
+            where: {
+              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
+            },
+          })
         : [];
 
       const scopesByCategoryId = {};
@@ -1199,13 +1197,18 @@ module.exports = {
     }
   },
 
-  async getAllBudgetBooksHistory(budget_book_id,revision_id, revision_status, page, per_page) {
+  async getAllBudgetBooksHistory(
+    budget_book_id,
+    revision_id,
+    revision_status,
+    page,
+    per_page
+  ) {
     const limit = parseInt(per_page) || 10;
     const offset = (parseInt(page) - 1) * limit;
 
     if (revision_id && revision_status !== undefined) {
-    
-       await db.budgetHistoryObj.update(
+      await db.budgetHistoryObj.update(
         { revision_status },
         {
           where: {
@@ -1214,7 +1217,6 @@ module.exports = {
           },
         }
       );
-     
     }
 
     const { count, rows } = await db.budgetHistoryObj.findAndCountAll({
@@ -1244,123 +1246,6 @@ module.exports = {
     };
   },
 
-  // async getBudgetBySegment({
-  //   engineer_id,
-  //   scope_id,
-  //   sagment_id,
-  //   current_project,
-  //   page = 1,
-  //   per_page = 10,
-  // }) {
-  //   const offset = (page - 1) * per_page;
-
-  //   const { count, rows: budgetBooks } =
-  //     await db.budgetBooksObj.findAndCountAll({
-  //       where: {
-  //         engineer_id,
-  //         ...(current_project ? { id: { [Op.ne]: current_project } } : {}),
-  //       },
-  //       include: [
-  //         {
-  //           model: db.projectObj,
-  //           as: "budgetProject",
-  //           required: false,
-  //         },
-  //         {
-  //           model: db.companyObj,
-  //           as: "engineer",
-  //           required: false,
-  //         },
-  //         {
-  //           model: db.budgetBooksScopesObj,
-  //           as: "projectScopes",
-  //           required: true,
-  //           where: { scope_id },
-  //           include: [
-  //             {
-  //               model: db.budgetBooksScopeCategoriesObj,
-  //               as: "categories",
-  //               required: true,
-  //               include: [
-  //                 {
-  //                   model: db.budgetBooksScopeGroupsObj,
-  //                   as: "groups",
-  //                   required: true,
-  //                   include: [
-  //                     {
-  //                       model: db.budgetBooksScopeSegmentsObj,
-  //                       as: "segments",
-  //                       required: true,
-  //                       where: { scope_sagment_id: sagment_id },
-  //                     },
-  //                   ],
-  //                 },
-  //               ],
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //       limit: per_page,
-  //       offset,
-  //       distinct: true,
-  //     });
-
-  //   // ---------- FORMAT RESULT ----------
-  //   const formatted = [];
-
-  //   for (const budgetBook of budgetBooks) {
-  //     const b = budgetBook.toJSON();
-
-  //     if (Array.isArray(b.projectScopes)) {
-  //       for (const scope of b.projectScopes) {
-  //         if (Array.isArray(scope.categories)) {
-  //           for (const category of scope.categories) {
-  //             if (Array.isArray(category.groups)) {
-  //               for (const group of category.groups) {
-  //                 if (Array.isArray(group.segments)) {
-  //                   for (const segment of group.segments) {
-  //                     formatted.push({
-  //                       projectName: b.budgetProject?.name || "N/A",
-  //                       engineer: b.engineer?.name || "N/A",
-  //                       scopeTitle: scope.title || "N/A",
-  //                       categoryTitle: category.title || "N/A",
-  //                       groupTitle: group.title || "N/A",
-  //                       segmentTitle: segment.title || "N/A",
-  //                       cost: `$${Number(segment.cost || 0).toFixed(2)}`,
-  //                       sqft: Number(b.bldg_sqft || 0),
-  //                       option: segment.is_include ?? "N/A",
-  //                       condition: segment.conditions ?? "N/A",
-  //                       notes: segment.notes ?? "N/A",
-  //                       total: Number(segment.total || 0),
-  //                       optionPercentage: segment.optionPercentage ?? "N/A",
-  //                       site_id: segment.site_id || null,
-  //                     });
-  //                   }
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   const last_page = Math.ceil(count / per_page);
-  //   const from = count === 0 ? 0 : offset + 1;
-  //   const to = count === 0 ? 0 : Math.min(offset + per_page, count);
-
-  //   return {
-  //     data: formatted,
-  //     meta: {
-  //       current_page: page,
-  //       from: count === 0 ? 0 : from,
-  //       last_page,
-  //       per_page,
-  //       to: count === 0 ? 0 : to,
-  //       total: count,
-  //     },
-  //   };
-  // },
   async getBudgetBySegment({
     engineer_id,
     scope_id,
@@ -1504,6 +1389,70 @@ module.exports = {
         message: "Internal server error while fetching budget segment data.",
         error: error.message,
       };
+    }
+  },
+
+  async findBudgetHistoryDetailById(budgetId) {
+    try {
+      const budgetHistoryDetails = await db.budgetHistoryObj.findByPk(
+        budgetId,
+        {
+          include: [
+            {
+              model: db.projectObj,
+              as: "budgetProject",
+              required: false,
+              attributes: ["id", "name"],
+            },
+          ],
+        }
+      );
+
+      if (!budgetHistoryDetails) {
+        return null;
+      }
+      let log = {};
+      try {
+        log = JSON.parse(budgetHistoryDetails.log || "{}");
+      } catch (e) {
+        console.warn("Invalid JSON log for budgetHistory ID:", budgetId);
+        log = {};
+      }
+
+      const engineerId = log?.data?.engineer_id || null;
+      const customerId = log?.data?.customer_id || null;
+      const contactId = log?.data?.contact_id || null;
+
+      const [engineerDetails, customerDetails, contactDetails] =
+        await Promise.all([
+          engineerId ? db.companyObj.findByPk(engineerId) : null,
+          customerId ? db.userObj.findByPk(customerId) : null,
+          contactId ? db.contactsObj.findByPk(contactId) : null,
+        ]);
+
+      const budgetHistory = {
+        id: budgetHistoryDetails.id,
+        budget_id: budgetHistoryDetails.budget_id,
+        project_id: budgetHistoryDetails.project_id,
+        project_name: budgetHistoryDetails.budgetProject?.name || null,
+        engineer_id: engineerDetails?.id || null,
+        engineerName: engineerDetails?.name || null,
+        customer_id: customerDetails?.id || null,
+        customerName: customerDetails?.name || null,
+        contact_id: contactDetails?.id || null,
+        contactName: contactDetails?.name || null,
+        plan_date: log.plan_date || null,
+        plan_note: log.plan_note || null,
+        quote_date: log.quote_date || null,
+        created_at: budgetHistoryDetails.created_at,
+        updated_at: budgetHistoryDetails.updated_at,
+        log: log,
+      };
+
+      return budgetHistory;
+    } catch (error) {
+      console.error("Error in findBudgetHistoryDetailById service:", error);
+      return { success: false, message: "Internal server error" };
     }
   },
 };

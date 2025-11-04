@@ -18,5 +18,7 @@ router.delete("/budget-document-delete/:id", [authJwt.verifyToken], budgetBooksC
 router.get("/budgetBooksHistory", [authJwt.verifyToken], budgetBooksController.getAllBudgetBooksHistory);
 router.get("/get-budget-segment", [authJwt.verifyToken], budgetBooksController.getBudgetBySegment);
 
+router.get("/getBudgetHistoryDetailById", [authJwt.verifyToken], budgetBooksController.getBudgetHistoryDetailById);
+
 
 module.exports = router;

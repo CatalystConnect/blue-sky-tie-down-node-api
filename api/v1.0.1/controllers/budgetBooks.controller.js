@@ -804,7 +804,7 @@ module.exports = {
 
   async getAllBudgetBooks(req, res) {
     try {
-      let { page = "1", per_page = "10", take_all = "" ,id} = req.query;
+      let { page = "1", per_page = "10", take_all = "", id } = req.query;
 
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
@@ -816,7 +816,7 @@ module.exports = {
           page,
           per_page,
           take_all,
-          id
+          id,
         });
 
       return res.status(200).json({
@@ -1905,7 +1905,13 @@ module.exports = {
 
   async getAllBudgetBooksHistory(req, res) {
     try {
-      const { budgetId,revision_id, revision_status, page = 1, per_page = 10 } = req.query;
+      const {
+        budgetId,
+        revision_id,
+        revision_status,
+        page = 1,
+        per_page = 10,
+      } = req.query;
 
       if (!budgetId) {
         return res
@@ -1915,7 +1921,7 @@ module.exports = {
 
       const result = await budgetBooksServices.getAllBudgetBooksHistory(
         budgetId,
-        revision_id, 
+        revision_id,
         revision_status,
         page,
         per_page
@@ -1932,254 +1938,7 @@ module.exports = {
       return res.status(500).json(commonHelper.errorResponse(error.message));
     }
   },
-  // async getBudgetBySegment(req, res) {
-  //   // try {
-  //   //   const engineer_id = req.query.engineer_id;
-  //   //   const scope_id = req.query.scope_id;
-  //   //   const sagment_id = req.query.sagment_id;
-  //   //   const current_project = req.query.current_project;
 
-  //   //   if (!engineer_id || !scope_id || !sagment_id) {
-  //   //     return res.status(400).json({
-  //   //       message:
-  //   //         "engineer_id, scope_id & sagment_id parameters are required.",
-  //   //     });
-  //   //   }
-
-  //   //   const budgetBooks = await db.budgetBooksObj.findAll({
-  //   //     where: {
-  //   //       engineer_id,
-  //   //       ...(current_project ? { id: { [Op.ne]: current_project } } : {}),
-  //   //     },
-  //   //     include: [
-  //   //       {
-  //   //         model: db.projectObj,
-  //   //         as: "budgetProject",
-  //   //         required: false,
-  //   //       },
-  //   //       {
-  //   //         model: db.companyObj,
-  //   //         as: "engineer",
-  //   //         required: false,
-  //   //       },
-  //   //       {
-  //   //         model: db.budgetBooksScopesObj,
-  //   //         as: "projectScopes",
-  //   //         required: true,
-  //   //         where: { scope_id },
-  //   //         include: [
-  //   //           {
-  //   //             model: db.budgetBooksScopeCategoriesObj,
-  //   //             as: "categories",
-  //   //             required: true,
-  //   //             include: [
-  //   //               {
-  //   //                 model: db.budgetBooksScopeGroupsObj,
-  //   //                 as: "groups",
-  //   //                 required: true,
-  //   //                 include: [
-  //   //                   {
-  //   //                     model: db.budgetBooksScopeSegmentsObj,
-  //   //                     as: "segments",
-  //   //                     required: true,
-  //   //                     where: { scope_sagment_id: sagment_id },
-  //   //                   },
-  //   //                 ],
-  //   //               },
-  //   //             ],
-  //   //           },
-  //   //         ],
-  //   //       },
-  //   //     ],
-  //   //   });
-
-  //   //   const formatted = [];
-
-  //   //   for (const budgetBook of budgetBooks) {
-  //   //     const b = budgetBook.toJSON();
-
-  //   //     if (Array.isArray(b.projectScopes)) {
-  //   //       for (const scope of b.projectScopes) {
-  //   //         if (Array.isArray(scope.categories)) {
-  //   //           for (const category of scope.categories) {
-  //   //             if (Array.isArray(category.groups)) {
-  //   //               for (const group of category.groups) {
-  //   //                 if (Array.isArray(group.segments)) {
-  //   //                   for (const segment of group.segments) {
-  //   //                     formatted.push({
-  //   //                       projectName: b.budgetProject?.name || "N/A",
-  //   //                       engineer: b.engineer?.name || "N/A",
-  //   //                       scopeTitle: scope.title || "N/A",
-  //   //                       categoryTitle: category.title || "N/A",
-  //   //                       groupTitle: group.title || "N/A",
-  //   //                       segmentTitle: segment.title || "N/A",
-  //   //                       cost: `$${Number(segment.cost || 0).toFixed(2)}`,
-  //   //                       sqft: Number(b.bldg_sqft || 0),
-  //   //                       option: segment.is_include ?? "N/A",
-  //   //                       condition: segment.conditions ?? "N/A",
-  //   //                       notes: segment.notes ?? "N/A",
-  //   //                       total: Number(segment.total || 0),
-  //   //                       optionPercentage: segment.optionPercentage ?? "N/A",
-  //   //                       site_id: segment.site_id || null,
-  //   //                     });
-  //   //                   }
-  //   //                 }
-  //   //               }
-  //   //             }
-  //   //           }
-  //   //         }
-  //   //       }
-  //   //     }
-  //   //   }
-
-  //   //   return res.status(200).json({
-  //   //     status: true,
-  //   //     message: "Budget data fetched successfully",
-  //   //     total: formatted.length,
-  //   //     data: formatted,
-  //   //   });
-  //   // } catch (error) {
-  //   //   console.error("Error fetching budget segment data:", error);
-  //   //   return res.status(500).json({
-  //   //     message: "Internal server error while fetching budget segment data.",
-  //   //     error: error.message,
-  //   //   });
-  //   // }
-
-  //   try {
-  //     const engineer_id = req.query.engineer_id;
-  //     const scope_id = req.query.scope_id;
-  //     const sagment_id = req.query.sagment_id;
-  //     const current_project = req.query.current_project;
-
-  //     const page = parseInt(req.query.page) || 1;
-  //     const per_page = parseInt(req.query.per_page) || 10;
-  //     const offset = (page - 1) * per_page;
-
-  //     if (!engineer_id || !scope_id || !sagment_id) {
-  //       return res.status(400).json({
-  //         status: false,
-  //         message:
-  //           "engineer_id, scope_id & sagment_id parameters are required.",
-  //       });
-  //     }
-
-  //     const { count, rows: budgetBooks } =
-  //       await db.budgetBooksObj.findAndCountAll({
-  //         where: {
-  //           engineer_id,
-  //           ...(current_project ? { id: { [Op.ne]: current_project } } : {}),
-  //         },
-  //         include: [
-  //           {
-  //             model: db.projectObj,
-  //             as: "budgetProject",
-  //             required: false,
-  //           },
-  //           {
-  //             model: db.companyObj,
-  //             as: "engineer",
-  //             required: false,
-  //           },
-  //           {
-  //             model: db.budgetBooksScopesObj,
-  //             as: "projectScopes",
-  //             required: true,
-  //             where: { scope_id },
-  //             include: [
-  //               {
-  //                 model: db.budgetBooksScopeCategoriesObj,
-  //                 as: "categories",
-  //                 required: true,
-  //                 include: [
-  //                   {
-  //                     model: db.budgetBooksScopeGroupsObj,
-  //                     as: "groups",
-  //                     required: true,
-  //                     include: [
-  //                       {
-  //                         model: db.budgetBooksScopeSegmentsObj,
-  //                         as: "segments",
-  //                         required: true,
-  //                         where: { scope_sagment_id: sagment_id },
-  //                       },
-  //                     ],
-  //                   },
-  //                 ],
-  //               },
-  //             ],
-  //           },
-  //         ],
-  //         limit: per_page,
-  //         offset,
-  //         distinct: true,
-  //       });
-
-  //     const formatted = [];
-
-  //     for (const budgetBook of budgetBooks) {
-  //       const b = budgetBook.toJSON();
-
-  //       if (Array.isArray(b.projectScopes)) {
-  //         for (const scope of b.projectScopes) {
-  //           if (Array.isArray(scope.categories)) {
-  //             for (const category of scope.categories) {
-  //               if (Array.isArray(category.groups)) {
-  //                 for (const group of category.groups) {
-  //                   if (Array.isArray(group.segments)) {
-  //                     for (const segment of group.segments) {
-  //                       formatted.push({
-  //                         projectName: b.budgetProject?.name || "N/A",
-  //                         engineer: b.engineer?.name || "N/A",
-  //                         scopeTitle: scope.title || "N/A",
-  //                         categoryTitle: category.title || "N/A",
-  //                         groupTitle: group.title || "N/A",
-  //                         segmentTitle: segment.title || "N/A",
-  //                         cost: `$${Number(segment.cost || 0).toFixed(2)}`,
-  //                         sqft: Number(b.bldg_sqft || 0),
-  //                         option: segment.is_include ?? "N/A",
-  //                         condition: segment.conditions ?? "N/A",
-  //                         notes: segment.notes ?? "N/A",
-  //                         total: Number(segment.total || 0),
-  //                         optionPercentage: segment.optionPercentage ?? "N/A",
-  //                         site_id: segment.site_id || null,
-  //                       });
-  //                     }
-  //                   }
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     const last_page = Math.ceil(count / per_page);
-  //     const from = offset + 1;
-  //     const to = Math.min(offset + per_page, count);
-
-  //     return res.status(200).json({
-  //       status: true,
-  //       message: "Budget data fetched successfully",
-  //       data: formatted,
-  //       meta: {
-  //         current_page: page,
-  //         from: count === 0 ? 0 : from,
-  //         last_page,
-  //         per_page,
-  //         to: count === 0 ? 0 : to,
-  //         total: count,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching budget segment data:", error);
-  //     return res.status(500).json({
-  //       status: false,
-  //       message: "Internal server error while fetching budget segment data.",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   async getBudgetBySegment(req, res) {
     try {
       const { engineer_id, scope_id, sagment_id, current_project } = req.query;
@@ -2215,6 +1974,30 @@ module.exports = {
         message: "Internal server error while fetching budget segment data.",
         error: error.message,
       });
+    }
+  },
+
+  async getBudgetHistoryDetailById(req, res) {
+    try {
+      const budgetId = req.query.id;
+
+      const budgetHistory =
+        await budgetBooksServices.findBudgetHistoryDetailById(budgetId);
+
+      if (!budgetHistory) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Budget history not found" });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Budget history fetched successfully",
+        data: budgetHistory,
+      });
+    } catch (error) {
+      console.error("error in budgetHistoryDetailById:", error);
+      return res.status(500).json(commonHelper.errorResponse(error.message));
     }
   },
 };

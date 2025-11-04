@@ -66,18 +66,35 @@ module.exports = {
           as: "budgetBooksDrawings",
           required: false,
           separate: true,
+          include: [
+            { model: db.submittalsObj, as: "submittals", required: false },
+          ],
         },
         {
           model: db.budgetBooksKeyAreasObj,
           as: "budgetBooksKeyAreas",
           required: false,
           separate: true,
+          include: [
+            {
+              model: db.budgetKeyAreasObj,
+              as: "budgetKeyAreas",
+              required: false,
+            },
+          ],
         },
         {
           model: db.budgetBooksContractsObj,
           as: "budgetBooksContracts",
           required: false,
           separate: true,
+          include: [
+            {
+              model: db.contractComponentsObj,
+              as: "contractComponents",
+              required: false,
+            },
+          ],
         },
         {
           model: db.sitePlansObj,
@@ -265,6 +282,42 @@ module.exports = {
             required: false,
             separate: true,
           },
+
+          {
+            model: db.budgetBooksDrawingsObj,
+            as: "budgetBooksDrawings",
+            required: false,
+            separate: true,
+            include: [
+              { model: db.submittalsObj, as: "submittals", required: false },
+            ],
+          },
+          {
+            model: db.budgetBooksKeyAreasObj,
+            as: "budgetBooksKeyAreas",
+            required: false,
+            separate: true,
+            include: [
+              {
+                model: db.budgetKeyAreasObj,
+                as: "budgetKeyAreas",
+                required: false,
+              },
+            ],
+          },
+          {
+            model: db.budgetBooksContractsObj,
+            as: "budgetBooksContracts",
+            required: false,
+            separate: true,
+            include: [
+              {
+                model: db.contractComponentsObj,
+                as: "contractComponents",
+                required: false,
+              },
+            ],
+          },
           {
             model: db.veOptionsObj,
             as: "veOptions",
@@ -274,24 +327,6 @@ module.exports = {
           {
             model: db.optionPackageObj,
             as: "optionPackages",
-            required: false,
-            separate: true,
-          },
-          {
-            model: db.budgetBooksDrawingsObj,
-            as: "budgetBooksDrawings",
-            required: false,
-            separate: true,
-          },
-          {
-            model: db.budgetBooksKeyAreasObj,
-            as: "budgetBooksKeyAreas",
-            required: false,
-            separate: true,
-          },
-          {
-            model: db.budgetBooksContractsObj,
-            as: "budgetBooksContracts",
             required: false,
             separate: true,
           },
@@ -1391,7 +1426,71 @@ module.exports = {
       };
     }
   },
+  // async findBudgetHistoryDetailById(budgetId) {
+  //   try {
+  //     const budgetHistoryDetails = await db.budgetHistoryObj.findByPk(
+  //       budgetId,
+  //       {
+  //         include: [
+  //           {
+  //             model: db.projectObj,
+  //             as: "budgetProject",
+  //             required: false,
+  //             attributes: ["id", "name"],
+  //           },
+  //         ],
+  //       }
+  //     );
 
+  //     if (!budgetHistoryDetails) {
+  //       return null;
+  //     }
+
+  //     // Parse log JSON safely
+  //     let log = {};
+  //     try {
+  //       log = JSON.parse(budgetHistoryDetails.log || "{}");
+  //     } catch {
+  //       log = {};
+  //     }
+
+  //     // Extract related IDs
+  //     const engineerId = log?.data?.engineer_id || null;
+  //     const customerId = log?.data?.customer_id || null;
+  //     const contactId = log?.data?.contact_id || null;
+
+  //     // Fetch related entities in parallel
+  //     const [engineerDetails, customerDetails, contactDetails] =
+  //       await Promise.all([
+  //         engineerId ? db.companyObj.findByPk(engineerId) : null,
+  //         customerId ? db.userObj.findByPk(customerId) : null,
+  //         contactId ? db.contactsObj.findByPk(contactId) : null,
+  //       ]);
+
+  //     // ✅ Match Laravel response exactly
+  //     return {
+  //       ids: budgetHistoryDetails.id,
+  //       budget_id: budgetHistoryDetails.budget_id,
+  //       project_id: budgetHistoryDetails.project_id,
+  //       project_name: budgetHistoryDetails.budgetProject?.name || null,
+  //       engineer_id: engineerDetails?.id || null,
+  //       engineerName: engineerDetails?.name || null,
+  //       customer_id: customerDetails?.id || null,
+  //       customerName: customerDetails?.name || null,
+  //       contact_id: contactDetails?.id || null,
+  //       contactName: contactDetails?.name || null,
+  //       plan_date: log.plan_date || null,
+  //       plan_note: log.plan_note || null,
+  //       quote_date: log.quote_date || null,
+  //       created_at: budgetHistoryDetails.created_at,
+  //       updated_at: budgetHistoryDetails.updated_at,
+  //       log: log,
+  //     };
+  //   } catch (error) {
+  //     console.error("Error in findBudgetHistoryDetailById service:", error);
+  //     throw new Error("Internal server error");
+  //   }
+  // },
   async findBudgetHistoryDetailById(budgetId) {
     try {
       const budgetHistoryDetails = await db.budgetHistoryObj.findByPk(
@@ -1411,18 +1510,21 @@ module.exports = {
       if (!budgetHistoryDetails) {
         return null;
       }
+
+      // Parse log JSON safely
       let log = {};
       try {
         log = JSON.parse(budgetHistoryDetails.log || "{}");
-      } catch (e) {
-        console.warn("Invalid JSON log for budgetHistory ID:", budgetId);
+      } catch {
         log = {};
       }
 
+      // Extract related IDs
       const engineerId = log?.data?.engineer_id || null;
       const customerId = log?.data?.customer_id || null;
       const contactId = log?.data?.contact_id || null;
 
+      // Fetch related entities in parallel
       const [engineerDetails, customerDetails, contactDetails] =
         await Promise.all([
           engineerId ? db.companyObj.findByPk(engineerId) : null,
@@ -1430,8 +1532,9 @@ module.exports = {
           contactId ? db.contactsObj.findByPk(contactId) : null,
         ]);
 
-      const budgetHistory = {
-        id: budgetHistoryDetails.id,
+      // ✅ Match Laravel response exactly
+      return {
+        ids: budgetHistoryDetails.id,
         budget_id: budgetHistoryDetails.budget_id,
         project_id: budgetHistoryDetails.project_id,
         project_name: budgetHistoryDetails.budgetProject?.name || null,
@@ -1448,11 +1551,9 @@ module.exports = {
         updated_at: budgetHistoryDetails.updated_at,
         log: log,
       };
-
-      return budgetHistory;
     } catch (error) {
       console.error("Error in findBudgetHistoryDetailById service:", error);
-      return { success: false, message: "Internal server error" };
+      throw new Error("Internal server error");
     }
   },
 };

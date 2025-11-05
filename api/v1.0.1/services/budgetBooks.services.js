@@ -772,7 +772,7 @@ module.exports = {
               subject: item.subject || null,
               description: item.description || null,
               amount: item.amount || null,
-              optionDate: item.optionDate || null,
+              optionDate: item.date || null,
               groups: item.groups || null,
             }))
           )

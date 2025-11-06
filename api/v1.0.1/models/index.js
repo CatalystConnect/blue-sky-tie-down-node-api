@@ -1180,5 +1180,11 @@ db.budgetHistoryObj.belongsTo(db.projectObj, {
   as: "budgetProject",
 });
 
+db.leadNotesObj.belongsTo(db.userObj, { foreignKey: "user_id", as: "userName" });
+db.userObj.hasMany(db.leadNotesObj, {
+  foreignKey: "user_id",
+  as: "leadNotes",
+});
+
 
 module.exports = db;

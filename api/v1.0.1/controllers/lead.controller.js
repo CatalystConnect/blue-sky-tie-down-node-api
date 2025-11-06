@@ -342,7 +342,7 @@ module.exports = {
   async getAllLeadNotes(req, res) {
     try {
       let { page = 1, per_page, search, date, take_all, lead_id } = req.query;
-
+      
       page = parseInt(page);
       per_page = parseInt(per_page) || 10;
 

@@ -280,7 +280,7 @@ module.exports = {
     try {
       const limit = length || 10;
       const offset = (page - 1) * limit || 0;
-
+     
       let whereCondition = { lead_id: lead_id };
 
       if (search) {
@@ -296,9 +296,18 @@ module.exports = {
 
       let queryOptions = {
         where: whereCondition,
+        include: [
+          {
+            model: db.userObj,
+            as: "userName", 
+            attributes: ["id", "name", "email"],
+            required: false, 
+          },
+        ],
         order: [["id", "DESC"]],
         distinct: true,
       };
+      
 
       if (!(take_all && take_all === "all")) {
         queryOptions.limit = limit;

@@ -92,6 +92,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      date: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: true,

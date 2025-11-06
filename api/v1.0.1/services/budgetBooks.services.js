@@ -951,6 +951,7 @@ module.exports = {
               scopeId: scope_id || null,
               optionPercentage: optionPercentage ?? null,
               budgetIndex: budgetIndex ?? null,
+              date: null,
             });
           }
         }

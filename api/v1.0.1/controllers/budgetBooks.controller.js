@@ -769,6 +769,7 @@ module.exports = {
                   client_notes: null,
                   is_include: is_include ?? null,
                   acc: null,
+                  date: null,
                   internal_notes: null,
                   price_sqft: Number(pricePerSqft) || 0,
                   additionals: Number(additional) || 0,

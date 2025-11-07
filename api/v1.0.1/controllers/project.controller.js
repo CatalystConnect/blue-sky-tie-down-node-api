@@ -18,7 +18,6 @@ const path = require("path");
 const fs = require("fs");
 
 module.exports = {
-
   async addProject(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -217,7 +216,12 @@ module.exports = {
             name: file.originalname,
             link: driveFile.webViewLink,
           });
-          await saveFolder("planSetFiles", index + 1, driveFile.id, file.originalname,);
+          await saveFolder(
+            "planSetFiles",
+            index + 1,
+            driveFile.id,
+            file.originalname
+          );
         }
 
         const planData = {
@@ -280,9 +284,8 @@ module.exports = {
         const tagIds = Array.isArray(data.project_tags)
           ? data.project_tags
           : String(data.project_tags)
-            .split(",")
-            .map((id) => parseInt(id));
-
+              .split(",")
+              .map((id) => parseInt(id));
 
         await projectServices.addProjectTags(project.id, tagIds);
       }
@@ -291,8 +294,8 @@ module.exports = {
         const tagIds = Array.isArray(data.projectType)
           ? data.projectType
           : String(data.projectType)
-            .split(",")
-            .map((id) => parseInt(id));
+              .split(",")
+              .map((id) => parseInt(id));
         await projectServices.addProjectType(project.id, tagIds);
       }
 
@@ -604,19 +607,18 @@ module.exports = {
         const tagIds = Array.isArray(data.projectType)
           ? data.projectType
           : String(data.projectType)
-            .split(",")
-            .map((id) => parseInt(id));
+              .split(",")
+              .map((id) => parseInt(id));
 
         await projectServices.updateProjectTypes(projectId, tagIds);
       }
-
 
       if (data.project_tags) {
         const tagIds = Array.isArray(data.project_tags)
           ? data.project_tags
           : String(data.project_tags)
-            .split(",")
-            .map((id) => parseInt(id));
+              .split(",")
+              .map((id) => parseInt(id));
 
         await projectServices.updateProjectTags(projectId, tagIds);
       }
@@ -906,7 +908,12 @@ module.exports = {
       if (!getProjectById) throw new Error("Project not found");
 
       // Helper to save Google Drive association
-      const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+      const saveFolder = async (
+        module,
+        module_id,
+        drive_id,
+        file_name = null
+      ) =>
         await projectServices.addDriveAssociation({
           parent: projectId,
           module,
@@ -992,12 +999,14 @@ module.exports = {
         results.push(newPlanSet);
       }
 
-      return res.status(200).send(
-        commonHelper.parseSuccessRespose(
-          results,
-          "Project plan set added successfully"
-        )
-      );
+      return res
+        .status(200)
+        .send(
+          commonHelper.parseSuccessRespose(
+            results,
+            "Project plan set added successfully"
+          )
+        );
     } catch (error) {
       console.error("Error in addProjectPlanSet:", error);
       return res.status(400).json({
@@ -1361,7 +1370,6 @@ module.exports = {
   //       });
   //     }
 
-
   //     const updatedResults = [];
   //     for (const planSetData of planSets) {
   //       const postData = {
@@ -1421,12 +1429,95 @@ module.exports = {
 
       const updatedResults = [];
 
+      // for (let i = 0; i < planSets.length; i++) {
+      //   const planSetData = planSets[i];
+
+      //   // 🔍 Fetch existing plan set
+      //   const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
+      //   if (!existingPlanSet) {
+      //     continue;
+      //   }
+
+      //   const projectId = existingPlanSet.project_id;
+      //   const getProjectById = await projectServices.getProjectById(projectId);
+      //   if (!getProjectById) throw new Error("Project not found");
+
+      //   // 📁 Google Drive folder setup
+      //   const mainFolder = await getOrCreateSubfolder(
+      //     process.env.GOOGLE_DRIVE_FOLDER_ID,
+      //     `${projectId}. ${getProjectById.name}`
+      //   );
+
+      //   const allPlanSets = await db.gDriveAssociationObj.findAll({
+      //     where: { parent: projectId },
+      //   });
+
+      //   const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
+
+      //   const planSetNumberFolder = await getOrCreateSubfolder(planSetsFolder, `${id}`);
+
+      //   const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+      //     await projectServices.addDriveAssociation({
+      //       parent: projectId,
+      //       module,
+      //       module_id,
+      //       drive_id,
+      //       file_name,
+      //     });
+
+      //   await saveFolder("planSetFiles", id, planSetNumberFolder);
+
+      //   const planSetFiles = [];
+      //   const planFilesUploads = req.files?.filter(
+      //     (f) => f.fieldname === `planSets[${i}][planFiles]`
+      //   );
+      //   if (planFilesUploads?.length > 0) {
+      //     for (const file of planFilesUploads) {
+      //       const driveFile = await uploadFileToDrive(
+      //         file.path,
+      //         file.originalname,
+      //         file.mimetype,
+      //         planSetNumberFolder
+      //       );
+
+      //       planSetFiles.push({
+      //         name: file.originalname,
+      //         link: driveFile.webViewLink,
+      //         size: file.size,
+      //       });
+
+      //       await saveFolder("planSetFiles", id, driveFile.id, file.originalname);
+      //     }
+      //   }
+
+      //   const postData = {
+      //     project_id: planSetData.project_id,
+      //     submissionType: planSetData.submissionType,
+      //     date_received: planSetData.date_received,
+      //     plan_link: planSetData.plan_link,
+      //     planFiles: planSetFiles.length > 0 ? JSON.stringify(planSetFiles) : existingPlanSet.planFiles,
+      //     plan_date: planSetData.plan_date,
+      //     rev_status: planSetData.rev_status,
+      //     plan_reviewed_date: planSetData.plan_reviewed_date,
+      //     plan_reviewed_by: planSetData.plan_reviewed_by,
+      //     data_collocated_date: planSetData.data_collocated_date,
+      //     plan_revision_notes: planSetData.plan_revision_notes,
+      //     planType: planSetData.planType,
+      //   };
+
+      //   const updated = await projectServices.updateProjectPlanSetById(id, postData);
+      //   if (updated) updatedResults.push(updated);
+      // }
       for (let i = 0; i < planSets.length; i++) {
         const planSetData = planSets[i];
+        // const id = planSetData.id; // ✅ Fix: define ID properly
 
         // 🔍 Fetch existing plan set
-        const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
+        const existingPlanSet = await db.projectplanSetsObj.findOne({
+          where: { id },
+        });
         if (!existingPlanSet) {
+          console.warn(`Plan set not found for ID: ${id}`);
           continue;
         }
 
@@ -1444,12 +1535,21 @@ module.exports = {
           where: { parent: projectId },
         });
 
+        const planSetsFolder = await getOrCreateSubfolder(
+          mainFolder,
+          "planSets"
+        );
+        const planSetNumberFolder = await getOrCreateSubfolder(
+          planSetsFolder,
+          `${id}`
+        );
 
-        const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
-        
-        const planSetNumberFolder = await getOrCreateSubfolder(planSetsFolder, `${id}`);
-
-        const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+        const saveFolder = async (
+          module,
+          module_id,
+          drive_id,
+          file_name = null
+        ) =>
           await projectServices.addDriveAssociation({
             parent: projectId,
             module,
@@ -1460,11 +1560,23 @@ module.exports = {
 
         await saveFolder("planSetFiles", id, planSetNumberFolder);
 
- 
-        const planSetFiles = [];
+        // 🧩 Step 1: Start with existing files
+        let existingFiles = [];
+        if (existingPlanSet.planFiles) {
+          try {
+            existingFiles = JSON.parse(existingPlanSet.planFiles);
+          } catch (err) {
+            console.warn("Invalid existing planFiles JSON, resetting:", err);
+            existingFiles = [];
+          }
+        }
+
+        // 🧩 Step 2: Upload new files and append
+        const newPlanSetFiles = [];
         const planFilesUploads = req.files?.filter(
           (f) => f.fieldname === `planSets[${i}][planFiles]`
         );
+
         if (planFilesUploads?.length > 0) {
           for (const file of planFilesUploads) {
             const driveFile = await uploadFileToDrive(
@@ -1474,22 +1586,31 @@ module.exports = {
               planSetNumberFolder
             );
 
-            planSetFiles.push({
+            newPlanSetFiles.push({
               name: file.originalname,
               link: driveFile.webViewLink,
               size: file.size,
             });
 
-            await saveFolder("planSetFiles", id, driveFile.id, file.originalname);
+            await saveFolder(
+              "planSetFiles",
+              id,
+              driveFile.id,
+              file.originalname
+            );
           }
         }
 
+        // 🧩 Step 3: Combine old + new files
+        const combinedFiles = [...existingFiles, ...newPlanSetFiles];
+
+        // 🧩 Step 4: Update Plan Set
         const postData = {
           project_id: planSetData.project_id,
           submissionType: planSetData.submissionType,
           date_received: planSetData.date_received,
           plan_link: planSetData.plan_link,
-          planFiles: planSetFiles.length > 0 ? JSON.stringify(planSetFiles) : existingPlanSet.planFiles,
+          planFiles: JSON.stringify(combinedFiles), // ✅ keep old + new
           plan_date: planSetData.plan_date,
           rev_status: planSetData.rev_status,
           plan_reviewed_date: planSetData.plan_reviewed_date,
@@ -1499,7 +1620,10 @@ module.exports = {
           planType: planSetData.planType,
         };
 
-        const updated = await projectServices.updateProjectPlanSetById(id, postData);
+        const updated = await projectServices.updateProjectPlanSetById(
+          id,
+          postData
+        );
         if (updated) updatedResults.push(updated);
       }
 

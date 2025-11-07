@@ -409,58 +409,61 @@ module.exports = {
         ],
       });
 
-      if (!lead) return null;
+      // ---- Calculate budget_totals for each lead_budget ----
+      if (lead?.lead_budget?.length) {
+        lead.lead_budget = lead.lead_budget.map((element) => {
+          const budgets = element.budgets || [];
 
-      // ---- Calculate budget_totals ----
-      const fields = [
-        "cost_beam",
-        "cost_coridor",
-        "cost_deck",
-        "cost_misc",
-        "cost_misc_hardware",
-        "cost_posts",
-        "cost_roof",
-        "cost_rtu",
-        "cost_sill_plate",
-        "cost_smu",
-        "cost_stair_wells",
-        "cost_stl",
-        "cost_sw_tiedown",
-        "cost_up_lift",
-        "price_coridor",
-        "price_deck",
-        "price_misc",
-        "price_misc_hardware",
-        "price_posts",
-        "price_roof",
-        "price_rtu",
-        "price_sill_plate",
-        "price_smu",
-        "price_stair_wells",
-        "price_stl",
-        "price_sw_tiedown",
-        "price_total",
-        "price_up_lift",
-      ];
+          const fields = [
+            "cost_beam",
+            "cost_coridor",
+            "cost_deck",
+            "cost_misc",
+            "cost_misc_hardware",
+            "cost_posts",
+            "cost_roof",
+            "cost_rtu",
+            "cost_sill_plate",
+            "cost_smu",
+            "cost_stair_wells",
+            "cost_stl",
+            "cost_sw_tiedown",
+            "cost_up_lift",
+            "price_coridor",
+            "price_deck",
+            "price_misc",
+            "price_misc_hardware",
+            "price_posts",
+            "price_roof",
+            "price_rtu",
+            "price_sill_plate",
+            "price_smu",
+            "price_stair_wells",
+            "price_stl",
+            "price_sw_tiedown",
+            "price_total",
+            "price_up_lift",
+          ];
 
-      const budget_totals = {};
-      fields.forEach((field) => (budget_totals[field] = 0));
+          const budget_totals = {};
+          fields.forEach((field) => (budget_totals[field] = 0));
 
-      lead.lead_budget?.forEach((element) => {
-        const budgets = element.budgets || [];
-        budgets.forEach((item) => {
-          fields.forEach((field) => {
-            budget_totals[field] += parseFloat(item[field]) || 0;
+          budgets.forEach((item) => {
+            fields.forEach((field) => {
+              budget_totals[field] += parseFloat(item[field]) || 0;
+            });
           });
+
+          return {
+            ...element.toJSON(),
+            budget_totals,
+          };
         });
-      });
+      }
 
-      // console.log("budget_totals:", budget_totals);
-
-      // ---- Add it to the returned object ----
       const leadWithTotals = {
         ...lead.toJSON(),
-        budget_totals,
+        lead_budget: lead.lead_budget,
       };
 
       return leadWithTotals;

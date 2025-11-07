@@ -642,6 +642,9 @@ module.exports = {
           { plan_link: { [Op.like]: `%${filters.search}%` } },
           { submissionType: { [Op.like]: `%${filters.search}%` } },
           { plan_revision_notes: { [Op.like]: `%${filters.search}%` } },
+          { '$reviewedByUser.name$': { [Op.like]: `%${filters.search}%` } },
+          
+          
         ];
       }
 
@@ -658,7 +661,8 @@ module.exports = {
           {
             model: db.userObj,
             as: "reviewedByUser",
-            attributes: ["id", "name", "email"],
+            attributes: ["id", "name", "email"], 
+            required: false,
           },
         ],
       });
@@ -681,6 +685,7 @@ module.exports = {
   },
   async updateProjectPlanSetById(id, updateData) {
     try {
+      
       const planSet = await db.projectplanSetsObj.findOne({ where: { id } });
 
       if (!planSet) {

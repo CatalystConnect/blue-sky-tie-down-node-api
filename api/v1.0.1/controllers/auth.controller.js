@@ -11,7 +11,8 @@ const myValidationResult = validationResult.withDefaults({
     return error.msg;
   },
 });
-
+const db = require("../models");
+const { Op, fn, col, where } = require("sequelize");
 module.exports = {
   /*user register*/
   async register(req, res) {
@@ -24,6 +25,23 @@ module.exports = {
       }
 
       const data = req.body;
+
+      const existingUser = await db.userObj.findOne({
+        where: {
+          [Op.or]: [
+            { email: data.email },
+            { phone: data.phone },
+          ],
+        },
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          status: false,
+          message: "Email or phone number already exists",
+          data: {},
+        });
+      }
       let postData = {
         name: data.name,
         email: data.email,
@@ -81,10 +99,10 @@ module.exports = {
         id: getUserInfo.id,
         name: getUserInfo.name,
         role: getUserInfo.role,
-        roleName:roleName,
-        roleAccess:roleAccess
+        roleName: roleName,
+        roleAccess: roleAccess
       };
-      
+
       var accessToken = jwt.sign(payload, config.secret, {
         expiresIn: "1d", // 24x7 hours
       });
@@ -207,9 +225,9 @@ module.exports = {
         avatar: user.avatar,
         departments: user.department
           ? {
-              id: user.department.id,
-              name: user.department.name,
-            }
+            id: user.department.id,
+            name: user.department.name,
+          }
           : null,
         userType: user.userType,
         userHourlyRate: user.userHourlyRate,

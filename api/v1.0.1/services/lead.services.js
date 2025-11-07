@@ -41,22 +41,22 @@ module.exports = {
       //   : undefined;
       const companyWhere = searchTerm
         ? {
-          name: {
-            [Op.iLike]: `%${searchTerm}%`,
-            [Op.ne]: "",
-            [Op.not]: null,
-          },
-        }
+            name: {
+              [Op.iLike]: `%${searchTerm}%`,
+              [Op.ne]: "",
+              [Op.not]: null,
+            },
+          }
         : undefined;
 
       const projectWhere = searchTerm
         ? {
-          name: {
-            [Op.iLike]: `%${searchTerm}%`,
-            [Op.ne]: "",
-            [Op.not]: null,
-          },
-        }
+            name: {
+              [Op.iLike]: `%${searchTerm}%`,
+              [Op.ne]: "",
+              [Op.not]: null,
+            },
+          }
         : undefined;
 
       let queryOptions = {
@@ -77,11 +77,13 @@ module.exports = {
             // attributes: ["id", "name"],
             required: false,
             where: projectWhere,
-            include: [{ model: db.taxesObj, as: "stateDetails" },
-            { model: db.taxesObj, as: "zipCodeDetails" },
-            {
-              model: db.stateObj, as: "states",
-            },
+            include: [
+              { model: db.taxesObj, as: "stateDetails" },
+              { model: db.taxesObj, as: "zipCodeDetails" },
+              {
+                model: db.stateObj,
+                as: "states",
+              },
             ],
           },
 
@@ -159,6 +161,192 @@ module.exports = {
   },
 
   /*getLeadById*/
+  // async getLeadById(leadId) {
+  //   try {
+  //     const lead = await db.leadsObj.findOne({
+  //       where: { id: leadId },
+  //       include: [
+  //         { model: db.companyObj, as: "company" },
+  //         { model: db.contactsObj, as: "contact" },
+  //         {
+  //           model: db.userObj,
+  //           as: "salePerson",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         {
+  //           model: db.userObj,
+  //           as: "engineer",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         { model: db.leadTeamsObj, as: "leadTeam" },
+  //         { model: db.leadStatusesObj, as: "leadStatus" },
+  //         {
+  //           model: db.projectObj, as: "project",
+  //           include: [{ model: db.taxesObj, as: "stateDetails" },
+  //           { model: db.taxesObj, as: "zipCodeDetails" },
+  //           {
+  //             model: db.stateObj, as: "states",
+  //           },
+  //           ],
+  //         },
+  //         {
+  //           model: db.leadTagsObj,
+  //           as: "lead_tags",
+  //           include: [
+  //             {
+  //               model: db.tagsObj,
+  //               as: "tag",
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.leadTeamsMemberObj,
+  //           as: "leadTeamMembers",
+  //           include: [
+  //             {
+  //               model: db.userObj,
+  //               as: "userData",
+  //               attributes: { exclude: ["password"] },
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.salesPipelinesObj,
+  //           as: "salesPipelines",
+  //           attributes: ["id", "name"],
+  //         },
+  //         {
+  //           model: db.salesPipelinesStatusesObj,
+  //           as: "salesPipelinesStatus",
+  //           attributes: ["id", "name"],
+  //         },
+  //       ],
+  //     });
+  //     return lead;
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
+  // async getLeadById(leadId) {
+  //   try {
+  //     const lead = await db.leadsObj.findOne({
+  //       where: { id: leadId },
+  //       include: [
+  //         { model: db.companyObj, as: "company" },
+  //         { model: db.contactsObj, as: "contact" },
+  //         {
+  //           model: db.userObj,
+  //           as: "salePerson",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         {
+  //           model: db.userObj,
+  //           as: "engineer",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         { model: db.leadTeamsObj, as: "leadTeam" },
+  //         { model: db.leadStatusesObj, as: "leadStatus" },
+  //         {
+  //           model: db.projectObj,
+  //           as: "project",
+  //           include: [
+  //             { model: db.taxesObj, as: "stateDetails" },
+  //             { model: db.taxesObj, as: "zipCodeDetails" },
+  //             { model: db.stateObj, as: "states" },
+  //           ],
+  //         },
+  //         {
+  //           model: db.budgetBooksObj,
+  //           as: "lead_budget",
+  //           include: [{ model: db.projectBudgetsObj, as: "budgets" }],
+  //         },
+  //         {
+  //           model: db.leadTagsObj,
+  //           as: "lead_tags",
+  //           include: [{ model: db.tagsObj, as: "tag" }],
+  //         },
+  //         {
+  //           model: db.leadTeamsMemberObj,
+  //           as: "leadTeamMembers",
+  //           include: [
+  //             {
+  //               model: db.userObj,
+  //               as: "userData",
+  //               attributes: { exclude: ["password"] },
+  //             },
+  //           ],
+  //         },
+  //         {
+  //           model: db.salesPipelinesObj,
+  //           as: "salesPipelines",
+  //           attributes: ["id", "name"],
+  //         },
+  //         {
+  //           model: db.salesPipelinesStatusesObj,
+  //           as: "salesPipelinesStatus",
+  //           attributes: ["id", "name"],
+  //         },
+  //       ],
+  //     });
+
+  //     // ---- Calculate budget_totals ----
+  //     let budget_totals = {};
+  //     const fields = [
+  //       "cost_beam",
+  //       "cost_coridor",
+  //       "cost_deck",
+  //       "cost_misc",
+  //       "cost_misc_hardware",
+  //       "cost_posts",
+  //       "cost_roof",
+  //       "cost_rtu",
+  //       "cost_sill_plate",
+  //       "cost_smu",
+  //       "cost_stair_wells",
+  //       "cost_stl",
+  //       "cost_sw_tiedown",
+  //       "cost_up_lift",
+  //       "price_coridor",
+  //       "price_deck",
+  //       "price_misc",
+  //       "price_misc_hardware",
+  //       "price_posts",
+  //       "price_roof",
+  //       "price_rtu",
+  //       "price_sill_plate",
+  //       "price_smu",
+  //       "price_stair_wells",
+  //       "price_stl",
+  //       "price_sw_tiedown",
+  //       "price_total",
+  //       "price_up_lift",
+  //     ];
+
+  //     fields.forEach((field) => (budget_totals[field] = 0));
+
+  //     lead?.lead_budget?.forEach((element) => {
+  //       const budgets = element.budgets || [];
+  //       budgets.forEach((item) => {
+  //         fields.forEach((field) => {
+  //           budget_totals[field] += parseFloat(item[field]) || 0;
+  //         });
+  //       });
+  //     });
+
+  //   // ---- Add it as a new object in the response ----
+  //     const leadWithTotals = {
+  //       ...lead?.toJSON?.(),
+  //       budget_totals,
+  //     };
+  //     return leadWithTotals;
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
   async getLeadById(leadId) {
     try {
       const lead = await db.leadsObj.findOne({
@@ -179,23 +367,23 @@ module.exports = {
           { model: db.leadTeamsObj, as: "leadTeam" },
           { model: db.leadStatusesObj, as: "leadStatus" },
           {
-            model: db.projectObj, as: "project",
-            include: [{ model: db.taxesObj, as: "stateDetails" },
-            { model: db.taxesObj, as: "zipCodeDetails" },
-            {
-              model: db.stateObj, as: "states",
-            },
+            model: db.projectObj,
+            as: "project",
+            include: [
+              { model: db.taxesObj, as: "stateDetails" },
+              { model: db.taxesObj, as: "zipCodeDetails" },
+              { model: db.stateObj, as: "states" },
             ],
+          },
+          {
+            model: db.budgetBooksObj,
+            as: "lead_budget",
+            include: [{ model: db.projectBudgetsObj, as: "budgets" }],
           },
           {
             model: db.leadTagsObj,
             as: "lead_tags",
-            include: [
-              {
-                model: db.tagsObj,
-                as: "tag",
-              },
-            ],
+            include: [{ model: db.tagsObj, as: "tag" }],
           },
           {
             model: db.leadTeamsMemberObj,
@@ -220,7 +408,62 @@ module.exports = {
           },
         ],
       });
-      return lead;
+
+      if (!lead) return null;
+
+      // ---- Calculate budget_totals ----
+      const fields = [
+        "cost_beam",
+        "cost_coridor",
+        "cost_deck",
+        "cost_misc",
+        "cost_misc_hardware",
+        "cost_posts",
+        "cost_roof",
+        "cost_rtu",
+        "cost_sill_plate",
+        "cost_smu",
+        "cost_stair_wells",
+        "cost_stl",
+        "cost_sw_tiedown",
+        "cost_up_lift",
+        "price_coridor",
+        "price_deck",
+        "price_misc",
+        "price_misc_hardware",
+        "price_posts",
+        "price_roof",
+        "price_rtu",
+        "price_sill_plate",
+        "price_smu",
+        "price_stair_wells",
+        "price_stl",
+        "price_sw_tiedown",
+        "price_total",
+        "price_up_lift",
+      ];
+
+      const budget_totals = {};
+      fields.forEach((field) => (budget_totals[field] = 0));
+
+      lead.lead_budget?.forEach((element) => {
+        const budgets = element.budgets || [];
+        budgets.forEach((item) => {
+          fields.forEach((field) => {
+            budget_totals[field] += parseFloat(item[field]) || 0;
+          });
+        });
+      });
+
+      // console.log("budget_totals:", budget_totals);
+
+      // ---- Add it to the returned object ----
+      const leadWithTotals = {
+        ...lead.toJSON(),
+        budget_totals,
+      };
+
+      return leadWithTotals;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
@@ -280,7 +523,7 @@ module.exports = {
     try {
       const limit = length || 10;
       const offset = (page - 1) * limit || 0;
-     
+
       let whereCondition = { lead_id: lead_id };
 
       if (search) {
@@ -299,15 +542,14 @@ module.exports = {
         include: [
           {
             model: db.userObj,
-            as: "userName", 
+            as: "userName",
             attributes: ["id", "name", "email"],
-            required: false, 
+            required: false,
           },
         ],
         order: [["id", "DESC"]],
         distinct: true,
       };
-      
 
       if (!(take_all && take_all === "all")) {
         queryOptions.limit = limit;
@@ -582,7 +824,6 @@ module.exports = {
   //     const limit = parseInt(per_page) || 10;
   //     const offset = (parseInt(page) - 1) * limit || 0;
 
-
   //     const whereClause = {};
   //     if (search) {
   //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
@@ -605,7 +846,7 @@ module.exports = {
   //         },
   //         {
   //           model: db.companyObj,
-  //           as: "company",  
+  //           as: "company",
   //         },
   //         {
   //           model: db.contactsObj,
@@ -671,9 +912,9 @@ module.exports = {
 
       if (search && search.trim() !== "") {
         projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
-          db.Sequelize.fn('LOWER', db.Sequelize.col('project.name')),
+          db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
           {
-            [db.Sequelize.Op.like]: `%${search.toLowerCase()}%`
+            [db.Sequelize.Op.like]: `%${search.toLowerCase()}%`,
           }
         );
       }
@@ -748,10 +989,6 @@ module.exports = {
       where: { id },
     });
 
-
     return updatedRows;
-  }
-
-
-
+  },
 };

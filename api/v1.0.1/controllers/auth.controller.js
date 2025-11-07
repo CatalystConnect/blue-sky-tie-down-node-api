@@ -277,7 +277,11 @@ module.exports = {
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
       };
-      if (data.password && data.password.trim() !== "") {
+      if (
+        data.password &&
+        data.password.trim() !== "" ||
+        data.password.trim() != "undefined"
+      ) {
         postData.password = bcrypt.hashSync(data.password, 8);
       }
       if (req.files && req.files.avatar) {

@@ -28,10 +28,7 @@ module.exports = {
 
       const existingUser = await db.userObj.findOne({
         where: {
-          [Op.or]: [
-            { email: data.email },
-            { phone: data.phone },
-          ],
+          [Op.or]: [{ email: data.email }, { phone: data.phone }],
         },
       });
 
@@ -100,7 +97,7 @@ module.exports = {
         name: getUserInfo.name,
         role: getUserInfo.role,
         roleName: roleName,
-        roleAccess: roleAccess
+        roleAccess: roleAccess,
       };
 
       var accessToken = jwt.sign(payload, config.secret, {
@@ -225,9 +222,9 @@ module.exports = {
         avatar: user.avatar,
         departments: user.department
           ? {
-            id: user.department.id,
-            name: user.department.name,
-          }
+              id: user.department.id,
+              name: user.department.name,
+            }
           : null,
         userType: user.userType,
         userHourlyRate: user.userHourlyRate,
@@ -271,7 +268,7 @@ module.exports = {
       let postData = {
         name: data.name,
         email: data.email,
-        password: bcrypt.hashSync(data.password, 8),
+        // password: bcrypt.hashSync(data.password, 8),
         role: data.role_id,
         phone: data.phone,
         department_id: data.department_id ? Number(data.department_id) : null,
@@ -280,6 +277,9 @@ module.exports = {
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
       };
+      if (data.password && data.password.trim() !== "") {
+        postData.password = bcrypt.hashSync(data.password, 8);
+      }
       if (req.files && req.files.avatar) {
         postData.avatar = `files/${req.files.avatar[0].filename}`;
       }

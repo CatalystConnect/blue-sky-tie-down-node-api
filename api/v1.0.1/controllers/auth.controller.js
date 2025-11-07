@@ -279,6 +279,7 @@ module.exports = {
       };
      
       if (
+        data.password &&
         data.password != null &&
         data.password != undefined &&
         data.password.trim() != "" &&

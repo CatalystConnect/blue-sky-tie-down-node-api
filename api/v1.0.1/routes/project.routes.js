@@ -39,7 +39,7 @@ router.put("/updateProjectNotes", [authJwt.verifyToken], controller.updateProjec
 router.delete("/deleteProjectNotes", [authJwt.verifyToken], controller.deleteProjectNotes);
 
 router.get("/getProjectPlanSet", [authJwt.verifyToken], controller.getProjectPlanSet);
-router.put("/updateProjectPlanSetById", [authJwt.verifyToken,upload.none()], controller.updateProjectPlanSetById);
+router.put("/updateProjectPlanSetById", [authJwt.verifyToken,upload.any()], controller.updateProjectPlanSetById);
 router.delete("/deleteProjectPlanSet", [authJwt.verifyToken,upload.none()], controller.deleteProjectPlanSet);
 router.get("/getProjectPlanSetById", [authJwt.verifyToken], controller.getProjectPlanSetById);
 

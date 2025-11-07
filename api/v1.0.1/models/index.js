@@ -51,6 +51,7 @@ db.leadInteractionsObj = require("./leadInteractions.models")(
   db.dbObj,
   Sequelize
 );
+db.interactionsObj = require("./interactions.models")(db.dbObj, Sequelize);
 db.catalogObj = require("./catalog.models")(db.dbObj, Sequelize);
 db.catalogVariationsObj = require("./catalogVariations.models")(
   db.dbObj,
@@ -241,18 +242,37 @@ db.budgetBookDocumentsObj = require("./budgetBookDocuments.models")(
 db.projectPhasesObj = require("./projectPhases.models")(db.dbObj, Sequelize);
 db.projectTagsObj = require("./projectTags.models")(db.dbObj, Sequelize);
 db.stateObj = require("./state.models")(db.dbObj, Sequelize);
-db.projectTagMappingsObj = require("./projectTagMappings.models")(db.dbObj, Sequelize);
-db.gDriveAssociationObj = require("./gDriveAssociation.models")(db.dbObj, Sequelize);
-db.projectTypeMappingsObj = require("./projectTypeMappings.models")(db.dbObj, Sequelize);
+db.projectTagMappingsObj = require("./projectTagMappings.models")(
+  db.dbObj,
+  Sequelize
+);
+db.gDriveAssociationObj = require("./gDriveAssociation.models")(
+  db.dbObj,
+  Sequelize
+);
+db.projectTypeMappingsObj = require("./projectTypeMappings.models")(
+  db.dbObj,
+  Sequelize
+);
 db.budgetHistoryObj = require("./budgetHistory.models")(db.dbObj, Sequelize);
-
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {
   foreignKey: "zip",
   as: "zipCodeDetails",
 });
-
+db.interactionsObj.belongsTo(db.userObj, {
+  foreignKey: "user_id",
+  as: "userInteractions",
+});
+db.interactionsObj.belongsTo(db.contactsObj, {
+  foreignKey: "contact_id",
+  as: "contactInteractions",
+});
+db.interactionsObj.belongsTo(db.interactionTypesObj, {
+  foreignKey: "interaction_type_id",
+  as: "interactionTypes",
+});
 db.projectObj.belongsTo(db.taxesObj, {
   foreignKey: "state",
   as: "stateDetails",
@@ -1180,11 +1200,13 @@ db.budgetHistoryObj.belongsTo(db.projectObj, {
   as: "budgetProject",
 });
 
-db.leadNotesObj.belongsTo(db.userObj, { foreignKey: "user_id", as: "userName" });
+db.leadNotesObj.belongsTo(db.userObj, {
+  foreignKey: "user_id",
+  as: "userName",
+});
 db.userObj.hasMany(db.leadNotesObj, {
   foreignKey: "user_id",
   as: "leadNotes",
 });
-
 
 module.exports = db;

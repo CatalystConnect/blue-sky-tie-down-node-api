@@ -59,5 +59,6 @@ router.use(require("./proejctPhases.routes"));
 router.use(require("./proejctTags.routes"));
 router.use(require("./state.routes"));
 router.use(require("./salesPipelinesLeads.routes"));
+router.use(require("./interactions.routes"));
 
 module.exports = router;

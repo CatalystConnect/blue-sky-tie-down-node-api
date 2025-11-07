@@ -32,6 +32,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT("long"),
         allowNull: true,
       },
+      scope_sagment_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      site_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      budget_Cat_Id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: true,

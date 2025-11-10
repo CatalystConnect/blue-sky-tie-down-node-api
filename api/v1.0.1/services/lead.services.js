@@ -352,7 +352,11 @@ module.exports = {
       const lead = await db.leadsObj.findOne({
         where: { id: leadId },
         include: [
-          { model: db.companyObj, as: "company" },
+          {
+            model: db.companyObj,
+            as: "company",
+            include: [{ model: db.companyTypeObj, as: "companyType" }],
+          },
           { model: db.contactsObj, as: "contact" },
           {
             model: db.userObj,

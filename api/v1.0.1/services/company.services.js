@@ -104,9 +104,8 @@ module.exports = {
       const offset = (page - 1) * per_page;
 
       let whereCondition = {};
-
       if (search) {
-        whereCondition.name = { [Op.like]: `%${search}%` };
+        whereCondition.name = { [Op.iLike]: `%${search}%` };
       }
 
       let order = [["id", "DESC"]];
@@ -129,7 +128,12 @@ module.exports = {
           ...(type
             ? {
                 where: {
-                  [Op.or]: [{ name: { [Op.like]: `%${type}%` } }],
+                  [Op.or]: Sequelize.where(
+                    Sequelize.fn("LOWER", Sequelize.col("companyType.name")),
+                    {
+                      [Op.like]: `%${type.toLowerCase()}%`,
+                    }
+                  ),
                 },
                 required: true,
               }

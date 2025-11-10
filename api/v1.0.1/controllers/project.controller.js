@@ -13,11 +13,308 @@ const db = require("../models");
 const {
   uploadFileToDrive,
   getOrCreateSubfolder,
+  deleteFileFromDrive,
 } = require("../helper/googleDrive");
 const path = require("path");
 const fs = require("fs");
 
 module.exports = {
+  // async addProject(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     const data = req.body;
+
+  //     // --- Sanitize helpers ---
+  //     const sanitizeInteger = (value) => (value ? Number(value) : null);
+  //     const sanitizeDate = (value) => {
+  //       if (!value) return null;
+  //       const date = new Date(value);
+  //       return isNaN(date.getTime()) ? null : date;
+  //     };
+
+  //     // --- Step 1: Add project to DB ---
+  //     const postData = {
+  //       user_id: req.userId,
+  //       engineer_id: sanitizeInteger(data.engineer_id),
+  //       name: data.name || null,
+  //       city: data.city || null,
+  //       state: sanitizeInteger(data.state),
+  //       bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
+  //       address: data.address || null,
+  //       zip: sanitizeInteger(data.zip),
+  //       units: sanitizeInteger(data.units),
+  //       // projectType: data.projectType || null,
+  //       project_phase: data.project_phase || null,
+  //       bldgs: sanitizeInteger(data.bldgs),
+  //       wind_zone: data.wind_zone || null,
+  //       seismic_zone: data.seismic_zone || null,
+  //       developer_id: sanitizeInteger(data.developer_id),
+  //       general_contractor_id: sanitizeInteger(data.general_contractor_id),
+  //       assign_to_budget: sanitizeDate(data.assign_to_budget),
+  //       take_off_team_id: sanitizeInteger(data.take_off_team_id),
+  //       take_off_type: data.take_off_type || null,
+  //       take_off_scope: data.take_off_scope || null,
+  //       assign_date: sanitizeDate(data.assign_date),
+  //       architecture: sanitizeInteger(data.architecture),
+  //       takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
+  //       dueDate: sanitizeDate(data.dueDate),
+  //       status: "new",
+  //       takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
+  //       connectplan: data.connectplan || null,
+  //       surveyorNotes: data.surveyorNotes || null,
+  //       takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
+  //       takeoffDueDate: sanitizeDate(data.takeoffDueDate),
+  //       takeoffStartDate: sanitizeDate(data.takeoffStartDate),
+  //       project_status: data.project_status || "active",
+  //       takeoff_status: data.takeoff_status || null,
+  //       work_hours: data.work_hours || null,
+  //     };
+
+  //     const project = await projectServices.addProject(postData);
+
+  //     // --- Step 2: Create Project root folder ---
+  //     const rootFolder = await getOrCreateSubfolder(
+  //       process.env.GOOGLE_DRIVE_FOLDER_ID,
+  //       `${project.id}. ${project.name}`
+  //     );
+
+  //     // --- Step 3: Create subfolders ---
+  //     const projectFilesFolder = await getOrCreateSubfolder(
+  //       rootFolder,
+  //       "projectFiles"
+  //     );
+  //     const planSetsFolder = await getOrCreateSubfolder(rootFolder, "PlanSets");
+  //     const completedFolder = await getOrCreateSubfolder(
+  //       rootFolder,
+  //       "CompletedFiles"
+  //     );
+  //     // const leadFilesFolder = await getOrCreateSubfolder(
+  //     //   rootFolder,
+  //     //   "Lead Files"
+  //     // );
+
+  //     // --- Step 4: Save folders in gDriveAssociation ---
+  //     const saveFolder = async (module, module_id, drive_id, file_name) =>
+  //       await projectServices.addDriveAssociation({
+  //         parent: project.id,
+  //         module,
+  //         module_id,
+  //         drive_id,
+  //         file_name,
+  //       });
+
+  //     // await saveFolder("projectFiles", project.id, projectFilesFolder);
+  //     // await saveFolder("completedFiles", project.id, completedFolder);
+  //     // await saveFolder("planSets", project.id, planSetsFolder);
+  //     // await saveFolder("leadFiles", project.id, leadFilesFolder);
+
+  //     // --- Step 5: Upload Project Files ---
+  //     let projectFiles = [];
+  //     if (Array.isArray(req.files)) {
+  //       const projectUploads = req.files.filter((f) =>
+  //         f.fieldname.startsWith("projectFiles")
+  //       );
+
+  //       for (let file of projectUploads) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           projectFilesFolder
+  //         );
+  //         projectFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //           size: file.size,
+  //         });
+
+  //         await saveFolder(
+  //           "projectFiles",
+  //           project.id,
+  //           driveFile.id,
+  //           file.originalname
+  //         );
+  //       }
+  //     }
+
+  //     if (projectFiles.length > 0) {
+  //       const updateData = { project_file: JSON.stringify(projectFiles) };
+  //       const updateResult = await projectServices.updateProject(
+  //         updateData,
+  //         project.id
+  //       );
+  //     } else {
+  //       console.log("No completed files found to update.");
+  //     }
+
+  //     // --- Step 6: Upload Completed Files ---
+  //     let completedFiles = [];
+  //     if (Array.isArray(req.files)) {
+  //       const completedUploads = req.files.filter((f) =>
+  //         f.fieldname.startsWith("completedFiles")
+  //       );
+  //       for (let file of completedUploads) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           completedFolder
+  //         );
+  //         completedFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //           size: file.size,
+  //         });
+  //         await saveFolder(
+  //           "completedFiles",
+  //           project.id,
+  //           driveFile.id,
+  //           file.originalname
+  //         );
+  //       }
+  //     }
+
+  //     if (completedFiles.length > 0) {
+  //       const updateData = { completedFiles: JSON.stringify(completedFiles) };
+  //       const updateResult = await projectServices.updateProject(
+  //         updateData,
+  //         project.id
+  //       );
+  //     } else {
+  //       console.log("No completed files found to update.");
+  //     }
+
+  //     // --- Step 7: Upload Plan Sets ---
+  //     const planSets = Array.isArray(data.planSets)
+  //       ? data.planSets
+  //       : JSON.parse(data.planSets || "[]");
+  //     for (let index = 0; index < planSets.length; index++) {
+  //       const plan = planSets[index];
+  //       const planSetFolder = await getOrCreateSubfolder(
+  //         planSetsFolder,
+  //         `${index + 1}`
+  //       );
+  //       await saveFolder("planSetFiles", index + 1, planSetFolder);
+
+  //       const planFiles = req.files.filter(
+  //         (f) => f.fieldname === `planSets[${index}][planFiles]`
+  //       );
+  //       let uploadedFiles = [];
+  //       for (let file of planFiles) {
+  //         const driveFile = await uploadFileToDrive(
+  //           file.path,
+  //           file.originalname,
+  //           file.mimetype,
+  //           planSetFolder
+  //         );
+  //         uploadedFiles.push({
+  //           name: file.originalname,
+  //           link: driveFile.webViewLink,
+  //         });
+  //         await saveFolder(
+  //           "planSetFiles",
+  //           index + 1,
+  //           driveFile.id,
+  //           file.originalname
+  //         );
+  //       }
+
+  //       const planData = {
+  //         project_id: project.id,
+  //         submissionType: plan.submissionType || null,
+  //         date_received: sanitizeDate(plan.date_received),
+  //         plan_link: plan.plan_link || null,
+  //         planType: plan.planType || null,
+  //         planFiles: null,
+  //         plan_date: sanitizeDate(plan.plan_date),
+  //         rev_status: plan.rev_status || null,
+  //         plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
+  //         plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by),
+  //         data_collocated_date: sanitizeDate(plan.data_collocated_date),
+  //         plan_revision_notes: plan.plan_revision_notes || null,
+  //       };
+  //       // await projectServices.projectplanSets(planData);
+
+  //       const createdPlan = await projectServices.projectplanSets(planData);
+
+  //       // const planSetFolder = await getOrCreateSubfolder(
+  //       //   planSetsFolder,
+  //       //   `${createdPlan.id}` // use DB ID
+  //       // );
+
+  //       // const planFiles = req.files.filter(
+  //       //   (f) => f.fieldname === `planSets[${index}][planFiles]`
+  //       // );
+
+  //       // let uploadedFiles = [];
+  //       // for (let file of planFiles) {
+  //       //   const driveFile = await uploadFileToDrive(
+  //       //     file.path,
+  //       //     file.originalname,
+  //       //     file.mimetype,
+  //       //     planSetFolder
+  //       //   );
+  //       //   uploadedFiles.push({
+  //       //     name: file.originalname,
+  //       //     link: driveFile.webViewLink,
+  //       //   });
+  //       //   await saveFolder(
+  //       //     "planSetFiles",
+  //       //     createdPlan.id,
+  //       //     driveFile.id,
+  //       //     file.originalname
+  //       //   );
+  //       // }
+
+  //       // --- Step 4: Update planFiles field in DB ---
+  //       await projectServices.updatePlanFiles(
+  //         createdPlan.id,
+  //         JSON.stringify(uploadedFiles)
+  //       );
+  //     }
+
+  //     // --- Step 8: Handle project tags ---
+
+  //     if (data.project_tags) {
+  //       const tagIds = Array.isArray(data.project_tags)
+  //         ? data.project_tags
+  //         : String(data.project_tags)
+  //             .split(",")
+  //             .map((id) => parseInt(id));
+
+  //       await projectServices.addProjectTags(project.id, tagIds);
+  //     }
+
+  //     if (data.projectType) {
+  //       const tagIds = Array.isArray(data.projectType)
+  //         ? data.projectType
+  //         : String(data.projectType)
+  //             .split(",")
+  //             .map((id) => parseInt(id));
+  //       await projectServices.addProjectType(project.id, tagIds);
+  //     }
+
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose("", "Project added successfully")
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error || error.message || "Project failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+
   async addProject(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -29,7 +326,6 @@ module.exports = {
 
       const data = req.body;
 
-      // --- Sanitize helpers ---
       const sanitizeInteger = (value) => (value ? Number(value) : null);
       const sanitizeDate = (value) => {
         if (!value) return null;
@@ -37,7 +333,7 @@ module.exports = {
         return isNaN(date.getTime()) ? null : date;
       };
 
-      // --- Step 1: Add project to DB ---
+      // Step 1: Add project to DB
       const postData = {
         user_id: req.userId,
         engineer_id: sanitizeInteger(data.engineer_id),
@@ -48,7 +344,6 @@ module.exports = {
         address: data.address || null,
         zip: sanitizeInteger(data.zip),
         units: sanitizeInteger(data.units),
-        // projectType: data.projectType || null,
         project_phase: data.project_phase || null,
         bldgs: sanitizeInteger(data.bldgs),
         wind_zone: data.wind_zone || null,
@@ -77,29 +372,18 @@ module.exports = {
 
       const project = await projectServices.addProject(postData);
 
-      // --- Step 2: Create Project root folder ---
+      // Step 2: Create root folder
       const rootFolder = await getOrCreateSubfolder(
         process.env.GOOGLE_DRIVE_FOLDER_ID,
         `${project.id}. ${project.name}`
       );
 
-      // --- Step 3: Create subfolders ---
-      const projectFilesFolder = await getOrCreateSubfolder(
-        rootFolder,
-        "projectFiles"
-      );
+      // Step 3: Create subfolders
+      const projectFilesFolder = await getOrCreateSubfolder(rootFolder, "projectFiles");
       const planSetsFolder = await getOrCreateSubfolder(rootFolder, "PlanSets");
-      const completedFolder = await getOrCreateSubfolder(
-        rootFolder,
-        "CompletedFiles"
-      );
-      // const leadFilesFolder = await getOrCreateSubfolder(
-      //   rootFolder,
-      //   "Lead Files"
-      // );
+      const completedFolder = await getOrCreateSubfolder(rootFolder, "CompletedFiles");
 
-      // --- Step 4: Save folders in gDriveAssociation ---
-      const saveFolder = async (module, module_id, drive_id, file_name) =>
+      const saveFolder = async (module, module_id, drive_id, file_name = null) =>
         await projectServices.addDriveAssociation({
           parent: project.id,
           module,
@@ -108,121 +392,72 @@ module.exports = {
           file_name,
         });
 
-      // await saveFolder("projectFiles", project.id, projectFilesFolder);
-      // await saveFolder("completedFiles", project.id, completedFolder);
-      // await saveFolder("planSets", project.id, planSetsFolder);
-      // await saveFolder("leadFiles", project.id, leadFilesFolder);
-
-      // --- Step 5: Upload Project Files ---
+      // Step 4: Upload Project Files
       let projectFiles = [];
-      if (Array.isArray(req.files)) {
-        const projectUploads = req.files.filter((f) =>
-          f.fieldname.startsWith("projectFiles")
+      const projectUploads = req.files?.filter((f) =>
+        f.fieldname.startsWith("projectFiles")
+      ) || [];
+
+      for (let file of projectUploads) {
+        const driveFile = await uploadFileToDrive(
+          file.path,
+          file.originalname,
+          file.mimetype,
+          projectFilesFolder
         );
-
-        for (let file of projectUploads) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            projectFilesFolder
-          );
-          projectFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-
-          await saveFolder(
-            "projectFiles",
-            project.id,
-            driveFile.id,
-            file.originalname
-          );
-        }
+        projectFiles.push({
+          name: file.originalname,
+          link: driveFile.webViewLink,
+          size: file.size,
+        });
+        await saveFolder("projectFiles", project.id, driveFile.id, file.originalname);
       }
 
       if (projectFiles.length > 0) {
-        const updateData = { project_file: JSON.stringify(projectFiles) };
-        const updateResult = await projectServices.updateProject(
-          updateData,
+        await projectServices.updateProject(
+          { project_file: JSON.stringify(projectFiles) },
           project.id
         );
-      } else {
-        console.log("No completed files found to update.");
       }
 
-      // --- Step 6: Upload Completed Files ---
+      // Step 5: Upload Completed Files
       let completedFiles = [];
-      if (Array.isArray(req.files)) {
-        const completedUploads = req.files.filter((f) =>
-          f.fieldname.startsWith("completedFiles")
+      const completedUploads = req.files?.filter((f) =>
+        f.fieldname.startsWith("completedFiles")
+      ) || [];
+
+      for (let file of completedUploads) {
+        const driveFile = await uploadFileToDrive(
+          file.path,
+          file.originalname,
+          file.mimetype,
+          completedFolder
         );
-        for (let file of completedUploads) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            completedFolder
-          );
-          completedFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-            size: file.size,
-          });
-          await saveFolder(
-            "completedFiles",
-            project.id,
-            driveFile.id,
-            file.originalname
-          );
-        }
+        completedFiles.push({
+          name: file.originalname,
+          link: driveFile.webViewLink,
+          size: file.size,
+        });
+        await saveFolder("completedFiles", project.id, driveFile.id, file.originalname);
       }
 
       if (completedFiles.length > 0) {
-        const updateData = { completedFiles: JSON.stringify(completedFiles) };
-        const updateResult = await projectServices.updateProject(
-          updateData,
+        await projectServices.updateProject(
+          { completedFiles: JSON.stringify(completedFiles) },
           project.id
         );
-      } else {
-        console.log("No completed files found to update.");
       }
 
-      // --- Step 7: Upload Plan Sets ---
+      // Step 6: Upload Plan Sets
       const planSets = Array.isArray(data.planSets)
         ? data.planSets
         : JSON.parse(data.planSets || "[]");
+
       for (let index = 0; index < planSets.length; index++) {
         const plan = planSets[index];
-        const planSetFolder = await getOrCreateSubfolder(
-          planSetsFolder,
-          `${index + 1}`
-        );
-        await saveFolder("planSetFiles", index + 1, planSetFolder);
 
-        const planFiles = req.files.filter(
-          (f) => f.fieldname === `planSets[${index}][planFiles]`
-        );
-        let uploadedFiles = [];
-        for (let file of planFiles) {
-          const driveFile = await uploadFileToDrive(
-            file.path,
-            file.originalname,
-            file.mimetype,
-            planSetFolder
-          );
-          uploadedFiles.push({
-            name: file.originalname,
-            link: driveFile.webViewLink,
-          });
-          await saveFolder(
-            "planSetFiles",
-            index + 1,
-            driveFile.id,
-            file.originalname
-          );
-        }
+        // Create folder with index name
+        const planSetFolder = await getOrCreateSubfolder(planSetsFolder, `${index + 1}`);
 
         const planData = {
           project_id: project.id,
@@ -238,72 +473,56 @@ module.exports = {
           data_collocated_date: sanitizeDate(plan.data_collocated_date),
           plan_revision_notes: plan.plan_revision_notes || null,
         };
-        // await projectServices.projectplanSets(planData);
 
         const createdPlan = await projectServices.projectplanSets(planData);
 
-        // const planSetFolder = await getOrCreateSubfolder(
-        //   planSetsFolder,
-        //   `${createdPlan.id}` // use DB ID
-        // );
+        // Save folder with actual planSet.id
+        await saveFolder("planSetFiles", createdPlan.id, planSetFolder);
 
-        // const planFiles = req.files.filter(
-        //   (f) => f.fieldname === `planSets[${index}][planFiles]`
-        // );
+        // Upload files
+        const planFiles = req.files?.filter(
+          (f) => f.fieldname === `planSets[${index}][planFiles]`
+        ) || [];
 
-        // let uploadedFiles = [];
-        // for (let file of planFiles) {
-        //   const driveFile = await uploadFileToDrive(
-        //     file.path,
-        //     file.originalname,
-        //     file.mimetype,
-        //     planSetFolder
-        //   );
-        //   uploadedFiles.push({
-        //     name: file.originalname,
-        //     link: driveFile.webViewLink,
-        //   });
-        //   await saveFolder(
-        //     "planSetFiles",
-        //     createdPlan.id,
-        //     driveFile.id,
-        //     file.originalname
-        //   );
-        // }
+        let uploadedFiles = [];
+        for (let file of planFiles) {
+          const driveFile = await uploadFileToDrive(
+            file.path,
+            file.originalname,
+            file.mimetype,
+            planSetFolder
+          );
+          uploadedFiles.push({
+            name: file.originalname,
+            link: driveFile.webViewLink,
+          });
+          await saveFolder("planSetFiles", createdPlan.id, driveFile.id, file.originalname);
+        }
 
-        // --- Step 4: Update planFiles field in DB ---
         await projectServices.updatePlanFiles(
           createdPlan.id,
           JSON.stringify(uploadedFiles)
         );
       }
 
-      // --- Step 8: Handle project tags ---
-
+      // Step 7: Handle Tags
       if (data.project_tags) {
         const tagIds = Array.isArray(data.project_tags)
           ? data.project_tags
-          : String(data.project_tags)
-              .split(",")
-              .map((id) => parseInt(id));
-
+          : String(data.project_tags).split(",").map((id) => parseInt(id));
         await projectServices.addProjectTags(project.id, tagIds);
       }
 
       if (data.projectType) {
         const tagIds = Array.isArray(data.projectType)
           ? data.projectType
-          : String(data.projectType)
-              .split(",")
-              .map((id) => parseInt(id));
+          : String(data.projectType).split(",").map((id) => parseInt(id));
         await projectServices.addProjectType(project.id, tagIds);
       }
 
       return res
         .status(200)
-        .send(
-          commonHelper.parseSuccessRespose("", "Project added successfully")
-        );
+        .send(commonHelper.parseSuccessRespose("", "Project added successfully"));
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -313,6 +532,8 @@ module.exports = {
       });
     }
   },
+
+
   async getAllProject(req, res) {
     try {
       let { page, per_page, search, take_all, id } = req.query;
@@ -607,8 +828,8 @@ module.exports = {
         const tagIds = Array.isArray(data.projectType)
           ? data.projectType
           : String(data.projectType)
-              .split(",")
-              .map((id) => parseInt(id));
+            .split(",")
+            .map((id) => parseInt(id));
 
         await projectServices.updateProjectTypes(projectId, tagIds);
       }
@@ -617,8 +838,8 @@ module.exports = {
         const tagIds = Array.isArray(data.project_tags)
           ? data.project_tags
           : String(data.project_tags)
-              .split(",")
-              .map((id) => parseInt(id));
+            .split(",")
+            .map((id) => parseInt(id));
 
         await projectServices.updateProjectTags(projectId, tagIds);
       }
@@ -795,11 +1016,15 @@ module.exports = {
   //   try {
   //     const projectId = req.query.projectId;
   //     const getProjectById = await projectServices.getProjectById(projectId);
-
   //     if (!getProjectById) throw new Error("Project not found");
 
-  //     // Helper to save Google Drive association (folder or file)
-  //     const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+  //     // Helper to save Google Drive association
+  //     const saveFolder = async (
+  //       module,
+  //       module_id,
+  //       drive_id,
+  //       file_name = null
+  //     ) =>
   //       await projectServices.addDriveAssociation({
   //         parent: projectId,
   //         module,
@@ -808,96 +1033,98 @@ module.exports = {
   //         file_name,
   //       });
 
-  //     // --- 1. Main project folder ---
+  //     // Main Project Folder
   //     const mainFolder = await getOrCreateSubfolder(
   //       process.env.GOOGLE_DRIVE_FOLDER_ID,
   //       `${projectId}. ${getProjectById.name}`
   //     );
 
-  //     // --- 2. PlanSets folder inside main ---
+  //     // PlanSets Folder
   //     const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
 
-  //     // --- 3. Count existing plan sets to create numbered folder ---
-  //     const existingPlanSets = await db.projectplanSetsObj.count({
-  //       where: { project_id: projectId },
-  //     });
-  //     const newPlanSetNumber = existingPlanSets + 1;
+  //     // ✅ Now read your array properly
+  //     const planSets = req.body.planSets || [];
+  //     if (planSets.length === 0) throw new Error("No planSets data found");
 
-  //     // --- 4. Numbered folder inside PlanSets ---
-  //     const planSetNumberFolder = await getOrCreateSubfolder(
-  //       planSetsFolder,
-  //       `${newPlanSetNumber}`
-  //     );
+  //     const results = [];
 
-  //     // Save folder association in DB (file_name = null)
-  //     await saveFolder("planSetFiles", newPlanSetNumber, planSetNumberFolder);
+  //     for (const planSetData of planSets) {
+  //       // Count existing plan sets
+  //       const existingCount = await db.projectplanSetsObj.count({
+  //         where: { project_id: projectId },
+  //       });
+  //       const newPlanSetNumber = existingCount + 1;
 
-  //     // --- 5. Upload files inside the numbered folder ---
-  //     const planSetFiles = [];
-  //     if (Array.isArray(req.files) && req.files.length > 0) {
-  //       const planFilesUploads = req.files.filter(
-  //         (f) => f.fieldname === "planFiles"
+  //       // Create numbered folder
+  //       const planSetNumberFolder = await getOrCreateSubfolder(
+  //         planSetsFolder,
+  //         `${newPlanSetNumber}`
   //       );
 
-  //       for (const file of planFilesUploads) {
-  //         const driveFile = await uploadFileToDrive(
-  //           file.path,
-  //           file.originalname,
-  //           file.mimetype,
-  //           planSetNumberFolder // ✅ Upload inside numbered folder
-  //         );
 
-  //         planSetFiles.push({
-  //           name: file.originalname,
-  //           link: driveFile.webViewLink,
-  //           size: file.size,
-  //         });
+  //       // Upload Files (if any)
+  //       const planSetFiles = [];
+  //       const planFilesUploads = req.files?.filter(
+  //         (f) => f.fieldname === `planSets[0][planFiles]`
+  //       );
+  //       if (planFilesUploads?.length > 0) {
+  //         for (const file of planFilesUploads) {
+  //           const driveFile = await uploadFileToDrive(
+  //             file.path,
+  //             file.originalname,
+  //             file.mimetype,
+  //             planSetNumberFolder
+  //           );
 
-  //         // Save file association in DB
-  //         await saveFolder(
-  //           "planSetFiles",
-  //           newPlanSetNumber,
-  //           driveFile.id,
-  //           file.originalname
-  //         );
+  //           planSetFiles.push({
+  //             name: file.originalname,
+  //             link: driveFile.webViewLink,
+  //             size: file.size,
+  //           });
+
+  //           await saveFolder(
+  //             "planSetFiles",
+  //             newPlanSetNumber,
+  //             driveFile.id,
+  //             file.originalname
+  //           );
+  //         }
   //       }
+
+  //       // ✅ Insert PlanSet record using correct data path
+  //       const newPlanSet = await projectServices.projectplanSets({
+  //         project_id: projectId,
+  //         submissionType: planSetData.submissionType || null,
+  //         date_received: planSetData.date_received || null,
+  //         plan_link: planSetData.plan_link || null,
+  //         planFiles: JSON.stringify(planSetFiles),
+  //         plan_date: planSetData.plan_date || null,
+  //         rev_status: planSetData.rev_status || null,
+  //         plan_reviewed_date: planSetData.plan_reviewed_date || null,
+  //         plan_reviewed_by: planSetData.plan_reviewed_by || null,
+  //         data_collocated_date: planSetData.data_collocated_date || null,
+  //         plan_revision_notes: planSetData.plan_revision_notes || null,
+  //         planType: planSetData.planType || null,
+  //       });
+
+  //       await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
+
+  //       results.push(newPlanSet);
   //     }
-
-  //     // --- 6. Save PlanSet record in DB ---
-  //     const data = req.body;
-
-  //     const postData = {
-  //       project_id: projectId,
-  //       submissionType: data.submissionType,
-  //       date_received: data.date_received,
-  //       plan_link: data.plan_link,
-  //       planFiles: JSON.stringify(planSetFiles),
-  //       plan_date: data.plan_date,
-  //       rev_status: data.rev_status,
-  //       plan_reviewed_date: data.plan_reviewed_date,
-  //       plan_reviewed_by: data.plan_reviewed_by,
-  //       data_collocated_date: data.data_collocated_date,
-  //       plan_revision_notes: data.plan_revision_notes,
-  //     };
-
-  //     const newPlanSet = await projectServices.projectplanSets(postData);
 
   //     return res
   //       .status(200)
   //       .send(
   //         commonHelper.parseSuccessRespose(
-  //           newPlanSet,
+  //           results,
   //           "Project plan set added successfully"
   //         )
   //       );
   //   } catch (error) {
+  //     console.error("Error in addProjectPlanSet:", error);
   //     return res.status(400).json({
   //       status: false,
-  //       message:
-  //         error.response?.data?.error ||
-  //         error.message ||
-  //         "Adding project plan set failed",
-  //       data: error.response?.data || {},
+  //       message: error.message || "Adding project plan set failed",
   //     });
   //   }
   // },
@@ -908,12 +1135,7 @@ module.exports = {
       if (!getProjectById) throw new Error("Project not found");
 
       // Helper to save Google Drive association
-      const saveFolder = async (
-        module,
-        module_id,
-        drive_id,
-        file_name = null
-      ) =>
+      const saveFolder = async (module, module_id, drive_id, file_name = null) =>
         await projectServices.addDriveAssociation({
           parent: projectId,
           module,
@@ -931,31 +1153,52 @@ module.exports = {
       // PlanSets Folder
       const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
 
-      // ✅ Now read your array properly
+      // Validate planSets array
       const planSets = req.body.planSets || [];
       if (planSets.length === 0) throw new Error("No planSets data found");
 
       const results = [];
 
-      for (const planSetData of planSets) {
-        // Count existing plan sets
+      for (let index = 0; index < planSets.length; index++) {
+        const planSetData = planSets[index];
+
+        // Count existing plan sets for numbering
         const existingCount = await db.projectplanSetsObj.count({
           where: { project_id: projectId },
         });
         const newPlanSetNumber = existingCount + 1;
 
-        // Create numbered folder
+        // Create numbered subfolder (e.g., 1, 2, 3)
         const planSetNumberFolder = await getOrCreateSubfolder(
           planSetsFolder,
           `${newPlanSetNumber}`
         );
-        await saveFolder("planSetFiles", newPlanSetNumber, planSetNumberFolder);
 
-        // Upload Files (if any)
+        // ✅ First create PlanSet DB entry
+        const newPlanSet = await projectServices.projectplanSets({
+          project_id: projectId,
+          submissionType: planSetData.submissionType || null,
+          date_received: planSetData.date_received || null,
+          plan_link: planSetData.plan_link || null,
+          planFiles: null, // temporarily null until uploads are done
+          plan_date: planSetData.plan_date || null,
+          rev_status: planSetData.rev_status || null,
+          plan_reviewed_date: planSetData.plan_reviewed_date || null,
+          plan_reviewed_by: planSetData.plan_reviewed_by || null,
+          data_collocated_date: planSetData.data_collocated_date || null,
+          plan_revision_notes: planSetData.plan_revision_notes || null,
+          planType: planSetData.planType || null,
+        });
+
+        // Save association for the folder itself
+        await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
+
+        // ✅ Upload Files (if any)
         const planSetFiles = [];
         const planFilesUploads = req.files?.filter(
-          (f) => f.fieldname === `planSets[0][planFiles]`
+          (f) => f.fieldname === `planSets[${index}][planFiles]`
         );
+
         if (planFilesUploads?.length > 0) {
           for (const file of planFilesUploads) {
             const driveFile = await uploadFileToDrive(
@@ -971,42 +1214,30 @@ module.exports = {
               size: file.size,
             });
 
+            // Save file association
             await saveFolder(
               "planSetFiles",
-              newPlanSetNumber,
+              newPlanSet.id,
               driveFile.id,
               file.originalname
             );
           }
-        }
 
-        // ✅ Insert PlanSet record using correct data path
-        const newPlanSet = await projectServices.projectplanSets({
-          project_id: projectId,
-          submissionType: planSetData.submissionType || null,
-          date_received: planSetData.date_received || null,
-          plan_link: planSetData.plan_link || null,
-          planFiles: JSON.stringify(planSetFiles),
-          plan_date: planSetData.plan_date || null,
-          rev_status: planSetData.rev_status || null,
-          plan_reviewed_date: planSetData.plan_reviewed_date || null,
-          plan_reviewed_by: planSetData.plan_reviewed_by || null,
-          data_collocated_date: planSetData.data_collocated_date || null,
-          plan_revision_notes: planSetData.plan_revision_notes || null,
-          planType: planSetData.planType || null,
-        });
+          // Update planFiles column
+          await newPlanSet.update({
+            planFiles: JSON.stringify(planSetFiles),
+          });
+        }
 
         results.push(newPlanSet);
       }
 
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            results,
-            "Project plan set added successfully"
-          )
-        );
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          results,
+          "Project plan set added successfully"
+        )
+      );
     } catch (error) {
       console.error("Error in addProjectPlanSet:", error);
       return res.status(400).json({
@@ -1405,6 +1636,437 @@ module.exports = {
   //     });
   //   }
   // },
+  // async updateProjectPlanSetById(req, res) {
+  //   try {
+  //     const { id } = req.query;
+  //     if (!id) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "planSet id is required",
+  //         data: {},
+  //       });
+  //     }
+
+  //     const parsedBody = qs.parse(req.body);
+  //     const planSets = parsedBody.planSets;
+
+  //     if (!Array.isArray(planSets) || planSets.length === 0) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "No planSets found in request",
+  //         data: {},
+  //       });
+  //     }
+
+  //     let deletedOldImages = parsedBody.deletedOldImages || [];
+
+
+  //     const updatedResults = [];
+
+  //     // for (let i = 0; i < planSets.length; i++) {
+  //     //   const planSetData = planSets[i];
+
+  //     //   // 🔍 Fetch existing plan set
+  //     //   const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
+  //     //   if (!existingPlanSet) {
+  //     //     continue;
+  //     //   }
+
+  //     //   const projectId = existingPlanSet.project_id;
+  //     //   const getProjectById = await projectServices.getProjectById(projectId);
+  //     //   if (!getProjectById) throw new Error("Project not found");
+
+  //     //   // 📁 Google Drive folder setup
+  //     //   const mainFolder = await getOrCreateSubfolder(
+  //     //     process.env.GOOGLE_DRIVE_FOLDER_ID,
+  //     //     `${projectId}. ${getProjectById.name}`
+  //     //   );
+
+  //     //   const allPlanSets = await db.gDriveAssociationObj.findAll({
+  //     //     where: { parent: projectId },
+  //     //   });
+
+  //     //   const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
+
+  //     //   const planSetNumberFolder = await getOrCreateSubfolder(planSetsFolder, `${id}`);
+
+  //     //   const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+  //     //     await projectServices.addDriveAssociation({
+  //     //       parent: projectId,
+  //     //       module,
+  //     //       module_id,
+  //     //       drive_id,
+  //     //       file_name,
+  //     //     });
+
+  //     //   await saveFolder("planSetFiles", id, planSetNumberFolder);
+
+  //     //   const planSetFiles = [];
+  //     //   const planFilesUploads = req.files?.filter(
+  //     //     (f) => f.fieldname === `planSets[${i}][planFiles]`
+  //     //   );
+  //     //   if (planFilesUploads?.length > 0) {
+  //     //     for (const file of planFilesUploads) {
+  //     //       const driveFile = await uploadFileToDrive(
+  //     //         file.path,
+  //     //         file.originalname,
+  //     //         file.mimetype,
+  //     //         planSetNumberFolder
+  //     //       );
+
+  //     //       planSetFiles.push({
+  //     //         name: file.originalname,
+  //     //         link: driveFile.webViewLink,
+  //     //         size: file.size,
+  //     //       });
+
+  //     //       await saveFolder("planSetFiles", id, driveFile.id, file.originalname);
+  //     //     }
+  //     //   }
+
+  //     //   const postData = {
+  //     //     project_id: planSetData.project_id,
+  //     //     submissionType: planSetData.submissionType,
+  //     //     date_received: planSetData.date_received,
+  //     //     plan_link: planSetData.plan_link,
+  //     //     planFiles: planSetFiles.length > 0 ? JSON.stringify(planSetFiles) : existingPlanSet.planFiles,
+  //     //     plan_date: planSetData.plan_date,
+  //     //     rev_status: planSetData.rev_status,
+  //     //     plan_reviewed_date: planSetData.plan_reviewed_date,
+  //     //     plan_reviewed_by: planSetData.plan_reviewed_by,
+  //     //     data_collocated_date: planSetData.data_collocated_date,
+  //     //     plan_revision_notes: planSetData.plan_revision_notes,
+  //     //     planType: planSetData.planType,
+  //     //   };
+
+  //     //   const updated = await projectServices.updateProjectPlanSetById(id, postData);
+  //     //   if (updated) updatedResults.push(updated);
+  //     // }
+  //     for (let i = 0; i < planSets.length; i++) {
+  //       const planSetData = planSets[i];
+  //       // const id = planSetData.id; // ✅ Fix: define ID properly
+
+  //       // 🔍 Fetch existing plan set
+  //       const existingPlanSet = await db.projectplanSetsObj.findOne({
+  //         where: { id },
+  //       });
+  //       if (!existingPlanSet) {
+  //         console.warn(`Plan set not found for ID: ${id}`);
+  //         continue;
+  //       }
+
+  //       const projectId = existingPlanSet.project_id;
+  //       const getProjectById = await projectServices.getProjectById(projectId);
+  //       if (!getProjectById) throw new Error("Project not found");
+
+  //       // 📁 Google Drive folder setup
+  //       const mainFolder = await getOrCreateSubfolder(
+  //         process.env.GOOGLE_DRIVE_FOLDER_ID,
+  //         `${projectId}. ${getProjectById.name}`
+  //       );
+
+  //       const allPlanSets = await db.gDriveAssociationObj.findAll({
+  //         where: { module_id: id },
+  //       });
+
+  //       console.log("All Drive Associations for this Plan Set:", allPlanSets);
+
+  //       const planSetsFolder = await getOrCreateSubfolder(
+  //         mainFolder,
+  //         "planSets"
+  //       );
+  //       const planSetNumberFolder = await getOrCreateSubfolder(
+  //         planSetsFolder,
+  //         `${id}`
+  //       );
+
+  //       const saveFolder = async (
+  //         module,
+  //         module_id,
+  //         drive_id,
+  //         file_name = null
+  //       ) =>
+  //         await projectServices.addDriveAssociation({
+  //           parent: projectId,
+  //           module,
+  //           module_id,
+  //           drive_id,
+  //           file_name,
+  //         });
+
+  //       await saveFolder("planSetFiles", id, planSetNumberFolder);
+
+  //       // 🧩 Step 1: Start with existing files
+  //       let existingFiles = [];
+  //       if (existingPlanSet.planFiles) {
+  //         try {
+  //           existingFiles = JSON.parse(existingPlanSet.planFiles);
+  //         } catch (err) {
+  //           console.warn("Invalid existing planFiles JSON, resetting:", err);
+  //           existingFiles = [];
+  //         }
+  //       }
+
+  //       // 🧩 Step 2: Upload new files and append
+  //       const newPlanSetFiles = [];
+  //       const planFilesUploads = req.files?.filter(
+  //         (f) => f.fieldname === `planSets[${i}][planFiles]`
+  //       );
+
+  //       if (planFilesUploads?.length > 0) {
+  //         for (const file of planFilesUploads) {
+  //           const driveFile = await uploadFileToDrive(
+  //             file.path,
+  //             file.originalname,
+  //             file.mimetype,
+  //             planSetNumberFolder
+  //           );
+
+  //           newPlanSetFiles.push({
+  //             name: file.originalname,
+  //             link: driveFile.webViewLink,
+  //             size: file.size,
+  //           });
+
+  //           await saveFolder(
+  //             "planSetFiles",
+  //             id,
+  //             driveFile.id,
+  //             file.originalname
+  //           );
+  //         }
+  //       }
+
+  //       // 🧩 Step 3: Combine old + new files
+  //       const combinedFiles = [...existingFiles, ...newPlanSetFiles];
+
+  //       // 🧩 Step 4: Update Plan Set
+  //       const postData = {
+  //         project_id: planSetData.project_id,
+  //         submissionType: planSetData.submissionType,
+  //         date_received: planSetData.date_received,
+  //         plan_link: planSetData.plan_link,
+  //         planFiles: JSON.stringify(combinedFiles), // ✅ keep old + new
+  //         plan_date: planSetData.plan_date,
+  //         rev_status: planSetData.rev_status,
+  //         plan_reviewed_date: planSetData.plan_reviewed_date,
+  //         plan_reviewed_by: planSetData.plan_reviewed_by,
+  //         data_collocated_date: planSetData.data_collocated_date,
+  //         plan_revision_notes: planSetData.plan_revision_notes,
+  //         planType: planSetData.planType,
+  //       };
+
+  //       const updated = await projectServices.updateProjectPlanSetById(
+  //         id,
+  //         postData
+  //       );
+  //       if (updated) updatedResults.push(updated);
+  //     }
+
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "Project plan sets updated successfully",
+  //       data: updatedResults,
+  //     });
+  //   } catch (error) {
+  //     console.error("Update error:", error);
+  //     return res.status(400).json({
+  //       status: false,
+  //       message: error.message || "Updating project plan sets failed",
+  //       data: {},
+  //     });
+  //   }
+  // },
+  // async updateProjectPlanSetById(req, res) {
+  //   try {
+  //     const { id } = req.query;
+  //     if (!id) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "planSet id is required",
+  //         data: {},
+  //       });
+  //     }
+
+  //     const parsedBody = qs.parse(req.body);
+  //     const planSets = parsedBody.planSets;
+  //     let { deletedOldImages } = req.body;
+
+  //     if (!Array.isArray(planSets) || planSets.length === 0) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "No planSets found in request",
+  //         data: {},
+  //       });
+  //     }
+
+  //     const updatedResults = [];
+
+  //     for (let i = 0; i < planSets.length; i++) {
+  //       const planSetData = planSets[i];
+
+  //       // 🔍 Fetch existing plan set
+  //       const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
+  //       if (!existingPlanSet) {
+  //         console.warn(`Plan set not found for ID: ${id}`);
+  //         continue;
+  //       }
+
+  //       const projectId = existingPlanSet.project_id;
+  //       const getProjectById = await projectServices.getProjectById(projectId);
+  //       if (!getProjectById) throw new Error("Project not found");
+
+  //       // 📁 Main Google Drive project folder
+  //       const mainFolder = await getOrCreateSubfolder(
+  //         process.env.GOOGLE_DRIVE_FOLDER_ID,
+  //         `${projectId}. ${getProjectById.name}`
+  //       );
+
+  //       // ✅ Find existing Drive folder for this plan set
+  //       let planSetNumberFolderId;
+  //       const existingFolder = await db.gDriveAssociationObj.findOne({
+  //         where: {
+  //           module: "planSetFiles",
+  //           module_id: id,
+  //           parent: projectId,
+  //         },
+  //       });
+
+  //       if (existingFolder && existingFolder.drive_id) {
+  //         planSetNumberFolderId = existingFolder.drive_id;
+  //       } else {
+  //         const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
+  //         const newFolder = await getOrCreateSubfolder(planSetsFolder, `${id}`);
+  //         planSetNumberFolderId = newFolder;
+
+  //         await projectServices.addDriveAssociation({
+  //           parent: projectId,
+  //           module: "planSetFiles",
+  //           module_id: id,
+  //           drive_id: newFolder,
+  //         });
+  //         console.log("📁 Created New Folder:", newFolder);
+  //       }
+
+  //       const saveFolder = async (module, module_id, drive_id, file_name = null) =>
+  //         await projectServices.addDriveAssociation({
+  //           parent: projectId,
+  //           module,
+  //           module_id,
+  //           drive_id,
+  //           file_name,
+  //         });
+
+  //       // 🧩 Step 1: Get existing files from DB
+  //       let existingFiles = [];
+  //       if (existingPlanSet.planFiles) {
+  //         try {
+  //           existingFiles = JSON.parse(existingPlanSet.planFiles);
+  //         } catch (err) {
+  //           console.warn("Invalid existing planFiles JSON, resetting:", err);
+  //           existingFiles = [];
+  //         }
+  //       }
+
+  //       if (typeof deletedOldImages === "string") {
+  //         try {
+  //           deletedOldImages = JSON.parse(deletedOldImages);
+  //         } catch (err) {
+  //           console.error("Failed to parse deletedOldImages:", err.message);
+  //           deletedOldImages = [];
+  //         }
+  //       }
+
+  //       if (Array.isArray(deletedOldImages)) {
+  //         for (const url of deletedOldImages) {
+  //           try {
+  //             const decodedUrl = decodeURIComponent(url);
+  //             const match = decodedUrl.match(/\/d\/(.*?)\//);
+
+  //             if (match && match[1]) {
+  //               const driveId = match[1];
+
+
+  //               await projectServices.deleteDriveAssociation(driveId);
+
+  //               console.log("Deleted successfully:", driveId);
+  //             } else {
+  //               console.log("Invalid Google Drive URL:", decodedUrl);
+  //             }
+  //           } catch (error) {
+  //             console.error("Error while deleting file:", error.message);
+  //           }
+  //         }
+  //       } else {
+  //         console.log("deletedOldImages is not an array:", deletedOldImages);
+  //       }
+
+
+  //       const newPlanSetFiles = [];
+  //       const planFilesUploads = req.files?.filter(
+  //         (f) => f.fieldname === `planSets[${i}][planFiles]`
+  //       );
+
+  //       if (planFilesUploads?.length > 0) {
+  //         for (const file of planFilesUploads) {
+  //           const driveFile = await uploadFileToDrive(
+  //             file.path,
+  //             file.originalname,
+  //             file.mimetype,
+  //             planSetNumberFolderId
+  //           );
+
+  //           newPlanSetFiles.push({
+  //             name: file.originalname,
+  //             link: driveFile.webViewLink,
+  //             size: file.size,
+  //             drive_id: driveFile.id,
+  //           });
+
+  //           await saveFolder("planSetFiles", id, driveFile.id, file.originalname);
+  //         }
+  //       }
+
+  //       // 🧩 Step 4: Combine remaining + new files
+  //       const combinedFiles = [...existingFiles, ...newPlanSetFiles];
+
+  //       // 🧩 Step 5: Update Plan Set Record
+  //       const postData = {
+  //         project_id: planSetData.project_id,
+  //         submissionType: planSetData.submissionType,
+  //         date_received: planSetData.date_received,
+  //         plan_link: Array.isArray(planSetData.plan_link)
+  //           ? planSetData.plan_link[0]
+  //           : planSetData.plan_link,
+  //         planFiles: JSON.stringify(combinedFiles),
+  //         plan_date: planSetData.plan_date,
+  //         rev_status: planSetData.rev_status,
+  //         plan_reviewed_date: planSetData.plan_reviewed_date,
+  //         plan_reviewed_by: planSetData.plan_reviewed_by,
+  //         data_collocated_date: planSetData.data_collocated_date,
+  //         plan_revision_notes: planSetData.plan_revision_notes,
+  //         planType: planSetData.planType,
+  //       };
+
+  //       const updated = await projectServices.updateProjectPlanSetById(id, postData);
+  //       if (updated) updatedResults.push(updated);
+  //     }
+
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "Project plan sets updated successfully (with deletions handled)",
+  //       data: updatedResults,
+  //     });
+  //   } catch (error) {
+  //     console.error("Update error:", error);
+  //     return res.status(400).json({
+  //       status: false,
+  //       message: error.message || "Updating project plan sets failed",
+  //       data: {},
+  //     });
+  //   }
+  // },
+
   async updateProjectPlanSetById(req, res) {
     try {
       const { id } = req.query;
@@ -1418,6 +2080,7 @@ module.exports = {
 
       const parsedBody = qs.parse(req.body);
       const planSets = parsedBody.planSets;
+      let { deletedOldImages } = req.body;
 
       if (!Array.isArray(planSets) || planSets.length === 0) {
         return res.status(400).json({
@@ -1429,149 +2092,76 @@ module.exports = {
 
       const updatedResults = [];
 
-      // for (let i = 0; i < planSets.length; i++) {
-      //   const planSetData = planSets[i];
-
-      //   // 🔍 Fetch existing plan set
-      //   const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
-      //   if (!existingPlanSet) {
-      //     continue;
-      //   }
-
-      //   const projectId = existingPlanSet.project_id;
-      //   const getProjectById = await projectServices.getProjectById(projectId);
-      //   if (!getProjectById) throw new Error("Project not found");
-
-      //   // 📁 Google Drive folder setup
-      //   const mainFolder = await getOrCreateSubfolder(
-      //     process.env.GOOGLE_DRIVE_FOLDER_ID,
-      //     `${projectId}. ${getProjectById.name}`
-      //   );
-
-      //   const allPlanSets = await db.gDriveAssociationObj.findAll({
-      //     where: { parent: projectId },
-      //   });
-
-      //   const planSetsFolder = await getOrCreateSubfolder(mainFolder, "planSets");
-
-      //   const planSetNumberFolder = await getOrCreateSubfolder(planSetsFolder, `${id}`);
-
-      //   const saveFolder = async (module, module_id, drive_id, file_name = null) =>
-      //     await projectServices.addDriveAssociation({
-      //       parent: projectId,
-      //       module,
-      //       module_id,
-      //       drive_id,
-      //       file_name,
-      //     });
-
-      //   await saveFolder("planSetFiles", id, planSetNumberFolder);
-
-      //   const planSetFiles = [];
-      //   const planFilesUploads = req.files?.filter(
-      //     (f) => f.fieldname === `planSets[${i}][planFiles]`
-      //   );
-      //   if (planFilesUploads?.length > 0) {
-      //     for (const file of planFilesUploads) {
-      //       const driveFile = await uploadFileToDrive(
-      //         file.path,
-      //         file.originalname,
-      //         file.mimetype,
-      //         planSetNumberFolder
-      //       );
-
-      //       planSetFiles.push({
-      //         name: file.originalname,
-      //         link: driveFile.webViewLink,
-      //         size: file.size,
-      //       });
-
-      //       await saveFolder("planSetFiles", id, driveFile.id, file.originalname);
-      //     }
-      //   }
-
-      //   const postData = {
-      //     project_id: planSetData.project_id,
-      //     submissionType: planSetData.submissionType,
-      //     date_received: planSetData.date_received,
-      //     plan_link: planSetData.plan_link,
-      //     planFiles: planSetFiles.length > 0 ? JSON.stringify(planSetFiles) : existingPlanSet.planFiles,
-      //     plan_date: planSetData.plan_date,
-      //     rev_status: planSetData.rev_status,
-      //     plan_reviewed_date: planSetData.plan_reviewed_date,
-      //     plan_reviewed_by: planSetData.plan_reviewed_by,
-      //     data_collocated_date: planSetData.data_collocated_date,
-      //     plan_revision_notes: planSetData.plan_revision_notes,
-      //     planType: planSetData.planType,
-      //   };
-
-      //   const updated = await projectServices.updateProjectPlanSetById(id, postData);
-      //   if (updated) updatedResults.push(updated);
-      // }
       for (let i = 0; i < planSets.length; i++) {
         const planSetData = planSets[i];
-        // const id = planSetData.id; // ✅ Fix: define ID properly
 
-        // 🔍 Fetch existing plan set
-        const existingPlanSet = await db.projectplanSetsObj.findOne({
-          where: { id },
-        });
+   
+        const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
         if (!existingPlanSet) {
           console.warn(`Plan set not found for ID: ${id}`);
           continue;
         }
 
         const projectId = existingPlanSet.project_id;
-        const getProjectById = await projectServices.getProjectById(projectId);
-        if (!getProjectById) throw new Error("Project not found");
 
-        // 📁 Google Drive folder setup
-        const mainFolder = await getOrCreateSubfolder(
-          process.env.GOOGLE_DRIVE_FOLDER_ID,
-          `${projectId}. ${getProjectById.name}`
-        );
-
-        const allPlanSets = await db.gDriveAssociationObj.findAll({
-          where: { parent: projectId },
-        });
-
-        const planSetsFolder = await getOrCreateSubfolder(
-          mainFolder,
-          "planSets"
-        );
-        const planSetNumberFolder = await getOrCreateSubfolder(
-          planSetsFolder,
-          `${id}`
-        );
-
-        const saveFolder = async (
-          module,
-          module_id,
-          drive_id,
-          file_name = null
-        ) =>
-          await projectServices.addDriveAssociation({
+       
+        const existingFolder = await db.gDriveAssociationObj.findOne({
+          where: {
+            module: "planSetFiles",
+            module_id: id,
             parent: projectId,
-            module,
-            module_id,
-            drive_id,
-            file_name,
-          });
+          },
+        });
+       
 
-        await saveFolder("planSetFiles", id, planSetNumberFolder);
+        if (!existingFolder || !existingFolder.drive_id) {
+          throw new Error(`No existing Google Drive folder found for plan set ID: ${id}`);
+        }
 
-        // 🧩 Step 1: Start with existing files
+        const planSetFolderId = existingFolder.drive_id;
+
+    
+        if (typeof deletedOldImages === "string") {
+          try {
+            deletedOldImages = JSON.parse(deletedOldImages);
+          } catch (err) {
+            console.error("Failed to parse deletedOldImages:", err.message);
+            deletedOldImages = [];
+          }
+        }
+
+       
+        if (Array.isArray(deletedOldImages)) {
+          for (const url of deletedOldImages) {
+            try {
+              const decodedUrl = decodeURIComponent(url);
+              const match = decodedUrl.match(/\/d\/(.*?)\//);
+              if (match && match[1]) {
+                const driveId = match[1];
+                
+                await projectServices.deleteDriveAssociation(driveId);
+                
+                await deleteFileFromDrive(driveId);
+              } else {
+                console.log("Invalid Google Drive URL:", decodedUrl);
+              }
+            } catch (error) {
+              console.error("Error deleting old image:", error.message);
+            }
+          }
+        }
+
+       
         let existingFiles = [];
         if (existingPlanSet.planFiles) {
           try {
             existingFiles = JSON.parse(existingPlanSet.planFiles);
           } catch (err) {
-            console.warn("Invalid existing planFiles JSON, resetting:", err);
+            console.warn("Invalid existing planFiles JSON:", err);
             existingFiles = [];
           }
         }
 
-        // 🧩 Step 2: Upload new files and append
         const newPlanSetFiles = [];
         const planFilesUploads = req.files?.filter(
           (f) => f.fieldname === `planSets[${i}][planFiles]`
@@ -1583,34 +2173,39 @@ module.exports = {
               file.path,
               file.originalname,
               file.mimetype,
-              planSetNumberFolder
+              planSetFolderId
             );
 
             newPlanSetFiles.push({
               name: file.originalname,
               link: driveFile.webViewLink,
               size: file.size,
+              drive_id: driveFile.id,
             });
 
-            await saveFolder(
-              "planSetFiles",
-              id,
-              driveFile.id,
-              file.originalname
-            );
+            // save association
+            await projectServices.addDriveAssociation({
+              parent: projectId,
+              module: "planSetFiles",
+              module_id: id,
+              drive_id: driveFile.id,
+              file_name: file.originalname,
+            });
           }
         }
 
-        // 🧩 Step 3: Combine old + new files
+        
         const combinedFiles = [...existingFiles, ...newPlanSetFiles];
 
-        // 🧩 Step 4: Update Plan Set
+        
         const postData = {
           project_id: planSetData.project_id,
           submissionType: planSetData.submissionType,
           date_received: planSetData.date_received,
-          plan_link: planSetData.plan_link,
-          planFiles: JSON.stringify(combinedFiles), // ✅ keep old + new
+          plan_link: Array.isArray(planSetData.plan_link)
+            ? planSetData.plan_link[0]
+            : planSetData.plan_link,
+          planFiles: JSON.stringify(combinedFiles),
           plan_date: planSetData.plan_date,
           rev_status: planSetData.rev_status,
           plan_reviewed_date: planSetData.plan_reviewed_date,
@@ -1620,16 +2215,13 @@ module.exports = {
           planType: planSetData.planType,
         };
 
-        const updated = await projectServices.updateProjectPlanSetById(
-          id,
-          postData
-        );
+        const updated = await projectServices.updateProjectPlanSetById(id, postData);
         if (updated) updatedResults.push(updated);
       }
 
       return res.status(200).json({
         status: true,
-        message: "Project plan sets updated successfully",
+        message: "Plan Set updated successfully (files replaced/deleted)",
         data: updatedResults,
       });
     } catch (error) {
@@ -1641,6 +2233,11 @@ module.exports = {
       });
     }
   },
+
+
+
+
+
   async deleteProjectPlanSet(req, res) {
     try {
       const { id } = req.query;

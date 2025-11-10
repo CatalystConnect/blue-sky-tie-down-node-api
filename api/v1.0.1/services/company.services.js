@@ -25,9 +25,78 @@ module.exports = {
   },
 
   /*get all Company*/
+  // async getAllCompany(query) {
+  //   try {
+  //     let { page, per_page, limit, take_all, search, id } = query;
+
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+  //     limit = parseInt(limit) || null;
+  //     const offset = (page - 1) * per_page;
+
+  //     let whereCondition = {};
+  //     if (search) {
+  //       whereCondition = {
+  //         name: {
+  //           [Op.like]: `%${search}%`,
+  //         },
+  //       };
+  //     }
+
+  //     let order = [["id", "DESC"]];
+  //     if (id) {
+  //       order = [
+  //         [
+  //           Sequelize.literal(
+  //             `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ];
+  //     }
+
+  //      const includeRelation = [
+  //     {
+  //       model: db.companyTypeObj,
+  //       as: "companyType",
+
+  //     },
+  //   ];
+
+  //     if (take_all === "all") {
+  //       const companies = await db.companyObj.findAll({
+  //         where: whereCondition,
+  //         order: order,
+  //         ...(limit ? { limit } : {}),
+  //       });
+  //       return { data: companies, total: companies.length };
+  //     }
+
+  //     const { rows, count } = await db.companyObj.findAndCountAll({
+  //       where: whereCondition,
+  //       order: order,
+  //       limit: per_page,
+  //       offset: offset,
+  //       include: includeRelation,
+  //     });
+
+  //     return {
+  //       data: rows,
+  //       total: count,
+  //       current_page: page,
+  //       per_page: per_page,
+  //       last_page: Math.ceil(count / per_page),
+  //     };
+  //   } catch (e) {
+  //     console.error(commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
   async getAllCompany(query) {
     try {
-      let { page, per_page, limit, take_all, search, id } = query;
+      let { page, per_page, limit, take_all, search, id, type } = query;
 
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
@@ -35,12 +104,9 @@ module.exports = {
       const offset = (page - 1) * per_page;
 
       let whereCondition = {};
+
       if (search) {
-        whereCondition = {
-          name: {
-            [Op.like]: `%${search}%`,
-          },
-        };
+        whereCondition.name = { [Op.like]: `%${search}%` };
       }
 
       let order = [["id", "DESC"]];
@@ -56,28 +122,38 @@ module.exports = {
         ];
       }
 
-       const includeRelation = [
-      {
-        model: db.companyTypeObj,
-        as: "companyType",
-       
-      },
-    ];
-
+      const includeRelation = [
+        {
+          model: db.companyTypeObj,
+          as: "companyType",
+          ...(type
+            ? {
+                where: {
+                  [Op.or]: [{ name: { [Op.like]: `%${type}%` } }],
+                },
+                required: true,
+              }
+            : {
+                required: false,
+              }),
+        },
+      ];
       if (take_all === "all") {
         const companies = await db.companyObj.findAll({
           where: whereCondition,
-          order: order,
+          order,
           ...(limit ? { limit } : {}),
+          include: includeRelation,
         });
+
         return { data: companies, total: companies.length };
       }
 
       const { rows, count } = await db.companyObj.findAndCountAll({
         where: whereCondition,
-        order: order,
+        order,
         limit: per_page,
-        offset: offset,
+        offset,
         include: includeRelation,
       });
 
@@ -85,7 +161,7 @@ module.exports = {
         data: rows,
         total: count,
         current_page: page,
-        per_page: per_page,
+        per_page,
         last_page: Math.ceil(count / per_page),
       };
     } catch (e) {

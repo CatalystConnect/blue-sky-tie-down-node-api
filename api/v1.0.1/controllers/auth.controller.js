@@ -26,19 +26,19 @@ module.exports = {
 
       const data = req.body;
 
-      const existingUser = await db.userObj.findOne({
-        where: {
-          [Op.or]: [{ email: data.email }, { phone: data.phone }],
-        },
-      });
+      // const existingUser = await db.userObj.findOne({
+      //   where: {
+      //     [Op.or]: [{ email: data.email }, { phone: data.phone }],
+      //   },
+      // });
 
-      if (existingUser) {
-        return res.status(400).json({
-          status: false,
-          message: "Email or phone number already exists",
-          data: {},
-        });
-      }
+      // if (existingUser) {
+      //   return res.status(400).json({
+      //     status: false,
+      //     message: "Email or phone number already exists",
+      //     data: {},
+      //   });
+      // }
       let postData = {
         name: data.name,
         email: data.email,
@@ -277,7 +277,7 @@ module.exports = {
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
       };
-     
+
       if (
         data.password &&
         data.password != null &&
@@ -288,7 +288,7 @@ module.exports = {
         postData.password = bcrypt.hashSync(data.password, 8);
       }
 
-      console.log('postData',postData)
+      console.log("postData", postData);
 
       if (req.files && req.files.avatar) {
         postData.avatar = `files/${req.files.avatar[0].filename}`;
@@ -349,10 +349,41 @@ module.exports = {
     switch (method) {
       case "register": {
         return [
-          check("email").not().isEmpty().withMessage("Email is Required"),
-          check("password").not().isEmpty().withMessage("Password is Required"),
+          check("email")
+            .notEmpty()
+            .withMessage("Email is required")
+            .isEmail()
+            .withMessage("Invalid email format")
+            .custom(async (value) => {
+              const existing = await authServices.getUserByEmail(value);
+              if (existing) {
+                throw new Error("Email already in use by another account");
+              }
+              return true;
+            }),
+
+          check("password").notEmpty().withMessage("Password is required"),
         ];
       }
+
+      case "updateUser": {
+        return [
+          check("email")
+            .notEmpty()
+            .withMessage("Email is required")
+            .isEmail()
+            .withMessage("Invalid email format")
+            .custom(async (value, { req }) => {
+              const existing = await authServices.getUserByEmail(value);
+              // ✅ Allow same email for the user being updated
+              if (existing && existing.id !== req.body.id) {
+                throw new Error("Email already in use by another account");
+              }
+              return true;
+            }),
+        ];
+      }
+
       case "login": {
         return [
           check("email").not().isEmpty().withMessage("Email is Required"),

@@ -14,6 +14,19 @@ module.exports = {
       throw e;
     }
   },
+
+  async getUserByEmail(email) {
+    try {
+      const user = await db.userObj.findOne({
+        where: { email },
+      });
+      return user;
+    } catch (e) {
+      logger.error(commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
   /*getUserByEmail*/
   async getUserByEmail(email) {
     try {

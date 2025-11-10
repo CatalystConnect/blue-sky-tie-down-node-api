@@ -17,7 +17,7 @@ router.get("/users", [authJwt.verifyToken], controller.getAllUsers);
 router.get("/getUserById", [authJwt.verifyToken],[controller.validate("getUserById")], controller.getUserById);
 
 /*updateUser*/
-router.put("/updateUser", multiUpload,[authJwt.verifyToken], controller.updateUser);
+router.put("/updateUser", multiUpload,[authJwt.verifyToken], [controller.validate("updateUser")], controller.updateUser);
 
 /*deleteUser*/
 router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);

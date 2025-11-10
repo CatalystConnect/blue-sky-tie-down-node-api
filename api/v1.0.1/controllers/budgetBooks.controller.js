@@ -718,7 +718,7 @@ module.exports = {
                 const selectedDate = matchedOption ? matchedOption.date : null;
 
                 // 🧩 Create Segment
-                const daaaa = await db.budgetBooksScopeSegmentsObj.create({
+                await db.budgetBooksScopeSegmentsObj.create({
                   budget_books_scope_group_id: budgetBooksScopeGroup.id,
                   scope_sagment_id: segment_id,
                   title: segment_name || "",

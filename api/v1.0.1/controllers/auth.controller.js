@@ -365,7 +365,6 @@ module.exports = {
           check("password").notEmpty().withMessage("Password is required"),
         ];
       }
-
       case "updateUser": {
         return [
           check("email")
@@ -375,8 +374,7 @@ module.exports = {
             .withMessage("Invalid email format")
             .custom(async (value, { req }) => {
               const existing = await authServices.getUserByEmail(value);
-              // ✅ Allow same email for the user being updated
-              if (existing && existing.id !== req.body.id) {
+              if (existing && existing.id !== Number(req.query.userId)) {
                 throw new Error("Email already in use by another account");
               }
               return true;

@@ -5,6 +5,149 @@ const { Op, fn, col, where, Sequelize } = require("sequelize");
 
 module.exports = {
   /*getAllLeads*/
+  // async getAllLeads(
+  //   page,
+  //   length,
+  //   search,
+  //   date,
+  //   role_id,
+  //   userId,
+  //   role,
+  //   take_all
+  // ) {
+  //   try {
+  //     page = Math.max(parseInt(page) || 1, 1);
+  //     length = Math.max(parseInt(length) || 10, 1);
+  //     const limit = length;
+  //     const offset = (page - 1) * limit;
+
+  //     let whereCondition = {};
+
+  //     if (date) {
+  //       whereCondition.createdAt = {
+  //         [Op.gte]: new Date(date + " 00:00:00"),
+  //         [Op.lte]: new Date(date + " 23:59:59"),
+  //       };
+  //     }
+
+  //     const searchTerm =
+  //       search && search.trim() !== "" ? search.trim() : undefined;
+
+  //     // const companyWhere = searchTerm
+  //     //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+  //     //   : undefined;
+  //     // const projectWhere = searchTerm
+  //     //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
+  //     //   : undefined;
+  //     const companyWhere = searchTerm
+  //       ? {
+  //           name: {
+  //             [Op.iLike]: `%${searchTerm}%`,
+  //             [Op.ne]: "",
+  //             [Op.not]: null,
+  //           },
+  //         }
+  //       : undefined;
+
+  //     const projectWhere = searchTerm
+  //       ? {
+  //           name: {
+  //             [Op.iLike]: `%${searchTerm}%`,
+  //             [Op.ne]: "",
+  //             [Op.not]: null,
+  //           },
+  //         }
+  //       : undefined;
+
+  //     let queryOptions = {
+  //       where: whereCondition,
+  //       order: [["id", "DESC"]],
+  //       distinct: true,
+  //       include: [
+  //         {
+  //           model: db.companyObj,
+  //           as: "company",
+  //           attributes: ["id", "name"],
+  //           required: false,
+  //           where: companyWhere,
+  //         },
+  //         {
+  //           model: db.projectObj,
+  //           as: "project",
+  //           // attributes: ["id", "name"],
+  //           required: false,
+  //           where: projectWhere,
+  //           include: [
+  //             { model: db.taxesObj, as: "stateDetails" },
+  //             { model: db.taxesObj, as: "zipCodeDetails" },
+  //             {
+  //               model: db.stateObj,
+  //               as: "states",
+  //             },
+  //           ],
+  //         },
+
+  //         { model: db.contactsObj, as: "contact" },
+  //         {
+  //           model: db.userObj,
+  //           as: "salePerson",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         {
+  //           model: db.userObj,
+  //           as: "engineer",
+  //           attributes: { exclude: ["password"] },
+  //         },
+  //         { model: db.leadTeamsObj, as: "leadTeam" },
+  //         { model: db.leadStatusesObj, as: "leadStatus" },
+  //         {
+  //           model: db.leadTagsObj,
+  //           as: "lead_tags",
+  //           include: [{ model: db.tagsObj, as: "tag" }],
+  //         },
+  //         {
+  //           model: db.salesPipelinesObj,
+  //           as: "salesPipelines",
+  //           attributes: ["id", "name"],
+  //         },
+  //         {
+  //           model: db.salesPipelinesStatusesObj,
+  //           as: "salesPipelinesStatus",
+  //           attributes: ["id", "name"],
+  //         },
+  //       ],
+  //     };
+
+  //     if (!(take_all && take_all === "all")) {
+  //       queryOptions.limit = limit;
+  //       queryOptions.offset = offset;
+  //     }
+
+  //     let { rows: leads, count } = await db.leadsObj.findAndCountAll({
+  //       ...queryOptions,
+  //       // logging: console.log,
+  //     });
+
+  //     let lastPage = Math.ceil(count / limit);
+  //     let from = offset + 1;
+  //     let to = offset + leads.length;
+
+  //     return {
+  //       leads,
+  //       meta: {
+  //         current_page: page,
+  //         from: from,
+  //         to: to,
+  //         last_page: lastPage,
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllLeads(
     page,
     length,
@@ -30,92 +173,66 @@ module.exports = {
         };
       }
 
-      const searchTerm =
-        search && search.trim() !== "" ? search.trim() : undefined;
+      const include = [
+        {
+          model: db.companyObj,
+          as: "company",
+          required: false,
+        },
+        {
+          model: db.projectObj,
+          as: "project",
+          required: false,
+          include: [
+            { model: db.taxesObj, as: "stateDetails" },
+            { model: db.taxesObj, as: "zipCodeDetails" },
+            { model: db.stateObj, as: "states" },
+          ],
+        },
+        { model: db.contactsObj, as: "contact" },
+        {
+          model: db.userObj,
+          as: "salePerson",
+          attributes: { exclude: ["password"] },
+        },
+        {
+          model: db.userObj,
+          as: "engineer",
+          attributes: { exclude: ["password"] },
+        },
+        { model: db.leadTeamsObj, as: "leadTeam" },
+        { model: db.leadStatusesObj, as: "leadStatus" },
+        {
+          model: db.leadTagsObj,
+          as: "lead_tags",
+          include: [{ model: db.tagsObj, as: "tag" }],
+        },
+        {
+          model: db.salesPipelinesObj,
+          as: "salesPipelines",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.salesPipelinesStatusesObj,
+          as: "salesPipelinesStatus",
+          attributes: ["id", "name"],
+        },
+      ];
 
-      // const companyWhere = searchTerm
-      //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
-      //   : undefined;
-      // const projectWhere = searchTerm
-      //   ? { name: { [Op.iLike]: `%${searchTerm}%` } }
-      //   : undefined;
-      const companyWhere = searchTerm
-        ? {
-            name: {
-              [Op.iLike]: `%${searchTerm}%`,
-              [Op.ne]: "",
-              [Op.not]: null,
-            },
-          }
-        : undefined;
+      const searchTerm = search?.trim();
+      if (searchTerm) {
+        whereCondition[Op.or] = [
+          { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
+          { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
+        ];
+      }
 
-      const projectWhere = searchTerm
-        ? {
-            name: {
-              [Op.iLike]: `%${searchTerm}%`,
-              [Op.ne]: "",
-              [Op.not]: null,
-            },
-          }
-        : undefined;
-
-      let queryOptions = {
+      const queryOptions = {
         where: whereCondition,
-        order: [["id", "DESC"]],
+        include,
         distinct: true,
-        include: [
-          {
-            model: db.companyObj,
-            as: "company",
-            attributes: ["id", "name"],
-            required: false,
-            where: companyWhere,
-          },
-          {
-            model: db.projectObj,
-            as: "project",
-            // attributes: ["id", "name"],
-            required: false,
-            where: projectWhere,
-            include: [
-              { model: db.taxesObj, as: "stateDetails" },
-              { model: db.taxesObj, as: "zipCodeDetails" },
-              {
-                model: db.stateObj,
-                as: "states",
-              },
-            ],
-          },
-
-          { model: db.contactsObj, as: "contact" },
-          {
-            model: db.userObj,
-            as: "salePerson",
-            attributes: { exclude: ["password"] },
-          },
-          {
-            model: db.userObj,
-            as: "engineer",
-            attributes: { exclude: ["password"] },
-          },
-          { model: db.leadTeamsObj, as: "leadTeam" },
-          { model: db.leadStatusesObj, as: "leadStatus" },
-          {
-            model: db.leadTagsObj,
-            as: "lead_tags",
-            include: [{ model: db.tagsObj, as: "tag" }],
-          },
-          {
-            model: db.salesPipelinesObj,
-            as: "salesPipelines",
-            attributes: ["id", "name"],
-          },
-          {
-            model: db.salesPipelinesStatusesObj,
-            as: "salesPipelinesStatus",
-            attributes: ["id", "name"],
-          },
-        ],
+        order: [["id", "DESC"]],
+        subQuery: false,
       };
 
       if (!(take_all && take_all === "all")) {
@@ -123,21 +240,20 @@ module.exports = {
         queryOptions.offset = offset;
       }
 
-      let { rows: leads, count } = await db.leadsObj.findAndCountAll({
-        ...queryOptions,
-        // logging: console.log,
-      });
+      const { rows: leads, count } = await db.leadsObj.findAndCountAll(
+        queryOptions
+      );
 
-      let lastPage = Math.ceil(count / limit);
-      let from = offset + 1;
-      let to = offset + leads.length;
+      const lastPage = Math.ceil(count / limit);
+      const from = offset + 1;
+      const to = offset + leads.length;
 
       return {
         leads,
         meta: {
           current_page: page,
-          from: from,
-          to: to,
+          from,
+          to,
           last_page: lastPage,
           per_page: limit,
           total: count,
@@ -148,7 +264,6 @@ module.exports = {
       throw e;
     }
   },
-
   /*addLead*/
   async addLead(postData) {
     try {
@@ -347,327 +462,220 @@ module.exports = {
   //   }
   // },
 
-  // async getLeadById(leadId) {
-  //   try {
-  //     const lead = await db.leadsObj.findOne({
-  //       where: { id: leadId },
-  //       include: [
-  //         {
-  //           model: db.companyObj,
-  //           as: "company",
-  //           required: false,
-  //           separate: false,
-  //           include: [
-  //             {
-  //               model: db.companyTypeObj,
-  //               as: "companyType",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.contactsObj,
-  //           as: "contact",
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.userObj,
-  //           as: "salePerson",
-  //           attributes: { exclude: ["password"] },
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.userObj,
-  //           as: "engineer",
-  //           attributes: { exclude: ["password"] },
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.leadTeamsObj,
-  //           as: "leadTeam",
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.leadStatusesObj,
-  //           as: "leadStatus",
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.projectObj,
-  //           as: "project",
-  //           required: false,
-  //           separate: false,
-  //           include: [
-  //             {
-  //               model: db.projectTypeMappingsObj,
-  //               as: "projectTypeMapping",
-  //               required: false,
-  //               separate: false,
-  //               include: [
-  //                 {
-  //                   model: db.projectTypesObj,
-  //                   as: "projectType",
-  //                   required: false,
-  //                   separate: false,
-  //                 },
-  //               ],
-  //             },
-  //             {
-  //               model: db.taxesObj,
-  //               as: "stateDetails",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //             {
-  //               model: db.taxesObj,
-  //               as: "zipCodeDetails",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //             {
-  //               model: db.stateObj,
-  //               as: "states",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.budgetBooksObj,
-  //           as: "lead_budget",
-  //           required: false,
-  //           separate: false,
-  //           include: [
-  //             {
-  //               model: db.projectBudgetsObj,
-  //               as: "budgets",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.leadTagsObj,
-  //           as: "lead_tags",
-  //           required: false,
-  //           separate: false,
-  //           include: [
-  //             {
-  //               model: db.tagsObj,
-  //               as: "tag",
-  //               required: false,
-  //               separate: false,
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.leadTeamsMemberObj,
-  //           as: "leadTeamMembers",
-  //           required: false,
-  //           separate: false,
-  //           include: [
-  //             {
-  //               model: db.userObj,
-  //               as: "userData",
-  //               attributes: { exclude: ["password"] },
-  //               required: false,
-  //               separate: false,
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.salesPipelinesObj,
-  //           as: "salesPipelines",
-  //           attributes: ["id", "name"],
-  //           required: false,
-  //           separate: false,
-  //         },
-  //         {
-  //           model: db.salesPipelinesStatusesObj,
-  //           as: "salesPipelinesStatus",
-  //           attributes: ["id", "name"],
-  //           required: false,
-  //           separate: false,
-  //         },
-  //       ],
-  //     });
-
-  //     // ---- Calculate budget_totals for each lead_budget ----
-  //     if (lead?.lead_budget?.length) {
-  //       lead.lead_budget = lead.lead_budget.map((element) => {
-  //         const budgets = element.budgets || [];
-
-  //         const fields = [
-  //           "cost_beam",
-  //           "cost_coridor",
-  //           "cost_deck",
-  //           "cost_misc",
-  //           "cost_misc_hardware",
-  //           "cost_posts",
-  //           "cost_roof",
-  //           "cost_rtu",
-  //           "cost_sill_plate",
-  //           "cost_smu",
-  //           "cost_stair_wells",
-  //           "cost_stl",
-  //           "cost_sw_tiedown",
-  //           "cost_up_lift",
-  //           "price_coridor",
-  //           "price_deck",
-  //           "price_misc",
-  //           "price_misc_hardware",
-  //           "price_posts",
-  //           "price_roof",
-  //           "price_rtu",
-  //           "price_sill_plate",
-  //           "price_smu",
-  //           "price_stair_wells",
-  //           "price_stl",
-  //           "price_sw_tiedown",
-  //           "price_total",
-  //           "price_up_lift",
-  //         ];
-
-  //         const budget_totals = {};
-  //         fields.forEach((field) => (budget_totals[field] = 0));
-
-  //         budgets.forEach((item) => {
-  //           fields.forEach((field) => {
-  //             budget_totals[field] += parseFloat(item[field]) || 0;
-  //           });
-  //         });
-
-  //         return {
-  //           ...element.toJSON(),
-  //           budget_totals,
-  //         };
-  //       });
-  //     }
-
-  //     const leadWithTotals = {
-  //       ...lead.toJSON(),
-  //       lead_budget: lead.lead_budget,
-  //     };
-
-  //     return leadWithTotals;
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
-
-  async getAllLeads(page, length, search, date, role_id, userId, role, take_all) {
+  async getLeadById(leadId) {
     try {
-      page = Math.max(parseInt(page) || 1, 1);
-      length = Math.max(parseInt(length) || 10, 1);
-      const limit = length;
-      const offset = (page - 1) * limit;
-  
-      let whereCondition = {};
-  
-      if (date) {
-        whereCondition.createdAt = {
-          [Op.gte]: new Date(date + " 00:00:00"),
-          [Op.lte]: new Date(date + " 23:59:59"),
-        };
+      const lead = await db.leadsObj.findOne({
+        where: { id: leadId },
+        include: [
+          {
+            model: db.companyObj,
+            as: "company",
+            required: false,
+            separate: false,
+            include: [
+              {
+                model: db.companyTypeObj,
+                as: "companyType",
+                required: false,
+                separate: false,
+              },
+            ],
+          },
+          {
+            model: db.contactsObj,
+            as: "contact",
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.userObj,
+            as: "salePerson",
+            attributes: { exclude: ["password"] },
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.userObj,
+            as: "engineer",
+            attributes: { exclude: ["password"] },
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.leadTeamsObj,
+            as: "leadTeam",
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.leadStatusesObj,
+            as: "leadStatus",
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.projectObj,
+            as: "project",
+            required: false,
+            separate: false,
+            include: [
+              {
+                model: db.projectTypeMappingsObj,
+                as: "projectTypeMapping",
+                required: false,
+                separate: false,
+                include: [
+                  {
+                    model: db.projectTypesObj,
+                    as: "projectType",
+                    required: false,
+                    separate: false,
+                  },
+                ],
+              },
+              {
+                model: db.taxesObj,
+                as: "stateDetails",
+                required: false,
+                separate: false,
+              },
+              {
+                model: db.taxesObj,
+                as: "zipCodeDetails",
+                required: false,
+                separate: false,
+              },
+              {
+                model: db.stateObj,
+                as: "states",
+                required: false,
+                separate: false,
+              },
+            ],
+          },
+          {
+            model: db.budgetBooksObj,
+            as: "lead_budget",
+            required: false,
+            separate: false,
+            include: [
+              {
+                model: db.projectBudgetsObj,
+                as: "budgets",
+                required: false,
+                separate: false,
+              },
+            ],
+          },
+          {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            required: false,
+            separate: false,
+            include: [
+              {
+                model: db.tagsObj,
+                as: "tag",
+                required: false,
+                separate: false,
+              },
+            ],
+          },
+          {
+            model: db.leadTeamsMemberObj,
+            as: "leadTeamMembers",
+            required: false,
+            separate: false,
+            include: [
+              {
+                model: db.userObj,
+                as: "userData",
+                attributes: { exclude: ["password"] },
+                required: false,
+                separate: false,
+              },
+            ],
+          },
+          {
+            model: db.salesPipelinesObj,
+            as: "salesPipelines",
+            attributes: ["id", "name"],
+            required: false,
+            separate: false,
+          },
+          {
+            model: db.salesPipelinesStatusesObj,
+            as: "salesPipelinesStatus",
+            attributes: ["id", "name"],
+            required: false,
+            separate: false,
+          },
+        ],
+      });
+
+      // ---- Calculate budget_totals for each lead_budget ----
+      if (lead?.lead_budget?.length) {
+        lead.lead_budget = lead.lead_budget.map((element) => {
+          const budgets = element.budgets || [];
+
+          const fields = [
+            "cost_beam",
+            "cost_coridor",
+            "cost_deck",
+            "cost_misc",
+            "cost_misc_hardware",
+            "cost_posts",
+            "cost_roof",
+            "cost_rtu",
+            "cost_sill_plate",
+            "cost_smu",
+            "cost_stair_wells",
+            "cost_stl",
+            "cost_sw_tiedown",
+            "cost_up_lift",
+            "price_coridor",
+            "price_deck",
+            "price_misc",
+            "price_misc_hardware",
+            "price_posts",
+            "price_roof",
+            "price_rtu",
+            "price_sill_plate",
+            "price_smu",
+            "price_stair_wells",
+            "price_stl",
+            "price_sw_tiedown",
+            "price_total",
+            "price_up_lift",
+          ];
+
+          const budget_totals = {};
+          fields.forEach((field) => (budget_totals[field] = 0));
+
+          budgets.forEach((item) => {
+            fields.forEach((field) => {
+              budget_totals[field] += parseFloat(item[field]) || 0;
+            });
+          });
+
+          return {
+            ...element.toJSON(),
+            budget_totals,
+          };
+        });
       }
-  
-      const include = [
-        {
-          model: db.companyObj,
-          as: "company",
-          required: false,
-        },
-        {
-          model: db.projectObj,
-          as: "project",
-          required: false,
-          include: [
-            { model: db.taxesObj, as: "stateDetails" },
-            { model: db.taxesObj, as: "zipCodeDetails" },
-            { model: db.stateObj, as: "states" },
-          ],
-        },
-        { model: db.contactsObj, as: "contact" },
-        {
-          model: db.userObj,
-          as: "salePerson",
-          attributes: { exclude: ["password"] },
-        },
-        {
-          model: db.userObj,
-          as: "engineer",
-          attributes: { exclude: ["password"] },
-        },
-        { model: db.leadTeamsObj, as: "leadTeam" },
-        { model: db.leadStatusesObj, as: "leadStatus" },
-        {
-          model: db.leadTagsObj,
-          as: "lead_tags",
-          include: [{ model: db.tagsObj, as: "tag" }],
-        },
-        {
-          model: db.salesPipelinesObj,
-          as: "salesPipelines",
-          attributes: ["id", "name"],
-        },
-        {
-          model: db.salesPipelinesStatusesObj,
-          as: "salesPipelinesStatus",
-          attributes: ["id", "name"],
-        },
-      ];
-  
-      const searchTerm = search?.trim();
-      if (searchTerm) {
-        whereCondition[Op.or] = [
-          { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
-          { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
-        ];
-      }
-  
-      const queryOptions = {
-        where: whereCondition,
-        include,
-        distinct: true,
-        order: [["id", "DESC"]],
-        subQuery: false, 
+
+      const leadWithTotals = {
+        ...lead.toJSON(),
+        lead_budget: lead.lead_budget,
       };
-  
-      if (!(take_all && take_all === "all")) {
-        queryOptions.limit = limit;
-        queryOptions.offset = offset;
-      }
-  
-      const { rows: leads, count } = await db.leadsObj.findAndCountAll(queryOptions);
-  
-      const lastPage = Math.ceil(count / limit);
-      const from = offset + 1;
-      const to = offset + leads.length;
-  
-      return {
-        leads,
-        meta: {
-          current_page: page,
-          from,
-          to,
-          last_page: lastPage,
-          per_page: limit,
-          total: count,
-        },
-      };
+
+      return leadWithTotals;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
-  
 
   /*leadUpdate*/
   async leadUpdate(data, leadId) {

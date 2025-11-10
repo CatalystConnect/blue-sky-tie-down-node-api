@@ -518,6 +518,120 @@ module.exports = {
             );
           }
 
+          if (Array.isArray(optionPackages) && optionPackages.length) {
+            promises.push(
+              db.optionPackageObj.bulkCreate(
+                optionPackages.map((item) => ({
+                  budget_books_id: budgetBook.id,
+                  subject: item.subject || null,
+                  description: item.description || null,
+                  amount: item.amount || null,
+                  groups: item.groups || null,
+                }))
+              )
+            );
+          }
+
+          // console.log("veOptionsveOptionsveOptions", veOptions);
+
+          // if (Array.isArray(veOptions) && veOptions.length) {
+          //   promises.push(
+          //     db.veOptionsObj.bulkCreate(
+          //       veOptions.map((item) => ({
+          //         budget_books_id: budgetBook.id,
+          //         subject: item.subject || null,
+          //         description: item.description || null,
+          //         amount: item.amount || null,
+          //         optionDate: item.date || null,
+          //         groups: item.groups || null,
+          //         scope_sagment_id: item.scope_sagment_id || null,
+          //         site_id: item.site_id || null,
+          //         budget_Cat_Id: item.budget_Cat_Id || null,
+          //       }))
+          //     )
+          //   );
+          // }
+          // console.log("scopesscopesscopesscopes", scopes);
+          // if (Array.isArray(scopes) && scopes.length) {
+          //   for (const scopeGroup of scopes) {
+          //     const entries = Object.values(scopeGroup);
+
+          //     for (const item of entries) {
+          //       const {
+          //         scope_id,
+          //         scope_name,
+          //         scope_category_id,
+          //         category_name,
+          //         group_id,
+          //         group_name,
+          //         segment_id,
+          //         segment_name,
+          //         site_id,
+          //         is_include,
+          //         pricePerSqft,
+          //         additional,
+          //         cost,
+          //         priceWithAdditional,
+          //         costSqft,
+          //         total,
+          //         condition,
+          //         notes,
+          //         optionPercentage,
+          //         budgetIndex,
+          //         budget_Cat_Id,
+          //       } = item;
+
+          //       const budgetBooksScope = await db.budgetBooksScopesObj.create({
+          //         budget_books_id: budgetBook.id,
+          //         is_include: is_include ?? null,
+          //         scope_id: scope_id,
+          //         title: scope_name || "",
+          //       });
+
+          //       const budgetBooksScopeCategory =
+          //         await db.budgetBooksScopeCategoriesObj.create({
+          //           budget_books_scope_id: budgetBooksScope.id,
+          //           scope_category_id: scope_category_id || null,
+          //           title: category_name || "",
+          //         });
+
+          //       const budgetBooksScopeGroup =
+          //         await db.budgetBooksScopeGroupsObj.create({
+          //           budget_books_scope_category_id: budgetBooksScopeCategory.id,
+          //           scope_group_id: group_id || null,
+          //           title: group_name || "",
+          //         });
+
+          //       await db.budgetBooksScopeSegmentsObj.create({
+          //         budget_books_scope_group_id: budgetBooksScopeGroup.id,
+          //         scope_sagment_id: segment_id,
+          //         title: segment_name || "",
+          //         notes: notes || "",
+          //         client_notes: null,
+          //         is_include: is_include ?? null,
+          //         acc: null,
+          //         date: null,
+          //         internal_notes: null,
+          //         price_sqft: Number(pricePerSqft) || 0,
+          //         additionals: Number(additional) || 0,
+          //         price_w_additional: Number(priceWithAdditional) || 0,
+          //         budget_Cat_Id: budget_Cat_Id || null,
+          //         cost: Number(cost) || 0,
+          //         costSqft: Number(costSqft) || 0,
+          //         total: Number(total) || 0,
+          //         conditions: Array.isArray(condition)
+          //           ? condition.join(", ")
+          //           : condition || null,
+          //         site_id: site_id || null,
+          //         scopeId: scope_id || null,
+          //         optionPercentage: optionPercentage ?? null,
+          //         budgetIndex: budgetIndex ?? null,
+          //       });
+          //     }
+          //   }
+          // }
+
+          // 1️⃣ Save veOptions
           if (Array.isArray(veOptions) && veOptions.length) {
             promises.push(
               db.veOptionsObj.bulkCreate(
@@ -535,20 +649,8 @@ module.exports = {
               )
             );
           }
-          if (Array.isArray(optionPackages) && optionPackages.length) {
-            promises.push(
-              db.optionPackageObj.bulkCreate(
-                optionPackages.map((item) => ({
-                  budget_books_id: budgetBook.id,
-                  subject: item.subject || null,
-                  description: item.description || null,
-                  amount: item.amount || null,
-                  groups: item.groups || null,
-                }))
-              )
-            );
-          }
 
+          // 2️⃣ Save Scopes + linked segments
           if (Array.isArray(scopes) && scopes.length) {
             for (const scopeGroup of scopes) {
               const entries = Object.values(scopeGroup);
@@ -578,6 +680,7 @@ module.exports = {
                   budget_Cat_Id,
                 } = item;
 
+                // 🧩 Create Scope
                 const budgetBooksScope = await db.budgetBooksScopesObj.create({
                   budget_books_id: budgetBook.id,
                   is_include: is_include ?? null,
@@ -585,6 +688,7 @@ module.exports = {
                   title: scope_name || "",
                 });
 
+                // 🧩 Create Category
                 const budgetBooksScopeCategory =
                   await db.budgetBooksScopeCategoriesObj.create({
                     budget_books_scope_id: budgetBooksScope.id,
@@ -592,6 +696,7 @@ module.exports = {
                     title: category_name || "",
                   });
 
+                // 🧩 Create Group
                 const budgetBooksScopeGroup =
                   await db.budgetBooksScopeGroupsObj.create({
                     budget_books_scope_category_id: budgetBooksScopeCategory.id,
@@ -599,7 +704,21 @@ module.exports = {
                     title: group_name || "",
                   });
 
-                await db.budgetBooksScopeSegmentsObj.create({
+                // 🔍 Find matched option (based on site_id + segment_id)
+                let matchedOption = null;
+                if (Array.isArray(veOptions)) {
+                  matchedOption = veOptions.find(
+                    (opt) =>
+                      opt.site_id === site_id &&
+                      String(opt.scope_sagment_id) === String(segment_id)
+                  );
+                }
+
+                // 🗓️ Use date if found
+                const selectedDate = matchedOption ? matchedOption.date : null;
+
+                // 🧩 Create Segment
+                const daaaa = await db.budgetBooksScopeSegmentsObj.create({
                   budget_books_scope_group_id: budgetBooksScopeGroup.id,
                   scope_sagment_id: segment_id,
                   title: segment_name || "",
@@ -607,7 +726,7 @@ module.exports = {
                   client_notes: null,
                   is_include: is_include ?? null,
                   acc: null,
-                  date: null,
+                  date: selectedDate, // ✅ store user-selected date from veOptions
                   internal_notes: null,
                   price_sqft: Number(pricePerSqft) || 0,
                   additionals: Number(additional) || 0,
@@ -624,11 +743,16 @@ module.exports = {
                   optionPercentage: optionPercentage ?? null,
                   budgetIndex: budgetIndex ?? null,
                 });
+
+               
               }
             }
           }
 
-          await Promise.all(promises);
+          // 3️⃣ Wait for any remaining async ops
+          await Promise.all(promises || []);
+
+          // await Promise.all(promises);
         } catch (err) {}
       });
     } catch (error) {

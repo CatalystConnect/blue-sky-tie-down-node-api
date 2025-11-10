@@ -2196,14 +2196,15 @@ module.exports = {
 
 
         const combinedFiles = [...existingFiles, ...newPlanSetFiles];
-
+        
+        const sanitizeInteger = (value) => (value ? Number(value) : null);
         const sanitizeDate = (value) => {
           if (!value) return null;
           const date = new Date(value);
           return isNaN(date.getTime()) ? null : date;
         };
         const postData = {
-          project_id: planSetData.project_id,
+          project_id: projectId,
           submissionType: planSetData.submissionType,
           date_received: sanitizeDate(planSetData.date_received),
           plan_link: Array.isArray(planSetData.plan_link)
@@ -2213,11 +2214,12 @@ module.exports = {
           plan_date: sanitizeDate(planSetData.plan_date),
           rev_status: planSetData.rev_status,
           plan_reviewed_date: sanitizeDate(planSetData.plan_reviewed_date),
-          plan_reviewed_by: planSetData.plan_reviewed_by,
+          plan_reviewed_by: sanitizeInteger(planSetData.plan_reviewed_by),
           data_collocated_date: sanitizeDate(planSetData.data_collocated_date),
           plan_revision_notes: planSetData.plan_revision_notes,
           planType: planSetData.planType,
         };
+        
 
         const updated = await projectServices.updateProjectPlanSetById(id, postData);
         if (updated) updatedResults.push(updated);

@@ -2095,7 +2095,7 @@ module.exports = {
       for (let i = 0; i < planSets.length; i++) {
         const planSetData = planSets[i];
 
-   
+
         const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
         if (!existingPlanSet) {
           console.warn(`Plan set not found for ID: ${id}`);
@@ -2104,7 +2104,7 @@ module.exports = {
 
         const projectId = existingPlanSet.project_id;
 
-       
+
         const existingFolder = await db.gDriveAssociationObj.findOne({
           where: {
             module: "planSetFiles",
@@ -2112,7 +2112,7 @@ module.exports = {
             parent: projectId,
           },
         });
-       
+
 
         if (!existingFolder || !existingFolder.drive_id) {
           throw new Error(`No existing Google Drive folder found for plan set ID: ${id}`);
@@ -2120,7 +2120,7 @@ module.exports = {
 
         const planSetFolderId = existingFolder.drive_id;
 
-    
+
         if (typeof deletedOldImages === "string") {
           try {
             deletedOldImages = JSON.parse(deletedOldImages);
@@ -2130,7 +2130,7 @@ module.exports = {
           }
         }
 
-       
+
         if (Array.isArray(deletedOldImages)) {
           for (const url of deletedOldImages) {
             try {
@@ -2138,9 +2138,9 @@ module.exports = {
               const match = decodedUrl.match(/\/d\/(.*?)\//);
               if (match && match[1]) {
                 const driveId = match[1];
-                
+
                 await projectServices.deleteDriveAssociation(driveId);
-                
+
                 await deleteFileFromDrive(driveId);
               } else {
                 console.log("Invalid Google Drive URL:", decodedUrl);
@@ -2151,7 +2151,7 @@ module.exports = {
           }
         }
 
-       
+
         let existingFiles = [];
         if (existingPlanSet.planFiles) {
           try {
@@ -2194,23 +2194,27 @@ module.exports = {
           }
         }
 
-        
+
         const combinedFiles = [...existingFiles, ...newPlanSetFiles];
 
-        
+        const sanitizeDate = (value) => {
+          if (!value) return null;
+          const date = new Date(value);
+          return isNaN(date.getTime()) ? null : date;
+        };
         const postData = {
           project_id: planSetData.project_id,
           submissionType: planSetData.submissionType,
-          date_received: planSetData.date_received,
+          date_received: sanitizeDate(planSetData.date_received),
           plan_link: Array.isArray(planSetData.plan_link)
             ? planSetData.plan_link[0]
             : planSetData.plan_link,
           planFiles: JSON.stringify(combinedFiles),
-          plan_date: planSetData.plan_date,
+          plan_date: sanitizeDate(planSetData.plan_date),
           rev_status: planSetData.rev_status,
-          plan_reviewed_date: planSetData.plan_reviewed_date,
+          plan_reviewed_date: sanitizeDate(planSetData.plan_reviewed_date),
           plan_reviewed_by: planSetData.plan_reviewed_by,
-          data_collocated_date: planSetData.data_collocated_date,
+          data_collocated_date: sanitizeDate(planSetData.data_collocated_date),
           plan_revision_notes: planSetData.plan_revision_notes,
           planType: planSetData.planType,
         };

@@ -131,8 +131,27 @@ async function uploadFileToDrive(
   return file.data;
 }
 
+/**
+ * ✅ Delete file from Google Drive
+ */
+async function deleteFileFromDrive(fileId) {
+  try {
+   
+    await drive.files.delete({
+      fileId,
+      supportsAllDrives: true,
+    });
+    console.log(` File deleted from Google Drive: ${fileId}`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting file (${fileId}):`, error.message);
+    return false;
+  }
+}
+
 module.exports = {
   uploadFileToDrive,
   getOrCreateSubfolder,
   getOrCreateNestedFolders,
+  deleteFileFromDrive,
 };

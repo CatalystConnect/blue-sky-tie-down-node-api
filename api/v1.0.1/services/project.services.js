@@ -454,7 +454,7 @@ module.exports = {
       // project.googleDrive = googleDrive;
 
       // return project;
-      let project = getProjectById.toJSON();
+      const project = getProjectById.toJSON();
 
       // --- Google Drive grouping ---
       const googleDriveData = project.googleDrive || [];
@@ -481,25 +481,30 @@ module.exports = {
         }
       });
 
-      // Step 2: Transform planSet into structured object
+      // Step 2: Map planSet.id to folder number
+      const planSetFolderMap = {};
+      project.planSets?.forEach((planSet, index) => {
+        planSetFolderMap[planSet.id] = index + 1;
+      });
+
+      // Step 3: Transform planSet into structured object
       const planSet = {};
 
       googleDrive.planSet.forEach((item) => {
         const moduleId = item.module_id;
+        const folderNumber = planSetFolderMap[moduleId] || moduleId;
 
-        if (!planSet[moduleId]) {
-          planSet[moduleId] = { folder: null, files: [] };
+        if (!planSet[folderNumber]) {
+          planSet[folderNumber] = { folder: null, files: [] };
         }
 
-        // Folder has null file_name
         if (!item.file_name) {
-          planSet[moduleId].folder = {
+          planSet[folderNumber].folder = {
             drive_id: item.drive_id,
             createdAt: item.createdAt,
           };
         } else {
-          // Files have non-null file_name
-          planSet[moduleId].files.push({
+          planSet[folderNumber].files.push({
             drive_id: item.drive_id,
             file_name: item.file_name,
             createdAt: item.createdAt,
@@ -507,10 +512,10 @@ module.exports = {
         }
       });
 
-      // Step 3: Assign structured result for planSet only
+      // Step 4: Assign structured result for planSet only
       googleDrive.planSet = planSet;
 
-      // Step 4: Attach back to project
+      // Step 5: Attach back to project
       project.googleDrive = googleDrive;
 
       return project;
@@ -643,8 +648,8 @@ module.exports = {
           { submissionType: { [Op.like]: `%${filters.search}%` } },
           { plan_revision_notes: { [Op.like]: `%${filters.search}%` } },
           { '$reviewedByUser.name$': { [Op.like]: `%${filters.search}%` } },
-          
-          
+
+
         ];
       }
 
@@ -661,7 +666,7 @@ module.exports = {
           {
             model: db.userObj,
             as: "reviewedByUser",
-            attributes: ["id", "name", "email"], 
+            attributes: ["id", "name", "email"],
             required: false,
           },
         ],
@@ -685,7 +690,7 @@ module.exports = {
   },
   async updateProjectPlanSetById(id, updateData) {
     try {
-      
+
       const planSet = await db.projectplanSetsObj.findOne({ where: { id } });
 
       if (!planSet) {
@@ -2057,7 +2062,7 @@ module.exports = {
     if (!projectId || !Array.isArray(projectTypeIds)) {
       throw new Error('Invalid input: projectId and projectTypeIds are required');
     }
-    console.log('ttttttt', projectTypeIds)
+    
     const mappings = projectTypeIds.map(typeId => ({
       project_id: projectId,
       project_type_id: parseInt(typeId, 10),

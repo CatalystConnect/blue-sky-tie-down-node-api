@@ -45,7 +45,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       tax: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(255),
         allowNull: true,
       },
     },

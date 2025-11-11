@@ -2067,6 +2067,190 @@ module.exports = {
   //   }
   // },
 
+  // async updateProjectPlanSetById(req, res) {
+  //   try {
+  //     const { id } = req.query;
+  //     if (!id) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "planSet id is required",
+  //         data: {},
+  //       });
+  //     }
+
+  //     const parsedBody = qs.parse(req.body);
+  //     const planSets = parsedBody.planSets;
+  //     let { deletedOldImages } = req.body;
+
+  //     if (!Array.isArray(planSets) || planSets.length === 0) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "No planSets found in request",
+  //         data: {},
+  //       });
+  //     }
+
+  //     const updatedResults = [];
+
+  //     for (let i = 0; i < planSets.length; i++) {
+  //       const planSetData = planSets[i];
+
+
+  //       const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
+  //       if (!existingPlanSet) {
+  //         console.warn(`Plan set not found for ID: ${id}`);
+  //         continue;
+  //       }
+
+  //       const projectId = existingPlanSet.project_id;
+
+
+  //       const existingFolder = await db.gDriveAssociationObj.findOne({
+  //         where: {
+  //           module: "planSetFiles",
+  //           module_id: id,
+  //           parent: projectId,
+  //         },
+  //       });
+
+  //        const existingPlanSetFiles = await db.projectplanSetsObj.findOne({
+  //         where: {
+  //           id: id,
+  //           project_id: projectId,
+  //         },
+  //       });
+
+  //       console.log("Existing Plan Set Files from DB:", existingPlanSetFiles);
+
+
+  //       if (!existingFolder || !existingFolder.drive_id) {
+  //         throw new Error(`No existing Google Drive folder found for plan set ID: ${id}`);
+  //       }
+
+  //       const planSetFolderId = existingFolder.drive_id;
+
+
+  //       if (typeof deletedOldImages === "string") {
+  //         try {
+  //           deletedOldImages = JSON.parse(deletedOldImages);
+  //         } catch (err) {
+  //           console.error("Failed to parse deletedOldImages:", err.message);
+  //           deletedOldImages = [];
+  //         }
+  //       }
+
+
+  //       if (Array.isArray(deletedOldImages)) {
+  //         for (const url of deletedOldImages) {
+  //           try {
+  //             const decodedUrl = decodeURIComponent(url);
+  //             console.log("Decoded URL for deletion:", decodedUrl);
+  //             const match = decodedUrl.match(/\/d\/(.*?)\//);
+  //             if (match && match[1]) {
+  //               const driveId = match[1];
+
+  //               await projectServices.deleteDriveAssociation(driveId);
+
+  //               await deleteFileFromDrive(driveId);
+  //             } else {
+  //               console.log("Invalid Google Drive URL:", decodedUrl);
+  //             }
+  //           } catch (error) {
+  //             console.error("Error deleting old image:", error.message);
+  //           }
+  //         }
+  //       }
+
+
+
+
+  //       let existingFiles = [];
+  //       if (existingPlanSet.planFiles) {
+  //         try {
+  //           existingFiles = JSON.parse(existingPlanSet.planFiles);
+  //         } catch (err) {
+  //           console.warn("Invalid existing planFiles JSON:", err);
+  //           existingFiles = [];
+  //         }
+  //       }
+
+  //       const newPlanSetFiles = [];
+  //       const planFilesUploads = req.files?.filter(
+  //         (f) => f.fieldname === `planSets[${i}][planFiles]`
+  //       );
+
+  //       if (planFilesUploads?.length > 0) {
+  //         for (const file of planFilesUploads) {
+  //           const driveFile = await uploadFileToDrive(
+  //             file.path,
+  //             file.originalname,
+  //             file.mimetype,
+  //             planSetFolderId
+  //           );
+
+  //           newPlanSetFiles.push({
+  //             name: file.originalname,
+  //             link: driveFile.webViewLink,
+  //             size: file.size,
+  //             drive_id: driveFile.id,
+  //           });
+
+  //           // save association
+  //           await projectServices.addDriveAssociation({
+  //             parent: projectId,
+  //             module: "planSetFiles",
+  //             module_id: id,
+  //             drive_id: driveFile.id,
+  //             file_name: file.originalname,
+  //           });
+  //         }
+  //       }
+
+
+  //       const combinedFiles = [...existingFiles, ...newPlanSetFiles];
+
+  //       const sanitizeInteger = (value) => (value ? Number(value) : null);
+  //       const sanitizeDate = (value) => {
+  //         if (!value) return null;
+  //         const date = new Date(value);
+  //         return isNaN(date.getTime()) ? null : date;
+  //       };
+  //       const postData = {
+  //         project_id: projectId,
+  //         submissionType: planSetData.submissionType,
+  //         date_received: sanitizeDate(planSetData.date_received),
+  //         plan_link: Array.isArray(planSetData.plan_link)
+  //           ? planSetData.plan_link[0]
+  //           : planSetData.plan_link,
+  //         planFiles: JSON.stringify(combinedFiles),
+  //         plan_date: sanitizeDate(planSetData.plan_date),
+  //         rev_status: planSetData.rev_status,
+  //         plan_reviewed_date: sanitizeDate(planSetData.plan_reviewed_date),
+  //         plan_reviewed_by: sanitizeInteger(planSetData.plan_reviewed_by),
+  //         data_collocated_date: sanitizeDate(planSetData.data_collocated_date),
+  //         plan_revision_notes: planSetData.plan_revision_notes,
+  //         planType: planSetData.planType,
+  //       };
+
+
+  //       const updated = await projectServices.updateProjectPlanSetById(id, postData);
+  //       if (updated) updatedResults.push(updated);
+  //     }
+
+  //     return res.status(200).json({
+  //       status: true,
+  //       message: "Plan Set updated successfully (files replaced/deleted)",
+  //       data: updatedResults,
+  //     });
+  //   } catch (error) {
+  //     console.error("Update error:", error);
+  //     return res.status(400).json({
+  //       status: false,
+  //       message: error.message || "Updating project plan sets failed",
+  //       data: {},
+  //     });
+  //   }
+  // },
   async updateProjectPlanSetById(req, res) {
     try {
       const { id } = req.query;
@@ -2095,7 +2279,6 @@ module.exports = {
       for (let i = 0; i < planSets.length; i++) {
         const planSetData = planSets[i];
 
-
         const existingPlanSet = await db.projectplanSetsObj.findOne({ where: { id } });
         if (!existingPlanSet) {
           console.warn(`Plan set not found for ID: ${id}`);
@@ -2103,7 +2286,6 @@ module.exports = {
         }
 
         const projectId = existingPlanSet.project_id;
-
 
         const existingFolder = await db.gDriveAssociationObj.findOne({
           where: {
@@ -2113,6 +2295,11 @@ module.exports = {
           },
         });
 
+        const existingPlanSetFiles = await db.projectplanSetsObj.findOne({
+          where: { id, project_id: projectId },
+        });
+
+        console.log("Existing Plan Set Files from DB:", existingPlanSetFiles);
 
         if (!existingFolder || !existingFolder.drive_id) {
           throw new Error(`No existing Google Drive folder found for plan set ID: ${id}`);
@@ -2125,39 +2312,54 @@ module.exports = {
           try {
             deletedOldImages = JSON.parse(deletedOldImages);
           } catch (err) {
-            console.error("Failed to parse deletedOldImages:", err.message);
             deletedOldImages = [];
           }
         }
 
 
-        if (Array.isArray(deletedOldImages)) {
+        if (Array.isArray(deletedOldImages) && deletedOldImages.length > 0) {
           for (const url of deletedOldImages) {
             try {
               const decodedUrl = decodeURIComponent(url);
               const match = decodedUrl.match(/\/d\/(.*?)\//);
               if (match && match[1]) {
                 const driveId = match[1];
-
                 await projectServices.deleteDriveAssociation(driveId);
-
                 await deleteFileFromDrive(driveId);
-              } else {
-                console.log("Invalid Google Drive URL:", decodedUrl);
               }
-            } catch (error) {
-              console.error("Error deleting old image:", error.message);
+            } catch (err) {
+              console.error("Error deleting old image:", err.message);
             }
           }
-        }
 
+          
+          if (existingPlanSetFiles.planFiles) {
+            let currentFiles = [];
+            try {
+              currentFiles = JSON.parse(existingPlanSetFiles.planFiles);
+            } catch (err) {
+              console.warn("Invalid existing planFiles JSON:", err);
+              currentFiles = [];
+            }
+
+            const filteredFiles = currentFiles.filter(
+              (file) => !deletedOldImages.includes(file.link)
+            );
+
+            await db.projectplanSetsObj.update(
+              { planFiles: JSON.stringify(filteredFiles) },
+              { where: { id, project_id: projectId } }
+            );
+
+
+          }
+        }
 
         let existingFiles = [];
         if (existingPlanSet.planFiles) {
           try {
             existingFiles = JSON.parse(existingPlanSet.planFiles);
           } catch (err) {
-            console.warn("Invalid existing planFiles JSON:", err);
             existingFiles = [];
           }
         }
@@ -2183,7 +2385,6 @@ module.exports = {
               drive_id: driveFile.id,
             });
 
-            // save association
             await projectServices.addDriveAssociation({
               parent: projectId,
               module: "planSetFiles",
@@ -2194,15 +2395,20 @@ module.exports = {
           }
         }
 
+       
+        const combinedFiles = [
+          ...existingFiles.filter((file) => !deletedOldImages?.includes(file.link)),
+          ...newPlanSetFiles,
+        ];
 
-        const combinedFiles = [...existingFiles, ...newPlanSetFiles];
-        
+       
         const sanitizeInteger = (value) => (value ? Number(value) : null);
         const sanitizeDate = (value) => {
           if (!value) return null;
           const date = new Date(value);
           return isNaN(date.getTime()) ? null : date;
         };
+
         const postData = {
           project_id: projectId,
           submissionType: planSetData.submissionType,
@@ -2219,7 +2425,6 @@ module.exports = {
           plan_revision_notes: planSetData.plan_revision_notes,
           planType: planSetData.planType,
         };
-        
 
         const updated = await projectServices.updateProjectPlanSetById(id, postData);
         if (updated) updatedResults.push(updated);
@@ -2239,10 +2444,6 @@ module.exports = {
       });
     }
   },
-
-
-
-
 
   async deleteProjectPlanSet(req, res) {
     try {

@@ -22,10 +22,7 @@ module.exports = {
   /*getAllLeads*/
   async getAllLeads(req, res) {
     try {
-      let { page = 1, per_page, search, date, role_id, take_all } = req.query;
-
-      const userId = req.userId;
-      const role = req.role;
+      let { page = 1, per_page, search, date, take_all } = req.query;
 
       page = parseInt(page);
       per_page = parseInt(per_page) || 10;
@@ -39,9 +36,6 @@ module.exports = {
         per_page,
         search,
         date,
-        role_id,
-        userId,
-        role,
         take_all
       );
 
@@ -89,7 +83,6 @@ module.exports = {
           console.warn("Default pipeline not found:", err.message);
         }
       }
-
 
       let postData = {
         date_record: data.date_record || null,
@@ -149,8 +142,6 @@ module.exports = {
           await leadServices.updateLeadTeamMember(contactIds, lead.id);
         }
       }
-
-
 
       return res.status(200).send({
         status: true,
@@ -342,7 +333,7 @@ module.exports = {
   async getAllLeadNotes(req, res) {
     try {
       let { page = 1, per_page, search, date, take_all, lead_id } = req.query;
-      
+
       page = parseInt(page);
       per_page = parseInt(per_page) || 10;
 
@@ -471,6 +462,7 @@ module.exports = {
     }
   },
 
+  /*deleteLeadNotes*/
   async deleteLeadNotes(req, res) {
     try {
       const { leadNoteId } = req.query;
@@ -501,6 +493,8 @@ module.exports = {
       });
     }
   },
+
+  /*updateLeadTeamMember*/
   async updateLeadTeamMember(req, res) {
     try {
       const { leadId } = req.query;
@@ -547,33 +541,7 @@ module.exports = {
     }
   },
 
-  // async getLeadTeamMembers(req, res) {
-  //   try {
-  //     const { leadId } = req.query;
-
-  //     if (!leadId) {
-  //       return res.status(400).json({
-  //         status: false,
-  //         message: "leadId is required",
-  //       });
-  //     }
-
-  //     const teamMembers = await leadServices.getLeadTeamMembers(leadId);
-
-  //     return res.status(200).json({
-  //       status: true,
-  //       message: "Lead team members fetched successfully!",
-  //       data: teamMembers,
-  //     });
-  //   } catch (error) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
-  //     return res.status(500).json({
-  //       status: false,
-  //       message: error.message || "Failed to fetch lead team members",
-  //     });
-  //   }
-  // },
-
+  /*getLeadTeamMembers*/
   async getLeadTeamMembers(req, res) {
     try {
       const { leadId } = req.query;
@@ -617,6 +585,7 @@ module.exports = {
     }
   },
 
+  /*updateLeadDcs*/
   async updateLeadDcs(req, res) {
     try {
       const data = req.body;
@@ -652,6 +621,7 @@ module.exports = {
     }
   },
 
+  /*getAllProjectDatatakeoffLead*/
   async getAllProjectDatatakeoffLead(req, res) {
     try {
       let { page = 1, per_page = 10, search = "" } = req.query;
@@ -696,16 +666,14 @@ module.exports = {
       });
     }
   },
+
+  /*updateleadPriorty*/
   async updateleadPriorty(req, res) {
     try {
       const { takeoff_status, ids } = req.body;
 
       const updatePromises = ids.map((item) =>
-        leadServices.updateLeadPriority(
-          item.id,
-          takeoff_status,
-          item.priority
-        )
+        leadServices.updateLeadPriority(item.id, takeoff_status, item.priority)
       );
 
       await Promise.all(updatePromises);
@@ -723,8 +691,6 @@ module.exports = {
       });
     }
   },
-
-
 
   /* validate */
   validate(method) {

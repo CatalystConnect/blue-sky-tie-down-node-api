@@ -522,7 +522,7 @@ module.exports = {
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Deleting Catalog failed",
+                message: error.response?.data?.error || error.message || "Deleting catalog failed",
                 data: error.response?.data || {}
             });
         }
@@ -540,7 +540,7 @@ module.exports = {
             }
             case "getCatalogById": {
                 return [
-                    check("catalogId").not().isEmpty().withMessage("Catalog Id is Required"),
+                    check("catalogId").not().isEmpty().withMessage("Catalog id is required"),
                 ];
             }
         }

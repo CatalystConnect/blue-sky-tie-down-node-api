@@ -147,7 +147,7 @@ module.exports = {
         return [
           check("name")
             .notEmpty()
-            .withMessage("Name is Required")
+            .withMessage("Name is required")
             .custom(async (value) => {
               // Check if brand already exists
               const existing = await brandsServices.getBrandByName(value);
@@ -163,7 +163,7 @@ module.exports = {
         return [
           check("name")
             .notEmpty()
-            .withMessage("Name is Required")
+            .withMessage("Name is required")
             .custom(async (value, { req }) => {
               // Check if another brand with same name exists
               const existing = await brandsServices.getBrandByName(value);

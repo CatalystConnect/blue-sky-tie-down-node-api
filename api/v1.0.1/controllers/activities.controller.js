@@ -40,10 +40,10 @@ module.exports = {
         switch (method) {
             case "getActivitiesById": {
                 return [
-                    check("moduleName").not().isEmpty().withMessage("Module Name is Required")
+                    check("moduleName").not().isEmpty().withMessage("Module name is required")
                     .isIn(["leadsObj", "contractObj", "workOrderObj"])
                     .withMessage("Invalid module! Please send these modules only leadsObj, contractObj, workOrderObj"),
-                    check("activityId").not().isEmpty().withMessage("Activity Id is Required")
+                    check("activityId").not().isEmpty().withMessage("Activity id is required")
                 ];
             }
         }

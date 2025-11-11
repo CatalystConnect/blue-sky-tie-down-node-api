@@ -171,7 +171,7 @@ module.exports = {
 
       res.status(200).json({
         status: true,
-        message: "Budget Book creation started",
+        message: "Budget book creation started",
         budgetBook,
       });
 
@@ -628,7 +628,6 @@ module.exports = {
           //   }
           // }
 
-          // 1️⃣ Save veOptions
           if (Array.isArray(veOptions) && veOptions.length) {
             promises.push(
               db.veOptionsObj.bulkCreate(
@@ -647,7 +646,6 @@ module.exports = {
             );
           }
 
-          // 2️⃣ Save Scopes + linked segments
           if (Array.isArray(scopes) && scopes.length) {
             for (const scopeGroup of scopes) {
               const entries = Object.values(scopeGroup);
@@ -770,7 +768,7 @@ module.exports = {
 
       return res.status(200).json({
         status: true,
-        message: "Budget Books fetched successfully",
+        message: "Budget books fetched successfully",
         data: budgetBooks,
         meta,
       });
@@ -778,7 +776,7 @@ module.exports = {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
       return res.status(500).json({
         status: false,
-        message: error.message || "Failed to fetch Budget Books",
+        message: error.message || "Failed to fetch budget books",
         data: [],
       });
     }
@@ -792,7 +790,7 @@ module.exports = {
       if (!budgetBooksId) {
         return res.status(400).json({
           status: false,
-          message: "budgetBooksId is required",
+          message: "Budget book id is required",
           data: [],
         });
       }
@@ -804,21 +802,21 @@ module.exports = {
       if (!budgetBook) {
         return res.status(404).json({
           status: false,
-          message: "Budget Book not found",
+          message: "Budget book not found",
           data: [],
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: "Budget Book fetched successfully",
+        message: "Budget book fetched successfully",
         data: budgetBook,
       });
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
       return res.status(500).json({
         status: false,
-        message: error.message || "Failed to fetch Budget Book",
+        message: error.message || "Failed to fetch budget book",
         data: [],
       });
     }
@@ -1250,13 +1248,13 @@ module.exports = {
         .json(
           commonHelper.parseSuccessRespose(
             updatedBudgetBook,
-            "Budget Book and related project data updated successfully."
+            "Budget book and related project data updated successfully."
           )
         );
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: error.message || "Budget Book update failed",
+        message: error.message || "Budget book update failed",
         data: {},
       });
     }
@@ -1270,7 +1268,7 @@ module.exports = {
       if (!budgetBooksId) {
         return res.status(400).json({
           status: false,
-          message: "budgetBooksId is required",
+          message: "Budget books id is required",
           data: [],
         });
       }
@@ -1282,21 +1280,21 @@ module.exports = {
       if (!deleted) {
         return res.status(404).json({
           status: false,
-          message: "Budget Book not found or already deleted",
+          message: "Budget book not found or already deleted",
           data: [],
         });
       }
 
       return res.status(200).json({
         status: true,
-        message: "Budget Book and related data deleted successfully",
+        message: "Budget book and related data deleted successfully",
         data: {},
       });
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
       return res.status(500).json({
         status: false,
-        message: error.message || "Failed to delete Budget Book",
+        message: error.message || "Failed to delete budget book",
         data: [],
       });
     }
@@ -1316,13 +1314,13 @@ module.exports = {
 
       return res.status(200).json({
         status: true,
-        message: "Budget Categories fetched successfully",
+        message: "Budget categories fetched successfully",
         data,
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Failed to fetch Budget Categories",
+        message: "Failed to fetch budget categories",
         error: error.message,
       });
     }
@@ -1347,7 +1345,7 @@ module.exports = {
         message: "Document deleted successfully",
       });
     } catch (error) {
-      console.error("Error in budgetDocumentDelete:", error);
+      console.error("Error in budget document delete:", error);
       return res.status(500).json({
         success: false,
         message: "Server error while deleting document",
@@ -1369,7 +1367,7 @@ module.exports = {
       if (!budgetId) {
         return res
           .status(400)
-          .json(commonHelper.errorResponse("budget_book_id is required"));
+          .json(commonHelper.errorResponse("Budget book id is required"));
       }
 
       const result = await budgetBooksServices.getAllBudgetBooksHistory(

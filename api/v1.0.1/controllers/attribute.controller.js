@@ -143,7 +143,7 @@ module.exports = {
         switch (method) {
             case "getAttributesById": {
                 return [
-                    check("attributeId").not().isEmpty().withMessage("Attribute is Required"),
+                    check("attributeId").not().isEmpty().withMessage("Attribute is required"),
                 ];
             }
         }

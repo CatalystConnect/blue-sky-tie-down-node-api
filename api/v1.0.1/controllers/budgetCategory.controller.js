@@ -100,7 +100,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget category id is required" }));
       }
 
       const result = await budgetCategoryServices.getById(id);
@@ -139,7 +139,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget category id is required" }));
       }
 
       await budgetCategoryServices.delete(id);
@@ -178,7 +178,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget category id is required" }));
       }
 
       const data = req.body;

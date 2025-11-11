@@ -29,9 +29,9 @@ module.exports = {
             if (!findContractor) throw new Error("Contractor not found");
             let rejectedContractor = await applyWorkOrdersServices.rejectedContractor(data.workOrderId, data.contractorId);
 
-            if (rejectedContractor) throw new Error("You are rejected on this workOrder");
+            if (rejectedContractor) throw new Error("You are rejected on this work order");
             let alreadyApply = await applyWorkOrdersServices.alreadyApply(data.workOrderId, data.contractorId);
-            if (alreadyApply) throw new Error("You already apply on this workOrder");
+            if (alreadyApply) throw new Error("You already apply on this work order");
             let postData = {
                 workOrderId: data.workOrderId,
                 contractorId: data.contractorId,
@@ -47,11 +47,11 @@ module.exports = {
             await applyWorkOrdersServices.addApplyWorkOrder(postData);
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose("", "WorkOrder apply add successfully"));
+                .send(commonHelper.parseSuccessRespose("", "Work order apply add successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Apply WorkOrder failed",
+                message: error.response?.data?.error || error.message || "Apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -85,11 +85,11 @@ module.exports = {
             }
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(response, "Apply WorkOrders displayed successfully"));
+                .send(commonHelper.parseSuccessRespose(response, "Apply work order displayed successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Fetching apply workOrders failed",
+                message: error.response?.data?.error || error.message || "Fetching apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -105,18 +105,18 @@ module.exports = {
             }
             let applyWorkOrderId = req.query.applyWorkOrderId;
             let applyWorkOrder = await applyWorkOrdersServices.getApplyWorkOrderById(applyWorkOrderId);
-            if (!applyWorkOrder) throw new Error("Apply workOrder not found");
+            if (!applyWorkOrder) throw new Error("Apply work order not found");
             if (applyWorkOrder.image != null) {
                 applyWorkOrder.image = process.env.BASE_URL + applyWorkOrder.image;
             }
 
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(applyWorkOrder, "Apply WorkOrders displayed successfully"));
+                .send(commonHelper.parseSuccessRespose(applyWorkOrder, "Apply work order displayed successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Fetching Apply WorkOrders failed",
+                message: error.response?.data?.error || error.message || "Fetching apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -132,7 +132,7 @@ module.exports = {
             }
             let applyWorkOrderId = req.query.applyWorkOrderId;
             let applyWorkOrder = await applyWorkOrdersServices.getApplyWorkOrderById(applyWorkOrderId);
-            if (!applyWorkOrder) throw new Error("Apply workOrder not found");
+            if (!applyWorkOrder) throw new Error("Apply work order not found");
             const baseUrl = "/public/files/";
             let image = req.file ? `${baseUrl}${req.file.filename}` : null;
             let data = req.body;
@@ -151,11 +151,11 @@ module.exports = {
             let updateApplyWorkOrderById = await applyWorkOrdersServices.updateApplyWorkOrderById(postData, applyWorkOrderId);
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(updateApplyWorkOrderById, "Apply WorkOrders updated successfully"));
+                .send(commonHelper.parseSuccessRespose(updateApplyWorkOrderById, "Apply work order updated successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Updating Apply WorkOrders failed",
+                message: error.response?.data?.error || error.message || "Updating apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -171,15 +171,15 @@ module.exports = {
             }
             let applyWorkOrderId = req.query.applyWorkOrderId;
             let applyWorkOrder = await applyWorkOrdersServices.getApplyWorkOrderById(applyWorkOrderId);
-            if (!applyWorkOrder) throw new Error("Apply workOrder not found");
+            if (!applyWorkOrder) throw new Error("Apply work order not found");
             let deleteApplyWorkOrder = await applyWorkOrdersServices.deleteApplyWorkOrderById(applyWorkOrderId);
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(deleteApplyWorkOrder, "Apply WorkOrders deleted successfully"));
+                .send(commonHelper.parseSuccessRespose(deleteApplyWorkOrder, "Apply work order deleted successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Deleting Apply WorkOrders failed",
+                message: error.response?.data?.error || error.message || "Deleting apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -212,7 +212,7 @@ module.exports = {
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Fetching Proposal failed",
+                message: error.response?.data?.error || error.message || "Fetching proposal failed",
                 data: error.response?.data || {}
             });
         }
@@ -252,7 +252,7 @@ module.exports = {
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Updating Proposal failed",
+                message: error.response?.data?.error || error.message || "Updating proposal failed",
                 data: error.response?.data || {}
             });
         }
@@ -274,11 +274,11 @@ module.exports = {
 
             return res
                 .status(200)
-                .send(commonHelper.parseSuccessRespose(bidsOnWorkOrder, "Bids on workOrder displayed successfully"));
+                .send(commonHelper.parseSuccessRespose(bidsOnWorkOrder, "Bids on work order displayed successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,
-                message: error.response?.data?.error || error.message || "Fetching Apply WorkOrders failed",
+                message: error.response?.data?.error || error.message || "Fetching apply work order failed",
                 data: error.response?.data || {}
             });
         }
@@ -288,31 +288,31 @@ module.exports = {
         switch (method) {
             case "addApplyWorkOrder": {
                 return [
-                    check("workOrderId").not().isEmpty().withMessage("Work Order Id is Required"),
-                    check("contractorId").not().isEmpty().withMessage("Contractor Id is Required"),
-                    check("description").not().isEmpty().withMessage("Description Id is Required"),
-                    check("projectName").not().isEmpty().withMessage("Project Name is Required"),
-                    check("projectLocation").not().isEmpty().withMessage("Project Location is Required"),
-                    check("bidDate").not().isEmpty().withMessage("Bid Date is Required"),
-                    check("labourCost").not().isEmpty().withMessage("Labour Cost is Required"),
-                    check("totalEstimatedCost").not().isEmpty().withMessage("Total Estimated Cost is Required"),
-                    check("startDate").not().isEmpty().withMessage("Start Date is Required")
+                    check("workOrderId").not().isEmpty().withMessage("Work order id is required"),
+                    check("contractorId").not().isEmpty().withMessage("Contractor id is required"),
+                    check("description").not().isEmpty().withMessage("Description id is required"),
+                    check("projectName").not().isEmpty().withMessage("Project name is required"),
+                    check("projectLocation").not().isEmpty().withMessage("Project location is required"),
+                    check("bidDate").not().isEmpty().withMessage("Bid date is required"),
+                    check("labourCost").not().isEmpty().withMessage("Labour cost is required"),
+                    check("totalEstimatedCost").not().isEmpty().withMessage("Total estimated cost is required"),
+                    check("startDate").not().isEmpty().withMessage("Start date is required")
                 ];
             }
             case "getApplyWorkOrderById": {
                 return [
-                    check("applyWorkOrderId").not().isEmpty().withMessage("Apply Work Order Id is Required"),
+                    check("applyWorkOrderId").not().isEmpty().withMessage("Apply work order id is required"),
                 ];
             }
             case "getContractorProposal": {
                 return [
-                    check("workOrderId").not().isEmpty().withMessage("Work Order Id is Required"),
-                    check("contractorId").not().isEmpty().withMessage("contractor Id is Required"),
+                    check("workOrderId").not().isEmpty().withMessage("Work order id is required"),
+                    check("contractorId").not().isEmpty().withMessage("contractor Id is required"),
                 ];
             }
             case "bidsOnWorkOrder": {
                 return [
-                    check("workOrderId").not().isEmpty().withMessage("Work Order Id is Required")
+                    check("workOrderId").not().isEmpty().withMessage("Work order id is required")
                 ];
             }
         }

@@ -76,7 +76,7 @@ module.exports = {
       if (!companyId) {
         return res.status(400).json({
           status: false,
-          message: "Company ID is required",
+          message: "Company id is required",
         });
       }
 
@@ -126,7 +126,7 @@ module.exports = {
         data: company,
       });
     } catch (err) {
-      console.error("Update Company Error:", err.message); 
+      console.error("Update company Error:", err.message); 
       res.status(500).json({
         status: false,
         message: "Failed to update company",
@@ -142,7 +142,7 @@ module.exports = {
       if (!companyId) {
         return res.status(400).json({
           status: false,
-          message: "Company ID is required",
+          message: "Company id is required",
         });
       }
 

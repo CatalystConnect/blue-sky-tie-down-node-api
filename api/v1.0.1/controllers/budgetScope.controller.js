@@ -143,7 +143,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget scopes id is required" }));
       }
 
       const result = await budgetScopeServices.getById(id);
@@ -182,7 +182,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget scopes id is required" }));
       }
 
       let scopeId = id;
@@ -240,7 +240,7 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(commonHelper.parseErrorRespose({ id: "ID is required" }));
+          .send(commonHelper.parseErrorRespose({ id: "Budget scopes id is required" }));
       }
 
       const data = req.body;

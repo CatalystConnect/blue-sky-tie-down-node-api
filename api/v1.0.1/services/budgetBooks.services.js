@@ -17,6 +17,8 @@ module.exports = {
       throw error;
     }
   },
+
+  /*getAllBudgetBooks*/
   async getAllBudgetBooks(query) {
     try {
       let { page = 1, per_page = 10, take_all = false, id } = query;
@@ -255,6 +257,7 @@ module.exports = {
     }
   },
 
+  /*getBudgetBooksById*/
   async getBudgetBooksById(budgetBooksId) {
     try {
       const budgetBook = await db.budgetBooksObj.findOne({
@@ -439,6 +442,7 @@ module.exports = {
     }
   },
 
+  /*updateBudgetBooks*/
   async updateBudgetBooks(id, postData) {
     try {
       const [updated] = await db.budgetBooksObj.update(postData, {
@@ -458,6 +462,7 @@ module.exports = {
     }
   },
 
+  /*replaceAssociations*/
   async replaceAssociations(
     budgetBooksId,
     {
@@ -522,7 +527,6 @@ module.exports = {
 
       const parseNumber = (val) =>
         val === "" || val === null || val === undefined ? null : Number(val);
-
       if (
         Array.isArray(budgetBooksScopeIncludes) &&
         budgetBooksScopeIncludes.length
@@ -665,7 +669,6 @@ module.exports = {
       }
 
       const sitePlanMap = [];
-
       if (Array.isArray(sitePlan) && sitePlan.length) {
         const sitePlanRecords = sitePlan.map((item) => ({
           budget_books_id: budgetBooksId,
@@ -690,6 +693,7 @@ module.exports = {
           sitePlanMap[index] = plan.id;
         });
       }
+
       if (Array.isArray(scopeOther) && scopeOther.length) {
         const toNum = (val) => {
           const num = Number(val);
@@ -793,92 +797,15 @@ module.exports = {
         );
       }
 
-      // if (Array.isArray(scopes) && scopes.length) {
-      //   for (const scopeGroup of scopes) {
-      //     const entries = Object.values(scopeGroup);
-      //     for (const item of entries) {
-      //       const {
-      //         scope_id,
-      //         scope_name,
-      //         scope_category_id,
-      //         category_name,
-      //         group_id,
-      //         group_name,
-      //         segment_id,
-      //         segment_name,
-      //         site_id,
-      //         is_include,
-      //         pricePerSqft,
-      //         additional,
-      //         cost,
-      //         priceWithAdditional,
-      //         costSqft,
-      //         total,
-      //         condition,
-      //         notes,
-      //         optionPercentage,
-      //         budgetIndex,
-      //         budget_Cat_Id,
-      //       } = item;
-
-      //       const budgetBooksScope = await db.budgetBooksScopesObj.create({
-      //         budget_books_id: budgetBooksId,
-      //         is_include: is_include ?? null,
-      //         scope_id: scope_id,
-      //         title: scope_name || "",
-      //       });
-
-      //       const budgetBooksScopeCategory =
-      //         await db.budgetBooksScopeCategoriesObj.create({
-      //           budget_books_scope_id: budgetBooksScope.id,
-      //           scope_category_id: scope_category_id || null,
-      //           title: category_name || "",
-      //         });
-
-      //       const budgetBooksScopeGroup =
-      //         await db.budgetBooksScopeGroupsObj.create({
-      //           budget_books_scope_category_id: budgetBooksScopeCategory.id,
-      //           scope_group_id: group_id || null,
-      //           title: group_name || "",
-      //         });
-
-      //       await db.budgetBooksScopeSegmentsObj.create({
-      //         budget_books_scope_group_id: budgetBooksScopeGroup.id,
-      //         scope_sagment_id: segment_id,
-      //         title: segment_name || "",
-      //         notes: notes || "",
-      //         client_notes: null,
-      //         is_include: is_include ?? null,
-      //         acc: null,
-      //         internal_notes: null,
-      //         price_sqft: Number(pricePerSqft) || 0,
-      //         additionals: Number(additional) || 0,
-      //         price_w_additional: Number(priceWithAdditional) || 0,
-      //         budget_Cat_Id: budget_Cat_Id || null,
-      //         cost: Number(cost) || 0,
-      //         costSqft: Number(costSqft) || 0,
-      //         total: Number(total) || 0,
-      //         conditions: Array.isArray(condition)
-      //           ? condition.join(", ")
-      //           : condition || null,
-      //         site_id: site_id || null,
-      //         scopeId: scope_id || null,
-      //         optionPercentage: optionPercentage ?? null,
-      //         budgetIndex: budgetIndex ?? null,
-      //       });
-      //     }
-      //   }
-      // }
       if (Array.isArray(scopes) && scopes.length) {
         for (const scopeGroup of scopes) {
-          if (!scopeGroup || typeof scopeGroup !== "object") continue; // ✅ skip invalid/null entries
+          if (!scopeGroup || typeof scopeGroup !== "object") continue; 
 
           const entries = Object.values(scopeGroup || {});
-          if (!entries.length) continue; // ✅ skip empty object
+          if (!entries.length) continue; 
 
           for (const item of entries) {
-            if (!item || typeof item !== "object") continue; // ✅ skip invalid item
-
+            if (!item || typeof item !== "object") continue; 
             const {
               scope_id,
               scope_name,
@@ -903,7 +830,6 @@ module.exports = {
               budget_Cat_Id,
             } = item;
 
-            // 🧩 Create Scope
             const budgetBooksScope = await db.budgetBooksScopesObj.create({
               budget_books_id: budgetBooksId,
               is_include: is_include ?? null,
@@ -911,15 +837,12 @@ module.exports = {
               title: scope_name || "",
             });
 
-            // 🧩 Create Scope Category
             const budgetBooksScopeCategory =
               await db.budgetBooksScopeCategoriesObj.create({
                 budget_books_scope_id: budgetBooksScope.id,
                 scope_category_id: scope_category_id || null,
                 title: category_name || "",
               });
-
-            // 🧩 Create Scope Group
             const budgetBooksScopeGroup =
               await db.budgetBooksScopeGroupsObj.create({
                 budget_books_scope_category_id: budgetBooksScopeCategory.id,
@@ -927,7 +850,17 @@ module.exports = {
                 title: group_name || "",
               });
 
-            // 🧩 Create Scope Segment
+            let matchedOption = null;
+            if (Array.isArray(veOptions)) {
+              matchedOption = veOptions.find(
+                (opt) =>
+                  opt.site_id === site_id &&
+                  String(opt.scope_sagment_id) === String(segment_id)
+              );
+            }
+
+            const selectedDate = matchedOption ? matchedOption.date : null;
+
             await db.budgetBooksScopeSegmentsObj.create({
               budget_books_scope_group_id: budgetBooksScopeGroup.id,
               scope_sagment_id: segment_id,
@@ -951,7 +884,7 @@ module.exports = {
               scopeId: scope_id || null,
               optionPercentage: optionPercentage ?? null,
               budgetIndex: budgetIndex ?? null,
-              date: null,
+              date: selectedDate,
             });
           }
         }
@@ -964,6 +897,7 @@ module.exports = {
     }
   },
 
+  /*deleteBudgetBooks*/
   async deleteBudgetBooks(budgetBooksId) {
     try {
       const budgetBook = await db.budgetBooksObj.findOne({
@@ -1038,6 +972,7 @@ module.exports = {
     }
   },
 
+  /*getAllBudgetCategory*/
   async getAllBudgetCategory() {
     try {
       const budgetCategories = await db.budgetCategoryObj.findAll({
@@ -1216,6 +1151,7 @@ module.exports = {
     }
   },
 
+  /*deleteBudgetDocument*/
   async deleteBudgetDocument(id) {
     try {
       const document = await db.budgetBookDocumentsObj.findByPk(id);
@@ -1233,6 +1169,7 @@ module.exports = {
     }
   },
 
+  /*getAllBudgetBooksHistory*/
   async getAllBudgetBooksHistory(
     budget_book_id,
     revision_id,
@@ -1282,6 +1219,7 @@ module.exports = {
     };
   },
 
+  /*getBudgetBySegment*/
   async getBudgetBySegment({
     engineer_id,
     scope_id,
@@ -1427,71 +1365,8 @@ module.exports = {
       };
     }
   },
-  // async findBudgetHistoryDetailById(budgetId) {
-  //   try {
-  //     const budgetHistoryDetails = await db.budgetHistoryObj.findByPk(
-  //       budgetId,
-  //       {
-  //         include: [
-  //           {
-  //             model: db.projectObj,
-  //             as: "budgetProject",
-  //             required: false,
-  //             attributes: ["id", "name"],
-  //           },
-  //         ],
-  //       }
-  //     );
 
-  //     if (!budgetHistoryDetails) {
-  //       return null;
-  //     }
-
-  //     // Parse log JSON safely
-  //     let log = {};
-  //     try {
-  //       log = JSON.parse(budgetHistoryDetails.log || "{}");
-  //     } catch {
-  //       log = {};
-  //     }
-
-  //     // Extract related IDs
-  //     const engineerId = log?.data?.engineer_id || null;
-  //     const customerId = log?.data?.customer_id || null;
-  //     const contactId = log?.data?.contact_id || null;
-
-  //     // Fetch related entities in parallel
-  //     const [engineerDetails, customerDetails, contactDetails] =
-  //       await Promise.all([
-  //         engineerId ? db.companyObj.findByPk(engineerId) : null,
-  //         customerId ? db.userObj.findByPk(customerId) : null,
-  //         contactId ? db.contactsObj.findByPk(contactId) : null,
-  //       ]);
-
-  //     // ✅ Match Laravel response exactly
-  //     return {
-  //       ids: budgetHistoryDetails.id,
-  //       budget_id: budgetHistoryDetails.budget_id,
-  //       project_id: budgetHistoryDetails.project_id,
-  //       project_name: budgetHistoryDetails.budgetProject?.name || null,
-  //       engineer_id: engineerDetails?.id || null,
-  //       engineerName: engineerDetails?.name || null,
-  //       customer_id: customerDetails?.id || null,
-  //       customerName: customerDetails?.name || null,
-  //       contact_id: contactDetails?.id || null,
-  //       contactName: contactDetails?.name || null,
-  //       plan_date: log.plan_date || null,
-  //       plan_note: log.plan_note || null,
-  //       quote_date: log.quote_date || null,
-  //       created_at: budgetHistoryDetails.created_at,
-  //       updated_at: budgetHistoryDetails.updated_at,
-  //       log: log,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error in findBudgetHistoryDetailById service:", error);
-  //     throw new Error("Internal server error");
-  //   }
-  // },
+  /*findBudgetHistoryDetailById*/
   async findBudgetHistoryDetailById(budgetId) {
     try {
       const budgetHistoryDetails = await db.budgetHistoryObj.findByPk(

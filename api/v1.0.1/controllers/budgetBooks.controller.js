@@ -532,8 +532,6 @@ module.exports = {
             );
           }
 
-          // console.log("veOptionsveOptionsveOptions", veOptions);
-
           // if (Array.isArray(veOptions) && veOptions.length) {
           //   promises.push(
           //     db.veOptionsObj.bulkCreate(
@@ -551,7 +549,6 @@ module.exports = {
           //     )
           //   );
           // }
-          // console.log("scopesscopesscopesscopes", scopes);
           // if (Array.isArray(scopes) && scopes.length) {
           //   for (const scopeGroup of scopes) {
           //     const entries = Object.values(scopeGroup);
@@ -680,7 +677,6 @@ module.exports = {
                   budget_Cat_Id,
                 } = item;
 
-                // 🧩 Create Scope
                 const budgetBooksScope = await db.budgetBooksScopesObj.create({
                   budget_books_id: budgetBook.id,
                   is_include: is_include ?? null,
@@ -688,7 +684,6 @@ module.exports = {
                   title: scope_name || "",
                 });
 
-                // 🧩 Create Category
                 const budgetBooksScopeCategory =
                   await db.budgetBooksScopeCategoriesObj.create({
                     budget_books_scope_id: budgetBooksScope.id,
@@ -696,7 +691,6 @@ module.exports = {
                     title: category_name || "",
                   });
 
-                // 🧩 Create Group
                 const budgetBooksScopeGroup =
                   await db.budgetBooksScopeGroupsObj.create({
                     budget_books_scope_category_id: budgetBooksScopeCategory.id,
@@ -704,7 +698,6 @@ module.exports = {
                     title: group_name || "",
                   });
 
-                // 🔍 Find matched option (based on site_id + segment_id)
                 let matchedOption = null;
                 if (Array.isArray(veOptions)) {
                   matchedOption = veOptions.find(
@@ -714,10 +707,8 @@ module.exports = {
                   );
                 }
 
-                // 🗓️ Use date if found
                 const selectedDate = matchedOption ? matchedOption.date : null;
 
-                // 🧩 Create Segment
                 await db.budgetBooksScopeSegmentsObj.create({
                   budget_books_scope_group_id: budgetBooksScopeGroup.id,
                   scope_sagment_id: segment_id,
@@ -726,7 +717,7 @@ module.exports = {
                   client_notes: null,
                   is_include: is_include ?? null,
                   acc: null,
-                  date: selectedDate, // ✅ store user-selected date from veOptions
+                  date: selectedDate,
                   internal_notes: null,
                   price_sqft: Number(pricePerSqft) || 0,
                   additionals: Number(additional) || 0,
@@ -743,16 +734,10 @@ module.exports = {
                   optionPercentage: optionPercentage ?? null,
                   budgetIndex: budgetIndex ?? null,
                 });
-
-               
               }
             }
           }
-
-          // 3️⃣ Wait for any remaining async ops
           await Promise.all(promises || []);
-
-          // await Promise.all(promises);
         } catch (err) {}
       });
     } catch (error) {
@@ -765,6 +750,7 @@ module.exports = {
     }
   },
 
+  /*getAllBudgetBooks*/
   async getAllBudgetBooks(req, res) {
     try {
       let { page = "1", per_page = "10", take_all = "", id } = req.query;
@@ -798,6 +784,7 @@ module.exports = {
     }
   },
 
+  /*getBudgetBooksById*/
   async getBudgetBooksById(req, res) {
     try {
       const budgetBooksId = req.query.id || req.params.id;
@@ -837,236 +824,7 @@ module.exports = {
     }
   },
 
-  // async updateBudgetBooks(req, res) {
-  //   try {
-  //     let data = req.body;
-  //     let documentData = req.body;
-
-  //     if (typeof data.form === "string") {
-  //       try {
-  //         data = JSON.parse(data.form);
-  //       } catch (err) {
-  //         return res.status(400).json({
-  //           status: false,
-  //           message: "Invalid JSON in 'form' field.",
-  //         });
-  //       }
-  //     }
-
-  //     const id = req.query.id;
-  //     if (!id) {
-  //       return res.status(400).json({
-  //         status: false,
-  //         message: "Missing budget book ID (id).",
-  //       });
-  //     }
-
-  //     const postData = {
-  //       user_id: req.userId || null,
-  //       name: data.name || null,
-  //       engineer_id: data.engineer_id || null,
-  //       project_id: data.project_id || null,
-  //       lead_id: data.lead_id || null,
-  //       customer_id: data.customer_id || null,
-  //       contact_id: data.contact_id || null,
-  //       address: data.address || null,
-  //       city: data.city || null,
-  //       state: data.state || null,
-  //       zip: data.zip || null,
-  //       quote_date: data.quote_date || null,
-  //       job_no: data.job_no || null,
-  //       plan_date: data.plan_date || null,
-  //       plan_status: data.plan_status || null,
-  //       plan_info: data.plan_info || null,
-  //       plan_note: data.plan_note || null,
-  //       up_margin: data.up_margin || null,
-  //       sp_margin: data.sp_margin || null,
-  //       mc_margin: data.mc_margin || null,
-  //       sw_margin: data.sw_margin || null,
-  //       total_adders: data.total_adders || null,
-  //       total_calculate: data.total_calculate || null,
-  //       total: data.total || null,
-  //       is_pricing: Boolean(data.is_pricing),
-  //       is_budget_only: Boolean(data.is_budget_only),
-  //       design: data.design || null,
-  //       design_total: data.design_total || null,
-  //       design_hr: data.design_hr || null,
-  //       design_hrs: data.design_hrs || null,
-  //       engineering: data.engineering || null,
-  //       engineering_total: data.engineering_total || null,
-  //       engineering_seal: data.engineering_seal || null,
-  //       engineering_seals: data.engineering_seals || null,
-  //       budget: data.budget || null,
-  //       budget_total: data.budget_total || null,
-  //       budget_hr: data.budget_hr || null,
-  //       budget_hrs: data.budget_hrs || null,
-  //       shipping: data.shipping || null,
-  //       shipping_total: data.shipping_total || null,
-  //       shipping_ship: data.shipping_ship || null,
-  //       shipping_shipment: data.shipping_shipment || null,
-  //       per_sqft: data.per_sqft || null,
-  //       bldg_count: data.bldg_count || null,
-  //       bldg_gsqft: data.bldg_gsqft || null,
-  //       bldg_cost: data.bldg_cost || null,
-  //       bldg_sqft: data.bldg_sqft || null,
-  //       bldg_price: data.bldg_price || null,
-  //       price: data.price || null,
-  //       sw_tiedown: data.sw_tiedown || null,
-  //       up_lift: data.up_lift || null,
-  //       misc: data.misc || null,
-  //       anchorage: data.anchorage || null,
-  //       commission: data.commission || null,
-  //       commission_rate: data.commission_rate || null,
-  //       shipment_limit: data.shipment_limit || null,
-  //       fill_in_limit: data.fill_in_limit || null,
-  //       seal_limit: data.seal_limit || null,
-  //       limit_notes: data.limit_notes || null,
-  //       terms: data.terms || null,
-  //       tax: data.tax || null,
-  //       projectType: data.projectType || null,
-  //       taxRate: data.taxRate || null,
-  //       contact_email: data.contact_email || null,
-  //     };
-
-  //     const updatedBudgetBook = await budgetBooksServices.updateBudgetBooks(
-  //       id,
-  //       postData
-  //     );
-
-  //     const project = await projectServices.getProjectById(data.project_id);
-
-  //     const saveFolder = async (module, module_id, drive_id, file_name) =>
-  //       await projectServices.addDriveAssociation({
-  //         parent: data.project_id,
-  //         module,
-  //         module_id,
-  //         drive_id,
-  //         file_name,
-  //       });
-
-  //     if (
-  //       documentData.uploadDocumentDelete &&
-  //       documentData.uploadDocumentDelete.length > 0
-  //     ) {
-  //       const idsToDelete = Array.isArray(documentData.uploadDocumentDelete)
-  //         ? documentData.uploadDocumentDelete
-  //         : JSON.parse(documentData.uploadDocumentDelete);
-
-  //       for (const docId of idsToDelete) {
-  //         const doc = await db.budgetBookDocumentsObj.findOne({
-  //           where: { id: docId },
-  //         });
-  //         if (doc) {
-  //           try {
-  //             const driveId = doc.file_path?.includes("drive.google.com")
-  //               ? doc.file_path.split("/d/")[1]?.split("/")[0]
-  //               : null;
-
-  //             if (driveId) {
-  //               await db.gDriveAssociationObj.destroy({
-  //                 where: { drive_id: driveId },
-  //               });
-  //             }
-  //             await db.budgetBookDocumentsObj.destroy({ where: { id: docId } });
-  //           } catch (delErr) {
-  //             console.error(" Error deleting file:", delErr);
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     if (Array.isArray(req.files) && req.files.length) {
-  //       const budgetUploads = req.files.filter((f) =>
-  //         f.fieldname.startsWith("uploadDocument")
-  //       );
-
-  //       if (budgetUploads.length) {
-  //         const mainFolder = await getOrCreateSubfolder(
-  //           process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //           `${data.project_id}. ${project.name}`
-  //         );
-
-  //         const budgetFolder = await getOrCreateSubfolder(
-  //           mainFolder,
-  //           "budgetFiles"
-  //         );
-
-  //         for (const [index, file] of budgetUploads.entries()) {
-  //           const driveFile = await uploadFileToDrive(
-  //             file.path,
-  //             file.originalname,
-  //             file.mimetype,
-  //             budgetFolder
-  //           );
-
-  //           const uploadMeta = documentData.uploadDocument?.[index] || {};
-
-  //           let doc = await db.budgetBookDocumentsObj.create({
-  //             budget_book_id: id,
-  //             file_name: file.originalname,
-  //             notes: uploadMeta.note || null,
-  //             type: uploadMeta.type || null,
-  //             is_display: uploadMeta.displayToCustomer || null,
-  //             file_path: driveFile.webViewLink,
-  //           });
-  //           await saveFolder(
-  //             "budgetFiles",
-  //             doc.id,
-  //             driveFile.id,
-  //             file.originalname
-  //           );
-  //         }
-  //       }
-  //     }
-
-  //     const {
-  //       budgetBooksScopeIncludes,
-  //       budgetBooksDrawings,
-  //       budgetBooksKeyAreas,
-  //       budgetBooksContracts,
-  //       sites,
-  //       budgets,
-  //       sitePlan,
-  //       scopeOther,
-  //       sitePlan2,
-  //       veOptions,
-  //       optionPackages,
-  //       scopes,
-  //     } = data;
-
-  //     await budgetBooksServices.replaceAssociations(id, {
-  //       budgetBooksScopeIncludes,
-  //       budgetBooksDrawings,
-  //       budgetBooksKeyAreas,
-  //       budgetBooksContracts,
-  //       sites,
-  //       budgets,
-  //       sitePlan,
-  //       scopeOther,
-  //       sitePlan2,
-  //       veOptions,
-  //       optionPackages,
-  //       scopes,
-  //     });
-
-  //     return res
-  //       .status(200)
-  //       .json(
-  //         commonHelper.parseSuccessRespose(
-  //           updatedBudgetBook,
-  //           "Budget Book and related project data updated successfully."
-  //         )
-  //       );
-  //   } catch (error) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
-  //     return res.status(500).json({
-  //       status: false,
-  //       message: error.message || "Budget Book update failed",
-  //       data: {},
-  //     });
-  //   }
-  // },
-
+  /*updateBudgetBooks*/
   async updateBudgetBooks(req, res) {
     try {
       let data = req.body;
@@ -1091,254 +849,11 @@ module.exports = {
         });
       }
 
-      // if (data.updateType === "new_version") {
-      //   const record = await db.budgetBooksObj.findOne({
-      //     where: { id },
-      //     include: [
-      //       // 🔹 Related Project
-      //       { model: db.projectObj, as: "budgetProject", required: false },
-
-      //       // 🔹 Site Plans
-      //       {
-      //         model: db.sitePlansObj,
-      //         as: "sitePlan",
-      //         required: false,
-      //         separate: true,
-      //         include: [
-      //           {
-      //             model: db.budgetBookOthersObj,
-      //             as: "budgetBookOthers",
-      //             required: false,
-      //           },
-      //         ],
-      //       },
-
-      //       // 🔹 Lead + Project
-      //       {
-      //         model: db.leadsObj,
-      //         as: "budgetLead",
-      //         required: false,
-      //         include: [
-      //           { model: db.projectObj, as: "project", required: false },
-      //         ],
-      //       },
-
-      //       // 🔹 Budgets
-      //       {
-      //         model: db.projectBudgetsObj,
-      //         as: "budgets",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Site Plan Items
-      //       {
-      //         model: db.sitePlanItemsObj,
-      //         as: "sitePlan2",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Documents
-      //       {
-      //         model: db.budgetBookDocumentsObj,
-      //         as: "budgetBookDocuments",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Sites
-      //       {
-      //         model: db.budgetBooksSitesObj,
-      //         as: "sites",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 VE Options
-      //       {
-      //         model: db.veOptionsObj,
-      //         as: "veOptions",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Option Packages
-      //       {
-      //         model: db.optionPackageObj,
-      //         as: "optionPackages",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Scope Includes
-      //       {
-      //         model: db.budgetBooksScopeIncludesObj,
-      //         as: "budgetBooksScopeIncludes",
-      //         required: false,
-      //         separate: true,
-      //       },
-
-      //       // 🔹 Contracts + Components
-      //       {
-      //         model: db.budgetBooksContractsObj,
-      //         as: "budgetBooksContracts",
-      //         required: false,
-      //         separate: true,
-      //         include: [
-      //           {
-      //             model: db.contractComponentsObj,
-      //             as: "contractComponents",
-      //             required: false,
-      //           },
-      //         ],
-      //       },
-
-      //       // 🔹 Key Areas
-      //       {
-      //         model: db.budgetBooksKeyAreasObj,
-      //         as: "budgetBooksKeyAreas",
-      //         required: false,
-      //         separate: true,
-      //         include: [
-      //           {
-      //             model: db.budgetKeyAreasObj,
-      //             as: "budgetKeyAreas",
-      //             required: false,
-      //           },
-      //         ],
-      //       },
-
-      //       // 🔹 Drawings + Submittals
-      //       {
-      //         model: db.budgetBooksDrawingsObj,
-      //         as: "budgetBooksDrawings",
-      //         required: false,
-      //         separate: true,
-      //         include: [
-      //           {
-      //             model: db.submittalsObj,
-      //             as: "submittals",
-      //             required: false,
-      //           },
-      //         ],
-      //       },
-
-      //       // 🔹 Scopes Hierarchy
-      //       {
-      //         model: db.budgetBooksScopesObj,
-      //         as: "projectScopes",
-      //         required: false,
-      //         separate: true,
-      //         include: [
-      //           { model: db.budgetScopeObj, as: "scope", required: false },
-      //           {
-      //             model: db.budgetBooksScopeCategoriesObj,
-      //             as: "categories",
-      //             required: false,
-      //             include: [
-      //               {
-      //                 model: db.scopeCategoryObj,
-      //                 as: "scopeCategory",
-      //                 required: false,
-      //               },
-      //               {
-      //                 model: db.budgetBooksScopeGroupsObj,
-      //                 as: "groups",
-      //                 required: false,
-      //                 include: [
-      //                   {
-      //                     model: db.scopeGroupObj,
-      //                     as: "scopeGroup",
-      //                     required: false,
-      //                   },
-      //                   {
-      //                     model: db.budgetBooksScopeSegmentsObj,
-      //                     as: "segments",
-      //                     required: false,
-      //                     include: [
-      //                       {
-      //                         model: db.scopeSegmentObj,
-      //                         as: "scopeSagment",
-      //                         required: false,
-      //                       },
-      //                     ],
-      //                   },
-      //                 ],
-      //               },
-      //             ],
-      //           },
-      //         ],
-      //       },
-      //     ],
-      //   });
-
-      //   const recordJson = record.toJSON();
-
-      //   const snapshot = {
-      //     ...(recordJson.budgets?.length
-      //       ? { budgets: recordJson.budgets }
-      //       : {}),
-      //     ...(recordJson.sitePlan?.length
-      //       ? { sitePlan: recordJson.sitePlan }
-      //       : {}),
-      //     ...(recordJson.sitePlan2?.length
-      //       ? { sitePlan2: recordJson.sitePlan2 }
-      //       : {}),
-      //     ...(recordJson.sites?.length ? { sites: recordJson.sites } : {}),
-      //     ...(recordJson.veOptions?.length
-      //       ? { veOptions: recordJson.veOptions }
-      //       : {}),
-      //     ...(recordJson.optionPackages?.length
-      //       ? { optionPackages: recordJson.optionPackages }
-      //       : {}),
-      //     ...(recordJson.budgetBooksContracts?.length
-      //       ? { budgetBooksContracts: recordJson.budgetBooksContracts }
-      //       : {}),
-      //     ...(recordJson.budgetBooksScopeIncludes?.length
-      //       ? {
-      //           budgetBooksScopeIncludes: recordJson.budgetBooksScopeIncludes,
-      //         }
-      //       : {}),
-      //     ...(recordJson.budgetBooksKeyAreas?.length
-      //       ? { budgetBooksKeyAreas: recordJson.budgetBooksKeyAreas }
-      //       : {}),
-      //     ...(recordJson.budgetBooksDrawings?.length
-      //       ? { budgetBooksDrawings: recordJson.budgetBooksDrawings }
-      //       : {}),
-      //     ...(recordJson.projectScopes?.length
-      //       ? { projectScopes: recordJson.projectScopes }
-      //       : {}),
-      //     ...(recordJson.budgetBookDocuments?.length
-      //       ? { budgetBookDocuments: recordJson.budgetBookDocuments }
-      //       : {}),
-      //   };
-
-      //   let logData;
-      //   const logType = db.budgetHistoryObj.rawAttributes?.log?.type?.key;
-
-      //   if (["STRING", "TEXT"].includes(logType)) {
-      //     logData = JSON.stringify(snapshot);
-      //   } else {
-      //     logData = snapshot;
-      //   }
-
-      //   await db.budgetHistoryObj.create({
-      //     budget_book_id: id,
-      //     project_id: data.project_id,
-      //     revision_status: record.revision_status || "0",
-      //     log: logData,
-      //     changed_by: req.userId || null,
-      //   });
-      // }
       if (data.updateType === "new_version") {
         const record = await db.budgetBooksObj.findOne({
           where: { id },
           include: [
-            // 🔹 Related Project
             { model: db.projectObj, as: "budgetProject", required: false },
-
-            // 🔹 Site Plans
             {
               model: db.sitePlansObj,
               as: "sitePlan",
@@ -1352,8 +867,6 @@ module.exports = {
                 },
               ],
             },
-
-            // 🔹 Lead + Project
             {
               model: db.leadsObj,
               as: "budgetLead",
@@ -1362,64 +875,48 @@ module.exports = {
                 { model: db.projectObj, as: "project", required: false },
               ],
             },
-
-            // 🔹 Budgets
             {
               model: db.projectBudgetsObj,
               as: "budgets",
               required: false,
               separate: true,
             },
-
-            // 🔹 Site Plan Items
             {
               model: db.sitePlanItemsObj,
               as: "sitePlan2",
               required: false,
               separate: true,
             },
-
-            // 🔹 Documents
             {
               model: db.budgetBookDocumentsObj,
               as: "budgetBookDocuments",
               required: false,
               separate: true,
             },
-
-            // 🔹 Sites
             {
               model: db.budgetBooksSitesObj,
               as: "sites",
               required: false,
               separate: true,
             },
-
-            // 🔹 VE Options
             {
               model: db.veOptionsObj,
               as: "veOptions",
               required: false,
               separate: true,
             },
-
-            // 🔹 Option Packages
             {
               model: db.optionPackageObj,
               as: "optionPackages",
               required: false,
               separate: true,
             },
-
-            // 🔹 Scope Includes
             {
               model: db.budgetBooksScopeIncludesObj,
               as: "budgetBooksScopeIncludes",
               required: false,
               separate: true,
             },
-
-            // 🔹 Contracts + Components
             {
               model: db.budgetBooksContractsObj,
               as: "budgetBooksContracts",
@@ -1433,8 +930,6 @@ module.exports = {
                 },
               ],
             },
-
-            // 🔹 Key Areas
             {
               model: db.budgetBooksKeyAreasObj,
               as: "budgetBooksKeyAreas",
@@ -1448,8 +943,6 @@ module.exports = {
                 },
               ],
             },
-
-            // 🔹 Drawings + Submittals
             {
               model: db.budgetBooksDrawingsObj,
               as: "budgetBooksDrawings",
@@ -1463,8 +956,6 @@ module.exports = {
                 },
               ],
             },
-
-            // 🔹 Scopes Hierarchy
             {
               model: db.budgetBooksScopesObj,
               as: "projectScopes",
@@ -1513,10 +1004,7 @@ module.exports = {
           ],
         });
 
-        // 🔹 Convert to plain JSON
         const recordJson = record.toJSON();
-
-        // 🔹 Build snapshot structure (skip empty arrays)
         const snapshot = {
           ...(recordJson.budgets?.length
             ? { budgets: recordJson.budgets }
@@ -1554,14 +1042,12 @@ module.exports = {
             : {}),
         };
 
-        // 🔹 Handle JSON column vs TEXT column
         const logType = db.budgetHistoryObj.rawAttributes?.log?.type?.key;
         const logData =
           ["STRING", "TEXT"].includes(logType) || typeof logType === "undefined"
             ? JSON.stringify(snapshot)
             : snapshot;
 
-        // 🔹 Create snapshot entry
         await db.budgetHistoryObj.create({
           budget_book_id: id,
           project_id: data.project_id || recordJson?.budgetProject?.id || null,
@@ -1569,8 +1055,6 @@ module.exports = {
           log: logData,
           changed_by: req.userId || null,
         });
-
-        console.log("✅ New version snapshot created successfully.");
       }
 
       const postData = {
@@ -1777,6 +1261,8 @@ module.exports = {
       });
     }
   },
+
+  /*deleteBudgetBooks*/
   async deleteBudgetBooks(req, res) {
     try {
       const budgetBooksId = req.query.id || req.params.id;
@@ -1816,6 +1302,7 @@ module.exports = {
     }
   },
 
+  /*getAllBudgetCategory*/
   async getAllBudgetCategory(req, res) {
     try {
       const data = await budgetBooksServices.getAllBudgetCategory();
@@ -1840,6 +1327,8 @@ module.exports = {
       });
     }
   },
+
+  /*budgetDocumentDelete*/
   async budgetDocumentDelete(req, res) {
     try {
       const { id } = req.params;
@@ -1866,6 +1355,7 @@ module.exports = {
     }
   },
 
+  /*getAllBudgetBooksHistory*/
   async getAllBudgetBooksHistory(req, res) {
     try {
       const {
@@ -1902,6 +1392,7 @@ module.exports = {
     }
   },
 
+  /*getBudgetBySegment*/
   async getBudgetBySegment(req, res) {
     try {
       const { engineer_id, scope_id, sagment_id, current_project } = req.query;
@@ -1940,6 +1431,7 @@ module.exports = {
     }
   },
 
+  /*getBudgetHistoryDetailById*/
   async getBudgetHistoryDetailById(req, res) {
     try {
       const budgetId = req.query.id;

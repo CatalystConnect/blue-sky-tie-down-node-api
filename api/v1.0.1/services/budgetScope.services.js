@@ -26,6 +26,12 @@ module.exports = {
 
       const { rows, count } = await db.budgetScopeObj.findAndCountAll({
         where: whereCondition,
+        include: [
+          {
+            model: db.budgetCategoryObj,
+            as: "budgetCategory",
+          },
+        ],
         order: [["id", "DESC"]], // order by 'ordering' column
         limit,
         offset,

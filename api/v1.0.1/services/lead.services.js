@@ -5,6 +5,112 @@ const { Op, fn, col, where, Sequelize } = require("sequelize");
 
 module.exports = {
   /*getAllLeads*/
+  // async getAllLeads(page, per_page, search, date, take_all) {
+  //   try {
+  //     page = Math.max(parseInt(page) || 1, 1);
+  //     const limit = Math.max(parseInt(per_page) || 10, 1);
+  //     const offset = (page - 1) * limit;
+
+  //     let whereCondition = {};
+
+  //     if (date) {
+  //       whereCondition.createdAt = {
+  //         [Op.gte]: new Date(date + " 00:00:00"),
+  //         [Op.lte]: new Date(date + " 23:59:59"),
+  //       };
+  //     }
+
+  //     const include = [
+  //       {
+  //         model: db.companyObj,
+  //         as: "company",
+  //         required: false,
+  //       },
+  //       {
+  //         model: db.projectObj,
+  //         as: "project",
+  //         required: false,
+  //         include: [
+  //           { model: db.taxesObj, as: "stateDetails" },
+  //           { model: db.taxesObj, as: "zipCodeDetails" },
+  //           { model: db.stateObj, as: "states" },
+  //         ],
+  //       },
+  //       { model: db.contactsObj, as: "contact" },
+  //       {
+  //         model: db.userObj,
+  //         as: "salePerson",
+  //         attributes: { exclude: ["password"] },
+  //       },
+  //       {
+  //         model: db.userObj,
+  //         as: "engineer",
+  //         attributes: { exclude: ["password"] },
+  //       },
+  //       { model: db.leadTeamsObj, as: "leadTeam" },
+  //       { model: db.leadStatusesObj, as: "leadStatus" },
+  //       {
+  //         model: db.leadTagsObj,
+  //         as: "lead_tags",
+  //         include: [{ model: db.tagsObj, as: "tag" }],
+  //       },
+  //       {
+  //         model: db.salesPipelinesObj,
+  //         as: "salesPipelines",
+  //         attributes: ["id", "name"],
+  //       },
+  //       {
+  //         model: db.salesPipelinesStatusesObj,
+  //         as: "salesPipelinesStatus",
+  //         attributes: ["id", "name"],
+  //       },
+  //     ];
+
+  //     const searchTerm = search?.trim();
+  //     if (searchTerm) {
+  //       whereCondition[Op.or] = [
+  //         { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
+  //         { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
+  //       ];
+  //     }
+
+  //     const queryOptions = {
+  //       where: whereCondition,
+  //       include,
+  //       distinct: true,
+  //       order: [["id", "DESC"]],
+  //       subQuery: false,
+  //     };
+
+  //     if (!(take_all && take_all === "all")) {
+  //       queryOptions.limit = limit;
+  //       queryOptions.offset = offset;
+  //     }
+  //     let { rows: leads, count } = await db.leadsObj.findAndCountAll({
+  //       ...queryOptions,
+  //     });
+
+  //     let lastPage = Math.ceil(count / limit);
+  //     let from = offset + 1;
+  //     let to = offset + leads.length;
+
+  //     return {
+  //       leads,
+  //       meta: {
+  //         current_page: page,
+  //         from: from,
+  //         to: to,
+  //         last_page: lastPage,
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
   async getAllLeads(page, per_page, search, date, take_all) {
     try {
       page = Math.max(parseInt(page) || 1, 1);
@@ -20,16 +126,63 @@ module.exports = {
         };
       }
 
+      const searchTerm = search?.trim();
+      if (searchTerm) {
+        whereCondition[Op.or] = [
+          { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
+          { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
+        ];
+      }
+
+      // ✅ Step 1: Count total leads
+      const total = await db.leadsObj.count({
+        include: [
+          { model: db.companyObj, as: "company", required: false },
+          { model: db.projectObj, as: "project", required: false },
+        ],
+        where: whereCondition,
+        distinct: true,
+      });
+
+      // ✅ Step 2: Get only lead IDs for the current page
+      const idQueryOptions = {
+        attributes: ["id"],
+        include: [
+          { model: db.companyObj, as: "company", required: false },
+          { model: db.projectObj, as: "project", required: false },
+        ],
+        where: whereCondition,
+        order: [["id", "DESC"]],
+      };
+
+      if (!(take_all && take_all === "all")) {
+        idQueryOptions.limit = limit;
+        idQueryOptions.offset = offset;
+      }
+
+      const idResults = await db.leadsObj.findAll(idQueryOptions);
+      const leadIds = idResults.map((item) => item.id);
+
+      if (leadIds.length === 0) {
+        return {
+          leads: [],
+          meta: {
+            current_page: page,
+            from: 0,
+            to: 0,
+            last_page: 0,
+            per_page: limit,
+            total: total,
+          },
+        };
+      }
+
+      // ✅ Step 3: Fetch full leads with includes
       const include = [
-        {
-          model: db.companyObj,
-          as: "company",
-          required: false,
-        },
+        { model: db.companyObj, as: "company" },
         {
           model: db.projectObj,
           as: "project",
-          required: false,
           include: [
             { model: db.taxesObj, as: "stateDetails" },
             { model: db.taxesObj, as: "zipCodeDetails" },
@@ -66,43 +219,25 @@ module.exports = {
         },
       ];
 
-      const searchTerm = search?.trim();
-      if (searchTerm) {
-        whereCondition[Op.or] = [
-          { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
-          { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
-        ];
-      }
-
-      const queryOptions = {
-        where: whereCondition,
+      const leads = await db.leadsObj.findAll({
+        where: { id: leadIds },
         include,
-        distinct: true,
         order: [["id", "DESC"]],
-        subQuery: false,
-      };
-
-      if (!(take_all && take_all === "all")) {
-        queryOptions.limit = limit;
-        queryOptions.offset = offset;
-      }
-      let { rows: leads, count } = await db.leadsObj.findAndCountAll({
-        ...queryOptions,
       });
 
-      let lastPage = Math.ceil(count / limit);
-      let from = offset + 1;
-      let to = offset + leads.length;
+      const lastPage = Math.ceil(total / limit);
+      const from = offset + 1;
+      const to = offset + leads.length;
 
       return {
         leads,
         meta: {
           current_page: page,
-          from: from,
-          to: to,
+          from,
+          to,
           last_page: lastPage,
           per_page: limit,
-          total: count,
+          total: total,
         },
       };
     } catch (e) {

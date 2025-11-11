@@ -87,7 +87,7 @@ module.exports = {
       if (!getUserInfo) throw new Error("User not found");
       let dbPassword = getUserInfo.password;
       var passwordIsValid = bcrypt.compareSync(password, dbPassword);
-      if (!passwordIsValid) throw new Error("Invalid Password!");
+      if (!passwordIsValid) throw new Error("Invalid password!");
 
       const roleName = getUserInfo["roles.name"];
       const roleAccess = JSON.parse(getUserInfo["roles.access"] || "[]");
@@ -384,18 +384,18 @@ module.exports = {
 
       case "login": {
         return [
-          check("email").not().isEmpty().withMessage("Email is Required"),
-          check("password").not().isEmpty().withMessage("Password is Required"),
+          check("email").not().isEmpty().withMessage("Email is required"),
+          check("password").not().isEmpty().withMessage("Password is required"),
         ];
       }
       case "getUserById": {
         return [
-          check("userId").not().isEmpty().withMessage("User Id is Required"),
+          check("userId").not().isEmpty().withMessage("User id is required"),
         ];
       }
       case "forgotPassword": {
         return [
-          check("email").not().isEmpty().withMessage("Email is Required"),
+          check("email").not().isEmpty().withMessage("Email is required"),
         ];
       }
       case "getAllUsers": {
@@ -403,7 +403,7 @@ module.exports = {
           check("role")
             .not()
             .isEmpty()
-            .withMessage("Role is Required")
+            .withMessage("Role is required")
             .isIn([
               "sales",
               "administrator",

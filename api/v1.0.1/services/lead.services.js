@@ -203,6 +203,20 @@ module.exports = {
         { model: db.leadTeamsObj, as: "leadTeam" },
         { model: db.leadStatusesObj, as: "leadStatus" },
         {
+          model: db.leadScopeMappingsObj,
+          as: "leadScopeMappings",
+          required: false,
+          separate: true,
+          include: [
+            {
+              model: db.leadScopesObj,
+              as: "leadScopes",
+              required: false,
+              separate: false,
+            },
+          ],
+        },
+        {
           model: db.leadTagsObj,
           as: "lead_tags",
           include: [{ model: db.tagsObj, as: "tag" }],
@@ -296,6 +310,20 @@ module.exports = {
             attributes: { exclude: ["password"] },
             required: false,
             separate: false,
+          },
+          {
+            model: db.leadScopeMappingsObj,
+            as: "leadScopeMappings",
+            required: false,
+            separate: true,
+            include: [
+              {
+                model: db.leadScopesObj,
+                as: "leadScopes",
+                required: false,
+                separate: false,
+              },
+            ],
           },
           {
             model: db.leadTeamsObj,

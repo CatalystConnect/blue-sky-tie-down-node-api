@@ -232,13 +232,11 @@ module.exports = {
       let whereCondition = {};
       let order = [["order", "ASC"]];
 
-      // ✅ Search filter (optional)
       if (search && search.trim() !== "") {
         const searchTerm = search.trim();
         whereCondition.name = { [Op.iLike]: `%${searchTerm}%` };
       }
 
-      // ✅ Parse multiple IDs (prioritized)
       let idArray = [];
       if (ids) {
         try {
@@ -254,26 +252,23 @@ module.exports = {
         }
       }
 
-      // ✅ Build CASE WHEN ordering for IDs on top (but not filtering)
       if (idArray.length > 0) {
         const orderCase = `CASE 
           ${idArray.map((id, i) => `WHEN id = ${id} THEN ${i}`).join(" ")} 
           ELSE ${idArray.length} END`;
 
         order = [
-          [db.Sequelize.literal(orderCase), "ASC"], // IDs first
+          [db.Sequelize.literal(orderCase), "ASC"],
           ["order", "ASC"],
           ["id", "DESC"],
         ];
       } else {
-        // Default ordering if no IDs provided
         order = [
           ["order", "ASC"],
           ["id", "DESC"],
         ];
       }
 
-      // ✅ Take all mode
       if (take_all === "all") {
         const leadScopes = await db.leadScopesObj.findAll({
           where: whereCondition,
@@ -294,7 +289,6 @@ module.exports = {
         };
       }
 
-      // ✅ Paginated 10-record result
       const { rows, count } = await db.leadScopesObj.findAndCountAll({
         where: whereCondition,
         order,

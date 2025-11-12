@@ -1261,6 +1261,20 @@ module.exports = {
                 as: "lead_company",
                 required: false,
               },
+              {
+                model: db.leadScopeMappingsObj,
+                as: "projectleadScopeMappings",
+                required: false,
+                separate: true,
+                include: [
+                  {
+                    model: db.leadScopesObj,
+                    as: "leadScopes",
+                    required: false,
+                   
+                  },
+                ],
+              },
             ],
           },
         ],

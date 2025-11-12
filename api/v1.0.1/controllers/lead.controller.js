@@ -109,11 +109,12 @@ module.exports = {
           : null,
         secretId: data.secretId || null,
         leadNotesField: data.leadNotesField || null,
-        requestedScope: data.requestedScope
-        ? JSON.stringify(data.requestedScope)  
-        : null,
+        // requestedScope: data.requestedScope
+        // ? JSON.stringify(data.requestedScope)
+        // : null,
       };
 
+      
       const lead = await leadServices.addLead(postData);
 
       if (data.leadTags && data.leadTags.length > 0) {
@@ -124,6 +125,18 @@ module.exports = {
 
         await leadTagsServices.addleadTags(tags);
       }
+      if (
+        Array.isArray(data.requestedScope) &&
+        data.requestedScope.length > 0
+      ) {
+        const leadScopeData = data.requestedScope.map((scopeId) => ({
+          lead_id: lead.id,
+          lead_scope_id: scopeId,
+        }));
+
+        await db.leadScopeMappingsObj.bulkCreate(leadScopeData);
+      }
+
 
       if (data.leadTeamId) {
         // Fetch LeadTeam by ID
@@ -236,9 +249,9 @@ module.exports = {
           : null,
         secretId: data.secretId || null,
         leadNotesField: data.leadNotesField || null,
-        requestedScope: data.requestedScope
-        ? JSON.stringify(data.requestedScope)  
-        : null,
+        // requestedScope: data.requestedScope
+        //   ? JSON.stringify(data.requestedScope)
+        //   : null,
       };
 
       // Update lead
@@ -252,6 +265,18 @@ module.exports = {
           tag_id: tagId,
         }));
         await leadTagsServices.addleadTags(tags);
+      }
+      await db.leadScopeMappingsObj.destroy({ where: { lead_id: leadId } });
+      if (
+        Array.isArray(data.requestedScope) &&
+        data.requestedScope.length > 0
+      ) {
+        const leadScopeData = data.requestedScope.map((scopeId) => ({
+          lead_id: leadId,
+          lead_scope_id: scopeId,
+        }));
+
+        await db.leadScopeMappingsObj.bulkCreate(leadScopeData);
       }
 
       // Handle lead team

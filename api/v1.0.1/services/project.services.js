@@ -2251,14 +2251,14 @@ module.exports = {
   },
 
   async addDriveAssociation({
-    parent,
+    project_id,
     module,
     module_id,
     drive_id,
     file_name,
   }) {
     return await db.gDriveAssociationObj.create({
-      parent,
+      project_id,
       module,
       module_id,
       drive_id,

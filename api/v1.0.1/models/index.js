@@ -102,6 +102,7 @@ db.takeOffQuotesItemsObj = require("./takeOffQuotesItems.models")(
 db.takeOffQuotesObj = require("./takeOffQuotes.models")(db.dbObj, Sequelize);
 db.chatObj = require("./chat.models")(db.dbObj, Sequelize);
 db.brandObj = require("./brands.models")(db.dbObj, Sequelize);
+db.leadScopesObj = require("./leadScopes.models")(db.dbObj, Sequelize);
 db.unitObj = require("./units.models")(db.dbObj, Sequelize);
 db.vendorsObj = require("./vendors.models")(db.dbObj, Sequelize);
 db.productCategoriesObj = require("./productCategories.models")(

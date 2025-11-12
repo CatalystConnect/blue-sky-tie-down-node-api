@@ -60,5 +60,6 @@ router.use(require("./proejctTags.routes"));
 router.use(require("./state.routes"));
 router.use(require("./salesPipelinesLeads.routes"));
 router.use(require("./interactions.routes"));
+router.use(require("./leadScopes.routes"));
 
 module.exports = router;

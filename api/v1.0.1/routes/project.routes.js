@@ -13,7 +13,6 @@ router.get("/project/getAllProject",[authJwt.verifyToken],  controller.getAllPro
 
 // /*getProjectById*/
  router.get("/project/getProjectById",[authJwt.verifyToken], controller.getProjectById);
-//  [controller.validate("updateProject")],
 // /*updateProject*/
 router.put("/project/updateProject",[authJwt.verifyToken,upload.any()],  controller.updateProject);
 

@@ -1163,7 +1163,7 @@ db.projectTagMappingsObj.belongsTo(db.projectTagsObj, {
 });
 
 db.projectObj.hasMany(db.gDriveAssociationObj, {
-  foreignKey: "parent",
+  foreignKey: "project_id",
   as: "googleDrive",
 });
 

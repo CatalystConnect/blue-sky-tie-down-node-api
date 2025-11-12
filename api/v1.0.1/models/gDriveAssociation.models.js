@@ -7,7 +7,7 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      parent: {
+      project_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },

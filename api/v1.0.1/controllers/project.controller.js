@@ -20,223 +20,7 @@ const fs = require("fs");
 
 module.exports = {
 
-  // async addProject(req, res) {
-  //   try {
-  //     const errors = myValidationResult(req);
-  //     if (!errors.isEmpty()) {
-  //       return res
-  //         .status(200)
-  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
-  //     }
-
-  //     const data = req.body;
-
-  //     const sanitizeInteger = (value) => (value ? Number(value) : null);
-  //     const sanitizeDate = (value) => {
-  //       if (!value) return null;
-  //       const date = new Date(value);
-  //       return isNaN(date.getTime()) ? null : date;
-  //     };
-
-  //     // Step 1: Add project to DB
-  //     const postData = {
-  //       user_id: req.userId,
-  //       engineer_id: sanitizeInteger(data.engineer_id),
-  //       name: data.name || null,
-  //       city: data.city || null,
-  //       state: sanitizeInteger(data.state),
-  //       bldg_gsqft: sanitizeInteger(data.bldg_gsqft),
-  //       address: data.address || null,
-  //       zip: sanitizeInteger(data.zip),
-  //       units: sanitizeInteger(data.units),
-  //       project_phase: data.project_phase || null,
-  //       bldgs: sanitizeInteger(data.bldgs),
-  //       wind_zone: data.wind_zone || null,
-  //       seismic_zone: data.seismic_zone || null,
-  //       developer_id: sanitizeInteger(data.developer_id),
-  //       general_contractor_id: sanitizeInteger(data.general_contractor_id),
-  //       assign_to_budget: sanitizeDate(data.assign_to_budget),
-  //       take_off_team_id: sanitizeInteger(data.take_off_team_id),
-  //       take_off_type: data.take_off_type || null,
-  //       take_off_scope: data.take_off_scope || null,
-  //       assign_date: sanitizeDate(data.assign_date),
-  //       architecture: sanitizeInteger(data.architecture),
-  //       takeoffactualtime: sanitizeInteger(data.takeoffactualtime),
-  //       dueDate: sanitizeDate(data.dueDate),
-  //       status: "new",
-  //       takeofCompleteDate: sanitizeDate(data.takeofCompleteDate),
-  //       connectplan: data.connectplan || null,
-  //       surveyorNotes: data.surveyorNotes || null,
-  //       takeOfEstimateTime: sanitizeInteger(data.takeOfEstimateTime),
-  //       takeoffDueDate: sanitizeDate(data.takeoffDueDate),
-  //       takeoffStartDate: sanitizeDate(data.takeoffStartDate),
-  //       project_status: data.project_status || "active",
-  //       takeoff_status: data.takeoff_status || null,
-  //       work_hours: data.work_hours || null,
-  //     };
-
-  //     const project = await projectServices.addProject(postData);
-
-  //     // Step 2: Create root folder
-  //     const rootFolder = await getOrCreateSubfolder(
-  //       process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //       `${project.id}. ${project.name}`
-  //     );
-
-  //     // Step 3: Create subfolders
-  //     const projectFilesFolder = await getOrCreateSubfolder(rootFolder, "projectFiles");
-  //     const planSetsFolder = await getOrCreateSubfolder(rootFolder, "PlanSets");
-  //     const completedFolder = await getOrCreateSubfolder(rootFolder, "CompletedFiles");
-
-  //     const saveFolder = async (module, module_id, drive_id, file_name = null) =>
-  //       await projectServices.addDriveAssociation({
-  //         parent: project.id,
-  //         module,
-  //         module_id,
-  //         drive_id,
-  //         file_name,
-  //       });
-
-  //     // Step 4: Upload Project Files
-  //     let projectFiles = [];
-  //     const projectUploads = req.files?.filter((f) =>
-  //       f.fieldname.startsWith("projectFiles")
-  //     ) || [];
-
-  //     for (let file of projectUploads) {
-  //       const driveFile = await uploadFileToDrive(
-  //         file.path,
-  //         file.originalname,
-  //         file.mimetype,
-  //         projectFilesFolder
-  //       );
-  //       projectFiles.push({
-  //         name: file.originalname,
-  //         link: driveFile.webViewLink,
-  //         size: file.size,
-  //       });
-  //       await saveFolder("projectFiles", project.id, driveFile.id, file.originalname);
-  //     }
-
-  //     if (projectFiles.length > 0) {
-  //       await projectServices.updateProject(
-  //         { project_file: JSON.stringify(projectFiles) },
-  //         project.id
-  //       );
-  //     }
-
-  //     // Step 5: Upload Completed Files
-  //     let completedFiles = [];
-  //     const completedUploads = req.files?.filter((f) =>
-  //       f.fieldname.startsWith("completedFiles")
-  //     ) || [];
-
-  //     for (let file of completedUploads) {
-  //       const driveFile = await uploadFileToDrive(
-  //         file.path,
-  //         file.originalname,
-  //         file.mimetype,
-  //         completedFolder
-  //       );
-  //       completedFiles.push({
-  //         name: file.originalname,
-  //         link: driveFile.webViewLink,
-  //         size: file.size,
-  //       });
-  //       await saveFolder("completedFiles", project.id, driveFile.id, file.originalname);
-  //     }
-
-  //     if (completedFiles.length > 0) {
-  //       await projectServices.updateProject(
-  //         { completedFiles: JSON.stringify(completedFiles) },
-  //         project.id
-  //       );
-  //     }
-
-  //     // Step 6: Upload Plan Sets
-  //     const planSets = Array.isArray(data.planSets)
-  //       ? data.planSets
-  //       : JSON.parse(data.planSets || "[]");
-
-  //     for (let index = 0; index < planSets.length; index++) {
-  //       const plan = planSets[index];
-
-  //       // Create folder with index name
-  //       const planSetFolder = await getOrCreateSubfolder(planSetsFolder, `${index + 1}`);
-
-  //       const planData = {
-  //         project_id: project.id,
-  //         submissionType: plan.submissionType || null,
-  //         date_received: sanitizeDate(plan.date_received),
-  //         plan_link: plan.plan_link || null,
-  //         planType: plan.planType || null,
-  //         planFiles: null,
-  //         plan_date: sanitizeDate(plan.plan_date),
-  //         rev_status: plan.rev_status || null,
-  //         plan_reviewed_date: sanitizeDate(plan.plan_reviewed_date),
-  //         plan_reviewed_by: sanitizeInteger(plan.plan_reviewed_by),
-  //         data_collocated_date: sanitizeDate(plan.data_collocated_date),
-  //         plan_revision_notes: plan.plan_revision_notes || null,
-  //       };
-
-  //       const createdPlan = await projectServices.projectplanSets(planData);
-
-  //       // Save folder with actual planSet.id
-  //       await saveFolder("planSetFiles", createdPlan.id, planSetFolder);
-
-  //       // Upload files
-  //       const planFiles = req.files?.filter(
-  //         (f) => f.fieldname === `planSets[${index}][planFiles]`
-  //       ) || [];
-
-  //       let uploadedFiles = [];
-  //       for (let file of planFiles) {
-  //         const driveFile = await uploadFileToDrive(
-  //           file.path,
-  //           file.originalname,
-  //           file.mimetype,
-  //           planSetFolder
-  //         );
-  //         uploadedFiles.push({
-  //           name: file.originalname,
-  //           link: driveFile.webViewLink,
-  //         });
-  //         await saveFolder("planSetFiles", createdPlan.id, driveFile.id, file.originalname);
-  //       }
-
-  //       await projectServices.updatePlanFiles(
-  //         createdPlan.id,
-  //         JSON.stringify(uploadedFiles)
-  //       );
-  //     }
-
-  //     // Step 7: Handle Tags
-  //     if (data.project_tags) {
-  //       const tagIds = Array.isArray(data.project_tags)
-  //         ? data.project_tags
-  //         : String(data.project_tags).split(",").map((id) => parseInt(id));
-  //       await projectServices.addProjectTags(project.id, tagIds);
-  //     }
-
-  //     if (data.projectType) {
-  //       const tagIds = Array.isArray(data.projectType)
-  //         ? data.projectType
-  //         : String(data.projectType).split(",").map((id) => parseInt(id));
-  //       await projectServices.addProjectType(project.id, tagIds);
-  //     }
-
-  //     return res
-  //       .status(200)
-  //       .send(commonHelper.parseSuccessRespose("", "Project added successfully"));
-  //   } catch (error) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message:
-  //         error.response?.data?.error || error.message || "Project failed",
-  //       data: error.response?.data || {},
-  //     });
-  //   }
-  // },
+ 
   async addProject(req, res) {
   try {
     const errors = myValidationResult(req);
@@ -320,7 +104,7 @@ module.exports = {
 
         const saveFolder = async (module, module_id, drive_id, file_name = null) =>
           await projectServices.addDriveAssociation({
-            parent: project.id,
+            project_id: project.id,
             module,
             module_id,
             drive_id,
@@ -606,7 +390,7 @@ module.exports = {
       // 🔹 Helper: Save file to Google Drive association
       const saveFolder = async (module, module_id, drive_id, file_name) =>
         await projectServices.addDriveAssociation({
-          parent: projectId,
+          project_id: projectId,
           module,
           module_id,
           drive_id,
@@ -1067,7 +851,7 @@ module.exports = {
       // Helper to save Google Drive association
       const saveFolder = async (module, module_id, drive_id, file_name = null) =>
         await projectServices.addDriveAssociation({
-          parent: projectId,
+          project_id: projectId,
           module,
           module_id,
           drive_id,
@@ -2221,7 +2005,7 @@ module.exports = {
           where: {
             module: "planSetFiles",
             module_id: id,
-            parent: projectId,
+            project_id: projectId,
           },
         });
 
@@ -2316,7 +2100,7 @@ module.exports = {
             });
 
             await projectServices.addDriveAssociation({
-              parent: projectId,
+              project_id: projectId,
               module: "planSetFiles",
               module_id: id,
               drive_id: driveFile.id,
@@ -2788,7 +2572,7 @@ module.exports = {
       // --- Step 3: Save file to Google Drive ---
       const saveFolder = async (module, module_id, drive_id, file_name) =>
         await projectServices.addDriveAssociation({
-          parent: project.id,
+          project_id: project.id,
           module,
           module_id,
           drive_id,

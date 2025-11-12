@@ -295,7 +295,8 @@ module.exports = {
     const project = await projectServices.addProject(postData);
 
     // ✅ Send response immediately (to prevent Heroku 503)
-    res.status(201).json({
+    
+    res.status(200).json({
       success: true,
       message: "Project created successfully.",
       

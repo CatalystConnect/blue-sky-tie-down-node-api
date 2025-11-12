@@ -235,7 +235,7 @@ module.exports = {
         secretId: data.secretId || null,
         leadNotesField: data.leadNotesField || null,
         requestedScope: data.requestedScope
-        ? JSON.stringify(data.requestedScope)
+        ? JSON.stringify(data.requestedScope)  
         : null,
       };
 

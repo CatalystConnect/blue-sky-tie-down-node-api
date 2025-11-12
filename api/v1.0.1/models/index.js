@@ -22,6 +22,10 @@ db.dbObj
 /*Models defined*/
 db.userObj = require("./users.models")(db.dbObj, Sequelize);
 db.leadsObj = require("./leads.models")(db.dbObj, Sequelize);
+db.leadScopeMappingsObj = require("./leadScopeMappings.models")(
+  db.dbObj,
+  Sequelize
+);
 db.leadNotesObj = require("./leadNotes.models")(db.dbObj, Sequelize);
 db.rolesObj = require("./roles.model")(db.dbObj, Sequelize);
 db.contractObj = require("./contract.models")(db.dbObj, Sequelize);
@@ -288,7 +292,14 @@ db.projectObj.belongsTo(db.taxesObj, {
 //   foreignKey: "lead_id",
 //   as: "budgetLead",
 // });
-
+db.leadsObj.hasMany(db.leadScopeMappingsObj, {
+  foreignKey: "lead_id",
+  as: "leadScopeMappings",
+});
+db.leadScopeMappingsObj.belongsTo(db.leadScopesObj, {
+  foreignKey: "lead_scope_id",
+  as: "leadScopes",
+});
 db.sitePlansObj.hasMany(db.budgetBookOthersObj, {
   foreignKey: "site_plan_id",
   as: "budgetBookOthers",
@@ -1071,6 +1082,10 @@ db.leadsObj.belongsTo(db.projectObj, {
 db.projectObj.hasMany(db.leadsObj, {
   foreignKey: "project_id",
   as: "project_leads",
+});
+db.leadsObj.hasMany(db.leadScopeMappingsObj, {
+  foreignKey: "lead_id",
+  as: "projectleadScopeMappings",
 });
 
 db.projectObj.hasMany(db.projectplanSetsObj, {

@@ -20,8 +20,9 @@ module.exports = {
       }
 
       let postData = {
-        name: req.body.name,
         user_id: req.userId,
+        name: req.body.name,
+        order: req.body.order,
       };
 
       const leadScope = await leadScopesServices.addLeadScopes(postData);

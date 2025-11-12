@@ -42,7 +42,7 @@ module.exports = {
         };
       }
 
-      let order = [["id", "DESC"]];
+      let order = [["order", "ASC"]];
       if (id) {
         order = [
           [

@@ -432,6 +432,20 @@ module.exports = {
                 model: db.projectObj,
                 as: "project",
               },
+              {
+                model: db.leadScopeMappingsObj,
+                as: "leadScopeMappings",
+                required: false,
+                separate: true,
+                include: [
+                  {
+                    model: db.leadScopesObj,
+                    as: "leadScopes",
+                    required: false,
+                    separate: false,
+                  },
+                ],
+              },
             ],
           },
           {
@@ -1271,7 +1285,6 @@ module.exports = {
                     model: db.leadScopesObj,
                     as: "leadScopes",
                     required: false,
-                   
                   },
                 ],
               },

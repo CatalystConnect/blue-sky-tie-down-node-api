@@ -663,6 +663,34 @@ async getProjectById(projectId) {
                 as: "project",
               },
               {
+                model: db.leadTagsObj,
+                as: "lead_tags",
+                required: false,
+                separate: false,
+                include: [
+                  {
+                    model: db.tagsObj,
+                    as: "tag",
+                    required: false,
+                    separate: false,
+                  },
+                ],
+              },
+              {
+                model: db.salesPipelinesObj,
+                as: "salesPipelines",
+                attributes: ["id", "name"],
+                required: false,
+                separate: false,
+              },
+              {
+                model: db.salesPipelinesStatusesObj,
+                as: "salesPipelinesStatus",
+                attributes: ["id", "name"],
+                required: false,
+                separate: false,
+              },
+              {
                 model: db.leadScopeMappingsObj,
                 as: "leadScopeMappings",
                 required: false,

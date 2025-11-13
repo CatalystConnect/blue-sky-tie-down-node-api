@@ -549,104 +549,104 @@ module.exports = {
   //   }
   // },
 
-async getProjectById(projectId) {
-  try {
-    let getProjectById = await db.projectObj.findOne({
-      where: { id: projectId },
-      attributes: [
-        "id",
-        "user_id",
-        "engineer_id",
-        "name",
-        "city",
-        "state",
-        "plan_date",
-        "bldg_gsqft",
-        "address",
-        "zip",
-        "units",
-        "projectType",
-        "project_phase",
-        "date_received",
-        "rev_status",
-        "project_file",
-        "plan_reviewed_date",
-        "plan_reviewed_by",
-        "plan_revision_notes",
-        "data_collocated_date",
-        "bldgs",
-        "wind_zone",
-        "seismic_zone",
-        "developer_id",
-        "general_contractor_id",
-        "assign_to_budget",
-        "take_off_team_id",
-        "take_off_type",
-        "take_off_scope",
-        "assign_date",
-        "plan_link",
-        "submissionType",
-        "planFiles",
-        "project_tags",
-        "projectFiles",
-        "architecture",
-        "takeoffactualtime",
-        "dueDate",
-        "projectAttachmentUrls",
-        "attachmentsLink",
-        "projectRifFields",
-        "takeofCompleteDate",
-        "connectplan",
-        "surveyorNotes",
-        "completedFiles",
-        "takeOfEstimateTime",
-        "takeoff_status",
-        "project_status",
-        "priority",
-        "takeoffStartDate",
-        "takeoffDueDate",
-        "work_hours",
-      ],
-      include: [
-        { model: db.companyObj, as: "engineer" },
-        { model: db.companyObj, as: "architect" },
-        { model: db.companyObj, as: "developer" },
-        { model: db.companyObj, as: "general_contractor" },
-        { model: db.userObj, as: "planReviewer" },
-        { model: db.leadTeamsObj, as: "takeoff_team" },
-        {
-          model: db.projectplanSetsObj,
-          as: "planSets",
-          include: [{ model: db.userObj, as: "planReviewerUers" }],
-        },
-        { model: db.taxesObj, as: "zipCodeDetails" },
-        { model: db.taxesObj, as: "stateDetails" },
-        { model: db.stateObj, as: "states" },
-        { model: db.projectPhasesObj, as: "projectPhase" },
-        { model: db.projectTagsObj, as: "projectTag" },
-        {
-          model: db.projectTagMappingsObj,
-          as: "projectTagsMapping",
-          include: [{ model: db.projectTagsObj, as: "tags" }],
-        },
-        {
-          model: db.projectTypeMappingsObj,
-          as: "projectTypeMapping",
-          include: [{ model: db.projectTypesObj, as: "projectType" }],
-        },
-        {
-          model: db.leadsObj,
-          as: "project_leads",
-          include: [
-            { model: db.companyObj, as: "lead_engineer" },
-            { model: db.contactsObj, as: "lead_contact" },
-            { model: db.companyObj, as: "lead_company" },
-            { model: db.userObj, as: "lead_sales_person" },
-            { model: db.leadStatusesObj, as: "leadStatus" },
-            { model: db.projectObj, as: "project" },
-          ],
-        },
-        {
+  async getProjectById(projectId) {
+    try {
+      let getProjectById = await db.projectObj.findOne({
+        where: { id: projectId },
+        attributes: [
+          "id",
+          "user_id",
+          "engineer_id",
+          "name",
+          "city",
+          "state",
+          "plan_date",
+          "bldg_gsqft",
+          "address",
+          "zip",
+          "units",
+          "projectType",
+          "project_phase",
+          "date_received",
+          "rev_status",
+          "project_file",
+          "plan_reviewed_date",
+          "plan_reviewed_by",
+          "plan_revision_notes",
+          "data_collocated_date",
+          "bldgs",
+          "wind_zone",
+          "seismic_zone",
+          "developer_id",
+          "general_contractor_id",
+          "assign_to_budget",
+          "take_off_team_id",
+          "take_off_type",
+          "take_off_scope",
+          "assign_date",
+          "plan_link",
+          "submissionType",
+          "planFiles",
+          "project_tags",
+          "projectFiles",
+          "architecture",
+          "takeoffactualtime",
+          "dueDate",
+          "projectAttachmentUrls",
+          "attachmentsLink",
+          "projectRifFields",
+          "takeofCompleteDate",
+          "connectplan",
+          "surveyorNotes",
+          "completedFiles",
+          "takeOfEstimateTime",
+          "takeoff_status",
+          "project_status",
+          "priority",
+          "takeoffStartDate",
+          "takeoffDueDate",
+          "work_hours",
+        ],
+        include: [
+          { model: db.companyObj, as: "engineer" },
+          { model: db.companyObj, as: "architect" },
+          { model: db.companyObj, as: "developer" },
+          { model: db.companyObj, as: "general_contractor" },
+          { model: db.userObj, as: "planReviewer" },
+          { model: db.leadTeamsObj, as: "takeoff_team" },
+          {
+            model: db.projectplanSetsObj,
+            as: "planSets",
+            include: [{ model: db.userObj, as: "planReviewerUers" }],
+          },
+          { model: db.taxesObj, as: "zipCodeDetails" },
+          { model: db.taxesObj, as: "stateDetails" },
+          { model: db.stateObj, as: "states" },
+          { model: db.projectPhasesObj, as: "projectPhase" },
+          { model: db.projectTagsObj, as: "projectTag" },
+          {
+            model: db.projectTagMappingsObj,
+            as: "projectTagsMapping",
+            include: [{ model: db.projectTagsObj, as: "tags" }],
+          },
+          {
+            model: db.projectTypeMappingsObj,
+            as: "projectTypeMapping",
+            include: [{ model: db.projectTypesObj, as: "projectType" }],
+          },
+          {
+            model: db.leadsObj,
+            as: "project_leads",
+            include: [
+              { model: db.companyObj, as: "lead_engineer" },
+              { model: db.contactsObj, as: "lead_contact" },
+              { model: db.companyObj, as: "lead_company" },
+              { model: db.userObj, as: "lead_sales_person" },
+              { model: db.leadStatusesObj, as: "leadStatus" },
+              { model: db.projectObj, as: "project" },
+            ],
+          },
+          {
             model: db.leadsObj,
             as: "project_leads",
             include: [
@@ -691,6 +691,12 @@ async getProjectById(projectId) {
                 separate: false,
               },
               {
+                model: db.contactsObj,
+                as: "contact",
+                required: false,
+                separate: false,
+              },
+              {
                 model: db.leadScopeMappingsObj,
                 as: "leadScopeMappings",
                 required: false,
@@ -707,110 +713,112 @@ async getProjectById(projectId) {
             ],
           },
 
-        { model: db.gDriveAssociationObj, as: "googleDrive" },
-      ],
-    });
-
-    const project = getProjectById.toJSON();
-
-    const googleDriveData = project.googleDrive || [];
-
-    // --- Helper function to build folder structure ---
-    const buildFolderStructure = (files) => {
-      const folderMap = {};
-      const rootFiles = [];
-
-      // Create folder entries
-      files.forEach((item) => {
-        if (item.type === "folder") {
-          folderMap[item.file_name] = { folder: item, files: [] };
-        }
+          { model: db.gDriveAssociationObj, as: "googleDrive" },
+        ],
       });
 
-      // Assign files to folders or root
-      files.forEach((item) => {
-        if (item.type === "file" && item.parent) {
-          const parentFolder = files.find(f => f.id === item.parent);
-          if (parentFolder && parentFolder.type === "folder") {
-            folderMap[parentFolder.file_name].files.push(item);
-          } else {
+      const project = getProjectById.toJSON();
+
+      const googleDriveData = project.googleDrive || [];
+
+      // --- Helper function to build folder structure ---
+      const buildFolderStructure = (files) => {
+        const folderMap = {};
+        const rootFiles = [];
+
+        // Create folder entries
+        files.forEach((item) => {
+          if (item.type === "folder") {
+            folderMap[item.file_name] = { folder: item, files: [] };
+          }
+        });
+
+        // Assign files to folders or root
+        files.forEach((item) => {
+          if (item.type === "file" && item.parent) {
+            const parentFolder = files.find((f) => f.id === item.parent);
+            if (parentFolder && parentFolder.type === "folder") {
+              folderMap[parentFolder.file_name].files.push(item);
+            } else {
+              rootFiles.push(item);
+            }
+          } else if (item.type === "file") {
             rootFiles.push(item);
           }
-        } else if (item.type === "file") {
-          rootFiles.push(item);
+        });
+
+        return { rootFiles, folders: folderMap };
+      };
+
+      // --- Separate modules ---
+      const modules = {
+        projectFiles: [],
+        completedFiles: [],
+        planSet: [],
+        budgetFiles: [],
+      };
+
+      googleDriveData.forEach((item) => {
+        const file = item.dataValues || item;
+
+        if (file.module === "projectFiles") modules.projectFiles.push(file);
+        else if (
+          file.module === "completedFiles" ||
+          file.module === "CompletedFiles"
+        )
+          modules.completedFiles.push(file);
+        else if (file.module === "planSetFiles") modules.planSet.push(file);
+        else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
+      });
+
+      // --- Transform planSet like before ---
+      const planSetFolderMap = {};
+      project.planSets?.forEach((planSet, index) => {
+        planSetFolderMap[planSet.id] = index + 1;
+      });
+
+      const planSet = {};
+      modules.planSet.forEach((item) => {
+        const moduleId = item.module_id;
+        const folderNumber = planSetFolderMap[moduleId] || moduleId;
+
+        if (!planSet[folderNumber]) {
+          planSet[folderNumber] = { folder: null, files: [] };
+        }
+
+        if (!item.file_name) {
+          planSet[folderNumber].folder = {
+            drive_id: item.drive_id,
+            createdAt: item.createdAt,
+          };
+        } else {
+          planSet[folderNumber].files.push({
+            drive_id: item.drive_id,
+            file_name: item.file_name,
+            createdAt: item.createdAt,
+          });
         }
       });
 
-      return { rootFiles, folders: folderMap };
-    };
+      // --- Build structured folders for projectFiles and completedFiles ---
+      const projectFiles = buildFolderStructure(modules.projectFiles);
+      const completedFiles = buildFolderStructure(modules.completedFiles);
+      const budgetFiles = buildFolderStructure(modules.budgetFiles);
 
-    // --- Separate modules ---
-    const modules = {
-      projectFiles: [],
-      completedFiles: [],
-      planSet: [],
-      budgetFiles: [],
-    };
+      project.googleDrive = {
+        planSet,
+        projectFiles,
+        completedFiles,
+        budgetFiles,
+      };
 
-    googleDriveData.forEach((item) => {
-      const file = item.dataValues || item;
+      return project;
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 
-      if (file.module === "projectFiles") modules.projectFiles.push(file);
-      else if (file.module === "completedFiles" || file.module === "CompletedFiles") modules.completedFiles.push(file);
-      else if (file.module === "planSetFiles") modules.planSet.push(file);
-      else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
-    });
-
-    // --- Transform planSet like before ---
-    const planSetFolderMap = {};
-    project.planSets?.forEach((planSet, index) => {
-      planSetFolderMap[planSet.id] = index + 1;
-    });
-
-    const planSet = {};
-    modules.planSet.forEach((item) => {
-      const moduleId = item.module_id;
-      const folderNumber = planSetFolderMap[moduleId] || moduleId;
-
-      if (!planSet[folderNumber]) {
-        planSet[folderNumber] = { folder: null, files: [] };
-      }
-
-      if (!item.file_name) {
-        planSet[folderNumber].folder = {
-          drive_id: item.drive_id,
-          createdAt: item.createdAt,
-        };
-      } else {
-        planSet[folderNumber].files.push({
-          drive_id: item.drive_id,
-          file_name: item.file_name,
-          createdAt: item.createdAt,
-        });
-      }
-    });
-
-    // --- Build structured folders for projectFiles and completedFiles ---
-    const projectFiles = buildFolderStructure(modules.projectFiles);
-    const completedFiles = buildFolderStructure(modules.completedFiles);
-    const budgetFiles = buildFolderStructure(modules.budgetFiles);
-
-    project.googleDrive = {
-      planSet,
-      projectFiles,
-      completedFiles,
-      budgetFiles,
-    };
-
-    return project;
-  } catch (e) {
-    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-    throw e;
-  }
-},
-
-  
-  
   // /*updateProject*/
   async updateProject(data, projectId) {
     try {

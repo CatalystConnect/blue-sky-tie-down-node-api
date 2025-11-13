@@ -19,7 +19,7 @@ module.exports = {
         allowNull: true
       },
       date_received: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       plan_link: {
@@ -31,7 +31,7 @@ module.exports = {
         allowNull: true
       },
       plan_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       rev_status: {
@@ -39,7 +39,7 @@ module.exports = {
         allowNull: true
       },
       plan_reviewed_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       plan_reviewed_by: {
@@ -47,7 +47,7 @@ module.exports = {
         allowNull: true
       },
       data_collocated_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
       plan_revision_notes: {

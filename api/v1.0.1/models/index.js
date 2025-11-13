@@ -317,6 +317,10 @@ db.budgetBooksObj.belongsTo(db.projectObj, {
   foreignKey: "project_id",
   as: "budgetProject",
 });
+db.projectObj.hasMany(db.budgetBooksObj, {
+  foreignKey: "project_id",
+  as: "budgetBook",
+});
 db.budgetBooksObj.belongsTo(db.leadsObj, {
   foreignKey: "lead_id",
   as: "budgetLead",

@@ -17,11 +17,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       start_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       end_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       description: {
@@ -105,7 +105,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       plan_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       project_phase: {
@@ -113,7 +113,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       date_received: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       rev_status: {
@@ -121,7 +121,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       plan_reviewed_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       plan_reviewed_by: {
@@ -137,15 +137,15 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       data_collocated_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       takeoffDueDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       takeoffStartDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
 
@@ -182,7 +182,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       assign_to_budget: {
-        type:  Sequelize.DATE,
+        type:  Sequelize.DATEONLY,
         allowNull: true,
       },
       take_off_team_id: {
@@ -202,7 +202,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       assign_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       plan_link: {
@@ -234,7 +234,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       dueDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       projectAttachmentUrls: {
@@ -254,7 +254,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       takeofCompleteDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       connectplan: {

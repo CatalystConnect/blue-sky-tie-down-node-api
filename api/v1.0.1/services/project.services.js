@@ -697,6 +697,13 @@ module.exports = {
                 separate: false,
               },
               {
+                model: db.userObj,
+                as: "salePerson",
+                attributes: { exclude: ["password"] },
+                required: false,
+                separate: false,
+              },
+              {
                 model: db.leadScopeMappingsObj,
                 as: "leadScopeMappings",
                 required: false,

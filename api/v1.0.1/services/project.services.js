@@ -271,11 +271,11 @@ module.exports = {
           // ✅ This puts the record with matching id at the top
           id
             ? [
-                db.Sequelize.literal(
-                  `CASE WHEN "projects"."id" = ${id} THEN 0 ELSE 1 END`
-                ),
-                "ASC",
-              ]
+              db.Sequelize.literal(
+                `CASE WHEN "projects"."id" = ${id} THEN 0 ELSE 1 END`
+              ),
+              "ASC",
+            ]
             : ["id", "DESC"],
           ["id", "DESC"],
         ],
@@ -1034,13 +1034,186 @@ module.exports = {
       throw e;
     }
   },
+  // async getAllProjectDataStatusNew(page = 1, per_page = 10, search = "") {
+  //   try {
+  //     const limit = parseInt(per_page) || 10;
+  //     const offset = (parseInt(page) - 1) * limit || 0;
+
+  //     const whereClause = { takeoff_status: "new" };
+
+  //     if (search) {
+  //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+  //     }
+
+  //     const { rows, count } = await db.projectObj.findAndCountAll({
+  //       where: whereClause,
+  //       limit,
+  //       offset,
+  //       distinct: true,
+  //       attributes: [
+  //         "id",
+  //         "user_id",
+  //         "engineer_id",
+  //         "name",
+  //         "city",
+  //         "state",
+  //         "plan_date",
+  //         "bldg_gsqft",
+  //         "address",
+  //         "zip",
+  //         "units",
+  //         "projectType",
+  //         "project_phase",
+  //         "date_received",
+  //         "rev_status",
+  //         "project_file",
+  //         "plan_reviewed_date",
+  //         "plan_reviewed_by",
+  //         "plan_revision_notes",
+  //         "data_collocated_date",
+  //         "bldgs",
+  //         "wind_zone",
+  //         "seismic_zone",
+  //         "developer_id",
+  //         "general_contractor_id",
+  //         "assign_to_budget",
+  //         "take_off_team_id",
+  //         "take_off_type",
+  //         "take_off_scope",
+  //         "assign_date",
+  //         "plan_link",
+  //         "submissionType",
+  //         "planFiles",
+  //         "project_tags",
+  //         "projectFiles",
+  //         "architecture",
+  //         "takeoffactualtime",
+  //         "dueDate",
+  //         "projectAttachmentUrls",
+  //         "attachmentsLink",
+  //         "projectRifFields",
+  //         "status",
+  //         "takeofCompleteDate",
+  //         "connectplan",
+  //         "surveyorNotes",
+  //         "completedFiles",
+  //         "takeOfEstimateTime",
+  //         "takeoff_status",
+  //         "project_status",
+  //         "priority",
+  //         "takeoffStartDate",
+  //         "takeoffDueDate",
+  //         "work_hours",
+  //       ],
+  //       include: [
+  //         { model: db.companyObj, as: "engineer" },
+  //         { model: db.companyObj, as: "architect" },
+  //         { model: db.companyObj, as: "developer" },
+  //         { model: db.companyObj, as: "general_contractor" },
+  //         { model: db.userObj, as: "planReviewer" },
+  //         { model: db.projectplanSetsObj, as: "planSets" },
+  //         { model: db.stateObj, as: "states" },
+  //         { model: db.projectPhasesObj, as: "projectPhase" },
+  //         { model: db.projectTagsObj, as: "projectTag" },
+  //         {
+  //           model: db.projectTagMappingsObj,
+  //           as: "projectTagsMapping",
+  //           include: [{ model: db.projectTagsObj, as: "tags" }],
+  //         },
+  //         {
+  //           model: db.projectTypeMappingsObj,
+  //           as: "projectTypeMapping",
+  //           include: [
+  //             {
+  //               model: db.projectTypesObj,
+  //               as: "projectType",
+  //             },
+  //           ],
+  //         },
+  //         { model: db.gDriveAssociationObj, as: "googleDrive" },
+  //       ],
+  //       order: [
+  //         [
+  //           db.Sequelize.literal(
+  //             `CASE WHEN priority = 'true' THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ],
+  //     });
+
+  //     // Process and transform each project
+  //     const projects = rows.map((projectInstance) => {
+  //       const project = projectInstance.toJSON();
+
+  //       const googleDriveData = project.googleDrive || [];
+  //       const googleDrive = {
+  //         projectFiles: [],
+  //         completedFiles: [],
+  //         planSet: [],
+  //       };
+
+  //       // Step 1: Separate Google Drive modules
+  //       googleDriveData.forEach((item) => {
+  //         const file = item.dataValues || item;
+  //         if (file.module === "projectFiles")
+  //           googleDrive.projectFiles.push(file);
+  //         else if (file.module === "completedFiles")
+  //           googleDrive.completedFiles.push(file);
+  //         else if (file.module === "planSetFiles")
+  //           googleDrive.planSet.push(file);
+  //       });
+
+  //       // Step 2: Transform planSet into structured object
+  //       const planSet = {};
+  //       googleDrive.planSet.forEach((item) => {
+  //         const moduleId = item.module_id;
+  //         if (!planSet[moduleId])
+  //           planSet[moduleId] = { folder: null, files: [] };
+
+  //         if (!item.file_name) {
+  //           planSet[moduleId].folder = {
+  //             drive_id: item.drive_id,
+  //             createdAt: item.createdAt,
+  //           };
+  //         } else {
+  //           planSet[moduleId].files.push({
+  //             drive_id: item.drive_id,
+  //             file_name: item.file_name,
+  //             createdAt: item.createdAt,
+  //           });
+  //         }
+  //       });
+
+  //       googleDrive.planSet = planSet;
+  //       project.googleDrive = googleDrive;
+
+  //       return project;
+  //     });
+
+  //     return {
+  //       data: projects,
+  //       meta: {
+  //         current_page: parseInt(page),
+  //         from: offset + 1,
+  //         to: offset + projects.length,
+  //         last_page: Math.ceil(count / limit),
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllProjectDataStatusNew(page = 1, per_page = 10, search = "") {
     try {
       const limit = parseInt(per_page) || 10;
       const offset = (parseInt(page) - 1) * limit || 0;
 
       const whereClause = { takeoff_status: "new" };
-
       if (search) {
         whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
       }
@@ -1123,12 +1296,7 @@ module.exports = {
           {
             model: db.projectTypeMappingsObj,
             as: "projectTypeMapping",
-            include: [
-              {
-                model: db.projectTypesObj,
-                as: "projectType",
-              },
-            ],
+            include: [{ model: db.projectTypesObj, as: "projectType" }],
           },
           { model: db.gDriveAssociationObj, as: "googleDrive" },
         ],
@@ -1143,42 +1311,81 @@ module.exports = {
         ],
       });
 
-      // Process and transform each project
+      // ✅ Helper to build folder/file structure
+      const buildFolderStructure = (files) => {
+        const folderMap = {};
+        const rootFiles = [];
+
+        files.forEach((item) => {
+          if (item.type === "folder") {
+            folderMap[item.file_name] = { folder: item, files: [] };
+          }
+        });
+
+        files.forEach((item) => {
+          if (item.type === "file" && item.parent) {
+            const parentFolder = files.find((f) => f.id === item.parent);
+            if (parentFolder && parentFolder.type === "folder") {
+              folderMap[parentFolder.file_name].files.push(item);
+            } else {
+              rootFiles.push(item);
+            }
+          } else if (item.type === "file") {
+            rootFiles.push(item);
+          }
+        });
+
+        return { rootFiles, folders: folderMap };
+      };
+
+      // ✅ Transform each project
       const projects = rows.map((projectInstance) => {
         const project = projectInstance.toJSON();
-
         const googleDriveData = project.googleDrive || [];
-        const googleDrive = {
+
+        // Separate into modules
+        const modules = {
           projectFiles: [],
           completedFiles: [],
           planSet: [],
+          budgetFiles: [],
         };
 
-        // Step 1: Separate Google Drive modules
         googleDriveData.forEach((item) => {
           const file = item.dataValues || item;
-          if (file.module === "projectFiles")
-            googleDrive.projectFiles.push(file);
-          else if (file.module === "completedFiles")
-            googleDrive.completedFiles.push(file);
-          else if (file.module === "planSetFiles")
-            googleDrive.planSet.push(file);
+
+          if (file.module === "projectFiles") modules.projectFiles.push(file);
+          else if (
+            file.module === "completedFiles" ||
+            file.module === "CompletedFiles"
+          )
+            modules.completedFiles.push(file);
+          else if (file.module === "planSetFiles") modules.planSet.push(file);
+          else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
         });
 
-        // Step 2: Transform planSet into structured object
+        // ✅ PlanSet transformation (same as before)
+        const planSetFolderMap = {};
+        project.planSets?.forEach((planSet, index) => {
+          planSetFolderMap[planSet.id] = index + 1;
+        });
+
         const planSet = {};
-        googleDrive.planSet.forEach((item) => {
+        modules.planSet.forEach((item) => {
           const moduleId = item.module_id;
-          if (!planSet[moduleId])
-            planSet[moduleId] = { folder: null, files: [] };
+          const folderNumber = planSetFolderMap[moduleId] || moduleId;
+
+          if (!planSet[folderNumber]) {
+            planSet[folderNumber] = { folder: null, files: [] };
+          }
 
           if (!item.file_name) {
-            planSet[moduleId].folder = {
+            planSet[folderNumber].folder = {
               drive_id: item.drive_id,
               createdAt: item.createdAt,
             };
           } else {
-            planSet[moduleId].files.push({
+            planSet[folderNumber].files.push({
               drive_id: item.drive_id,
               file_name: item.file_name,
               createdAt: item.createdAt,
@@ -1186,8 +1393,18 @@ module.exports = {
           }
         });
 
-        googleDrive.planSet = planSet;
-        project.googleDrive = googleDrive;
+        // ✅ Build structured folder/files for other modules
+        const projectFiles = buildFolderStructure(modules.projectFiles);
+        const completedFiles = buildFolderStructure(modules.completedFiles);
+        const budgetFiles = buildFolderStructure(modules.budgetFiles);
+
+        // Final structured response
+        project.googleDrive = {
+          planSet,
+          projectFiles,
+          completedFiles,
+          budgetFiles,
+        };
 
         return project;
       });
@@ -1208,166 +1425,7 @@ module.exports = {
       throw e;
     }
   },
-  // async getAllProjectDataStatusNew(page = 1, per_page, search = "") {
-  //   try {
-  //     const limit = parseInt(per_page) || 10;
-  //     const offset = (parseInt(page) - 1) * limit || 0;
 
-  //     const whereClause = {
-  //       takeoff_status: "new",
-  //     };
-
-  //     if (search) {
-  //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
-  //     }
-
-  //     const { rows, count } = await db.projectObj.findAndCountAll({
-  //       where: whereClause,
-  //       limit,
-  //       offset,
-  //       attributes: [
-  //         "id",
-  //         "user_id",
-  //         "engineer_id",
-  //         "name",
-  //         "city",
-  //         "state",
-  //         "plan_date",
-  //         "bldg_gsqft",
-  //         "address",
-  //         "zip",
-  //         "units",
-  //         "projectType",
-  //         "project_phase",
-  //         "date_received",
-  //         "rev_status",
-  //         "project_file",
-  //         "plan_reviewed_date",
-  //         "plan_reviewed_by",
-  //         "plan_revision_notes",
-  //         "data_collocated_date",
-  //         "bldgs",
-  //         "wind_zone",
-  //         "seismic_zone",
-  //         "developer_id",
-  //         "general_contractor_id",
-  //         "assign_to_budget",
-  //         "take_off_team_id",
-  //         "take_off_type",
-  //         "take_off_scope",
-  //         "assign_date",
-  //         "plan_link",
-  //         "submissionType",
-  //         "planFiles",
-  //         "project_tags",
-  //         "projectFiles",
-  //         "architecture",
-  //         "takeoffactualtime",
-  //         "dueDate",
-  //         "projectAttachmentUrls",
-  //         "attachmentsLink",
-  //         "projectRifFields",
-  //         "status",
-  //         "takeofCompleteDate",
-  //         "connectplan",
-  //         "surveyorNotes",
-  //         "completedFiles",
-  //         "takeOfEstimateTime",
-  //         "takeoff_status",
-  //         "project_status",
-  //         "priority",
-  //         "takeoffStartDate",
-  //         "takeoffDueDate",
-  //         "work_hours",
-  //       ],
-  //       include: [
-  //         { model: db.companyObj, as: "engineer" },
-  //         { model: db.companyObj, as: "architect" },
-  //         { model: db.companyObj, as: "developer" },
-  //         { model: db.companyObj, as: "general_contractor" },
-  //         { model: db.userObj, as: "planReviewer" },
-  //         { model: db.projectplanSetsObj, as: "planSets" },
-  //         {
-  //           model: db.stateObj,
-  //           as: "states",
-  //         },
-  //         {
-  //           model: db.projectPhasesObj,
-  //           as: "projectPhase",
-  //         },
-  //         {
-  //           model: db.projectTagsObj,
-  //           as: "projectTag",
-  //         },
-  //         {
-  //           model: db.projectTagMappingsObj,
-  //           as: "projectTagsMapping",
-  //           include: [
-  //             {
-  //               model: db.projectTagsObj,
-  //               as: "tags",
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           model: db.gDriveAssociationObj,
-  //           as: "googleDrive",
-  //         },
-  //       ],
-  //       order: [
-  //         [
-  //           db.Sequelize.literal(
-  //             `CASE WHEN priority = 'true' THEN 0 ELSE 1 END`
-  //           ),
-  //           "ASC",
-  //         ],
-  //         ["id", "DESC"],
-  //       ],
-  //     });
-
-  //     const projects = rows.map((projectInstance) => {
-  //       const project = projectInstance.toJSON();
-
-  //       const googleDriveData = project.googleDrive || [];
-
-  //       const googleDrive = {
-  //         projectFiles: [],
-  //         completedFiles: [],
-  //         planSet: [],
-  //       };
-
-  //       googleDriveData.forEach((item) => {
-  //         const file = item.dataValues || item;
-
-  //         if (file.module === "projectFiles")
-  //           googleDrive.projectFiles.push(file);
-  //         else if (file.module === "completedFiles")
-  //           googleDrive.completedFiles.push(file);
-  //         else if (file.module === "planSetFiles")
-  //           googleDrive.planSet.push(file);
-  //       });
-
-  //       project.googleDrive = googleDrive;
-
-  //       return project;
-  //     });
-
-  //     return {
-  //       data: projects,
-  //       meta: {
-  //         current_page: parseInt(page),
-  //         from: offset + 1,
-  //         to: offset + rows.length,
-  //         last_page: Math.ceil(count / limit),
-  //         per_page: limit,
-  //         total: count,
-  //       },
-  //     };
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
   async updateProjectType(projectId, projectType, name = null, units = null) {
     try {
       const project = await db.projectObj.findOne({ where: { id: projectId } });
@@ -2294,220 +2352,482 @@ module.exports = {
   //       throw e;
   //     }
   //   },
-  async getAllProjectDatatakeoffAssignToTeam(
-    page = 1,
-    per_page,
-    search = "",
-    userId
-  ) {
-    try {
-      const limit = parseInt(per_page) || 10;
-      const offset = (parseInt(page) - 1) * limit || 0;
+  // async getAllProjectDatatakeoffAssignToTeam(
+  //   page = 1,
+  //   per_page,
+  //   search = "",
+  //   userId
+  // ) {
+  //   try {
+  //     const limit = parseInt(per_page) || 10;
+  //     const offset = (parseInt(page) - 1) * limit || 0;
 
-      // Get user role
-      const user = await db.userObj.findOne({
-        where: { id: userId },
-        attributes: ["role"],
-      });
-      if (!user) throw new Error("User not found");
+  //     // Get user role
+  //     const user = await db.userObj.findOne({
+  //       where: { id: userId },
+  //       attributes: ["role"],
+  //     });
+  //     if (!user) throw new Error("User not found");
 
-      const isAdmin = parseInt(user.role) === 1;
+  //     const isAdmin = parseInt(user.role) === 1;
 
-      // Base where clause
-      const whereClause = { takeoff_status: "takeoff_assigned" };
-      if (search) {
-        whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+  //     // Base where clause
+  //     const whereClause = { takeoff_status: "takeoff_assigned" };
+  //     if (search) {
+  //       whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+  //     }
+
+  //     // If non-admin, filter by user's team IDs
+  //     if (!isAdmin) {
+  //       const userTeams = await db.leadTeamsObj.findAll();
+  //       const allowedTeamIds = userTeams
+  //         .filter((team) => {
+  //           try {
+  //             const contactIds = JSON.parse(team.dataValues.contact_id || "[]");
+  //             return contactIds.includes(String(userId));
+  //           } catch {
+  //             return false;
+  //           }
+  //         })
+  //         .map((team) => team.id);
+
+  //       if (allowedTeamIds.length === 0) {
+  //         return {
+  //           data: [],
+  //           meta: {
+  //             current_page: parseInt(page),
+  //             from: 0,
+  //             to: 0,
+  //             last_page: 0,
+  //             per_page: limit,
+  //             total: 0,
+  //           },
+  //         };
+  //       }
+
+  //       whereClause.take_off_team_id = { [db.Sequelize.Op.in]: allowedTeamIds };
+  //     }
+
+  //     // Fetch projects with proper filtering in DB
+  //     const { rows, count } = await db.projectObj.findAndCountAll({
+  //       where: whereClause,
+  //       limit,
+  //       offset,
+  //       distinct: true,
+  //       attributes: [
+  //         "id",
+  //         "user_id",
+  //         "engineer_id",
+  //         "name",
+  //         "city",
+  //         "state",
+  //         "plan_date",
+  //         "bldg_gsqft",
+  //         "address",
+  //         "zip",
+  //         "units",
+  //         "projectType",
+  //         "project_phase",
+  //         "date_received",
+  //         "rev_status",
+  //         "plan_reviewed_date",
+  //         "plan_reviewed_by",
+  //         "plan_revision_notes",
+  //         "data_collocated_date",
+  //         "bldgs",
+  //         "wind_zone",
+  //         "seismic_zone",
+  //         "developer_id",
+  //         "general_contractor_id",
+  //         "assign_to_budget",
+  //         "take_off_team_id",
+  //         "take_off_type",
+  //         "take_off_scope",
+  //         "assign_date",
+  //         "plan_link",
+  //         "submissionType",
+  //         "planFiles",
+  //         "project_tags",
+  //         "projectFiles",
+  //         "architecture",
+  //         "takeoffactualtime",
+  //         "dueDate",
+  //         "project_file",
+  //         "projectAttachmentUrls",
+  //         "attachmentsLink",
+  //         "projectRifFields",
+  //         "status",
+  //         "takeofCompleteDate",
+  //         "connectplan",
+  //         "surveyorNotes",
+  //         "completedFiles",
+  //         "takeOfEstimateTime",
+  //         "takeoff_status",
+  //         "project_status",
+  //         "priority",
+  //         "takeoffStartDate",
+  //         "takeoffDueDate",
+  //         "work_hours",
+  //       ],
+  //       include: [
+  //         { model: db.companyObj, as: "engineer" },
+  //         { model: db.companyObj, as: "architect" },
+  //         { model: db.companyObj, as: "developer" },
+  //         { model: db.companyObj, as: "general_contractor" },
+  //         { model: db.userObj, as: "planReviewer" },
+  //         { model: db.projectplanSetsObj, as: "planSets" },
+  //         { model: db.leadTeamsObj, as: "takeoff_team" },
+  //         { model: db.stateObj, as: "states" },
+  //         { model: db.projectPhasesObj, as: "projectPhase" },
+  //         { model: db.projectTagsObj, as: "projectTag" },
+  //         {
+  //           model: db.projectTagMappingsObj,
+  //           as: "projectTagsMapping",
+  //           include: [{ model: db.projectTagsObj, as: "tags" }],
+  //         },
+  //         {
+  //           model: db.projectTypeMappingsObj,
+  //           as: "projectTypeMapping",
+  //           include: [{ model: db.projectTypesObj, as: "projectType" }],
+  //         },
+  //         { model: db.gDriveAssociationObj, as: "googleDrive" },
+  //       ],
+  //       order: [
+  //         [
+  //           db.Sequelize.literal(
+  //             `CASE WHEN priority = 'true' THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ],
+  //     });
+
+  //     // Format Google Drive data
+  //     const formattedProjects = rows.map((projectInstance) => {
+  //       const project = projectInstance.toJSON();
+  //       const googleDriveData = project.googleDrive || [];
+
+  //       const googleDrive = {
+  //         projectFiles: [],
+  //         completedFiles: [],
+  //         planSet: [],
+  //       };
+
+  //       googleDriveData.forEach((item) => {
+  //         const file = item.dataValues || item;
+  //         if (file.module === "projectFiles")
+  //           googleDrive.projectFiles.push(file);
+  //         else if (file.module === "completedFiles")
+  //           googleDrive.completedFiles.push(file);
+  //         else if (file.module === "planSetFiles")
+  //           googleDrive.planSet.push(file);
+  //       });
+
+  //       const planSet = {};
+  //       googleDrive.planSet.forEach((item) => {
+  //         const moduleId = item.module_id;
+  //         if (!planSet[moduleId])
+  //           planSet[moduleId] = { folder: null, files: [] };
+
+  //         if (!item.file_name) {
+  //           planSet[moduleId].folder = {
+  //             drive_id: item.drive_id,
+  //             createdAt: item.createdAt,
+  //           };
+  //         } else {
+  //           planSet[moduleId].files.push({
+  //             drive_id: item.drive_id,
+  //             file_name: item.file_name,
+  //             createdAt: item.createdAt,
+  //           });
+  //         }
+  //       });
+
+  //       googleDrive.planSet = planSet;
+  //       project.googleDrive = googleDrive;
+
+  //       return project;
+  //     });
+
+  //     return {
+  //       data: formattedProjects,
+  //       meta: {
+  //         current_page: parseInt(page),
+  //         from: offset + 1,
+  //         to: offset + formattedProjects.length,
+  //         last_page: Math.ceil(count / limit),
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+async getAllProjectDatatakeoffAssignToTeam(
+  page = 1,
+  per_page,
+  search = "",
+  userId
+) {
+  try {
+    const limit = parseInt(per_page) || 10;
+    const offset = (parseInt(page) - 1) * limit || 0;
+
+    // Step 1: Get user role
+    const user = await db.userObj.findOne({
+      where: { id: userId },
+      attributes: ["role"],
+    });
+    if (!user) throw new Error("User not found");
+
+    const isAdmin = parseInt(user.role) === 1;
+
+    // Step 2: Base where clause
+    const whereClause = { takeoff_status: "takeoff_assigned" };
+    if (search) {
+      whereClause.name = { [db.Sequelize.Op.like]: `%${search}%` };
+    }
+
+    // Step 3: Restrict non-admin users by their teams
+    if (!isAdmin) {
+      const userTeams = await db.leadTeamsObj.findAll();
+      const allowedTeamIds = userTeams
+        .filter((team) => {
+          try {
+            const contactIds = JSON.parse(team.dataValues.contact_id || "[]");
+            return contactIds.includes(String(userId));
+          } catch {
+            return false;
+          }
+        })
+        .map((team) => team.id);
+
+      if (allowedTeamIds.length === 0) {
+        return {
+          data: [],
+          meta: {
+            current_page: parseInt(page),
+            from: 0,
+            to: 0,
+            last_page: 0,
+            per_page: limit,
+            total: 0,
+          },
+        };
       }
 
-      // If non-admin, filter by user's team IDs
-      if (!isAdmin) {
-        const userTeams = await db.leadTeamsObj.findAll();
-        const allowedTeamIds = userTeams
-          .filter((team) => {
-            try {
-              const contactIds = JSON.parse(team.dataValues.contact_id || "[]");
-              return contactIds.includes(String(userId));
-            } catch {
-              return false;
-            }
-          })
-          .map((team) => team.id);
+      whereClause.take_off_team_id = { [db.Sequelize.Op.in]: allowedTeamIds };
+    }
 
-        if (allowedTeamIds.length === 0) {
-          return {
-            data: [],
-            meta: {
-              current_page: parseInt(page),
-              from: 0,
-              to: 0,
-              last_page: 0,
-              per_page: limit,
-              total: 0,
-            },
-          };
+    // Step 4: Fetch all projects
+    const { rows, count } = await db.projectObj.findAndCountAll({
+      where: whereClause,
+      limit,
+      offset,
+      distinct: true,
+      attributes: [
+        "id",
+        "user_id",
+        "engineer_id",
+        "name",
+        "city",
+        "state",
+        "plan_date",
+        "bldg_gsqft",
+        "address",
+        "zip",
+        "units",
+        "projectType",
+        "project_phase",
+        "date_received",
+        "rev_status",
+        "plan_reviewed_date",
+        "plan_reviewed_by",
+        "plan_revision_notes",
+        "data_collocated_date",
+        "bldgs",
+        "wind_zone",
+        "seismic_zone",
+        "developer_id",
+        "general_contractor_id",
+        "assign_to_budget",
+        "take_off_team_id",
+        "take_off_type",
+        "take_off_scope",
+        "assign_date",
+        "plan_link",
+        "submissionType",
+        "planFiles",
+        "project_tags",
+        "projectFiles",
+        "architecture",
+        "takeoffactualtime",
+        "dueDate",
+        "project_file",
+        "projectAttachmentUrls",
+        "attachmentsLink",
+        "projectRifFields",
+        "status",
+        "takeofCompleteDate",
+        "connectplan",
+        "surveyorNotes",
+        "completedFiles",
+        "takeOfEstimateTime",
+        "takeoff_status",
+        "project_status",
+        "priority",
+        "takeoffStartDate",
+        "takeoffDueDate",
+        "work_hours",
+      ],
+      include: [
+        { model: db.companyObj, as: "engineer" },
+        { model: db.companyObj, as: "architect" },
+        { model: db.companyObj, as: "developer" },
+        { model: db.companyObj, as: "general_contractor" },
+        { model: db.userObj, as: "planReviewer" },
+        { model: db.projectplanSetsObj, as: "planSets" },
+        { model: db.leadTeamsObj, as: "takeoff_team" },
+        { model: db.stateObj, as: "states" },
+        { model: db.projectPhasesObj, as: "projectPhase" },
+        { model: db.projectTagsObj, as: "projectTag" },
+        {
+          model: db.projectTagMappingsObj,
+          as: "projectTagsMapping",
+          include: [{ model: db.projectTagsObj, as: "tags" }],
+        },
+        {
+          model: db.projectTypeMappingsObj,
+          as: "projectTypeMapping",
+          include: [{ model: db.projectTypesObj, as: "projectType" }],
+        },
+        { model: db.gDriveAssociationObj, as: "googleDrive" },
+      ],
+      order: [
+        [
+          db.Sequelize.literal(`CASE WHEN priority = 'true' THEN 0 ELSE 1 END`),
+          "ASC",
+        ],
+        ["id", "DESC"],
+      ],
+    });
+
+    // Step 5: Helper to build folder structure
+    const buildFolderStructure = (files) => {
+      const folderMap = {};
+      const rootFiles = [];
+
+      files.forEach((item) => {
+        if (item.type === "folder") {
+          folderMap[item.file_name] = { folder: item, files: [] };
+        }
+      });
+
+      files.forEach((item) => {
+        if (item.type === "file" && item.parent) {
+          const parentFolder = files.find((f) => f.id === item.parent);
+          if (parentFolder && parentFolder.type === "folder") {
+            folderMap[parentFolder.file_name].files.push(item);
+          } else {
+            rootFiles.push(item);
+          }
+        } else if (item.type === "file") {
+          rootFiles.push(item);
+        }
+      });
+
+      return { rootFiles, folders: folderMap };
+    };
+
+    // Step 6: Process each project
+    const formattedProjects = rows.map((projectInstance) => {
+      const project = projectInstance.toJSON();
+      const googleDriveData = project.googleDrive || [];
+
+      // --- Separate modules ---
+      const modules = {
+        projectFiles: [],
+        completedFiles: [],
+        planSet: [],
+        budgetFiles: [],
+      };
+
+      googleDriveData.forEach((item) => {
+        const file = item.dataValues || item;
+        if (file.module === "projectFiles") modules.projectFiles.push(file);
+        else if (
+          file.module === "completedFiles" ||
+          file.module === "CompletedFiles"
+        )
+          modules.completedFiles.push(file);
+        else if (file.module === "planSetFiles") modules.planSet.push(file);
+        else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
+      });
+
+      // --- PlanSet transformation ---
+      const planSetFolderMap = {};
+      project.planSets?.forEach((planSet, index) => {
+        planSetFolderMap[planSet.id] = index + 1;
+      });
+
+      const planSet = {};
+      modules.planSet.forEach((item) => {
+        const moduleId = item.module_id;
+        const folderNumber = planSetFolderMap[moduleId] || moduleId;
+
+        if (!planSet[folderNumber]) {
+          planSet[folderNumber] = { folder: null, files: [] };
         }
 
-        whereClause.take_off_team_id = { [db.Sequelize.Op.in]: allowedTeamIds };
-      }
-
-      // Fetch projects with proper filtering in DB
-      const { rows, count } = await db.projectObj.findAndCountAll({
-        where: whereClause,
-        limit,
-        offset,
-        distinct: true,
-        attributes: [
-          "id",
-          "user_id",
-          "engineer_id",
-          "name",
-          "city",
-          "state",
-          "plan_date",
-          "bldg_gsqft",
-          "address",
-          "zip",
-          "units",
-          "projectType",
-          "project_phase",
-          "date_received",
-          "rev_status",
-          "plan_reviewed_date",
-          "plan_reviewed_by",
-          "plan_revision_notes",
-          "data_collocated_date",
-          "bldgs",
-          "wind_zone",
-          "seismic_zone",
-          "developer_id",
-          "general_contractor_id",
-          "assign_to_budget",
-          "take_off_team_id",
-          "take_off_type",
-          "take_off_scope",
-          "assign_date",
-          "plan_link",
-          "submissionType",
-          "planFiles",
-          "project_tags",
-          "projectFiles",
-          "architecture",
-          "takeoffactualtime",
-          "dueDate",
-          "project_file",
-          "projectAttachmentUrls",
-          "attachmentsLink",
-          "projectRifFields",
-          "status",
-          "takeofCompleteDate",
-          "connectplan",
-          "surveyorNotes",
-          "completedFiles",
-          "takeOfEstimateTime",
-          "takeoff_status",
-          "project_status",
-          "priority",
-          "takeoffStartDate",
-          "takeoffDueDate",
-          "work_hours",
-        ],
-        include: [
-          { model: db.companyObj, as: "engineer" },
-          { model: db.companyObj, as: "architect" },
-          { model: db.companyObj, as: "developer" },
-          { model: db.companyObj, as: "general_contractor" },
-          { model: db.userObj, as: "planReviewer" },
-          { model: db.projectplanSetsObj, as: "planSets" },
-          { model: db.leadTeamsObj, as: "takeoff_team" },
-          { model: db.stateObj, as: "states" },
-          { model: db.projectPhasesObj, as: "projectPhase" },
-          { model: db.projectTagsObj, as: "projectTag" },
-          {
-            model: db.projectTagMappingsObj,
-            as: "projectTagsMapping",
-            include: [{ model: db.projectTagsObj, as: "tags" }],
-          },
-          {
-            model: db.projectTypeMappingsObj,
-            as: "projectTypeMapping",
-            include: [{ model: db.projectTypesObj, as: "projectType" }],
-          },
-          { model: db.gDriveAssociationObj, as: "googleDrive" },
-        ],
-        order: [
-          [
-            db.Sequelize.literal(
-              `CASE WHEN priority = 'true' THEN 0 ELSE 1 END`
-            ),
-            "ASC",
-          ],
-          ["id", "DESC"],
-        ],
+        if (!item.file_name) {
+          planSet[folderNumber].folder = {
+            drive_id: item.drive_id,
+            createdAt: item.createdAt,
+          };
+        } else {
+          planSet[folderNumber].files.push({
+            drive_id: item.drive_id,
+            file_name: item.file_name,
+            createdAt: item.createdAt,
+          });
+        }
       });
 
-      // Format Google Drive data
-      const formattedProjects = rows.map((projectInstance) => {
-        const project = projectInstance.toJSON();
-        const googleDriveData = project.googleDrive || [];
+      // --- Folder-based structure for other modules ---
+      const projectFiles = buildFolderStructure(modules.projectFiles);
+      const completedFiles = buildFolderStructure(modules.completedFiles);
+      const budgetFiles = buildFolderStructure(modules.budgetFiles);
 
-        const googleDrive = {
-          projectFiles: [],
-          completedFiles: [],
-          planSet: [],
-        };
-
-        googleDriveData.forEach((item) => {
-          const file = item.dataValues || item;
-          if (file.module === "projectFiles")
-            googleDrive.projectFiles.push(file);
-          else if (file.module === "completedFiles")
-            googleDrive.completedFiles.push(file);
-          else if (file.module === "planSetFiles")
-            googleDrive.planSet.push(file);
-        });
-
-        const planSet = {};
-        googleDrive.planSet.forEach((item) => {
-          const moduleId = item.module_id;
-          if (!planSet[moduleId])
-            planSet[moduleId] = { folder: null, files: [] };
-
-          if (!item.file_name) {
-            planSet[moduleId].folder = {
-              drive_id: item.drive_id,
-              createdAt: item.createdAt,
-            };
-          } else {
-            planSet[moduleId].files.push({
-              drive_id: item.drive_id,
-              file_name: item.file_name,
-              createdAt: item.createdAt,
-            });
-          }
-        });
-
-        googleDrive.planSet = planSet;
-        project.googleDrive = googleDrive;
-
-        return project;
-      });
-
-      return {
-        data: formattedProjects,
-        meta: {
-          current_page: parseInt(page),
-          from: offset + 1,
-          to: offset + formattedProjects.length,
-          last_page: Math.ceil(count / limit),
-          per_page: limit,
-          total: count,
-        },
+      project.googleDrive = {
+        planSet,
+        projectFiles,
+        completedFiles,
+        budgetFiles,
       };
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
-    }
-  },
+
+      return project;
+    });
+
+    // Step 7: Final Response
+    return {
+      data: formattedProjects,
+      meta: {
+        current_page: parseInt(page),
+        from: offset + 1,
+        to: offset + formattedProjects.length,
+        last_page: Math.ceil(count / limit),
+        per_page: limit,
+        total: count,
+      },
+    };
+  } catch (e) {
+    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    throw e;
+  }
+},
 
   async updateProjecttakeOffStatus(ids, takeoff_status, priority = false) {
     const updateData = {};

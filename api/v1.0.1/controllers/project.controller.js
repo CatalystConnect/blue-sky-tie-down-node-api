@@ -83,6 +83,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Project created successfully.",
+        projectId:project.id
 
       });
 

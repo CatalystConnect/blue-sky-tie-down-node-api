@@ -28,6 +28,16 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      parent: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+       type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'file',
+      },
     },
     {
       timestamps: true,

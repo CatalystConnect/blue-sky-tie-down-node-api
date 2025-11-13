@@ -141,13 +141,11 @@ module.exports = {
 
       const { id } = req.query;
       if (!id) {
-        return res
-          .status(200)
-          .send(
-            commonHelper.parseErrorRespose({
-              id: "Budget scopes id is required",
-            })
-          );
+        return res.status(200).send(
+          commonHelper.parseErrorRespose({
+            id: "Budget scopes id is required",
+          })
+        );
       }
 
       const result = await budgetScopeServices.getById(id);
@@ -184,13 +182,11 @@ module.exports = {
 
       const { id } = req.query;
       if (!id) {
-        return res
-          .status(200)
-          .send(
-            commonHelper.parseErrorRespose({
-              id: "Budget scopes id is required",
-            })
-          );
+        return res.status(200).send(
+          commonHelper.parseErrorRespose({
+            id: "Budget scopes id is required",
+          })
+        );
       }
 
       let scopeId = id;
@@ -392,6 +388,178 @@ module.exports = {
   //   }
   // },
 
+  // async updateBudgetScope(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     const { id } = req.query;
+  //     if (!id) {
+  //       return res
+  //         .status(200)
+  //         .send(
+  //           commonHelper.parseErrorRespose({
+  //             id: "Budget scope id is required",
+  //           })
+  //         );
+  //     }
+
+  //     const data = req.body;
+  //     const scopeId = id;
+
+  //     // --------------------------
+  //     // 1️⃣ Update Scope Header
+  //     // --------------------------
+  //     const postData = {
+  //       title: data.title,
+  //       short_title: data.short_title,
+  //       status: data.status,
+  //       category_id: data.category_id,
+  //     };
+  //     await budgetScopeServices.update(scopeId, postData);
+
+  //     // --------------------------
+  //     // 2️⃣ Update or Insert Category / Group / Segment
+  //     // --------------------------
+  //     const scopeCategories = data.categories || [];
+
+  //     for (let i = 0; i < scopeCategories.length; i++) {
+  //       const category = scopeCategories[i];
+  //       let categoryId;
+
+  //       // Category: update or create
+  //       if (category?.id) {
+  //         categoryId = category.id;
+  //         await scopeCategoryServices.update(categoryId, {
+  //           title: category.title,
+  //           order_index: i,
+  //         });
+  //       } else {
+  //         const newCat = await scopeCategoryServices.add({
+  //           user_id: req.userId,
+  //           scope_id: scopeId,
+  //           title: category.title,
+  //           order_index: i,
+  //         });
+  //         categoryId = newCat.id;
+  //       }
+
+  //       // Groups inside category
+  //       const categoryGroups = category.groups || [];
+  //       for (let j = 0; j < categoryGroups.length; j++) {
+  //         const group = categoryGroups[j];
+  //         let groupId;
+
+  //         // Group: update or create
+  //         if (group?.id) {
+  //           groupId = group.id;
+
+  //           // ⚠️ Handle drag & drop (if group moved between categories)
+  //           await scopeGroupServices.update(groupId, {
+  //             title: group.title,
+  //             scope_category_id: categoryId, // ensure group belongs to correct category
+  //           });
+  //         } else {
+  //           const newGroup = await scopeGroupServices.add({
+  //             user_id: req.userId,
+  //             scope_category_id: categoryId,
+  //             title: group.title,
+  //           });
+  //           groupId = newGroup.id;
+  //         }
+
+  //         // Segments inside group
+  //         const groupSegments = group.segments || [];
+  //         for (let k = 0; k < groupSegments.length; k++) {
+  //           const segment = groupSegments[k];
+  //           let segmentId;
+
+  //           // Segment: update or create
+  //           if (segment?.id) {
+  //             segmentId = segment.id;
+  //             // ⚠️ Handle drag & drop (if segment moved between groups)
+  //             await scopeSegmentServices.update(segmentId, {
+  //               title: segment.title,
+  //               url: segment.url,
+  //               options: JSON.stringify(segment.option || []),
+  //               scope_group_id: groupId,
+  //             });
+  //           } else {
+  //             const newSeg = await scopeSegmentServices.add({
+  //               user_id: req.userId,
+  //               scope_group_id: groupId,
+  //               title: segment.title,
+  //               url: segment.url,
+  //               options: JSON.stringify(segment.option || []),
+  //             });
+  //             segmentId = newSeg.id;
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     // --------------------------
+  //     // 3️⃣ Handle Deletions
+  //     // --------------------------
+  //     const deleteCategory = data.delete?.category || [];
+  //     const deleteGroup = data.delete?.group || [];
+  //     const deleteSegment = data.delete?.segment || [];
+
+  //     // Delete categories (and cascade)
+  //     for (const categoryId of deleteCategory) {
+  //       const groups = await scopeGroupServices.findByCategoryId(categoryId);
+  //       for (const group of groups) {
+  //         const segments = await scopeSegmentServices.findByGroupId(group.id);
+  //         for (const seg of segments) {
+  //           await scopeSegmentServices.delete(seg.id);
+  //         }
+  //         await scopeGroupServices.delete(group.id);
+  //       }
+  //       await scopeCategoryServices.delete(categoryId);
+  //     }
+
+  //     // Delete groups (and cascade segments)
+  //     for (const groupId of deleteGroup) {
+  //       const segments = await scopeSegmentServices.findByGroupId(groupId);
+  //       for (const seg of segments) {
+  //         await scopeSegmentServices.delete(seg.id);
+  //       }
+  //       await scopeGroupServices.delete(groupId);
+  //     }
+
+  //     // Delete segments directly
+  //     for (const segmentId of deleteSegment) {
+  //       await scopeSegmentServices.delete(segmentId);
+  //     }
+
+  //     // --------------------------
+  //     // 4️⃣ Success Response
+  //     // --------------------------
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose(
+  //           "",
+  //           "Budget scope updated successfully"
+  //         )
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Update budget scope failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+  
+  
   async updateBudgetScope(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -405,39 +573,29 @@ module.exports = {
       if (!id) {
         return res
           .status(200)
-          .send(
-            commonHelper.parseErrorRespose({
-              id: "Budget scope id is required",
-            })
-          );
+          .send(commonHelper.parseErrorRespose({ id: "Scope ID is required" }));
       }
 
       const data = req.body;
       const scopeId = id;
 
-      // --------------------------
-      // 1️⃣ Update Scope Header
-      // --------------------------
-      const postData = {
+      // ✅ 1. Update main scope
+      await budgetScopeServices.update(scopeId, {
         title: data.title,
         short_title: data.short_title,
         status: data.status,
         category_id: data.category_id,
-      };
-      await budgetScopeServices.update(scopeId, postData);
+      });
 
-      // --------------------------
-      // 2️⃣ Update or Insert Category / Group / Segment
-      // --------------------------
-      const scopeCategories = data.categories || [];
+      const categories = data.categories || [];
 
-      for (let i = 0; i < scopeCategories.length; i++) {
-        const category = scopeCategories[i];
-        let categoryId;
+      // ✅ 2. Iterate over categories
+      for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        let categoryId = category.id;
 
-        // Category: update or create
-        if (category?.id) {
-          categoryId = category.id;
+        // Update or create category
+        if (categoryId) {
           await scopeCategoryServices.update(categoryId, {
             title: category.title,
             order_index: i,
@@ -452,20 +610,33 @@ module.exports = {
           categoryId = newCat.id;
         }
 
-        // Groups inside category
-        const categoryGroups = category.groups || [];
-        for (let j = 0; j < categoryGroups.length; j++) {
-          const group = categoryGroups[j];
-          let groupId;
+        // ✅ If moved_category_id exists (category was dragged), update position/order
+        if (
+          category.moved_category_id &&
+          category.target_category_id === null
+        ) {
+          await scopeCategoryServices.update(category.moved_category_id, {
+            order_index: i,
+          });
+        }
 
-          // Group: update or create
-          if (group?.id) {
-            groupId = group.id;
+        const groups = category.groups || [];
+        for (const group of groups) {
+          let groupId = group.id;
 
-            // ⚠️ Handle drag & drop (if group moved between categories)
+          // 🧭 Handle moved groups
+          if (group.moved_group_id && group.target_category_id) {
+            await scopeGroupServices.update(group.moved_group_id, {
+              scope_category_id: group.target_category_id,
+            });
+            continue;
+          }
+
+          // Update or create group
+          if (groupId) {
             await scopeGroupServices.update(groupId, {
               title: group.title,
-              scope_category_id: categoryId, // ensure group belongs to correct category
+              scope_category_id: categoryId,
             });
           } else {
             const newGroup = await scopeGroupServices.add({
@@ -476,16 +647,20 @@ module.exports = {
             groupId = newGroup.id;
           }
 
-          // Segments inside group
-          const groupSegments = group.segments || [];
-          for (let k = 0; k < groupSegments.length; k++) {
-            const segment = groupSegments[k];
-            let segmentId;
+          const segments = group.segments || [];
+          for (const segment of segments) {
+            let segmentId = segment.id;
 
-            // Segment: update or create
-            if (segment?.id) {
-              segmentId = segment.id;
-              // ⚠️ Handle drag & drop (if segment moved between groups)
+            // 🧭 Handle moved segments
+            if (segment.moved_segment_id && segment.target_group_id) {
+              await scopeSegmentServices.update(segment.moved_segment_id, {
+                scope_group_id: segment.target_group_id,
+              });
+              continue;
+            }
+
+            // Update or create segment
+            if (segmentId) {
               await scopeSegmentServices.update(segmentId, {
                 title: segment.title,
                 url: segment.url,
@@ -493,27 +668,24 @@ module.exports = {
                 scope_group_id: groupId,
               });
             } else {
-              const newSeg = await scopeSegmentServices.add({
+              await scopeSegmentServices.add({
                 user_id: req.userId,
                 scope_group_id: groupId,
                 title: segment.title,
                 url: segment.url,
                 options: JSON.stringify(segment.option || []),
               });
-              segmentId = newSeg.id;
             }
           }
         }
       }
 
-      // --------------------------
-      // 3️⃣ Handle Deletions
-      // --------------------------
+      // ✅ 3. Handle Deletions
       const deleteCategory = data.delete?.category || [];
       const deleteGroup = data.delete?.group || [];
       const deleteSegment = data.delete?.segment || [];
 
-      // Delete categories (and cascade)
+      // Delete categories and their children
       for (const categoryId of deleteCategory) {
         const groups = await scopeGroupServices.findByCategoryId(categoryId);
         for (const group of groups) {
@@ -526,7 +698,7 @@ module.exports = {
         await scopeCategoryServices.delete(categoryId);
       }
 
-      // Delete groups (and cascade segments)
+      // Delete groups and their segments
       for (const groupId of deleteGroup) {
         const segments = await scopeSegmentServices.findByGroupId(groupId);
         for (const seg of segments) {
@@ -535,30 +707,25 @@ module.exports = {
         await scopeGroupServices.delete(groupId);
       }
 
-      // Delete segments directly
-      for (const segmentId of deleteSegment) {
-        await scopeSegmentServices.delete(segmentId);
+      // Delete individual segments
+      for (const segId of deleteSegment) {
+        await scopeSegmentServices.delete(segId);
       }
 
-      // --------------------------
-      // 4️⃣ Success Response
-      // --------------------------
       return res
         .status(200)
         .send(
           commonHelper.parseSuccessRespose(
             "",
-            "Budget scope updated successfully"
+            "Budget scope updated successfully with moves and deletions"
           )
         );
     } catch (error) {
+      console.log("updateBudgetScope error:", error);
       return res.status(400).json({
         status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Update budget scope failed",
-        data: error.response?.data || {},
+        message: error.message || "Failed to update budget scope",
+        data: {},
       });
     }
   },

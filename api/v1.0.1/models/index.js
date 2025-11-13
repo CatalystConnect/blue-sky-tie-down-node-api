@@ -1230,9 +1230,9 @@ db.userObj.hasMany(db.leadNotesObj, {
   as: "leadNotes",
 });
 
-db.projectObj.belongsTo(db.userObj, {
+db.projectObj.belongsTo(db.companyObj, {
   foreignKey: "engineer_id",
-  as: "engineerUser",
+  as: "engineerCompany",
 });
 
 module.exports = db;

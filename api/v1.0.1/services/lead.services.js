@@ -746,7 +746,7 @@ module.exports = {
           {
             model: db.projectObj,
             as: "project",
-            include: { model: db.userObj, as: "engineerUser" },
+            include: { model: db.companyObj, as: "engineerCompany" },
             required: true,
             where: projectWhere,
           },

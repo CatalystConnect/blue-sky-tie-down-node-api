@@ -746,6 +746,7 @@ module.exports = {
           {
             model: db.projectObj,
             as: "project",
+            include: { model: db.userObj, as: "engineerUser" },
             required: true,
             where: projectWhere,
           },
@@ -780,6 +781,7 @@ module.exports = {
             as: "project",
             required: true,
             where: projectWhere,
+
           },
         ],
       });

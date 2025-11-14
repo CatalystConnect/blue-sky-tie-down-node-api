@@ -60,6 +60,42 @@ module.exports = {
   },
 
   /*getBudgetKeyAreasById*/
+  // async getById(id) {
+  //   try {
+  //     const category = await db.budgetScopeObj.findOne({
+  //       where: { id },
+  //       include: [
+  //         {
+  //           model: db.scopeCategoryObj,
+  //           as: "categories",
+  //           order: [["order_index", "ASC"]],
+  //           include: [
+  //             {
+  //               model: db.scopeGroupObj,
+  //               as: "groups",
+  //               include: [
+  //                 {
+  //                   model: db.scopeSegmentObj,
+  //                   as: "segments"
+  //                 }
+  //               ]
+  //             }
+  //           ]
+  //         }
+  //       ]
+  //     });
+
+  //     if (!category) {
+  //       throw new Error("Budget scope not found");
+  //     }
+
+  //     return category;
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
   async getById(id) {
     try {
       const category = await db.budgetScopeObj.findOne({
@@ -76,20 +112,54 @@ module.exports = {
                 include: [
                   {
                     model: db.scopeSegmentObj,
-                    as: "segments"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    as: "segments",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       });
 
       if (!category) {
         throw new Error("Budget scope not found");
       }
 
-      return category;
+      // Convert Sequelize data → clean JSON response
+      const response = {
+        id: category.id,
+        user_id: category.user_id,
+        category_id: category.category_id,
+        title: category.title,
+        short_title: category.short_title,
+        status: category.status,
+        created_at: category.created_at,
+        updated_at: category.updated_at,
+        deleted_at: category.deleted_at,
+
+        categories: category.categories.map((cat) => ({
+          id: cat.id,
+          cate_id: cat.id, // 👈 REQUIRED
+          title: cat.title,
+          order_index: cat.order_index,
+
+          groups: (cat.groups || []).map((group) => ({
+            id: group.id,
+            title: group.title,
+            scope_category_id: group.scope_category_id,
+
+            segments: (group.segments || []).map((seg) => ({
+              id: seg.id,
+              title: seg.title,
+              url: seg.url,
+              option: seg.option || [],
+              scope_group_id: seg.scope_group_id,
+            })),
+          })),
+        })),
+      };
+
+      return response;
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

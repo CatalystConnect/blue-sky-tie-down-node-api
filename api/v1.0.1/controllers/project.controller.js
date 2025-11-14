@@ -83,7 +83,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Project created successfully.",
-        projectId:project.id
+        projectId: project.id
 
       });
 
@@ -3008,6 +3008,35 @@ module.exports = {
           }
         }
 
+        if (moduleType === "projectFiles" || moduleType === "CompletedFiles") {
+
+          const columnName =
+            moduleType === "projectFiles"
+              ? "project_file"
+              : moduleType === "CompletedFiles"
+                ? "completedFiles"
+                : null;
+
+          if (!columnName) {
+            console.log("Invalid moduleType:", moduleType);
+          } else {
+
+            let oldData = [];
+            try {
+              oldData = JSON.parse(project[columnName] || "[]");
+            } catch (e) {
+              oldData = [];
+            }
+
+            const newData = [...oldData, ...uploadedFiles];
+
+            await projectServices.updateProject(
+              { [columnName]: JSON.stringify(newData) },
+              project.id
+            );
+          }
+        }
+
         return res.status(200).json({
           status: true,
           message: uploadedFiles.length
@@ -3045,6 +3074,36 @@ module.exports = {
             parent: 0,
           });
         }
+
+        if (moduleType === "projectFiles" || moduleType === "CompletedFiles") {
+
+          const columnName =
+            moduleType === "projectFiles"
+              ? "project_file"
+              : moduleType === "CompletedFiles"
+                ? "completedFiles"
+                : null;
+
+          if (!columnName) {
+            console.log("Invalid moduleType:", moduleType);
+          } else {
+
+            let oldData = [];
+            try {
+              oldData = JSON.parse(project[columnName] || "[]");
+            } catch (e) {
+              oldData = [];
+            }
+
+            const newData = [...oldData, ...uploadedFiles];
+
+            await projectServices.updateProject(
+              { [columnName]: JSON.stringify(newData) },
+              project.id
+            );
+          }
+        }
+
 
         return res.status(200).json({
           status: true,

@@ -75,12 +75,13 @@ module.exports = {
                 finalOptions = [];
               }
             }
+            
             const segmentPostData = {
               user_id: req.userId,
               scope_group_id: groupId,
               title: segment.title,
               url: segment.url,
-              option: JSON.stringify(finalOptions),
+              options: JSON.stringify(finalOptions),
             };
             const segmentObj = await scopeSegmentServices.add(segmentPostData);
             const segmentId = segmentObj.id;
@@ -511,7 +512,7 @@ module.exports = {
               await scopeSegmentServices.update(segmentId, {
                 title: segment.title,
                 url: segment.url,
-                option: JSON.stringify(finalOptions),
+                options: JSON.stringify(finalOptions),
                 scope_group_id: groupId, // IMPORTANT (DRAG & DROP)
               });
             } else {
@@ -520,7 +521,7 @@ module.exports = {
                 scope_group_id: groupId,
                 title: segment.title,
                 url: segment.url,
-                option: JSON.stringify(finalOptions),
+                options: JSON.stringify(finalOptions),
               });
 
               segmentId = newSeg.id;

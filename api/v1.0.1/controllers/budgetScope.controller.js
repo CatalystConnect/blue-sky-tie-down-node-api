@@ -59,12 +59,28 @@ module.exports = {
 
           for (let k = 0; k < group.segments.length; k++) {
             const segment = group.segments[k];
+            let finalOptions = [];
+
+            if (Array.isArray(segment.option)) {
+              // frontend sends: option: []
+              finalOptions = segment.option;
+            } else if (Array.isArray(segment.options)) {
+              // if frontend sends: options: []
+              finalOptions = segment.options;
+            } else if (typeof segment.options === "string") {
+              // if frontend sends string JSON
+              try {
+                finalOptions = JSON.parse(segment.options);
+              } catch (e) {
+                finalOptions = [];
+              }
+            }
             const segmentPostData = {
               user_id: req.userId,
               scope_group_id: groupId,
               title: segment.title,
               url: segment.url,
-              options: JSON.stringify(segment.option),
+              option: JSON.stringify(finalOptions),
             };
             const segmentObj = await scopeSegmentServices.add(segmentPostData);
             const segmentId = segmentObj.id;
@@ -417,7 +433,7 @@ module.exports = {
         category_id: data.category_id,
       });
 
-      const scopeCategories = data.categories;      
+      const scopeCategories = data.categories;
 
       /**
        * ----------------------------------------------------------------
@@ -473,13 +489,29 @@ module.exports = {
           for (let k = 0; k < group.segments.length; k++) {
             const segment = group.segments[k];
             let segmentId;
+            let finalOptions = [];
+
+            if (Array.isArray(segment.option)) {
+              // frontend sends: option: []
+              finalOptions = segment.option;
+            } else if (Array.isArray(segment.options)) {
+              // if frontend sends: options: []
+              finalOptions = segment.options;
+            } else if (typeof segment.options === "string") {
+              // if frontend sends string JSON
+              try {
+                finalOptions = JSON.parse(segment.options);
+              } catch (e) {
+                finalOptions = [];
+              }
+            }
 
             if (segment.id) {
               segmentId = segment.id;
               await scopeSegmentServices.update(segmentId, {
                 title: segment.title,
                 url: segment.url,
-                options: JSON.stringify(segment.option),
+                option: JSON.stringify(finalOptions),
                 scope_group_id: groupId, // IMPORTANT (DRAG & DROP)
               });
             } else {
@@ -488,7 +520,7 @@ module.exports = {
                 scope_group_id: groupId,
                 title: segment.title,
                 url: segment.url,
-                options: JSON.stringify(segment.option),
+                option: JSON.stringify(finalOptions),
               });
 
               segmentId = newSeg.id;

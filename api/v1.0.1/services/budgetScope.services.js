@@ -145,11 +145,13 @@ module.exports = {
 
           groups: (cat.groups || []).map((group) => ({
             id: group.id,
+            group_id: group.id, 
             title: group.title,
             scope_category_id: group.scope_category_id,
 
             segments: (group.segments || []).map((seg) => ({
               id: seg.id,
+              segment_id: seg.id, 
               title: seg.title,
               url: seg.url,
               option: seg.option || [],

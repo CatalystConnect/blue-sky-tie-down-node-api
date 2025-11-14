@@ -154,7 +154,7 @@ module.exports = {
               segment_id: seg.id, 
               title: seg.title,
               url: seg.url,
-              option: seg.option || [],
+              option: seg.options || [],
               scope_group_id: seg.scope_group_id,
             })),
           })),

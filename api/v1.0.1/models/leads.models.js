@@ -46,22 +46,22 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
       },
       date_record: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       due_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       est_comp: {
         type: Sequelize.STRING(255),
       },
       assigned_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       completed_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       quote_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       quote: {
         type: Sequelize.STRING(255),

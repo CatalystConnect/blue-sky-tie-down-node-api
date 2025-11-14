@@ -608,7 +608,30 @@ module.exports = {
           "work_hours",
         ],
         include: [
-          { model: db.budgetBooksObj, as: "budgetBook" },
+          { model: db.budgetBooksObj, as: "budgetBook", required: false,
+            separate: true,
+            include: [
+              {
+                model: db.projectObj,
+                as: "budgetProject",
+                required: false,
+              },
+              {
+                model: db.leadsObj,
+                as: "budgetLead",
+                required: false,
+                separate: false,
+                include: [
+                  {
+                    model: db.projectObj,
+                    as: "project",
+                    required: false,
+                    separate: false,
+                  },
+                ],
+              },
+            ],
+           },
           { model: db.companyObj, as: "engineer" },
           { model: db.companyObj, as: "architect" },
           { model: db.companyObj, as: "developer" },

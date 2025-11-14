@@ -417,10 +417,7 @@ module.exports = {
         category_id: data.category_id,
       });
 
-      const scopeCategories = data.categories;
-
-      console.log('scopeCategories',scopeCategories);
-      
+      const scopeCategories = data.categories;      
 
       /**
        * ----------------------------------------------------------------
@@ -447,6 +444,7 @@ module.exports = {
             order_index: i,
           });
           categoryId = newCat.id;
+          category.id = categoryId;
         }
 
         // ------------------------ GROUPS ---------------------------

@@ -903,10 +903,76 @@ module.exports = {
           data_collocated_date: planSetData.data_collocated_date || null,
           plan_revision_notes: planSetData.plan_revision_notes || null,
           planType: planSetData.planType || null,
+          revisionRequired: false,
+          archiveData: "",
         });
 
         // Save association for the folder itself
         await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
+
+
+        if (String(planSetData.revisionRequired).toLowerCase() === "true") {
+
+          if (
+            getProjectById.takeoff_status === "takeoff_complete" ||
+            getProjectById.takeoff_status === "takeoff_assigned"
+          ) {
+
+
+            await db.projectObj.update(
+              { takeoff_status: "project_data_collected" },
+              { where: { id: projectId } }
+            );
+
+            const archivePayload = {
+              surveyorNotes: getProjectById.surveyorNotes || null,
+              take_off_scope: getProjectById.take_off_scope || null,
+              takeoffactualtime: getProjectById.takeoffactualtime || null,
+              takeofCompleteDate: getProjectById.takeofCompleteDate || null,
+              takeoffStartDate: getProjectById.takeoffStartDate || null,
+              takeoffDueDate: getProjectById.takeoffDueDate || null,
+              assign_date: getProjectById.assign_date || null,
+              assign_to_budget: getProjectById.assign_to_budget || null,
+
+
+            };
+
+
+            const lastPlanSet = await db.projectplanSetsObj.findOne({
+              where: {
+                project_id: projectId,
+                id: { [db.Sequelize.Op.lt]: newPlanSet.id }
+
+              },
+              order: [["id", "DESC"]],
+            });
+
+            if (lastPlanSet) {
+              await lastPlanSet.update({
+                archiveData: JSON.stringify(archivePayload),
+                workflow_status: "Superseded",
+
+              });
+            }
+
+            await db.projectObj.update(
+              {
+                takeofCompleteDate: null,
+                takeoffStartDate: null,
+                takeoffactualtime: null,
+                takeoffDueDate: null,
+                assign_date: null,
+                assign_to_budget: null,
+              },
+              { where: { id: projectId } }
+            );
+
+            await newPlanSet.update({
+              workflow_status: "Pending Decision",
+              revisionRequired: true,
+            });
+          }
+        }
 
         // ✅ Upload Files (if any)
         const planSetFiles = [];

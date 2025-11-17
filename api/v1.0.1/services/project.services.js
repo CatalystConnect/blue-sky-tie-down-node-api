@@ -606,6 +606,7 @@ module.exports = {
           "takeoffStartDate",
           "takeoffDueDate",
           "work_hours",
+          
         ],
         include: [
           { model: db.budgetBooksObj, as: "budgetBook", required: false,

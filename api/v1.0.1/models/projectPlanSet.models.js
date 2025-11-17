@@ -56,6 +56,20 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true
       },
+       revisionRequired: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+       archiveData: {
+        type: Sequelize.TEXT("long"),
+        allowNull: true
+      },
+      workflow_status: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

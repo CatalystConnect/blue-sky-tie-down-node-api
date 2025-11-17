@@ -1,5 +1,6 @@
 require("dotenv").config();
 var commonHelper = require("../helper/common.helper");
+const { WORK_FLOW_STATUS } = require("../helper/constant");
 const projectServices = require("../services/project.services");
 const leadServices = require("../services/lead.services");
 const { check, validationResult } = require("express-validator"); // Updated import
@@ -905,7 +906,7 @@ module.exports = {
           planType: planSetData.planType || null,
           revisionRequired: false,
           archiveData: "",
-          workflow_status: planSetData.workflow_status || "Active",
+          workflow_status: WORK_FLOW_STATUS.ACTIVE,
         });
 
         // Save association for the folder itself
@@ -951,7 +952,7 @@ module.exports = {
             if (lastPlanSet) {
               await lastPlanSet.update({
                 archiveData: JSON.stringify(archivePayload),
-                workflow_status: "Superseded",
+                workflow_status: WORK_FLOW_STATUS.SUPERSEDED,
 
               });
             }
@@ -991,7 +992,7 @@ module.exports = {
             }
 
             await newPlanSet.update({
-              workflow_status:  planSetData.workflow_status,
+              workflow_status:  WORK_FLOW_STATUS.PENDING_DECISION,
               revisionRequired: true,
             });
           }

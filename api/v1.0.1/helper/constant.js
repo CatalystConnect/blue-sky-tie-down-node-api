@@ -127,6 +127,15 @@ const TAKEOFF_STATUS = {
   TAKEOFF_IN_PROGRESS: "TakeoffInProgress",
   TAKEOFF_COMPLETED: "TakeoffCompleted",
 };
+
+const WORK_FLOW_STATUS = {
+  ACTIVE: "Active",
+  PENDING_DECISION: "Pending Decision",
+  SUPERSEDED: "Superseded",
+};
+
 module.exports = {
   ACCESS_MODULES,
+  TAKEOFF_STATUS,
+  WORK_FLOW_STATUS
 };

@@ -905,6 +905,7 @@ module.exports = {
           planType: planSetData.planType || null,
           revisionRequired: false,
           archiveData: "",
+          workflow_status: planSetData.workflow_status || "Active",
         });
 
         // Save association for the folder itself
@@ -990,7 +991,7 @@ module.exports = {
             }
 
             await newPlanSet.update({
-              workflow_status: "Pending Decision",
+              workflow_status:  planSetData.workflow_status,
               revisionRequired: true,
             });
           }

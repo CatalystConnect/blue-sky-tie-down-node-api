@@ -967,6 +967,28 @@ module.exports = {
               { where: { id: projectId } }
             );
 
+            if (projectId) {
+
+              const tagData = await db.projectTagsObj.findOne({
+                where: { name: "repriced" }
+              });
+
+              const tagId = tagData.id;
+
+              const existingTag = await db.projectTagMappingsObj.findOne({
+                where: {
+                  project_id: projectId,
+                  tag_id: tagId
+                }
+              });
+
+              const newTag = await db.projectTagMappingsObj.create({
+                project_id: projectId,
+                tag_id: tagId
+              });
+
+            }
+
             await newPlanSet.update({
               workflow_status: "Pending Decision",
               revisionRequired: true,

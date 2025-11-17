@@ -992,7 +992,7 @@ module.exports = {
             }
 
             await newPlanSet.update({
-              workflow_status:  WORK_FLOW_STATUS.PENDING_DECISION,
+              workflow_status:   planSetData.workflow_status || WORK_FLOW_STATUS.ACTIVE,
               revisionRequired: true,
             });
           }

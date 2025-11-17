@@ -21,10 +21,19 @@ module.exports = {
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
 
+            const name = req.body.name?.trim().toLowerCase();
+
+            if (name === "repriced") {
+                return res.status(400).json({
+                    status: false,
+                    message: "The 'repriced' tag already exists and cannot be created again.",
+                });
+            }
+
             const postData = {
                 name: req.body.name,
-                order:req.body.order
-          
+                order: req.body.order
+
             };
 
             const projectTags = await projectTagsServices.addProductTags(postData);
@@ -45,12 +54,12 @@ module.exports = {
         try {
             const { page = 1, per_page = 10, search = "" } = req.query;
 
-            
+
             let ProductTags = await projectTagsServices.getAllProductTags({
                 page: parseInt(page),
                 per_page: parseInt(per_page),
                 search,
-              
+
             });
 
             return res.status(200).send({
@@ -106,6 +115,13 @@ module.exports = {
             if (!projectPhases) {
                 throw new Error("project Phases   not found");
             }
+            if (projectPhases.name?.trim().toLowerCase() === "repriced") {
+                return res.status(400).json({
+                    status: false,
+                    message: "The 'repriced' tag cannot be deleted.",
+                });
+            }
+
             let projectPhase = await projectTagsServices.deleteProductTags(id);
             return res
                 .status(200)
@@ -133,11 +149,18 @@ module.exports = {
                 throw new Error("project Phases  not found");
             }
             let data = req.body;
+            
+            if (projectPhases.name?.trim().toLowerCase() === "repriced") {
+                return res.status(400).json({
+                    status: false,
+                    message: "The 'repriced' tag cannot be updated.",
+                });
+            }
             let postData = {
 
                 name: data.name,
                 order: data.order,
-                
+
             }
 
             let updateProductTags = await projectTagsServices.updateProductTags(id, postData);

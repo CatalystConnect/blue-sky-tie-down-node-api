@@ -926,7 +926,7 @@ module.exports = {
           await newPlanSet.update({
             revisionRequired: false,
             newDueDate: null,
-             workflow_status:null,
+            // workflow_status:null,
           });
           continue; 
         }

@@ -915,12 +915,21 @@ module.exports = {
           revisionRequired: false,
           archiveData: "",
           workflow_status: WORK_FLOW_STATUS.ACTIVE,
-          newDueDate: planSetData.newDueDate,
+          newDueDate: planSetData.newDueDate || null,
         });
 
         // Save association for the folder itself
         await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
 
+       if (String(planSetData.revisionRequired).toLowerCase() === "false") {
+          
+          await newPlanSet.update({
+            revisionRequired: false,
+            newDueDate: null,
+             workflow_status:null,
+          });
+          continue; 
+        }
 
         if (String(planSetData.revisionRequired).toLowerCase() === "true") {
 
@@ -1017,6 +1026,10 @@ module.exports = {
             });
           }
         }
+
+      
+        
+
 
         // ✅ Upload Files (if any)
         const planSetFiles = [];

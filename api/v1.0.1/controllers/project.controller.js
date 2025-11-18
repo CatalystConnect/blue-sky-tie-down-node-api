@@ -875,6 +875,14 @@ module.exports = {
 
       const results = [];
 
+      const allLeadsOfProject = await db.leadsObj.findAll({
+        where: { project_id: projectId }
+      });
+
+
+      const leadIds = allLeadsOfProject.map(l => l.id);
+
+
       for (let index = 0; index < planSets.length; index++) {
         const planSetData = planSets[index];
 
@@ -907,6 +915,7 @@ module.exports = {
           revisionRequired: false,
           archiveData: "",
           workflow_status: WORK_FLOW_STATUS.ACTIVE,
+          newDueDate: planSetData.newDueDate,
         });
 
         // Save association for the folder itself
@@ -935,6 +944,10 @@ module.exports = {
               takeoffDueDate: getProjectById.takeoffDueDate || null,
               assign_date: getProjectById.assign_date || null,
               assign_to_budget: getProjectById.assign_to_budget || null,
+              oldLeadDueDates: allLeadsOfProject.map(l => ({
+                leadId: l.id,
+                due_date: l.due_date
+              }))
 
 
             };
@@ -991,9 +1004,16 @@ module.exports = {
 
             }
 
+            await db.leadsObj.update(
+              { due_date: planSetData.newDueDate },
+              { where: { project_id: projectId } }
+            );
+
             await newPlanSet.update({
-              workflow_status:   planSetData.workflow_status || WORK_FLOW_STATUS.ACTIVE,
+              workflow_status: planSetData.workflow_status || WORK_FLOW_STATUS.ACTIVE,
               revisionRequired: true,
+              newDueDate: planSetData.newDueDate,
+
             });
           }
         }

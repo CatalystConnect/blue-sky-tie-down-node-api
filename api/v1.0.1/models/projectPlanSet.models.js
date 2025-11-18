@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   const projectPlanSets = sequelize.define(
     "project_plan_sets",
     {
-       id: {
+      id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       planFiles: {
-        type: Sequelize.TEXT,  
+        type: Sequelize.TEXT,
         allowNull: true
       },
       plan_date: {
@@ -45,7 +45,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       plan_reviewed_by: {
-        type: Sequelize.INTEGER, 
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       data_collocated_date: {
@@ -56,12 +56,12 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true
       },
-       revisionRequired: {
+      revisionRequired: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       },
-       archiveData: {
+      archiveData: {
         type: Sequelize.TEXT("long"),
         allowNull: true
       },
@@ -69,6 +69,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
         defaultValue: null
+      },
+      newDueDate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
       },
       created_at: {
         allowNull: false,
@@ -80,7 +84,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('NOW()')
       },
-      deleted_at: {           
+      deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
       },
@@ -92,7 +96,7 @@ module.exports = (sequelize, Sequelize) => {
       updatedAt: "updated_at",
       deletedAt: "deleted_at",
       paranoid: true,
-      
+
     }
   );
 

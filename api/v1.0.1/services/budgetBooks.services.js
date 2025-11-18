@@ -481,61 +481,7 @@ module.exports = {
     }
   ) {
     try {
-      // await Promise.all([
-      //   db.budgetBooksScopeIncludesObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksDrawingsObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksKeyAreasObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksContractsObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksSitesObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.projectBudgetsObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
-      //   db.sitePlanItemsObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
-      //   db.optionPackageObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
-      //   db.budgetBooksScopesObj.destroy({
-      //     where: { budget_books_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksScopeCategoriesObj.destroy({
-      //     where: { budget_books_scope_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksScopeGroupsObj.destroy({
-      //     where: { budget_books_scope_category_id: budgetBooksId },
-      //   }),
-      //   db.budgetBooksScopeSegmentsObj.destroy({
-      //     where: { budget_books_scope_group_id: budgetBooksId },
-      //   }),
-      // ]);
       await Promise.all([
-        db.budgetBooksScopeSegmentsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeGroupsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeCategoriesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksScopesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-
         db.budgetBooksScopeIncludesObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
@@ -554,20 +500,26 @@ module.exports = {
         db.projectBudgetsObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.sitePlansObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
+        db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
         db.sitePlanItemsObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.veOptionsObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
+        db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
         db.optionPackageObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.budgetBookOthersObj.destroy({
-          where: { budget_id: budgetBooksId },
+        db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
+        db.budgetBooksScopesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeCategoriesObj.destroy({
+          where: { budget_books_scope_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeGroupsObj.destroy({
+          where: { budget_books_scope_category_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeSegmentsObj.destroy({
+          where: { budget_books_scope_group_id: budgetBooksId },
         }),
       ]);
 

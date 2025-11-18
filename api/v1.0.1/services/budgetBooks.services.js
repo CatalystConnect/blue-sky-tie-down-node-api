@@ -481,7 +481,61 @@ module.exports = {
     }
   ) {
     try {
+      // await Promise.all([
+      //   db.budgetBooksScopeIncludesObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksDrawingsObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksKeyAreasObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksContractsObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksSitesObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.projectBudgetsObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+      //   db.sitePlanItemsObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+      //   db.optionPackageObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
+      //   db.budgetBooksScopesObj.destroy({
+      //     where: { budget_books_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksScopeCategoriesObj.destroy({
+      //     where: { budget_books_scope_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksScopeGroupsObj.destroy({
+      //     where: { budget_books_scope_category_id: budgetBooksId },
+      //   }),
+      //   db.budgetBooksScopeSegmentsObj.destroy({
+      //     where: { budget_books_scope_group_id: budgetBooksId },
+      //   }),
+      // ]);
       await Promise.all([
+        db.budgetBooksScopeSegmentsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeGroupsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksScopeCategoriesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+        db.budgetBooksScopesObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
+
         db.budgetBooksScopeIncludesObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
@@ -500,26 +554,20 @@ module.exports = {
         db.projectBudgetsObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.sitePlansObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.sitePlansObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
         db.sitePlanItemsObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.veOptionsObj.destroy({ where: { budget_books_id: budgetBooksId } }),
+        db.veOptionsObj.destroy({
+          where: { budget_books_id: budgetBooksId },
+        }),
         db.optionPackageObj.destroy({
           where: { budget_books_id: budgetBooksId },
         }),
-        db.budgetBookOthersObj.destroy({ where: { budget_id: budgetBooksId } }),
-        db.budgetBooksScopesObj.destroy({
-          where: { budget_books_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeCategoriesObj.destroy({
-          where: { budget_books_scope_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeGroupsObj.destroy({
-          where: { budget_books_scope_category_id: budgetBooksId },
-        }),
-        db.budgetBooksScopeSegmentsObj.destroy({
-          where: { budget_books_scope_group_id: budgetBooksId },
+        db.budgetBookOthersObj.destroy({
+          where: { budget_id: budgetBooksId },
         }),
       ]);
 
@@ -797,15 +845,115 @@ module.exports = {
         );
       }
 
+      // if (Array.isArray(scopes) && scopes.length) {
+      //   for (const scopeGroup of scopes) {
+      //     if (!scopeGroup || typeof scopeGroup !== "object") continue;
+
+      //     const entries = Object.values(scopeGroup || {});
+      //     if (!entries.length) continue;
+
+      //     for (const item of entries) {
+      //       if (!item || typeof item !== "object") continue;
+      //       const {
+      //         scope_id,
+      //         scope_name,
+      //         scope_category_id,
+      //         category_name,
+      //         group_id,
+      //         group_name,
+      //         segment_id,
+      //         segment_name,
+      //         site_id,
+      //         is_include,
+      //         pricePerSqft,
+      //         additional,
+      //         cost,
+      //         priceWithAdditional,
+      //         costSqft,
+      //         total,
+      //         condition,
+      //         notes,
+      //         optionPercentage,
+      //         budgetIndex,
+      //         budget_Cat_Id,
+      //       } = item;
+
+      //       const budgetBooksScope = await db.budgetBooksScopesObj.create({
+      //         budget_books_id: budgetBooksId,
+      //         is_include: is_include ?? null,
+      //         scope_id: scope_id,
+      //         title: scope_name || "",
+      //       });
+
+      //       const budgetBooksScopeCategory =
+      //         await db.budgetBooksScopeCategoriesObj.create({
+      //           budget_books_scope_id: budgetBooksScope.id,
+      //           scope_category_id: scope_category_id || null,
+      //           title: category_name || "",
+      //         });
+      //       const budgetBooksScopeGroup =
+      //         await db.budgetBooksScopeGroupsObj.create({
+      //           budget_books_scope_category_id: budgetBooksScopeCategory.id,
+      //           scope_group_id: group_id || null,
+      //           title: group_name || "",
+      //         });
+
+      //       let matchedOption = null;
+      //       if (Array.isArray(veOptions)) {
+      //         matchedOption = veOptions.find(
+      //           (opt) =>
+      //             opt.site_id === site_id &&
+      //             String(opt.scope_sagment_id) === String(segment_id)
+      //         );
+      //       }
+
+      //       const selectedDate = matchedOption ? matchedOption.date : null;
+
+      //       await db.budgetBooksScopeSegmentsObj.create({
+      //         budget_books_scope_group_id: budgetBooksScopeGroup.id,
+      //         scope_sagment_id: segment_id,
+      //         title: segment_name || "",
+      //         notes: notes || "",
+      //         client_notes: null,
+      //         is_include: is_include ?? null,
+      //         acc: null,
+      //         internal_notes: null,
+      //         price_sqft: Number(pricePerSqft) || 0,
+      //         additionals: Number(additional) || 0,
+      //         price_w_additional: Number(priceWithAdditional) || 0,
+      //         budget_Cat_Id: budget_Cat_Id || null,
+      //         cost: Number(cost) || 0,
+      //         costSqft: Number(costSqft) || 0,
+      //         total: Number(total) || 0,
+      //         conditions: Array.isArray(condition)
+      //           ? condition.join(", ")
+      //           : condition || null,
+      //         site_id: site_id || null,
+      //         scopeId: scope_id || null,
+      //         optionPercentage: optionPercentage ?? null,
+      //         budgetIndex: budgetIndex ?? null,
+      //         date: selectedDate,
+      //       });
+      //     }
+      //   }
+      // }
+
       if (Array.isArray(scopes) && scopes.length) {
         for (const scopeGroup of scopes) {
-          if (!scopeGroup || typeof scopeGroup !== "object") continue; 
+          if (!scopeGroup || typeof scopeGroup !== "object") continue;
 
-          const entries = Object.values(scopeGroup || {});
-          if (!entries.length) continue; 
+          const items = Object.values(scopeGroup);
+          if (!items.length) continue;
 
-          for (const item of entries) {
-            if (!item || typeof item !== "object") continue; 
+          const parentsCache = {};
+
+          for (const item of items) {
+            if (!item || typeof item !== "object") continue;
+            const cleanedValues = Object.values(item).filter(
+              (v) => v !== "" && v !== null && v !== undefined
+            );
+            if (cleanedValues.length === 0) continue;
+
             const {
               scope_id,
               scope_name,
@@ -830,39 +978,49 @@ module.exports = {
               budget_Cat_Id,
             } = item;
 
-            const budgetBooksScope = await db.budgetBooksScopesObj.create({
-              budget_books_id: budgetBooksId,
-              is_include: is_include ?? null,
-              scope_id: scope_id,
-              title: scope_name || "",
-            });
+            if (!scope_id || !scope_category_id || !group_id) continue;
 
-            const budgetBooksScopeCategory =
-              await db.budgetBooksScopeCategoriesObj.create({
-                budget_books_scope_id: budgetBooksScope.id,
-                scope_category_id: scope_category_id || null,
-                title: category_name || "",
+            const parentKey = `${scope_id}_${scope_category_id}_${group_id}`;
+
+            if (!parentsCache[parentKey]) {
+              const scopeObj = await db.budgetBooksScopesObj.create({
+                budget_books_id: budgetBooksId,
+                is_include: is_include ?? null,
+                scope_id: scope_id,
+                title: scope_name || "",
               });
-            const budgetBooksScopeGroup =
-              await db.budgetBooksScopeGroupsObj.create({
-                budget_books_scope_category_id: budgetBooksScopeCategory.id,
+
+              const categoryObj = await db.budgetBooksScopeCategoriesObj.create(
+                {
+                  budget_books_scope_id: scopeObj.id,
+                  scope_category_id: scope_category_id || null,
+                  title: category_name || "",
+                }
+              );
+
+              const groupObj = await db.budgetBooksScopeGroupsObj.create({
+                budget_books_scope_category_id: categoryObj.id,
                 scope_group_id: group_id || null,
                 title: group_name || "",
               });
 
-            let matchedOption = null;
+              parentsCache[parentKey] = { scopeObj, categoryObj, groupObj };
+            }
+
+            const parent = parentsCache[parentKey];
+
+            let selectedDate = null;
             if (Array.isArray(veOptions)) {
-              matchedOption = veOptions.find(
+              const match = veOptions.find(
                 (opt) =>
                   opt.site_id === site_id &&
                   String(opt.scope_sagment_id) === String(segment_id)
               );
+              if (match) selectedDate = match.date;
             }
 
-            const selectedDate = matchedOption ? matchedOption.date : null;
-
             await db.budgetBooksScopeSegmentsObj.create({
-              budget_books_scope_group_id: budgetBooksScopeGroup.id,
+              budget_books_scope_group_id: parent.groupObj.id,
               scope_sagment_id: segment_id,
               title: segment_name || "",
               notes: notes || "",
@@ -878,7 +1036,7 @@ module.exports = {
               costSqft: Number(costSqft) || 0,
               total: Number(total) || 0,
               conditions: Array.isArray(condition)
-                ? condition.join(", ")
+                ? condition.join(",")
                 : condition || null,
               site_id: site_id || null,
               scopeId: scope_id || null,

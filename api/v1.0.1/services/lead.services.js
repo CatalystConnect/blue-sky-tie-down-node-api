@@ -719,90 +719,276 @@ module.exports = {
   },
 
   /* getAllProjectDatatakeoffLead */
-  async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
-    try {
-      const limit = parseInt(per_page) || 10;
-      const offset = (parseInt(page) - 1) * limit || 0;
+  // async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
+  //   try {
+  //     const limit = parseInt(per_page) || 10;
+  //     const offset = (parseInt(page) - 1) * limit || 0;
 
-      // Build project filter
-      const projectWhere = {
-        takeoff_status: {
-          [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
-        },
-      };
+  //     // Build project filter
+  //     const projectWhere = {
+  //       takeoff_status: {
+  //         [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
+  //       },
+  //     };
 
-      if (search && search.trim() !== "") {
-        projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
-          db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
-          {
-            [db.Sequelize.Op.like]: `%${search.toLowerCase()}%`,
-          }
-        );
-      }
+  //     if (search && search.trim() !== "") {
+  //       projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
+  //         db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
+  //         {
+  //           [db.Sequelize.Op.like]: `%${search.toLowerCase()}%`,
+  //         }
+  //       );
+  //     }
 
-      // ✅ 1️⃣ Main query with pagination
-      const rows = await db.leadsObj.findAll({
-        include: [
-          {
-            model: db.projectObj,
-            as: "project",
-            include: { model: db.companyObj, as: "engineerCompany" },
-            required: true,
-            where: projectWhere,
-          },
-          { model: db.companyObj, as: "company" },
-          { model: db.contactsObj, as: "contact" },
-          { model: db.leadStatusesObj, as: "leadStatus" },
-          {
-            model: db.leadTagsObj,
-            as: "lead_tags",
-            include: { model: db.tagsObj, as: "tag" },
-          },
-          { model: db.budgetBooksObj, as: "lead_budget" },
-        ],
-        limit,
-        offset,
-        order: [
-          [
-            db.Sequelize.literal(
-              `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
-            ),
-            "ASC",
-          ],
-          ["id", "DESC"],
-        ],
-      });
+  //     // ✅ 1️⃣ Main query with pagination
+  //     const rows = await db.leadsObj.findAll({
+  //       include: [
+  //         {
+  //           model: db.projectObj,
+  //           as: "project",
+  //           include:[
+  //              { model: db.companyObj, as: "engineerCompany" },
+  //              { model: db.gDriveAssociationObj, as: "googleDrive" },
+  //               {
+  //                   model: db.projectplanSetsObj, as: "planSets",}
+  //           ], 
+  //           required: true,
+  //           where: projectWhere,
+  //         },
+  //         { model: db.companyObj, as: "company" },
+  //         { model: db.contactsObj, as: "contact" },
+  //         { model: db.leadStatusesObj, as: "leadStatus" },
+  //         {
+  //           model: db.leadTagsObj,
+  //           as: "lead_tags",
+  //           include: { model: db.tagsObj, as: "tag" },
+  //         },
+  //         { model: db.budgetBooksObj, as: "lead_budget" },
+  //       ],
+  //       limit,
+  //       offset,
+  //       order: [
+  //         [
+  //           db.Sequelize.literal(
+  //             `CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ],
+  //     });
 
-      // ✅ 2️⃣ Separate count query for total filtered records
-      const count = await db.leadsObj.count({
-        include: [
-          {
-            model: db.projectObj,
-            as: "project",
-            required: true,
-            where: projectWhere,
+  //     // ✅ 2️⃣ Separate count query for total filtered records
+  //     const count = await db.leadsObj.count({
+  //       include: [
+  //         {
+  //           model: db.projectObj,
+  //           as: "project",
+  //           required: true,
+  //           where: projectWhere,
 
-          },
-        ],
-      });
+  //         },
+  //       ],
+  //     });
 
-      // ✅ Return only filtered count (not all)
-      return {
-        data: rows,
-        meta: {
-          current_page: parseInt(page),
-          from: offset + 1,
-          to: offset + rows.length,
-          last_page: Math.ceil(count / limit),
-          per_page: limit,
-          total: count, // ✅ this is now filtered total
-        },
-      };
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
+  //     // ✅ Return only filtered count (not all)
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         current_page: parseInt(page),
+  //         from: offset + 1,
+  //         to: offset + rows.length,
+  //         last_page: Math.ceil(count / limit),
+  //         per_page: limit,
+  //         total: count, // ✅ this is now filtered total
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
+  try {
+    const limit = parseInt(per_page) || 10;
+    const offset = (parseInt(page) - 1) * limit || 0;
+
+    const projectWhere = {
+      takeoff_status: {
+        [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
+      },
+    };
+
+    if (search && search.trim() !== "") {
+      projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
+        db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
+        { [db.Sequelize.Op.like]: `%${search.toLowerCase()}%` }
+      );
     }
-  },
+
+    // ========== 1) MAIN QUERY ==========
+    const rows = await db.leadsObj.findAll({
+      include: [
+        {
+          model: db.projectObj,
+          as: "project",
+          include: [
+            { model: db.companyObj, as: "engineerCompany" },
+            { model: db.gDriveAssociationObj, as: "googleDrive" },
+            { model: db.projectplanSetsObj, as: "planSets" },
+          ],
+          required: true,
+          where: projectWhere,
+        },
+        { model: db.companyObj, as: "company" },
+        { model: db.contactsObj, as: "contact" },
+        { model: db.leadStatusesObj, as: "leadStatus" },
+        {
+          model: db.leadTagsObj,
+          as: "lead_tags",
+          include: { model: db.tagsObj, as: "tag" },
+        },
+        { model: db.budgetBooksObj, as: "lead_budget" },
+      ],
+      limit,
+      offset,
+      order: [
+        [
+          db.Sequelize.literal(`CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`),
+          "ASC",
+        ],
+        ["id", "DESC"],
+      ],
+    });
+
+    // ========== 2) COUNT ==========
+    const count = await db.leadsObj.count({
+      include: [
+        {
+          model: db.projectObj,
+          as: "project",
+          required: true,
+          where: projectWhere,
+        },
+      ],
+    });
+
+    // =======================================================================================
+    // ========== 3) APPLY YOUR GOOGLE DRIVE STRUCTURE LOGIC (NO OLD LOGIC CHANGED) ==========
+    // =======================================================================================
+
+    const buildFolderStructure = (files) => {
+      const folderMap = {};
+      const rootFiles = [];
+
+      files.forEach((item) => {
+        if (item.type === "folder") {
+          folderMap[item.file_name] = { folder: item, files: [] };
+        }
+      });
+
+      files.forEach((item) => {
+        if (item.type === "file" && item.parent) {
+          const parentFolder = files.find((f) => f.id === item.parent);
+          if (parentFolder && parentFolder.type === "folder") {
+            folderMap[parentFolder.file_name].files.push(item);
+          } else {
+            rootFiles.push(item);
+          }
+        } else if (item.type === "file") {
+          rootFiles.push(item);
+        }
+      });
+
+      return { rootFiles, folders: folderMap };
+    };
+
+    // Loop through each lead row and transform project.googleDrive
+    rows.forEach((lead) => {
+      const project = lead.project;
+      if (!project || !project.googleDrive) return;
+
+      const googleDriveData = project.googleDrive;
+
+      // --- Separate modules ---
+      const modules = {
+        projectFiles: [],
+        completedFiles: [],
+        planSet: [],
+        budgetFiles: [],
+      };
+
+      googleDriveData.forEach((item) => {
+        const file = item.dataValues || item;
+
+        if (file.module === "projectFiles") modules.projectFiles.push(file);
+        else if (file.module === "completedFiles" || file.module === "CompletedFiles")
+          modules.completedFiles.push(file);
+        else if (file.module === "planSetFiles") modules.planSet.push(file);
+        else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
+      });
+
+      // ------- PLAN SET logic -------
+      const planSetFolderMap = {};
+      project.planSets?.forEach((p, index) => {
+        planSetFolderMap[p.id] = index + 1;
+      });
+
+      const planSet = {};
+      modules.planSet.forEach((item) => {
+        const moduleId = item.module_id;
+        const folderNumber = planSetFolderMap[moduleId] || moduleId;
+
+        if (!planSet[folderNumber]) {
+          planSet[folderNumber] = { folder: null, files: [] };
+        }
+
+        if (!item.file_name) {
+          planSet[folderNumber].folder = {
+            drive_id: item.drive_id,
+            createdAt: item.createdAt,
+          };
+        } else {
+          planSet[folderNumber].files.push({
+            drive_id: item.drive_id,
+            file_name: item.file_name,
+            createdAt: item.createdAt,
+          });
+        }
+      });
+
+      // ------- Folder structure for other modules -------
+      const projectFiles = buildFolderStructure(modules.projectFiles);
+      const completedFiles = buildFolderStructure(modules.completedFiles);
+      const budgetFiles = buildFolderStructure(modules.budgetFiles);
+
+      // Final assignment
+      project.dataValues.googleDrive = {
+        planSet,
+        projectFiles,
+        completedFiles,
+        budgetFiles,
+      };
+    });
+
+    // =======================================================================================
+
+    return {
+      data: rows,
+      meta: {
+        current_page: parseInt(page),
+        from: offset + 1,
+        to: offset + rows.length,
+        last_page: Math.ceil(count / limit),
+        per_page: limit,
+        total: count,
+      },
+    };
+  } catch (e) {
+    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    throw e;
+  }
+},
 
   /* updateLeadPriority */
   async updateLeadPriority(id, takeoff_status, priority = false) {

@@ -921,15 +921,15 @@ module.exports = {
         // Save association for the folder itself
         await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
 
-       if (String(planSetData.revisionRequired).toLowerCase() === "false") {
+      //  if (String(planSetData.revisionRequired).toLowerCase() === "false") {
           
-          await newPlanSet.update({
-            revisionRequired: false,
-            newDueDate: null,
-            // workflow_status:null,
-          });
-          continue; 
-        }
+      //     await newPlanSet.update({
+      //       revisionRequired: false,
+      //       newDueDate: null,
+      //       // workflow_status:null,
+      //     });
+      //     continue; 
+      //   }
 
         if (String(planSetData.revisionRequired).toLowerCase() === "true") {
 

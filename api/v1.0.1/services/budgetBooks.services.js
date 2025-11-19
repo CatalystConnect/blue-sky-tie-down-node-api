@@ -1555,6 +1555,14 @@ module.exports = {
       {
         model: db.leadsObj,
         as: "budgetLead",
+          include: [
+            {
+              model: db.projectObj,
+              as: "project",
+              attributes: ["id", "name"],
+              required: false,
+            },
+          ]
       
       }
     ];

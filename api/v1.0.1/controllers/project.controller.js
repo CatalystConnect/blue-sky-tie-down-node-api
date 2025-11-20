@@ -921,15 +921,15 @@ module.exports = {
         // Save association for the folder itself
         await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
 
-       if (String(planSetData.revisionRequired).toLowerCase() === "false") {
+      //  if (String(planSetData.revisionRequired).toLowerCase() === "false") {
           
-          await newPlanSet.update({
-            revisionRequired: false,
-            newDueDate: null,
-            // workflow_status:null,
-          });
-          continue; 
-        }
+      //     await newPlanSet.update({
+      //       revisionRequired: false,
+      //       newDueDate: null,
+      //       // workflow_status:null,
+      //     });
+      //     continue; 
+      //   }
 
         if (String(planSetData.revisionRequired).toLowerCase() === "true") {
 
@@ -953,10 +953,11 @@ module.exports = {
               takeoffDueDate: getProjectById.takeoffDueDate || null,
               assign_date: getProjectById.assign_date || null,
               assign_to_budget: getProjectById.assign_to_budget || null,
-              oldLeadDueDates: allLeadsOfProject.map(l => ({
-                leadId: l.id,
-                due_date: l.due_date
-              }))
+              dueDate:getProjectById.dueDate  || null,
+              // oldLeadDueDates: allLeadsOfProject.map(l => ({
+              //   leadId: l.id,
+              //   due_date: l.due_date
+              // }))
 
 
             };
@@ -987,6 +988,7 @@ module.exports = {
                 takeoffDueDate: null,
                 assign_date: null,
                 assign_to_budget: null,
+                dueDate:planSetData.newDueDate
               },
               { where: { id: projectId } }
             );
@@ -1013,10 +1015,10 @@ module.exports = {
 
             }
 
-            await db.leadsObj.update(
-              { due_date: planSetData.newDueDate },
-              { where: { project_id: projectId } }
-            );
+            // await db.leadsObj.update(
+            //   { due_date: planSetData.newDueDate },
+            //   { where: { project_id: projectId } }
+            // );
 
             await newPlanSet.update({
               workflow_status: planSetData.workflow_status || WORK_FLOW_STATUS.ACTIVE,

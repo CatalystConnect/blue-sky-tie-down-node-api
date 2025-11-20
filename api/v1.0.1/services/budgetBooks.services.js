@@ -1136,10 +1136,10 @@ module.exports = {
 
       const projectSegments = segmentIds.length
         ? await db.budgetBooksScopeSegmentsObj.findAll({
-            where: {
-              [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
-            },
-          })
+          where: {
+            [Op.or]: [{ scope_sagment_id: { [Op.in]: segmentIds } }],
+          },
+        })
         : [];
 
       const scopesByCategoryId = {};
@@ -1541,5 +1541,64 @@ module.exports = {
       console.error("Error in findBudgetHistoryDetailById service:", error);
       throw new Error("Internal server error");
     }
+  },
+
+  async getBudgetBooksMinimal({ page, per_page, take_all, id }) {
+    const offset = (page - 1) * per_page;
+
+    const include = [
+      {
+        model: db.projectObj,
+        as: "budgetProject",
+      
+      },
+      {
+        model: db.leadsObj,
+        as: "budgetLead",
+          include: [
+            {
+              model: db.projectObj,
+              as: "project",
+              attributes: ["id", "name"],
+              required: false,
+            },
+          ]
+      
+      }
+    ];
+
+    let order = [["id", "DESC"]];
+
+    if (id) {
+      const parsedId = parseInt(id);
+      order = [
+        [
+          db.Sequelize.literal(
+            `CASE WHEN "budget_books"."project_id" = ${parsedId} THEN 0 ELSE 1 END`
+          ),
+          "ASC",
+        ],
+        ["id", "DESC"],
+      ];
+    }
+
+    const rows = await db.budgetBooksObj.findAll({
+      limit: take_all ? undefined : per_page,
+      offset: take_all ? undefined : offset,
+      include,
+      order,
+    });
+
+    const total = await db.budgetBooksObj.count();
+
+    return {
+      data: rows.map(r => r.toJSON()),
+      meta: {
+        current_page: page,
+        per_page: take_all ? total : per_page,
+        total,
+        last_page: Math.ceil(total / per_page),
+      }
+    };
   },
 };

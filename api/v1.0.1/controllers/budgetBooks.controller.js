@@ -736,7 +736,7 @@ module.exports = {
             }
           }
           await Promise.all(promises || []);
-        } catch (err) {}
+        } catch (err) { }
       });
     } catch (error) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(error));
@@ -751,12 +751,30 @@ module.exports = {
   /*getAllBudgetBooks*/
   async getAllBudgetBooks(req, res) {
     try {
-      let { page = "1", per_page = "10", take_all = "", id } = req.query;
+      let { page = "1", per_page = "10", take_all = "", id, allbudget = "" } = req.query;
 
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
 
       take_all = take_all === "all";
+
+      if (allbudget === "true") {
+
+        const { data: budgetBooks, meta } =
+          await budgetBooksServices.getBudgetBooksMinimal({
+            page,
+            per_page,
+            take_all,
+            id,
+          });
+
+        return res.status(200).json({
+          status: true,
+          message: "Budget books fetched successfully",
+          data: budgetBooks,
+          meta,
+        });
+      }
 
       const { data: budgetBooks, meta } =
         await budgetBooksServices.getAllBudgetBooks({

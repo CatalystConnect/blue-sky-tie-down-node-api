@@ -9,13 +9,13 @@ let { upload ,multiUpload } = require("../../../config/multer.config");
 router.get("/leads",[authJwt.verifyToken], controller.getAllLeads);
 
 /*add leads*/
-router.post("/leads",[authJwt.verifyToken],upload.none(),[controller.validate("addLead")], controller.addLead);
+router.post("/leads",[authJwt.verifyToken],upload.none(), controller.addLead);
 
 /*get lead by id*/
-router.get("/getLeadById",[authJwt.verifyToken], [controller.validate("getLeadById")], controller.getLeadById);
+router.get("/getLeadById",[authJwt.verifyToken],  controller.getLeadById);
 
 /*lead update by id*/
-router.put("/leadUpdate",[authJwt.verifyToken],upload.none(), [controller.validate("getLeadById")], controller.leadUpdate);
+router.put("/leadUpdate",[authJwt.verifyToken],upload.none(),  controller.leadUpdate);
 
 /*lead delete by id*/
 router.delete("/leadDelete",[authJwt.verifyToken], [controller.validate("getLeadById")], controller.leadDelete);

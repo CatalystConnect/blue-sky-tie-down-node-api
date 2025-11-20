@@ -61,7 +61,7 @@ module.exports = {
     }
   },
 
-  async getAllUsers(page, length, role, search, date, id, take_all, per_page) {
+  async getAllUsers(page, length, role, search, date, id, take_all, per_page, type) {
     try {
       let whereCondition = {};
 
@@ -70,6 +70,9 @@ module.exports = {
       }
       if (id) {
         whereCondition.id = id;
+      }
+      if (type) {
+        whereCondition.userType = type;
       }
       if (search) {
         whereCondition[Op.or] = [

@@ -1,7 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 module.exports = {
     /*addContacts*/
@@ -33,7 +33,7 @@ module.exports = {
                 include: [
                     { model: db.companyObj, as: "company" }
                 ],
-                limit: per_page,   
+                limit: per_page,
                 offset: offset,
             });
 
@@ -102,12 +102,71 @@ module.exports = {
             throw e;
         }
     },
-    async getContactCompany(company_id) {
-        return await db.contactsObj.findAll({
-            where: { company_id },
-            include: [
-                { model: db.companyObj, as: "company" }
-            ]
+    // async getContactCompany(company_id) {
+    //     return await db.contactsObj.findAll({
+    //         where: { company_id },
+    //         include: [
+    //             { model: db.companyObj, as: "company" }
+    //         ]
+    //     });
+    // }
+    // 
+    async getContactCompany({ company_id, search, page, limit, id }) {
+
+        page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
+        limit = Number.isNaN(parseInt(limit)) ? 10 : parseInt(limit);
+
+        const offset = (page - 1) * limit;
+
+        const whereCondition = { company_id };
+
+
+        if (search) {
+            const searchLower = search.toLowerCase();
+            whereCondition[Op.or] = [
+                Sequelize.where(
+                    Sequelize.fn("LOWER", Sequelize.col("contacts.name")),
+                    { [Op.like]: `%${searchLower}%` }
+                ),
+
+            ];
+        }
+
+
+        let orderClause = [["id", "DESC"]];
+        if (id) {
+            const idInt = parseInt(id);
+            if (!Number.isNaN(idInt)) {
+                orderClause = [
+                    [
+                        Sequelize.literal(
+                            `CASE WHEN "contacts"."id" = ${idInt} THEN 0 ELSE 1 END`
+                        ),
+                        "ASC",
+                    ],
+                    ["id", "DESC"],
+                ];
+            }
+        }
+
+
+        const { rows, count } = await db.contactsObj.findAndCountAll({
+            where: whereCondition,
+            include: [{ model: db.companyObj, as: "company" }],
+            order: orderClause,
+            limit,
+            offset,
         });
+
+
+        return {
+            data: rows,
+            meta: {
+                current_page: page,
+                per_page: limit,
+                total: count,
+                last_page: Math.ceil(count / limit),
+            },
+        };
     }
 }

@@ -156,8 +156,7 @@ module.exports = {
           } else {
             idsArray = [id];
           }
-          // ⚠️ Do NOT add id to whereCondition here
-          // because we want all type users, not just those IDs
+
         } catch (err) {
           console.log("Invalid id format", err);
         }
@@ -167,10 +166,29 @@ module.exports = {
         whereCondition.userType = type;
       }
 
+      // if (search) {
+      //   whereCondition[Op.or] = [
+      //     { name: { [Op.like]: `%${search}%` } },
+      //     { email: { [Op.like]: `%${search}%` } },
+      //   ];
+      // }
+
       if (search) {
+        const searchLower = search.toLowerCase();
+
         whereCondition[Op.or] = [
-          { name: { [Op.like]: `%${search}%` } },
-          { email: { [Op.like]: `%${search}%` } },
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("name")),
+            {
+              [Op.like]: `%${searchLower}%`
+            }
+          ),
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("email")),
+            {
+              [Op.like]: `%${searchLower}%`
+            }
+          )
         ];
       }
 

@@ -875,12 +875,12 @@ module.exports = {
 
       const results = [];
 
-      const allLeadsOfProject = await db.leadsObj.findAll({
-        where: { project_id: projectId }
-      });
+      // const allLeadsOfProject = await db.leadsObj.findAll({
+      //   where: { project_id: projectId }
+      // });
 
 
-      const leadIds = allLeadsOfProject.map(l => l.id);
+      // const leadIds = allLeadsOfProject.map(l => l.id);
 
 
       for (let index = 0; index < planSets.length; index++) {
@@ -906,7 +906,12 @@ module.exports = {
           plan_link: planSetData.plan_link || null,
           planFiles: null, // temporarily null until uploads are done
           plan_date: planSetData.plan_date || null,
-          rev_status: planSetData.rev_status || null,
+          // rev_status: planSetData.rev_status || null,
+          rev_status:
+            planSetData.rev_status?.trim() === "" ||
+              planSetData.rev_status == undefined
+              ? null
+              : planSetData.rev_status,
           plan_reviewed_date: planSetData.plan_reviewed_date || null,
           plan_reviewed_by: planSetData.plan_reviewed_by || null,
           data_collocated_date: planSetData.data_collocated_date || null,
@@ -921,15 +926,15 @@ module.exports = {
         // Save association for the folder itself
         await saveFolder("planSetFiles", newPlanSet.id, planSetNumberFolder);
 
-      //  if (String(planSetData.revisionRequired).toLowerCase() === "false") {
-          
-      //     await newPlanSet.update({
-      //       revisionRequired: false,
-      //       newDueDate: null,
-      //       // workflow_status:null,
-      //     });
-      //     continue; 
-      //   }
+        //  if (String(planSetData.revisionRequired).toLowerCase() === "false") {
+
+        //     await newPlanSet.update({
+        //       revisionRequired: false,
+        //       newDueDate: null,
+        //       // workflow_status:null,
+        //     });
+        //     continue; 
+        //   }
 
         if (String(planSetData.revisionRequired).toLowerCase() === "true") {
 
@@ -953,7 +958,7 @@ module.exports = {
               takeoffDueDate: getProjectById.takeoffDueDate || null,
               assign_date: getProjectById.assign_date || null,
               assign_to_budget: getProjectById.assign_to_budget || null,
-              dueDate:getProjectById.dueDate  || null,
+              dueDate: getProjectById.dueDate || null,
               // oldLeadDueDates: allLeadsOfProject.map(l => ({
               //   leadId: l.id,
               //   due_date: l.due_date
@@ -988,7 +993,7 @@ module.exports = {
                 takeoffDueDate: null,
                 assign_date: null,
                 assign_to_budget: null,
-                dueDate:planSetData.newDueDate
+                dueDate: planSetData.newDueDate
               },
               { where: { id: projectId } }
             );
@@ -1029,8 +1034,8 @@ module.exports = {
           }
         }
 
-      
-        
+
+
 
 
         // ✅ Upload Files (if any)

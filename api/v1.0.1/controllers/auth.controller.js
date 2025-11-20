@@ -140,6 +140,7 @@ module.exports = {
         id,
         take_all,
         per_page,
+        type,
       } = req.query;
 
       page = parseInt(page);
@@ -157,7 +158,8 @@ module.exports = {
         date,
         id,
         take_all,
-        per_page
+        per_page,
+        type
       );
 
       if (!users || users.length === 0) throw new Error("Users not found");

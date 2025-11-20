@@ -59,7 +59,7 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      let { page = 1, per_page, search = "" } = req.query;
+      let { page = 1, per_page, search = "",id } = req.query;
       page = parseInt(page);
       per_page = parseInt(per_page);
 
@@ -67,6 +67,7 @@ module.exports = {
         page,
         per_page,
         search,
+        id
       });
 
       return res

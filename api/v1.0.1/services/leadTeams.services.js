@@ -1,7 +1,9 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
+
+
 
 module.exports = {
   /*addLeadTeams*/
@@ -16,8 +18,68 @@ module.exports = {
   },
 
   /*getAllLeadTeams*/
-  async getAllLeadTeams({ page, per_page, search }) {
+  // async getAllLeadTeams({ page, per_page, search,id }) {
+  //   try {
+  //     const offset = (page - 1) * per_page;
+
+  //     const whereCondition = {};
+  //     if (search) {
+  //       whereCondition[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
+  //     }
+
+  //     const { rows, count } = await db.leadTeamsObj.findAndCountAll({
+  //       where: whereCondition,
+  //       order: [["id", "DESC"]],
+  //       limit:per_page,
+  //       offset,
+  //     });
+
+  //     // Fetch users for each team manually
+  //     for (const team of rows) {
+  //       let contactIds = [];
+  //       try {
+  //         contactIds = JSON.parse(team.contact_id || "[]");
+  //       } catch (e) {
+  //         contactIds = [];
+  //       }
+
+  //       if (contactIds.length > 0) {
+  //         const users = await db.userObj.findAll({
+  //           where: { id: contactIds },
+  //           attributes: { exclude: ["password"] },
+  //         });
+  //         team.dataValues.contactDetails = users;
+  //       } else {
+  //         team.dataValues.contactDetails = [];
+  //       }
+  //     }
+
+  //     // Calculate pagination metadata
+  //     const lastPage = Math.ceil(count / per_page);
+  //     const from = count > 0 ? offset + 1 : 0;
+  //     const to = offset + rows.length;
+
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         current_page: page,
+  //         from: from,
+  //         to: to,
+  //         per_page: per_page,
+  //         last_page: lastPage,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async getAllLeadTeams({ page, per_page, search, id }) {
     try {
+      page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
+      per_page = Number.isNaN(parseInt(per_page)) ? 10 : parseInt(per_page);
+
       const offset = (page - 1) * per_page;
 
       const whereCondition = {};
@@ -25,19 +87,34 @@ module.exports = {
         whereCondition[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
       }
 
+      let orderClause = [["id", "DESC"]];
+      if (id) {
+        const idInt = parseInt(id);
+        if (!Number.isNaN(idInt)) {
+          orderClause = [
+            [
+              Sequelize.literal(
+                `CASE WHEN "lead_teams"."id" = ${idInt} THEN 0 ELSE 1 END`
+              ),
+              "ASC",
+            ],
+            ["id", "DESC"],
+          ];
+        }
+      }
+
       const { rows, count } = await db.leadTeamsObj.findAndCountAll({
         where: whereCondition,
-        order: [["id", "DESC"]],
-        limit:per_page,
+        order: orderClause,
+        limit: per_page,
         offset,
       });
 
-      // Fetch users for each team manually
       for (const team of rows) {
         let contactIds = [];
         try {
           contactIds = JSON.parse(team.contact_id || "[]");
-        } catch (e) {
+        } catch {
           contactIds = [];
         }
 
@@ -52,7 +129,6 @@ module.exports = {
         }
       }
 
-      // Calculate pagination metadata
       const lastPage = Math.ceil(count / per_page);
       const from = count > 0 ? offset + 1 : 0;
       const to = offset + rows.length;
@@ -61,9 +137,9 @@ module.exports = {
         data: rows,
         meta: {
           current_page: page,
-          from: from,
-          to: to,
-          per_page: per_page,
+          from,
+          to,
+          per_page,
           last_page: lastPage,
           total: count,
         },

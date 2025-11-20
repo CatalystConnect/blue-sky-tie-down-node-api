@@ -56,7 +56,7 @@ module.exports = {
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
 
-            let { page = 1, per_page , search = "" } = req.query;
+            let { page = 1, per_page, search = "" } = req.query;
             page = parseInt(page);
             per_page = parseInt(per_page) || 10;
 
@@ -193,6 +193,7 @@ module.exports = {
     async getContactCompany(req, res) {
         try {
             const { id: company_id } = req.params;
+            const { search = "", page = 1, limit = 10,id } = req.query;
 
             if (!company_id) {
                 return res.status(200).send(
@@ -200,7 +201,11 @@ module.exports = {
                 );
             }
 
-            const result = await contactsServices.getContactCompany(company_id);
+            const result = await contactsServices.getContactCompany({company_id,
+                search,
+                page: parseInt(page),
+                limit: parseInt(limit),
+            id});
 
             return res
                 .status(200)

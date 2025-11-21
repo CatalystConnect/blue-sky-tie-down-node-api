@@ -1,7 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op,Sequelize } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 module.exports = {
   /*addProjectTypes*/
@@ -15,8 +15,8 @@ module.exports = {
     }
   },
 
-    /* Get Project Types by Name (for validation) */
- async getProjectTypesByName(title) {
+  /* Get Project Types by Name (for validation) */
+  async getProjectTypesByName(title) {
     try {
       return await db.projectTypesObj.findOne({ where: { title } });
     } catch (e) {
@@ -25,105 +25,102 @@ module.exports = {
     }
   },
 
-
   // /*getAllProjectTypes*/
- 
 
-// async getAllProjectTypes({ page, per_page, search, offset, id }) {
-//   try {
-//     const whereCondition = {};
+  // async getAllProjectTypes({ page, per_page, search, offset, id }) {
+  //   try {
+  //     const whereCondition = {};
 
-//     // 🔹 Search condition
-//     if (search && search.trim() !== "") {
-//       whereCondition[Op.or] = [
-//         { title: { [Op.iLike]: `%${search.trim()}%` } },
-//       ];
-//     }
+  //     // 🔹 Search condition
+  //     if (search && search.trim() !== "") {
+  //       whereCondition[Op.or] = [
+  //         { title: { [Op.iLike]: `%${search.trim()}%` } },
+  //       ];
+  //     }
 
-//     // 🔹 Order condition (default and prioritized by ID)
-//     let order = [["id", "DESC"]];
+  //     // 🔹 Order condition (default and prioritized by ID)
+  //     let order = [["id", "DESC"]];
 
-//     if (id) {
-//       order = [
-//         [
-//           Sequelize.literal(`CASE WHEN "project_types"."id" = ${parseInt(id)} THEN 0 ELSE 1 END`),
-//           "ASC",
-//         ],
-//         ["id", "DESC"],
-//       ];
-//     }
+  //     if (id) {
+  //       order = [
+  //         [
+  //           Sequelize.literal(`CASE WHEN "project_types"."id" = ${parseInt(id)} THEN 0 ELSE 1 END`),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ];
+  //     }
 
-//     // 🔹 Separate count to ensure total records are correct
-//     const total = await db.projectTypesObj.count({ where: whereCondition });
+  //     // 🔹 Separate count to ensure total records are correct
+  //     const total = await db.projectTypesObj.count({ where: whereCondition });
 
-//     // 🔹 Fetch paginated data
-//     const rows = await db.projectTypesObj.findAll({
-//       where: whereCondition,
-//       order,
-//       limit: per_page,
-//       offset,
-//     });
+  //     // 🔹 Fetch paginated data
+  //     const rows = await db.projectTypesObj.findAll({
+  //       where: whereCondition,
+  //       order,
+  //       limit: per_page,
+  //       offset,
+  //     });
 
-//     return {
-//       total,
-//       page,
-//       per_page,
-//       data: rows,
-//     };
-//   } catch (e) {
-//     console.error("Error in getAllProjectTypes:", e.message);
-//     throw e;
-//   }
-// },
+  //     return {
+  //       total,
+  //       page,
+  //       per_page,
+  //       data: rows,
+  //     };
+  //   } catch (e) {
+  //     console.error("Error in getAllProjectTypes:", e.message);
+  //     throw e;
+  //   }
+  // },
 
-async getAllProjectTypes({ page, per_page, search, offset, ids = [] }) {
-  try {
-    const whereCondition = {};
+  async getAllProjectTypes({ page = 1, per_page = 10, search = "", offset = 0, ids = [] }) {
+    try {
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+      const offsetVal = offset || (page - 1) * per_page;
 
-    if (search && search.trim() !== "") {
-      whereCondition[Op.or] = [
-        { title: { [Op.iLike]: `%${search.trim()}%` } },
-      ];
+      const whereCondition = {};
+
+      if (search && search.trim() !== "") {
+        whereCondition[Op.or] = [
+          { title: { [Op.iLike]: `%${search.trim()}%` } }
+        ];
+      }
+
+      // Clean ids array
+      ids = ids.map(x => parseInt(x)).filter(x => !Number.isNaN(x));
+
+      // Build order condition
+      let order = [["order", "ASC"]];
+      if (ids.length > 0) {
+        const caseExpr = `
+        CASE 
+          ${ids.map((idVal, index) => `WHEN "project_types"."id" = ${idVal} THEN ${index}`).join(" ")}
+          ELSE ${ids.length} 
+        END
+      `;
+        order = [
+          [Sequelize.literal(caseExpr), "ASC"],
+          ["id", "DESC"]
+        ];
+      }
+
+      const total = await db.projectTypesObj.count({ where: whereCondition });
+
+      const rows = await db.projectTypesObj.findAll({
+        where: whereCondition,
+        order,
+        limit: per_page,
+        offset: offsetVal
+      });
+
+      return { total, page, per_page, data: rows };
+    } catch (e) {
+      console.error("Error in getAllProjectTypes:", e.message);
+      throw e;
     }
-
-    let order =[["order", "ASC"]];
-
-    if (Array.isArray(ids) && ids.length > 0) {
-      order = [
-        [
-          Sequelize.literal(
-            `CASE 
-              ${ids
-                .map((id, index) => `WHEN "project_types"."id" = ${parseInt(id)} THEN ${index}`)
-                .join(" ")}
-              ELSE ${ids.length} 
-            END`
-          ),
-          "ASC",
-        ],
-        ["id", "DESC"],
-      ];
-    }
-
-    const total = await db.projectTypesObj.count({ where: whereCondition });
-
-    const rows = await db.projectTypesObj.findAll({
-      where: whereCondition,
-      order,
-      limit: per_page,
-      offset,
-    });
-
-    return { total, page, per_page, data: rows };
-  } catch (e) {
-    console.error("Error in getAllProjectTypes:", e.message);
-    throw e;
-  }
-},
-
-
-
-
+  },
 
   /*getProjectTypesById*/
   async getProjectTypesById(id) {

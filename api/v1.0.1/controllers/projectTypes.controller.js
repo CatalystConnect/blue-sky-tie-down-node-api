@@ -24,7 +24,7 @@ module.exports = {
         user_id: req.userId,
         title: data.title,
         color: data.color,
-        order:data.order,
+        order: data.order,
       };
       await projectTypesServices.addProjectTypes(postData);
       return res
@@ -45,97 +45,153 @@ module.exports = {
   },
 
   /*getAllProjectTypes*/
-//  async getAllProjectTypes(req, res) {
-//   try {
-//     const errors = myValidationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res
-//         .status(200)
-//         .send(commonHelper.parseErrorRespose(errors.mapped()));
-//     }
+  //  async getAllProjectTypes(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
 
-//     let { page = 1, per_page = 10, search = "", id = "" } = req.query;
-//     page = parseInt(page) || 1;
-//     per_page = parseInt(per_page) || 10;
-//     const offset = (page - 1) * per_page;
+  //     let { page = 1, per_page = 10, search = "", id = "" } = req.query;
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+  //     const offset = (page - 1) * per_page;
 
-//     const result = await projectTypesServices.getAllProjectTypes({
-//       page,
-//       per_page,
-//       search,
-//       offset,
-//       id,
-//     });
+  //     const result = await projectTypesServices.getAllProjectTypes({
+  //       page,
+  //       per_page,
+  //       search,
+  //       offset,
+  //       id,
+  //     });
 
-//     return res.status(200).send(
-//       commonHelper.parseSuccessRespose(
-//         result,
-//         "Project types fetched successfully"
-//       )
-//     );
-//   } catch (error) {
-//     console.error("Error in getAllProjectTypes controller:", error.message);
-//     return res.status(400).json({
-//       status: false,
-//       message:
-//         error.response?.data?.error ||
-//         error.message ||
-//         "Get project types failed",
-//       data: error.response?.data || {},
-//     });
-//   }
-// },
-async getAllProjectTypes(req, res) {
-  try {
-    const errors = myValidationResult(req);
-    if (!errors.isEmpty()) {
-      return res
-        .status(200)
-        .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     return res.status(200).send(
+  //       commonHelper.parseSuccessRespose(
+  //         result,
+  //         "Project types fetched successfully"
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Error in getAllProjectTypes controller:", error.message);
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Get project types failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+  // async getAllProjectTypes(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     let { page = 1, per_page = 10, search = "", id = [] } = req.query;
+
+  //     // 🧠 Support both: id[]=1&id[]=4 OR id=1,4
+  //     let ids = [];
+
+  //     if (Array.isArray(id)) {
+  //       ids = id.map((x) => parseInt(x)).filter(Boolean);
+  //     } else if (typeof id === "string" && id.trim() !== "") {
+  //       ids = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
+  //     }
+
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+  //     const offset = (page - 1) * per_page;
+
+  //     const result = await projectTypesServices.getAllProjectTypes({
+  //       page,
+  //       per_page,
+  //       search,
+  //       offset,
+  //       ids,
+  //     });
+
+  //     return res.status(200).send(
+  //       commonHelper.parseSuccessRespose(
+  //         result,
+  //         "Project types fetched successfully"
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Error in getAllProjectTypes controller:", error.message);
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Get project types failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
+  async getAllProjectTypes(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      let { page = 1, per_page = 10, search = "", id = [] } = req.query;
+
+      // Parse id param into array of numbers
+      let ids = [];
+      if (Array.isArray(id)) {
+        ids = id.map(x => parseInt(x)).filter(x => !Number.isNaN(x));
+      } else if (typeof id === "string" && id.trim() !== "") {
+        try {
+          if (id.startsWith("[")) {
+            ids = JSON.parse(id).map(x => parseInt(x)).filter(x => !Number.isNaN(x));
+          } else {
+            ids = id.split(",").map(x => parseInt(x.trim())).filter(x => !Number.isNaN(x));
+          }
+        } catch (e) {
+          console.error("Invalid id format", e);
+        }
+      }
+
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+      const offset = (page - 1) * per_page;
+
+      const result = await projectTypesServices.getAllProjectTypes({
+        page,
+        per_page,
+        search,
+        offset,
+        ids,   // ✅ send array here
+      });
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          result,
+          "Project types fetched successfully"
+        )
+      );
+    } catch (error) {
+      console.error("Error in getAllProjectTypes controller:", error.message);
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error ||
+          error.message ||
+          "Get project types failed",
+        data: error.response?.data || {},
+      });
     }
-
-    let { page = 1, per_page = 10, search = "", id = [] } = req.query;
-
-    // 🧠 Support both: id[]=1&id[]=4 OR id=1,4
-    let ids = [];
-
-    if (Array.isArray(id)) {
-      ids = id.map((x) => parseInt(x)).filter(Boolean);
-    } else if (typeof id === "string" && id.trim() !== "") {
-      ids = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
-    }
-
-    page = parseInt(page) || 1;
-    per_page = parseInt(per_page) || 10;
-    const offset = (page - 1) * per_page;
-
-    const result = await projectTypesServices.getAllProjectTypes({
-      page,
-      per_page,
-      search,
-      offset,
-      ids,
-    });
-
-    return res.status(200).send(
-      commonHelper.parseSuccessRespose(
-        result,
-        "Project types fetched successfully"
-      )
-    );
-  } catch (error) {
-    console.error("Error in getAllProjectTypes controller:", error.message);
-    return res.status(400).json({
-      status: false,
-      message:
-        error.response?.data?.error ||
-        error.message ||
-        "Get project types failed",
-      data: error.response?.data || {},
-    });
-  }
-},
-
+  },
 
 
   /*getProjectTypesById*/
@@ -239,7 +295,7 @@ async getAllProjectTypes(req, res) {
         title: data.title,
         color: data.color,
         user_id: req.userId,
-        order:data.order,
+        order: data.order,
       };
 
       const result = await projectTypesServices.updateProjectTypes(
@@ -266,7 +322,7 @@ async getAllProjectTypes(req, res) {
       });
     }
   },
- validate(method) {
+  validate(method) {
     switch (method) {
       case "addProjectTypes": {
         return [

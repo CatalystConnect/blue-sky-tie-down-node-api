@@ -52,13 +52,14 @@ module.exports = {
     /*getAllProductTags*/
     async getAllProductTags(req, res) {
         try {
-            const { page = 1, per_page = 10, search = "" } = req.query;
+            const { page = 1, per_page = 10, search = "" ,id} = req.query;
 
 
             let ProductTags = await projectTagsServices.getAllProductTags({
                 page: parseInt(page),
                 per_page: parseInt(per_page),
                 search,
+                id
 
             });
 

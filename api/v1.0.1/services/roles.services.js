@@ -55,8 +55,60 @@ module.exports = {
     //         throw e;
     //     }
     // },
+    // async getAllRoles(page = 1, perPage = 10, search = "", id = null) {
+    //     try {
+    //         page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
+    //         perPage = Number.isNaN(parseInt(perPage)) ? 10 : parseInt(perPage);
+
+    //         const offset = (page - 1) * perPage;
+
+    //         // Build where condition
+    //         const whereCondition = {};
+
+    //         if (search) {
+    //             const searchLower = search.toLowerCase();
+    //             whereCondition[Op.or] = [
+    //                 Sequelize.where(
+    //                     Sequelize.fn("LOWER", Sequelize.col("roles.name")),
+    //                     { [Op.like]: `%${searchLower}%` }
+    //                 )
+    //             ];
+    //         }
+
+    //         if (id) {
+    //             const idInt = parseInt(id);
+    //             if (!Number.isNaN(idInt)) {
+    //                 whereCondition.id = idInt;
+    //             }
+    //         }
+
+    //         const { count, rows } = await db.rolesObj.findAndCountAll({
+    //             where: whereCondition,
+    //             offset,
+    //             limit: perPage,
+    //             order: [["id", "ASC"]],
+    //             raw: true
+    //         });
+
+    //         return {
+    //             data: rows,
+    //             meta: {
+    //                 current_page: page,
+    //                 from: offset + 1,
+    //                 to: offset + rows.length,
+    //                 per_page: perPage,
+    //                 total: count,
+    //                 last_page: Math.ceil(count / perPage)
+    //             }
+    //         };
+    //     } catch (e) {
+    //         logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    //         throw e;
+    //     }
+    // },
     async getAllRoles(page = 1, perPage = 10, search = "", id = null) {
         try {
+            // Defensive parsing
             page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
             perPage = Number.isNaN(parseInt(perPage)) ? 10 : parseInt(perPage);
 
@@ -75,18 +127,29 @@ module.exports = {
                 ];
             }
 
+            // Default order
+            let orderCondition = [["id", "ASC"]];
+
+            // If id is provided, adjust ordering so that id row comes first
             if (id) {
                 const idInt = parseInt(id);
                 if (!Number.isNaN(idInt)) {
-                    whereCondition.id = idInt;
+                    orderCondition = [
+                        [
+                            db.Sequelize.literal(`CASE WHEN roles.id = ${idInt} THEN 0 ELSE 1 END`),
+                            "ASC"
+                        ],
+                        ["id", "ASC"]
+                    ];
                 }
             }
 
+            // Query
             const { count, rows } = await db.rolesObj.findAndCountAll({
                 where: whereCondition,
                 offset,
                 limit: perPage,
-                order: [["id", "ASC"]],
+                order: orderCondition,
                 raw: true
             });
 

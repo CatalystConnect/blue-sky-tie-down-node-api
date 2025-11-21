@@ -24,9 +24,25 @@ module.exports = {
 
       let whereCondition = {};
       if (search) {
-        whereCondition = {
-          name: { [Op.like]: `%${search}%` },
-        };
+        const searchLower = search.toLowerCase();
+        whereCondition[Op.or] = [
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("taxes.name")),
+            { [Op.like]: `%${searchLower}%` }
+          ),
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("taxes.zipcode")),
+            { [Op.like]: `%${searchLower}%` }
+          ),
+        ];
+      }
+
+
+      if (id) {
+        const idInt = parseInt(id);
+        if (!Number.isNaN(idInt)) {
+          whereCondition.id = idInt;
+        }
       }
 
       let order = [["id", "DESC"]];

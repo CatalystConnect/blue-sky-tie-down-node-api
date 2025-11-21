@@ -1,6 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
+const { Sequelize, Op } = require("sequelize");
 
 module.exports = {
     /*addRole*/
@@ -27,12 +28,63 @@ module.exports = {
         }
     },
     /*getAllRoles*/
-    async getAllRoles(page = 1, perPage = 10) {
+    // async getAllRoles(page = 1, perPage = 10) {
+    //     try {
+    //         const offset = (page - 1) * perPage;
+
+    //         const { count, rows } = await db.rolesObj.findAndCountAll({
+    //             offset: offset,
+    //             limit: perPage,
+    //             order: [["id", "ASC"]],
+    //             raw: true
+    //         });
+
+    //         return {
+    //             data: rows,
+    //             meta: {
+    //                 current_page: page,
+    //                 from: offset + 1,
+    //                 to: offset + rows.length,
+    //                 per_page: perPage,
+    //                 total: count,
+    //                 last_page: Math.ceil(count / perPage)
+    //             }
+    //         };
+    //     } catch (e) {
+    //         logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    //         throw e;
+    //     }
+    // },
+    async getAllRoles(page = 1, perPage = 10, search = "", id = null) {
         try {
+            page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
+            perPage = Number.isNaN(parseInt(perPage)) ? 10 : parseInt(perPage);
+
             const offset = (page - 1) * perPage;
 
+            // Build where condition
+            const whereCondition = {};
+
+            if (search) {
+                const searchLower = search.toLowerCase();
+                whereCondition[Op.or] = [
+                    Sequelize.where(
+                        Sequelize.fn("LOWER", Sequelize.col("roles.name")),
+                        { [Op.like]: `%${searchLower}%` }
+                    )
+                ];
+            }
+
+            if (id) {
+                const idInt = parseInt(id);
+                if (!Number.isNaN(idInt)) {
+                    whereCondition.id = idInt;
+                }
+            }
+
             const { count, rows } = await db.rolesObj.findAndCountAll({
-                offset: offset,
+                where: whereCondition,
+                offset,
                 limit: perPage,
                 order: [["id", "ASC"]],
                 raw: true

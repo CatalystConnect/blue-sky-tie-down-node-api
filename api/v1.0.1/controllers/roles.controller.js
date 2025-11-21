@@ -57,8 +57,10 @@ module.exports = {
     try {
       let page = parseInt(req.query.page) || 1;
       let perPage = parseInt(req.query.per_page) || 10;
+      let search = req.query.search || "";
+      let id = req.query.id || null;
 
-      let result = await roleServices.getAllRoles(page, perPage);
+      let result = await roleServices.getAllRoles(page, perPage, search, id);
 
       return res.status(200).json({
         status: true,

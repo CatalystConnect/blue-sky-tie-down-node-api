@@ -20,6 +20,7 @@ module.exports = {
     limit = 10,
     search = "",
     take_all = false,
+    id
   }) {
     try {
       const offset = (page - 1) * limit;
@@ -27,6 +28,18 @@ module.exports = {
       const whereCondition = {};
       if (search) {
         whereCondition.name = { [Op.like]: `%${search}%` };
+      }
+
+      if (id) {
+        
+        if (Array.isArray(id)) {
+          whereCondition.id = { [Op.in]: id.map(x => parseInt(x)).filter(x => !Number.isNaN(x)) };
+        } else {
+          const idInt = parseInt(id);
+          if (!Number.isNaN(idInt)) {
+            whereCondition.id = idInt;
+          }
+        }
       }
 
       let queryOptions = {

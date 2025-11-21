@@ -44,13 +44,14 @@ module.exports = {
     /*getAllState*/
     async getAllState(req, res) {
         try {
-            const { page = 1, per_page = 10, search = "" } = req.query;
+            const { page = 1, per_page = 10, search = "",id  } = req.query;
 
             
             let state = await stateServices.getAllState({
                 page: parseInt(page),
                 per_page: parseInt(per_page),
                 search,
+                id
               
             });
 

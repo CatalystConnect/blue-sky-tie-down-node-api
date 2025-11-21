@@ -16,9 +16,9 @@ module.exports = {
   },
 
   /*getAllProductPhases*/
-  async getAllProductPhases({ page, per_page, search }) {
+  async getAllProductPhases({ page, per_page, search, id }) {
     try {
-       const limit = per_page
+      const limit = per_page
       const offset = (page - 1) * limit;
 
       const whereCondition = {};
@@ -26,8 +26,21 @@ module.exports = {
       if (search) {
         whereCondition[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
-         
+
         ];
+      }
+
+      if (id) {
+        try {
+          if (id.startsWith("[")) {
+            const idsArray = JSON.parse(id);
+            whereCondition.id = { [Op.in]: idsArray };
+          } else {
+            whereCondition.id = parseInt(id);
+          }
+        } catch (err) {
+          console.log("Invalid id format", err);
+        }
       }
 
       const { rows, count } = await db.projectPhasesObj.findAndCountAll({
@@ -37,15 +50,15 @@ module.exports = {
         offset,
       });
 
-     return {
-      data: rows,
-      meta: {
-        total: count,
-        page,
-        per_page,
-        // hasPrevPage: page > 1
+      return {
+        data: rows,
+        meta: {
+          total: count,
+          page,
+          per_page,
+          // hasPrevPage: page > 1
+        }
       }
-    }
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

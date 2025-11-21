@@ -174,22 +174,23 @@ module.exports = {
       // }
 
       if (search) {
-        const searchLower = search.toLowerCase();
+        if (Array.isArray(search)) {
+          search = search[search.length - 1]; // pick last param
+        }
+        if (typeof search === "string") {
+          const searchLower = search.toLowerCase();
 
-        whereCondition[Op.or] = [
-          Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("name")),
-            {
-              [Op.like]: `%${searchLower}%`
-            }
-          ),
-          Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("email")),
-            {
-              [Op.like]: `%${searchLower}%`
-            }
-          )
-        ];
+          whereCondition[Op.or] = [
+            Sequelize.where(
+              Sequelize.fn("LOWER", Sequelize.col("users.name")),
+              { [Op.like]: `%${searchLower}%` }
+            ),
+            Sequelize.where(
+              Sequelize.fn("LOWER", Sequelize.col("users.email")),
+              { [Op.like]: `%${searchLower}%` }
+            )
+          ];
+        }
       }
 
       if (date) {

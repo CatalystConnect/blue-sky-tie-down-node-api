@@ -57,85 +57,83 @@ module.exports = {
   //     throw e;
   //   }
   // },
-  async getAllTags({ page = 1, per_page = 10, search, id }) {
-    try {
-      const limit = parseInt(per_page) || 10;
-      const offset = (page - 1) * limit;
+ async  getAllTags({ page = 1, per_page = 10, search, id }) {
+  try {
+    const limit = parseInt(per_page) || 10;
+    const offset = (page - 1) * limit;
 
-      let whereCondition = {};
+    let whereCondition = {};
 
-      // ✅ Search filter (case-insensitive on title, color, type)
-      if (search && search.trim() !== "") {
-        const searchTerm = search.trim();
-        whereCondition[Op.or] = [
-          { title: { [Op.iLike]: `%${searchTerm}%` } },
-          { color: { [Op.iLike]: `%${searchTerm}%` } },
-          { type: { [Op.iLike]: `%${searchTerm}%` } },
-        ];
-      }
+    // ✅ Search filter (case-insensitive on title, color, type)
+    if (search && search.trim() !== "") {
+      const searchTerm = search.trim();
+      whereCondition[Op.or] = [
+        { title: { [Op.iLike]: `%${searchTerm}%` } },
+        { color: { [Op.iLike]: `%${searchTerm}%` } },
+        { type: { [Op.iLike]: `%${searchTerm}%` } },
+      ];
+    }
 
-      // ✅ ID filter (single or multiple IDs)
-      let idsArray = [];
-      if (id) {
-        try {
-          if (id.startsWith("[")) {
-            idsArray = JSON.parse(id);
-          } else {
-            idsArray = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
-          }
-          if (idsArray.length > 0) {
-            whereCondition.id = { [Op.in]: idsArray };
-          }
-        } catch (err) {
-          console.log("Invalid id format", err);
+    // ✅ Normalize IDs (single, array string, comma-separated)
+    let idsArray = [];
+    if (id) {
+      try {
+        if (id.startsWith("[")) {
+          idsArray = JSON.parse(id);
+        } else {
+          idsArray = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
         }
+      } catch (err) {
+        console.log("Invalid id format", err);
       }
+    }
 
-      // ✅ Ordering: prioritize IDs if provided
-      let order = [["id", "DESC"]];
-      if (idsArray.length > 0) {
-        order = [
-          [
-            Sequelize.literal(
-              `CASE 
+    // ✅ Ordering: prioritize IDs if provided
+    let order = [["id", "DESC"]];
+    if (idsArray.length > 0) {
+      order = [
+        [
+          Sequelize.literal(
+            `CASE 
               ${idsArray
                 .map((id, index) => `WHEN "tags"."id" = ${parseInt(id)} THEN ${index}`)
                 .join(" ")}
               ELSE ${idsArray.length} 
             END`
-            ),
-            "ASC",
-          ],
-          ["id", "DESC"],
-        ];
-      }
-
-      const { rows, count } = await db.tagsObj.findAndCountAll({
-        where: whereCondition,
-        limit,
-        offset,
-        order,
-        raw: true,
-      });
-
-      const lastPage = Math.ceil(count / limit);
-
-      return {
-        data: rows,
-        meta: {
-          current_page: page,
-          from: offset + 1,
-          to: offset + rows.length,
-          last_page: lastPage,
-          per_page: limit,
-          total: count,
-        },
-      };
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
+          ),
+          "ASC",
+        ],
+        ["id", "DESC"],
+      ];
     }
-  },
+
+   
+    const { rows, count } = await db.tagsObj.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order,
+      raw: true,
+    });
+
+    const lastPage = Math.ceil(count / limit);
+
+    return {
+      data: rows,
+      meta: {
+        current_page: page,
+        from: offset + 1,
+        to: offset + rows.length,
+        last_page: lastPage,
+        per_page: limit,
+        total: count,
+      },
+    };
+  } catch (e) {
+    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    throw e;
+  }
+},
   /*getTagsById*/
   async getTagsById(tagId) {
     try {

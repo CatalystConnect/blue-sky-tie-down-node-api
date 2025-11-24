@@ -27,8 +27,8 @@ module.exports = {
       const { rows, count } = await db.budgetCategoryObj.findAndCountAll({
         where: whereCondition,
         order: [["ordering", "ASC"]], // order by 'ordering' column
-        per_page,
-        offset,
+        limit: per_page,   
+        offset: offset,
       });
 
       // Pagination metadata

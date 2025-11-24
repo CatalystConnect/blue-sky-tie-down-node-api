@@ -1235,4 +1235,16 @@ db.projectObj.belongsTo(db.companyObj, {
   as: "engineerCompany",
 });
 
+db.companyObj.belongsTo(db.stateObj, {
+  foreignKey: "state",
+  as: "CompanyState",
+});
+
+db.contactsObj.belongsTo(db.stateObj, {
+  foreignKey: "state",
+  as: "ContactState",
+});
+
+
+
 module.exports = db;

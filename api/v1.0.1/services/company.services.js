@@ -141,6 +141,10 @@ module.exports = {
                 required: false,
               }),
         },
+         {
+          model: db.stateObj,
+          as: "CompanyState",
+         }
       ];
       if (take_all === "all") {
         const companies = await db.companyObj.findAll({

@@ -29,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       city: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       zip: {

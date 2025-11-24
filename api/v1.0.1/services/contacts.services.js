@@ -31,7 +31,9 @@ module.exports = {
                 where: whereCondition,
                 order: [["id", "DESC"]],
                 include: [
-                    { model: db.companyObj, as: "company" }
+                    { model: db.companyObj, as: "company" },
+                    { model: db.stateObj, as: "ContactState" },
+                    
                 ],
                 limit: per_page,
                 offset: offset,

@@ -67,7 +67,7 @@ module.exports = {
                     .status(200)
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
-            let productCategoriesId = req.query.productCategoriesId;
+            let productCategoriesId = req.query.id;
             let ProductCategories = await productCategoriesServices.getProductCategoriesById(productCategoriesId);
             if (!ProductCategories) {
                 throw new Error("Product Categories not found");
@@ -92,7 +92,7 @@ module.exports = {
                     .status(200)
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
-            let productCategoriesId = req.query.productCategoriesId;
+            let productCategoriesId = req.query.id;
             let productCategories = await productCategoriesServices.getProductCategoriesById(productCategoriesId);
             if (!productCategories) {
                 throw new Error("product Categories not found");
@@ -118,7 +118,7 @@ module.exports = {
                     .status(200)
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
-            let productCategoriesId = req.query.productCategoriesId;
+            let productCategoriesId = req.query.id;
             let ProductCategories = await productCategoriesServices.getProductCategoriesById(productCategoriesId);
             if (!ProductCategories) {
                 throw new Error("Product Categories not found");

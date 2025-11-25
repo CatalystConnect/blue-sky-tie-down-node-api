@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
     const productCategories = sequelize.define(
-      "productCategories",
+      "product_categories",
       {
         id: {
           type: Sequelize.BIGINT,

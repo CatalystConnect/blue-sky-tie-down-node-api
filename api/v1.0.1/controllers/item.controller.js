@@ -9,6 +9,11 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
+const {
+  uploadFileToDrive,
+  getOrCreateSubfolder,
+  deleteFileFromDrive,
+} = require("../helper/googleDrive");
 
 module.exports = {
   /*addItems*/
@@ -113,7 +118,7 @@ module.exports = {
             unit_id: normalizeInt(unit.unit_id),
             qty: normalizeInt(unit.qty),
             per_unit_id: normalizeInt(unit.per_unit_id),
-            price: unit.price ,
+            price: unit.price,
             upc: unit.upc || null,
             height: unit.height || null,
             weight: unit.weight || null,
@@ -199,6 +204,40 @@ module.exports = {
 
         await itemServices.ItemWebs(webData);
       }
+
+      // Start GOOGLE DRIVE FOLDERS
+
+      // const itemName = postData.sku
+      // const itemFolderName = `${item.id}.${itemName}`;
+
+      // const mainFolderPath = ['inventory', 'item', itemFolderName, 'main'];
+      // const imagesFolderPath = ['inventory', 'item', itemFolderName, 'itemImages'];
+
+      // const mainFolderId = await getOrCreateSubfolder(process.env.GOOGLE_DRIVE_FOLDER_ID, mainFolderPath);
+      // const imagesFolderId = await getOrCreateSubfolder(process.env.GOOGLE_DRIVE_FOLDER_ID, imagesFolderPath);
+
+      // if (req.files?.image && req.files.image[0]) {
+      //   const mainFile = req.files.image[0];
+
+      //   // upload to drive
+      //   const uploadedMain = await uploadFileToDrive(mainFile.path, mainFile.originalname, mainFile.mimetype, mainFolderId);
+
+
+      //   await db.itemImagesObj.create({
+      //     item_id: item.id,
+      //     user_id: req.userId,
+      //     drive_id: uploadedMain.id,
+      //     file: mainFile.filename || null,
+      //     file_name: mainFile.originalname,
+      //     file_url: uploadedMain.webViewLink || null,
+      //     folder_id: mainFolderId,
+      //     type: 'main',
+      //   }
+
+      //   )
+      // }
+
+      // End GOOGLE DRIVE FOLDERS
 
       const uploadedFiles = Object.keys(req.files)
         .filter((key) => key.startsWith("itemImages"))

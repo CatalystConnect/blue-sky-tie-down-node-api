@@ -223,9 +223,9 @@ module.exports = {
       const item = await db.itemObj.findOne({
         where: { id: itemId },
         include: [
-          { model: db.brandItemObj, as: "item_brands" },
-          { model: db.itemTagObj, as: "item_tags" },
-          { model: db.itemCategoriesObj, as: "item_categories" },
+          { model: db.brandObj, as: "brand" },
+          // { model: db.itemTagObj, as: "item_tags" },
+          // { model: db.itemCategoriesObj, as: "item_categories" },
           {
             model: db.itemUnitsObj,
             as: "item_units",
@@ -236,18 +236,18 @@ module.exports = {
               },
             ],
           },
-          { model: db.itemVendorObj, as: "item_vendors" },
-          { model: db.itemWebsObj, as: "item_webs" },
-          { model: db.itemImagesObj, as: "item_images" },
-          { model: db.serviceTypeitemsObj, as: "serviceItems" },
+          // { model: db.itemVendorObj, as: "item_vendors" },
+          // { model: db.itemWebsObj, as: "item_webs" },
+          // { model: db.itemImagesObj, as: "item_images" },
+          // { model: db.serviceTypeitemsObj, as: "serviceItems" },
         ],
         order: [
-          [{ model: db.itemImagesObj, as: "item_images" }, "id", "ASC"],
+          // [{ model: db.itemImagesObj, as: "item_images" }, "id", "ASC"],
           [{ model: db.itemUnitsObj, as: "item_units" }, "id", "ASC"],
-          [{ model: db.itemVendorObj, as: "item_vendors" }, "id", "ASC"],
-          [{ model: db.itemWebsObj, as: "item_webs" }, "id", "ASC"],
-          [{ model: db.itemCategoriesObj, as: "item_categories" }, "id", "ASC"],
-          [{ model: db.itemTagObj, as: "item_tags" }, "id", "ASC"],
+          // [{ model: db.itemVendorObj, as: "item_vendors" }, "id", "ASC"],
+          // [{ model: db.itemWebsObj, as: "item_webs" }, "id", "ASC"],
+          // [{ model: db.itemCategoriesObj, as: "item_categories" }, "id", "ASC"],
+          // [{ model: db.itemTagObj, as: "item_tags" }, "id", "ASC"],
         ],
       });
       return item;

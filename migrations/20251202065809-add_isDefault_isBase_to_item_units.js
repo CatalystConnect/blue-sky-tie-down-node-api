@@ -28,7 +28,7 @@ module.exports = {
       allowNull: true,
     });
     await queryInterface.addColumn('item_units', 'volume', {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       allowNull: true,
       defaultValue: 0,
     });

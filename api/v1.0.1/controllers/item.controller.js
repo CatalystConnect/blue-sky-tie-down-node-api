@@ -113,7 +113,7 @@ module.exports = {
             unit_id: normalizeInt(unit.unit_id),
             qty: normalizeInt(unit.qty),
             per_unit_id: normalizeInt(unit.per_unit_id),
-            price: unit.price !== undefined ? parseFloat(unit.price) : 0,
+            price: unit.price ,
             upc: unit.upc || null,
             height: unit.height || null,
             weight: unit.weight || null,

@@ -83,7 +83,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       volume: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: true,
       },
     },

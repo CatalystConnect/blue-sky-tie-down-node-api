@@ -57,7 +57,7 @@ router.put("/updateProjecttakeOffStatus", [authJwt.verifyToken], controller.upda
 
 
 router.put("/project/uploadProjectFiles",upload.any(),controller.uploadProjectFile);
-
+router.get("/project/getProjectFilesByType",controller.getProjectFilesByType);
 
 
 module.exports = router

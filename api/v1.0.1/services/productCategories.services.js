@@ -15,38 +15,86 @@ module.exports = {
           }
     },
     /*getAllProductCategories*/
-    async getAllProductCategories({ page, per_page, search }) {
-        try {
-          const limit = parseInt(per_page);
-          const offset = (page - 1) * limit;
+    // async getAllProductCategories({ page, per_page, search }) {
+    //     try {
+    //       const limit = parseInt(per_page);
+    //       const offset = (page - 1) * limit;
       
-          let whereCondition = {};
-          if (search) {
-            whereCondition = {
-              name: { [Op.like]: `%${search}%` },
-            };
-          }
+    //       let whereCondition = {};
+    //       if (search) {
+    //         whereCondition = {
+    //           name: { [Op.like]: `%${search}%` },
+    //         };
+    //       }
       
-          const { rows, count } = await db.productCategoriesObj.findAndCountAll({
-            where: whereCondition,
-            limit,
-            offset,
-            order: [["created_at", "DESC"]],
-          });
+    //       const { rows, count } = await db.productCategoriesObj.findAndCountAll({
+    //         where: whereCondition,
+    //         limit,
+    //         offset,
+    //         order: [["created_at", "DESC"]],
+    //       });
       
-          return {
-            total: count,
-            page: parseInt(page),
-            per_page: limit,
-            totalPages: Math.ceil(count / limit),
-            productCategories: rows,
-          };
-        } catch (e) {
-          logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-          throw e;
-        }
-      },
-      
+    //       return {
+    //         total: count,
+    //         page: parseInt(page),
+    //         per_page: limit,
+    //         totalPages: Math.ceil(count / limit),
+    //         productCategories: rows,
+    //       };
+    //     } catch (e) {
+    //       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+    //       throw e;
+    //     }
+    //   },
+      async getAllProductCategories({ page, per_page, search }) {
+  try {
+    
+    let whereCondition = {};
+    if (search) {
+      whereCondition = {
+        name: { [Op.like]: `%${search}%` },
+      };
+    }
+
+    // CASE 1 → no pagination → return all categories
+    if (!page || !per_page) {
+      const rows = await db.productCategoriesObj.findAll({
+        where: whereCondition,
+        order: [["created_at", "DESC"]],
+      });
+
+      return {
+        total: rows.length,
+        page: null,
+        per_page: null,
+        totalPages: 1,
+        productCategories: rows
+      };
+    }
+
+    // CASE 2 → pagination
+    const limit = parseInt(per_page);
+    const offset = (page - 1) * limit;
+
+    const { rows, count } = await db.productCategoriesObj.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order: [["created_at", "DESC"]],
+    });
+
+    return {
+      total: count,
+      page: parseInt(page),
+      per_page: limit,
+      totalPages: Math.ceil(count / limit),
+      productCategories: rows,
+    };
+
+  } catch (e) {
+    throw e;
+  }
+},
      /*getProductCategoriesById*/
      async getProductCategoriesById(productCategoriesId) {
         try {

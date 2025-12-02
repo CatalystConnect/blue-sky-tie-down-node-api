@@ -44,7 +44,7 @@ module.exports = {
     /*getAllTags*/
     async getAllTags(req, res) {
         try {
-            const { page = 1, per_page = 10, search = "",id  } = req.query;
+            const { page = 1, per_page , search = "",id  } = req.query;
 
             
             let tags = await tagsServices.getAllTags({

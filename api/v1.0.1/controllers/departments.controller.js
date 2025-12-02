@@ -43,9 +43,9 @@ module.exports = {
   /* getAllDepartments */
   async getAllDepartments(req, res) {
     try {
-      let { page = 1, limit = 10, search = "", take_all = false, id } = req.query;
+      let { page = 1, per_page = 10, search = "", take_all = false, id } = req.query;
       page = parseInt(page);
-      limit = parseInt(limit);
+      let limit = parseInt(per_page);
       take_all = take_all === "true" || take_all === true;
       if (id === "" || id === undefined || id === null) {
         id = null;

@@ -75,30 +75,64 @@ module.exports = {
         await itemServices.ItemTag(tagData);
       }
 
-      if (req.body.itemUnits && Array.isArray(req.body.itemUnits)) {
-        const unitData = req.body.itemUnits.map((unit) => ({
-          item_id: item.id,
-          unit_id: unit.unit_id,
-          qty: unit.qty,
-          per_unit_id: normalizeInt(unit.per_unit_id),
-          price: unit.price,
-          upc: unit.upc,
-          height: unit.height || null,
-          weight: unit.weight || null,
-          length: unit.length || null,
-          width: unit.width || null,
-          unit_type: unit.unit_type || null,
-          isDefault: unit.isDefault || null,
-          isBase: unit.isBase || null,
-          // conversionMatrix: unit.conversionMatrix || null
-          conversionMatrix: unit.conversionMatrix
-            ? typeof unit.conversionMatrix === "string"
-              ? JSON.parse(unit.conversionMatrix)
-              : unit.conversionMatrix
-            : {},
-        }));
+      // if (req.body.itemUnits && Array.isArray(req.body.itemUnits)) {
+      //   const unitData = req.body.itemUnits.map((unit) => ({
+      //     item_id: item.id,
+      //     unit_id: unit.unit_id,
+      //     qty: unit.qty,
+      //     per_unit_id: normalizeInt(unit.per_unit_id),
+      //     price: unit.price,
+      //     upc: unit.upc,
+      //     height: unit.height || null,
+      //     weight: unit.weight || null,
+      //     length: unit.length || null,
+      //     width: unit.width || null,
+      //     unit_type: unit.unit_type || null,
+      //     isDefault: unit.isDefault || null,
+      //     volume: unit.volume || null,
+      //     isBase: unit.isBase || null,
+      //     // conversionMatrix: unit.conversionMatrix || null
+      //     conversionMatrix: unit.conversionMatrix
+      //       ? typeof unit.conversionMatrix === "string"
+      //         ? JSON.parse(unit.conversionMatrix)
+      //         : unit.conversionMatrix
+      //       : {},
+      //   }));
 
-        await itemServices.ItemUnits(unitData);
+      //   await itemServices.ItemUnits(unitData);
+      // }
+      if (req.body.itemUnits && Array.isArray(req.body.itemUnits)) {
+        const unitData = req.body.itemUnits
+          // 1️⃣ Filter out empty rows
+          .filter(unit =>
+            Object.values(unit).some(val => val !== "" && val !== null && val !== undefined)
+          )
+          // 2️⃣ Map valid units
+          .map(unit => ({
+            item_id: item.id,
+            unit_id: normalizeInt(unit.unit_id),
+            qty: normalizeInt(unit.qty),
+            per_unit_id: normalizeInt(unit.per_unit_id),
+            price: unit.price !== undefined ? parseFloat(unit.price) : 0,
+            upc: unit.upc || null,
+            height: unit.height || null,
+            weight: unit.weight || null,
+            length: unit.length || null,
+            width: unit.width || null,
+            unit_type: unit.unit_type || null,
+            isDefault: unit.isDefault || null,
+            isBase: unit.isBase || null,
+            volume: unit.volume || null,
+            conversionMatrix: unit.conversionMatrix
+              ? typeof unit.conversionMatrix === "string"
+                ? JSON.parse(unit.conversionMatrix)
+                : unit.conversionMatrix
+              : {},
+          }));
+
+        if (unitData.length) {
+          await itemServices.ItemUnits(unitData);
+        }
       }
 
       if (req.body.itemVendors && Array.isArray(req.body.itemVendors)) {
@@ -114,8 +148,8 @@ module.exports = {
             item_id: item.id ? parseInt(item.id, 10) : null, // required
             vendor_id:
               vendor.vendor_id &&
-              String(vendor.vendor_id).trim() !== "" &&
-              !isNaN(vendor.vendor_id)
+                String(vendor.vendor_id).trim() !== "" &&
+                !isNaN(vendor.vendor_id)
                 ? parseInt(vendor.vendor_id, 10)
                 : null,
             item:
@@ -140,8 +174,8 @@ module.exports = {
                 : null,
             is_stocked:
               vendor.is_stocked &&
-              (vendor.is_stocked.trim() === "1" ||
-                vendor.is_stocked.trim().toLowerCase() === "true")
+                (vendor.is_stocked.trim() === "1" ||
+                  vendor.is_stocked.trim().toLowerCase() === "true")
                 ? 1
                 : 0, // ✅ default to 0 instead of null
             unit_id:

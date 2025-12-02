@@ -67,6 +67,82 @@ module.exports = {
   //     throw e;
   //   }
   // },
+  // async getAllDepartments({
+  //   page = 1,
+  //   limit = 10,
+  //   search = "",
+  //   take_all = false,
+  //   id
+  // }) {
+  //   try {
+  //     page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
+  //     limit = Number.isNaN(parseInt(limit)) ? 10 : parseInt(limit);
+  //     const offset = (page - 1) * limit;
+
+  //     const whereCondition = {};
+
+  //     // Handle id filter (single or array) — but don't restrict, just for order
+  //     let idInt = null;
+  //     if (id) {
+  //       if (Array.isArray(id)) {
+  //         const ids = id.map(x => parseInt(x)).filter(x => !Number.isNaN(x));
+  //         if (ids.length > 0) idInt = ids[0]; // take first for ordering
+  //         whereCondition.id = { [Op.in]: ids };
+  //       } else {
+  //         const parsed = parseInt(id);
+  //         if (!Number.isNaN(parsed)) {
+  //           idInt = parsed;
+  //           // don't filter by id, we want all rows
+  //         }
+  //       }
+  //     }
+
+  //     // Build order condition
+  //     let orderCondition = [["id", "DESC"]];
+  //     if (search || idInt) {
+  //       const searchLower = search ? search.toLowerCase() : null;
+
+  //       let caseExpr = "1"; // default
+  //       if (idInt && searchLower) {
+  //         caseExpr = `CASE 
+  //                     WHEN departments.id = ${idInt} THEN 0
+  //                     WHEN LOWER(name) LIKE '%${searchLower}%' THEN 1
+  //                     ELSE 2 END`;
+  //       } else if (idInt) {
+  //         caseExpr = `CASE WHEN departments.id = ${idInt} THEN 0 ELSE 1 END`;
+  //       } else if (searchLower) {
+  //         caseExpr = `CASE WHEN LOWER(name) LIKE '%${searchLower}%' THEN 0 ELSE 1 END`;
+  //       }
+
+  //       orderCondition = [
+  //         [db.Sequelize.literal(caseExpr), "ASC"],
+  //         ["id", "DESC"]
+  //       ];
+  //     }
+
+  //     // Query options
+  //     let queryOptions = {
+  //       where: whereCondition,
+  //       order: orderCondition
+  //     };
+
+  //     if (!take_all) {
+  //       queryOptions.limit = limit;
+  //       queryOptions.offset = offset;
+  //     }
+
+  //     const { count, rows } = await db.departmentObj.findAndCountAll(queryOptions);
+
+  //     return {
+  //       departments: rows,
+  //       total: count
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+
   async getAllDepartments({
     page = 1,
     limit = 10,
@@ -81,47 +157,52 @@ module.exports = {
 
       const whereCondition = {};
 
-      // Handle id filter (single or array) — but don't restrict, just for order
+   
       let idInt = null;
-      if (id) {
+      if (id != null && id !== "" && id !== "null" && id !== "undefined") {
         if (Array.isArray(id)) {
-          const ids = id.map(x => parseInt(x)).filter(x => !Number.isNaN(x));
-          if (ids.length > 0) idInt = ids[0]; // take first for ordering
-          whereCondition.id = { [Op.in]: ids };
+          const validIds = id.map(x => parseInt(x, 10)).filter(x => !isNaN(x) && x > 0);
+          if (validIds.length > 0) {
+            idInt = validIds[0];
+            whereCondition.id = { [Op.in]: validIds };
+          }
         } else {
-          const parsed = parseInt(id);
-          if (!Number.isNaN(parsed)) {
+          const parsed = parseInt(id, 10);
+          if (!isNaN(parsed) && parsed > 0) {
             idInt = parsed;
-            // don't filter by id, we want all rows
           }
         }
       }
 
-      // Build order condition
+      
       let orderCondition = [["id", "DESC"]];
-      if (search || idInt) {
-        const searchLower = search ? search.toLowerCase() : null;
 
-        let caseExpr = "1"; // default
-        if (idInt && searchLower) {
-          caseExpr = `CASE 
-                      WHEN departments.id = ${idInt} THEN 0
-                      WHEN LOWER(name) LIKE '%${searchLower}%' THEN 1
-                      ELSE 2 END`;
-        } else if (idInt) {
-          caseExpr = `CASE WHEN departments.id = ${idInt} THEN 0 ELSE 1 END`;
-        } else if (searchLower) {
-          caseExpr = `CASE WHEN LOWER(name) LIKE '%${searchLower}%' THEN 0 ELSE 1 END`;
+      const hasSearch = search?.trim().length > 0;
+      const searchLower = hasSearch ? search.trim().toLowerCase() : "";
+
+      if (hasSearch || idInt !== null) {
+        if (idInt !== null && hasSearch) {
+          orderCondition = [
+            [db.Sequelize.literal(`CASE 
+            WHEN departments.id = ${idInt} THEN 0
+            WHEN LOWER(departments.name) LIKE '%${searchLower}%' THEN 1 
+            ELSE 2 END`), "ASC"],
+            ["id", "DESC"]
+          ];
+        } else if (idInt !== null) {
+          orderCondition = [
+            [db.Sequelize.literal(`CASE WHEN departments.id = ${idInt} THEN 0 ELSE 1 END`), "ASC"],
+            ["id", "DESC"]
+          ];
+        } else if (hasSearch) {
+          orderCondition = [
+            [db.Sequelize.literal(`CASE WHEN LOWER(departments.name) LIKE '%${searchLower}%' THEN 0 ELSE 1 END`), "ASC"],
+            ["id", "DESC"]
+          ];
         }
-
-        orderCondition = [
-          [db.Sequelize.literal(caseExpr), "ASC"],
-          ["id", "DESC"]
-        ];
       }
 
-      // Query options
-      let queryOptions = {
+      const queryOptions = {
         where: whereCondition,
         order: orderCondition
       };
@@ -137,6 +218,7 @@ module.exports = {
         departments: rows,
         total: count
       };
+
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

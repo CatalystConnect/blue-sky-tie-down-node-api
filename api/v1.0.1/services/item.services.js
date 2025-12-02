@@ -210,10 +210,22 @@ module.exports = {
           {
             model: db.itemCategoriesObj,
             as: "item_categories",
+            include: [
+              {
+                model: db.productCategoriesObj,
+                as: "categories"
+              }
+            ]
           },
           {
             model: db.itemTagObj,
             as: "item_tags",
+             include: [
+              {
+                model: db.tagsObj,
+                as: "tags"
+              }
+            ]
           },
         ],
       });

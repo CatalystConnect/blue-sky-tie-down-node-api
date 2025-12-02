@@ -658,7 +658,17 @@ db.itemObj.hasMany(db.itemCategoriesObj, {
   foreignKey: "item_id",
   as: "item_categories",
 });
+
+db.itemCategoriesObj.belongsTo(db.productCategoriesObj, {
+  foreignKey: "product_category_id",
+  as: "categories",
+});
+
+
+
 db.itemObj.hasMany(db.itemTagObj, { foreignKey: "item_id", as: "item_tags" });
+db.itemTagObj.belongsTo(db.tagsObj, { foreignKey: "product_tag_id", as: "tags" });
+
 db.itemObj.hasMany(db.itemUnitsObj, {
   foreignKey: "item_id",
   as: "item_units",

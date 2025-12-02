@@ -57,83 +57,129 @@ module.exports = {
   //     throw e;
   //   }
   // },
- async  getAllTags({ page = 1, per_page = 10, search, id }) {
-  try {
-    const limit = parseInt(per_page) || 10;
-    const offset = (page - 1) * limit;
+  //  async  getAllTags({ page = 1, per_page = 10, search, id }) {
+  //   try {
+  //     const limit = parseInt(per_page) || 10;
+  //     const offset = (page - 1) * limit;
 
-    let whereCondition = {};
+  //     let whereCondition = {};
 
-    // ✅ Search filter (case-insensitive on title, color, type)
-    if (search && search.trim() !== "") {
-      const searchTerm = search.trim();
-      whereCondition[Op.or] = [
-        { title: { [Op.iLike]: `%${searchTerm}%` } },
-        { color: { [Op.iLike]: `%${searchTerm}%` } },
-        { type: { [Op.iLike]: `%${searchTerm}%` } },
-      ];
-    }
+  //     // ✅ Search filter (case-insensitive on title, color, type)
+  //     if (search && search.trim() !== "") {
+  //       const searchTerm = search.trim();
+  //       whereCondition[Op.or] = [
+  //         { title: { [Op.iLike]: `%${searchTerm}%` } },
+  //         { color: { [Op.iLike]: `%${searchTerm}%` } },
+  //         { type: { [Op.iLike]: `%${searchTerm}%` } },
+  //       ];
+  //     }
 
-    // ✅ Normalize IDs (single, array string, comma-separated)
-    let idsArray = [];
-    if (id) {
-      try {
-        if (id.startsWith("[")) {
-          idsArray = JSON.parse(id);
-        } else {
-          idsArray = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
-        }
-      } catch (err) {
-        console.log("Invalid id format", err);
+  //     // ✅ Normalize IDs (single, array string, comma-separated)
+  //     let idsArray = [];
+  //     if (id) {
+  //       try {
+  //         if (id.startsWith("[")) {
+  //           idsArray = JSON.parse(id);
+  //         } else {
+  //           idsArray = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
+  //         }
+  //       } catch (err) {
+  //         console.log("Invalid id format", err);
+  //       }
+  //     }
+
+  //     // ✅ Ordering: prioritize IDs if provided
+  //     let order = [["id", "DESC"]];
+  //     if (idsArray.length > 0) {
+  //       order = [
+  //         [
+  //           Sequelize.literal(
+  //             `CASE 
+  //               ${idsArray
+  //                 .map((id, index) => `WHEN "tags"."id" = ${parseInt(id)} THEN ${index}`)
+  //                 .join(" ")}
+  //               ELSE ${idsArray.length} 
+  //             END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ];
+  //     }
+
+
+  //     const { rows, count } = await db.tagsObj.findAndCountAll({
+  //       where: whereCondition,
+  //       limit,
+  //       offset,
+  //       order,
+  //       raw: true,
+  //     });
+
+  //     const lastPage = Math.ceil(count / limit);
+
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         current_page: page,
+  //         from: offset + 1,
+  //         to: offset + rows.length,
+  //         last_page: lastPage,
+  //         per_page: limit,
+  //         total: count,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async getAllTags({ page, per_page, search, id }) {
+    try {
+      let whereCondition = {};
+
+      // Search filter
+      if (search && search.trim() !== "") {
+        const searchTerm = search.trim();
+        whereCondition[Op.or] = [
+          { title: { [Op.iLike]: `%${searchTerm}%` } },
+          { color: { [Op.iLike]: `%${searchTerm}%` } },
+          { type: { [Op.iLike]: `%${searchTerm}%` } },
+        ];
       }
+
+      // Detect pagination or no pagination
+      const paginationEnabled = page && per_page;
+
+      const limit = paginationEnabled ? parseInt(per_page) : null;
+      const offset = paginationEnabled ? (parseInt(page) - 1) * parseInt(per_page) : null;
+
+      const { rows, count } = await db.tagsObj.findAndCountAll({
+        where: whereCondition,
+        ...(limit ? { limit } : {}),   // Add limit only if pagination
+        ...(offset ? { offset } : {}),
+        order: [["id", "DESC"]],
+        raw: true,
+      });
+
+      let lastPage = paginationEnabled ? Math.ceil(count / limit) : 1;
+
+      return {
+        data: rows,
+        meta: {
+          current_page: parseInt(page),
+          from: offset + 1,
+          to: offset + rows.length,
+          last_page: lastPage,
+          per_page: limit,
+          total: count
+        },
+      };
+    } catch (e) {
+      throw e;
     }
+  },
 
-    // ✅ Ordering: prioritize IDs if provided
-    let order = [["id", "DESC"]];
-    if (idsArray.length > 0) {
-      order = [
-        [
-          Sequelize.literal(
-            `CASE 
-              ${idsArray
-                .map((id, index) => `WHEN "tags"."id" = ${parseInt(id)} THEN ${index}`)
-                .join(" ")}
-              ELSE ${idsArray.length} 
-            END`
-          ),
-          "ASC",
-        ],
-        ["id", "DESC"],
-      ];
-    }
-
-   
-    const { rows, count } = await db.tagsObj.findAndCountAll({
-      where: whereCondition,
-      limit,
-      offset,
-      order,
-      raw: true,
-    });
-
-    const lastPage = Math.ceil(count / limit);
-
-    return {
-      data: rows,
-      meta: {
-        current_page: page,
-        from: offset + 1,
-        to: offset + rows.length,
-        last_page: lastPage,
-        per_page: limit,
-        total: count,
-      },
-    };
-  } catch (e) {
-    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-    throw e;
-  }
-},
   /*getTagsById*/
   async getTagsById(tagId) {
     try {

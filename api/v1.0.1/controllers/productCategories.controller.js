@@ -42,7 +42,7 @@ module.exports = {
      /*getAllProductCategories*/
      async getAllProductCategories(req, res) {
         try {
-            const { page = 1, per_page = 10, search = ""  } = req.query;
+            const { page = 1, per_page , search = ""  } = req.query;
             let ProductCategories = await productCategoriesServices.getAllProductCategories({ page, per_page, search });
             if (!ProductCategories) {
                 throw new Error("Product Categories not found");

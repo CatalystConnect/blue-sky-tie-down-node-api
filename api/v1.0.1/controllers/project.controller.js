@@ -3252,6 +3252,36 @@ module.exports = {
       });
     }
   },
+
+  async getProjectFilesByType(req, res) {
+    try {
+        const { project_id, type } = req.query;
+
+        if (!project_id || !type) {
+            return res.status(400).json({
+                success: false,
+                message: "project_id and type are required"
+            });
+        }
+
+        const result = await projectServices.getProjectFilesByType(project_id, type);
+
+        return res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        console.error("getProjectFilesByType error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+},
+
+
+
   validate(method) {
     switch (method) {
       case "addProject": {

@@ -1,7 +1,7 @@
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
-const { Op,fn, col, where } = require("sequelize");
+const { Op, fn, col, where } = require("sequelize");
 
 module.exports = {
   /*addItems*/
@@ -140,7 +140,7 @@ module.exports = {
     try {
       page = parseInt(page) || 1;
 
-      // prefer explicit "limit" if passed, otherwise use per_page
+
       per_page = parseInt(limit) || parseInt(per_page) || 10;
 
       const _limit = per_page;
@@ -148,21 +148,25 @@ module.exports = {
 
       let whereCondition = {};
 
-      // search condition
+
       if (search) {
         whereCondition[Op.or] = [
-          where(fn("LOWER", col("sku")), {
-            [Op.like]: `%${search.toLowerCase()}%`,
-          }),
+          {
+            [Op.or]: [
+              where(fn("LOWER", col("sku")), {
+                [Op.like]: `%${search.toLowerCase()}%`,
+              }),
+            ],
+          },
         ];
       }
 
-      // handle id + per_id filters
+
       let ids = [];
 
       const collectIds = (value) => {
         if (Array.isArray(value)) {
-          return value.map((v) => parseInt(v)).filter((v) => !isNaN(v)); // remove empty & NaN
+          return value.map((v) => parseInt(v)).filter((v) => !isNaN(v));
         } else if (value) {
           let num = parseInt(value);
           return !isNaN(num) ? [num] : [];
@@ -176,17 +180,12 @@ module.exports = {
         whereCondition.id = { [Op.in]: ids };
       }
 
-      // if (type) {
-      //   if (type === "service") whereCondition.service = "service";
-      //   else if (type === "physical") whereCondition.service = "physical";
-      // }
-
       let queryOptions = {
         where: whereCondition,
         order: [["created_at", "DESC"]],
       };
 
-      // pagination or fetch all
+
       if (take_all && take_all === "all") {
         queryOptions.limit = null;
         queryOptions.offset = null;
@@ -195,17 +194,30 @@ module.exports = {
         queryOptions.offset = offset;
       }
 
-      const { rows, count } = await db.itemObj.findAndCountAll({
-        ...queryOptions, 
-        include: [
-           { model: db.itemUnitsObj, as: "item_units" },
-           { model: db.brandObj, as: 'brand' },
-           { model: db.itemCategoriesObj, as: "item_categories" },
-           { model: db.itemTagObj, as: "item_tags" },
 
+      const { rows, count } = await db.itemObj.findAndCountAll({
+        ...queryOptions,
+        distinct: true,
+        include: [
+          {
+            model: db.itemUnitsObj,
+            as: "item_units",
+          },
+          {
+            model: db.brandObj,
+            as: "brand",
+          },
+          {
+            model: db.itemCategoriesObj,
+            as: "item_categories",
+          },
+          {
+            model: db.itemTagObj,
+            as: "item_tags",
+          },
         ],
       });
-      
+
 
       return {
         total: count,
@@ -226,7 +238,7 @@ module.exports = {
         where: { id: itemId },
         include: [
           { model: db.brandObj, as: "brand" },
-           { model: db.itemTagObj, as: "item_tags" },
+          { model: db.itemTagObj, as: "item_tags" },
           { model: db.itemCategoriesObj, as: "item_categories" },
           {
             model: db.itemUnitsObj,

@@ -66,10 +66,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      per_unit: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-      },
+      // per_unit: {
+      //   type: Sequelize.STRING(255),
+      //   allowNull: true,
+      // },
       price: {
         type: Sequelize.STRING(255),
         allowNull: true,
@@ -80,6 +80,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       conversionMatrix: {
         type: Sequelize.JSONB,
+        allowNull: true,
+      },
+      volume: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
     },

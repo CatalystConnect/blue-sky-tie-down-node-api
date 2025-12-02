@@ -176,10 +176,10 @@ module.exports = {
         whereCondition.id = { [Op.in]: ids };
       }
 
-      if (type) {
-        if (type === "service") whereCondition.service = "service";
-        else if (type === "physical") whereCondition.service = "physical";
-      }
+      // if (type) {
+      //   if (type === "service") whereCondition.service = "service";
+      //   else if (type === "physical") whereCondition.service = "physical";
+      // }
 
       let queryOptions = {
         where: whereCondition,
@@ -198,8 +198,9 @@ module.exports = {
       const { rows, count } = await db.itemObj.findAndCountAll({
         ...queryOptions, 
         include: [
-          { model: db.serviceTypeitemsObj, as: "serviceItems" },
+           { model: db.itemUnitsObj, as: "item_units" },
            { model: db.brandObj, as: 'brand' }
+
         ],
       });
       

@@ -43,10 +43,13 @@ module.exports = {
   /* getAllDepartments */
   async getAllDepartments(req, res) {
     try {
-      let { page = 1, limit = 10, search = "", take_all = false,id } = req.query;
+      let { page = 1, limit = 10, search = "", take_all = false, id } = req.query;
       page = parseInt(page);
       limit = parseInt(limit);
       take_all = take_all === "true" || take_all === true;
+      if (id === "" || id === undefined || id === null) {
+        id = null;
+      }
 
       const { departments, total } =
         await departmentsServices.getAllDepartments({

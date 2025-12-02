@@ -47,7 +47,7 @@ module.exports = {
       page = parseInt(page);
       let limit = parseInt(per_page);
       take_all = take_all === "true" || take_all === true;
-      if (id === "" || id === undefined || id === null) {
+      if (id === "" || id === "null" || id === "undefined" || id == null) {
         id = null;
       }
 
@@ -60,8 +60,8 @@ module.exports = {
           id
         });
 
-      if (!departments || departments.length === 0)
-        throw new Error("Departments not found");
+      // if (!departments || departments.length === 0)
+      //   throw new Error("Departments not found");
 
       const lastPage = take_all ? 1 : Math.ceil(total / limit);
       const from = total > 0 ? (page - 1) * limit + 1 : 0;
@@ -69,7 +69,7 @@ module.exports = {
 
       return res.status(200).send({
         status: true,
-        message: "Departments displayed successfully",
+        message: departments.length > 0 ? "Departments displayed successfully" : "No departments found",
         data: departments,
         meta: {
           current_page: page,

@@ -200,7 +200,8 @@ module.exports = {
         include: [
            { model: db.itemUnitsObj, as: "item_units" },
            { model: db.brandObj, as: 'brand' },
-           { model: db.itemCategoriesObj, as: "item_categories" }
+           { model: db.itemCategoriesObj, as: "item_categories" },
+           { model: db.itemTagObj, as: "item_tags" },
 
         ],
       });
@@ -225,7 +226,7 @@ module.exports = {
         where: { id: itemId },
         include: [
           { model: db.brandObj, as: "brand" },
-          // { model: db.itemTagObj, as: "item_tags" },
+           { model: db.itemTagObj, as: "item_tags" },
           { model: db.itemCategoriesObj, as: "item_categories" },
           {
             model: db.itemUnitsObj,

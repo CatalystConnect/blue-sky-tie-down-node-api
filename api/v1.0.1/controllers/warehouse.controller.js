@@ -12,6 +12,7 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
+const warehouseQueue = require("../../../queues/warehouseQueue");
 module.exports = {
   /*addWareHouse*/
   async addWareHouse(req, res) {
@@ -34,7 +35,11 @@ module.exports = {
         state: data.state,
         zip: data.zip,
       };
-      await wareHouseServices.addWareHouse(postData);
+      const newWarehouse = await wareHouseServices.addWareHouse(postData);
+
+      await warehouseQueue.add("assignAllActiveItems", {
+        warehouseId: newWarehouse.id,
+      })
       return res
         .status(200)
         .send(

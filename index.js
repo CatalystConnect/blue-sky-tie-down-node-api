@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 8001;
 app.use(cors({ origin: "*" }));
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
+require("./workers/warehouseWorker");
+require("./workers/itemWorker");
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 app.use(function (req, res, next) {

@@ -9,6 +9,8 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 
+const { VENDOR_FREIGHT_TERMS, VENDOR_STATUS } = require("../helper/constant");
+
 module.exports = {
   /*addVendors*/
   async addVendors(req, res) {
@@ -20,8 +22,28 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      const { user_id, name, email, phone, bill_to, ship_to } = req.body;
+      const { user_id, name, email, phone, bill_to, ship_to, vendor_code, dba_name, tax_id, is_1099_eligible, payment_terms_id, incoterm_code, freight_terms, default_shipping_method_id, status } = req.body;
 
+      if (!Object.values(VENDOR_FREIGHT_TERMS).includes(freight_terms)) {
+        return res.status(400).send({
+          status: false,
+          message: `Invalid freight_terms. Allowed: ${Object.values(
+            VENDOR_FREIGHT_TERMS
+          ).join(", ")}`,
+          data: {},
+        });
+      }
+
+
+      if (!Object.values(VENDOR_STATUS).includes(status)) {
+        return res.status(400).send({
+          status: false,
+          message: `Invalid status. Allowed: ${Object.values(VENDOR_STATUS).join(
+            ", "
+          )}`,
+          data: {},
+        });
+      }
       const postData = {
         user_id: req.userId,
         name,
@@ -29,6 +51,15 @@ module.exports = {
         phone,
         bill_to,
         ship_to,
+        vendor_code,
+        dba_name,
+        tax_id,
+        is_1099_eligible,
+        payment_terms_id,
+        incoterm_code,
+        freight_terms,
+        default_shipping_method_id,
+        status,
       };
 
       const vendor = await vendorServices.addVendors(postData);
@@ -83,7 +114,7 @@ module.exports = {
   /*getAllVendors*/
   async getAllVendors(req, res) {
     try {
-      const { page = 1, per_page = 5, search = "", limit="" ,take_all="", id = "" } = req.query;
+      const { page = 1, per_page = 5, search = "", limit = "", take_all = "", id = "" } = req.query;
       let vendors = await vendorServices.getAllVendors({
         page,
         per_page,
@@ -95,14 +126,14 @@ module.exports = {
       if (!vendors) {
         throw new Error("Vendor not found");
       }
-     return res
-      .status(200)
-      .send({
-        status: true,
-        message: "Vendors displayed successfully",
-        data: vendors.data,
-        meta: vendors.meta
-      });
+      return res
+        .status(200)
+        .send({
+          status: true,
+          message: "Vendors displayed successfully",
+          data: vendors.data,
+          meta: vendors.meta
+        });
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -163,12 +194,42 @@ module.exports = {
         throw new Error("Vendor not found");
       }
       let data = req.body;
+
+      if (data.status && !Object.values(VENDOR_STATUS).includes(data.status)) {
+        return res.status(400).send({
+          status: false,
+          message: `Invalid status. Allowed: ${Object.values(VENDOR_STATUS).join(
+            ", "
+          )}`,
+          data: {},
+        });
+      }
+
+      if (data.freight_terms && !Object.values(VENDOR_FREIGHT_TERMS).includes(data.freight_terms)) {
+        return res.status(400).send({
+          status: false,
+          message: `Invalid freight_terms. Allowed: ${Object.values(VENDOR_FREIGHT_TERMS).join(
+            ", "
+          )}`,
+          data: {},
+        });
+      }
+
       let postData = {
         name: data.name,
         email: data.email,
         phone: data.phone,
         bill_to: data.bill_to,
         ship_to: data.ship_to,
+        vendor_code: data.vendor_code,
+        dba_name: data.dba_name,
+        tax_id: data.tax_id,
+        is_1099_eligible: data.is_1099_eligible,
+        payment_terms_id: data.payment_terms_id,
+        incoterm_code: data.incoterm_code,
+        freight_terms: data.freight_terms,
+        default_shipping_method_id: data.default_shipping_method_id,
+        status: data.status,
         updated_at: new Date(),
       };
 

@@ -260,6 +260,10 @@ db.projectTypeMappingsObj = require("./projectTypeMappings.models")(
   Sequelize
 );
 db.budgetHistoryObj = require("./budgetHistory.models")(db.dbObj, Sequelize);
+db.vendorAddressObj = require("./vendorsAddress.models")(db.dbObj, Sequelize);
+db.vendorContactObj = require("./vendorsContact.models")(db.dbObj, Sequelize);
+db.vendorItemObj = require("./vendorsItem.models")(db.dbObj, Sequelize);
+
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {
@@ -1253,6 +1257,35 @@ db.companyObj.belongsTo(db.stateObj, {
 db.contactsObj.belongsTo(db.stateObj, {
   foreignKey: "state",
   as: "ContactState",
+});
+
+
+db.vendorItemObj.belongsTo(db.itemObj, {
+  foreignKey: "item_id",
+   targetKey: "id", 
+  as: "item"
+
+});
+
+db.vendorItemObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",
+  targetKey: "id", 
+  as: "vendors"
+
+});
+
+db.vendorContactObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",
+  targetKey: "id", 
+  as: "vendorContacts"
+
+});
+
+db.vendorAddressObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",
+  targetKey: "id", 
+  as: "vendorAddresses"
+
 });
 
 

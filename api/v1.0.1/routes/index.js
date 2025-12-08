@@ -61,5 +61,8 @@ router.use(require("./state.routes"));
 router.use(require("./salesPipelinesLeads.routes"));
 router.use(require("./interactions.routes"));
 router.use(require("./leadScopes.routes"));
+router.use(require("./vendorAddress.routes"));
+router.use(require("./vendorContact.routes"));
+router.use(require("./vendorItem.routes"));
 
 module.exports = router;

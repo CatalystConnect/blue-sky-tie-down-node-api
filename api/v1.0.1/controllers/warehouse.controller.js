@@ -37,9 +37,11 @@ module.exports = {
       };
       const newWarehouse = await wareHouseServices.addWareHouse(postData);
 
-      await warehouseQueue.add("assignAllActiveItems", {
-        warehouseId: newWarehouse.id,
-      })
+      await warehouseQueue(newWarehouse.id);
+
+      // await warehouseQueue.add("assignAllActiveItems", {
+      //   warehouseId: newWarehouse.id,
+      // })
       return res
         .status(200)
         .send(

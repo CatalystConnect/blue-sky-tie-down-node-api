@@ -27,7 +27,7 @@ module.exports = {
         // raw: true,
       });
 
-      if (!wareHouseItem) return null;      
+      if (!wareHouseItem) return null;
 
       return {
         item: wareHouseItem.item || "",
@@ -37,7 +37,7 @@ module.exports = {
           description: wareHouseItem.description,
           date: wareHouseItem.date,
           contractor_id: wareHouseItem.contractor_id,
-           contractor: wareHouseItem.contractorData
+          contractor: wareHouseItem.contractorData
         },
         pricing: {
           per: wareHouseItem.per,
@@ -128,82 +128,93 @@ module.exports = {
         order: [["createdAt", "DESC"]],
       });
 
-      const formattedData = rows.map((item) => ({
-        item: item.id,
-        searchItem: search,
-        keyFields: {
-          itemNumber: item.itemNumber,
-          description: item.description,
-          date: item.date,
-          contractor: item.contractor,
-        },
-        pricing: {
-          per: item.per,
-          listPrice: item.listPrice,
-          fullList: item.fullList,
-          fullRetail: item.fullRetail,
-          unitCost: item.unitCost,
-          effectiveDate: item.effectiveDate,
-        },
-        costing: {
-          costPerEA: item.costPerEA,
-          stdCost: item.stdCost,
-          fullStd: item.fullStd,
-          average: item.average,
-          lastAvg: item.lastAvg,
-          lastLand: item.lastLand,
-          baseCost: item.baseCost,
-        },
-        quantities: {
-          onHand: item.onHand,
-          committed: item.committed,
-          available: item.available,
-          triRegOut: item.triRegOut,
-          triTotalOut: item.triTotalOut,
-          backorder: item.backorder,
-          rented: item.rented,
-          onPO: item.onPO,
-          tranRegIn: item.tranRegIn,
-          tranTotalIn: item.tranTotalIn,
-          webAllow: item.webAllow,
-          qtyAvail: item.qtyAvail,
-          workOrder: item.workOrder,
-        },
-        locations: {
-          shipping: item.shipping,
-          receiving: item.receiving,
-        },
-        units: {
-          webAllow: item.webAllow,
-          allow: item.allow,
-          uM: item.uM,
-          qtyAvail: item.qtyAvail,
-        },
-        purchasing: {
-          buyerType: item.buyerType,
-          replenishPath: item.replenishPath,
-          seasonal: item.seasonal,
-          safetyStock: item.safetyStock,
-          minQty: item.minQty,
-          maxQty: item.maxQty,
-          leadTime: item.leadTime,
-          reorderPoint: item.reorderPoint,
-        },
-        costingAdditions: {
-          standardCost: item.standardCost,
-          baseCost: item.baseCost,
-          lastCost: item.lastCost,
-          averageCost: item.averageCost,
-          workingCost: item.workingCost,
-          costAdditions: item.costAdditions,
-        },
-      }));
+      // const formattedData = rows.map((item) => ({
+      //   item: item.id,
+      //   searchItem: search,
+      //   keyFields: {
+      //     itemNumber: item.itemNumber,
+      //     description: item.description,
+      //     date: item.date,
+      //     contractor: item.contractor,
+      //   },
+      //   pricing: {
+      //     per: item.per,
+      //     listPrice: item.listPrice,
+      //     fullList: item.fullList,
+      //     fullRetail: item.fullRetail,
+      //     unitCost: item.unitCost,
+      //     effectiveDate: item.effectiveDate,
+      //   },
+      //   costing: {
+      //     costPerEA: item.costPerEA,
+      //     stdCost: item.stdCost,
+      //     fullStd: item.fullStd,
+      //     average: item.average,
+      //     lastAvg: item.lastAvg,
+      //     lastLand: item.lastLand,
+      //     baseCost: item.baseCost,
+      //   },
+      //   quantities: {
+      //     onHand: item.onHand,
+      //     committed: item.committed,
+      //     available: item.available,
+      //     triRegOut: item.triRegOut,
+      //     triTotalOut: item.triTotalOut,
+      //     backorder: item.backorder,
+      //     rented: item.rented,
+      //     onPO: item.onPO,
+      //     tranRegIn: item.tranRegIn,
+      //     tranTotalIn: item.tranTotalIn,
+      //     webAllow: item.webAllow,
+      //     qtyAvail: item.qtyAvail,
+      //     workOrder: item.workOrder,
+      //   },
+      //   locations: {
+      //     shipping: item.shipping,
+      //     receiving: item.receiving,
+      //   },
+      //   units: {
+      //     webAllow: item.webAllow,
+      //     allow: item.allow,
+      //     uM: item.uM,
+      //     qtyAvail: item.qtyAvail,
+      //   },
+      //   purchasing: {
+      //     buyerType: item.buyerType,
+      //     replenishPath: item.replenishPath,
+      //     seasonal: item.seasonal,
+      //     safetyStock: item.safetyStock,
+      //     minQty: item.minQty,
+      //     maxQty: item.maxQty,
+      //     leadTime: item.leadTime,
+      //     reorderPoint: item.reorderPoint,
+      //   },
+      //   costingAdditions: {
+      //     standardCost: item.standardCost,
+      //     baseCost: item.baseCost,
+      //     lastCost: item.lastCost,
+      //     averageCost: item.averageCost,
+      //     workingCost: item.workingCost,
+      //     costAdditions: item.costAdditions,
+      //   },
+      // }));
+
+      // return {
+      //   total: count,
+      //   page,
+      //   per_page,
+      //   data: rows,
+      // };
+      const totalPages = queryLimit ? Math.ceil(count / queryLimit) : 1;
 
       return {
-        total: count,
-        page,
-        per_page,
-        data: formattedData,
+        data: rows,
+        meta: {
+          total: count,
+          page,
+          per_page: queryLimit,
+          total_pages: totalPages,
+        }
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
@@ -221,22 +232,44 @@ module.exports = {
       throw e;
     }
   },
-  async updateWareHouseItems(wareHouseId, data) {
+  // async updateWareHouseItems(wareHouseId, data) {
+  //   try {
+  //     const wareHouseItem = await db.warehouseItemsObj.findOne({
+  //       where: { id: wareHouseId },
+  //     });
+
+  //     if (!wareHouseItem) return null;
+
+  //     await wareHouseItem.update(data);
+
+  //     const updatedItem = await db.warehouseItemsObj.findOne({
+  //       where: { id: wareHouseId },
+  //       raw: true,
+  //     });
+
+  //     return updatedItem;
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async updateWareHouseItems(id, payload) {
     try {
-      const wareHouseItem = await db.warehouseItemsObj.findOne({
-        where: { id: wareHouseId },
-      });
+   
+      const item = await db.warehouseItemsObj.findByPk(id);
 
-      if (!wareHouseItem) return null;
+      if (!item) {
+        throw new Error("Warehouse item not found");
+      }
 
-      await wareHouseItem.update(data);
+     
+      if (payload.id) delete payload.id;
 
-      const updatedItem = await db.warehouseItemsObj.findOne({
-        where: { id: wareHouseId },
-        raw: true,
-      });
+      
+      await item.update(payload);
 
-      return updatedItem;
+      return item;
+
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

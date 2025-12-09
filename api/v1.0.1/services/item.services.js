@@ -231,12 +231,21 @@ module.exports = {
       });
 
 
+      // return {
+      //   total: count,
+      //   page,
+      //   per_page: _limit,
+      //   totalPages: Math.ceil(count / _limit),
+      //   items: rows,
+      // };
       return {
-        total: count,
-        page,
-        per_page: _limit,
-        totalPages: Math.ceil(count / _limit),
-        items: rows,
+        data: rows,
+        meta: {
+          total: count,
+          page,
+          per_page: _limit,
+          total_pages: Math.ceil(count / _limit),
+        }
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

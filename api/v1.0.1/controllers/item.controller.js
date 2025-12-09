@@ -9,7 +9,7 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 const db = require("../models");
-const itemQueue = require("../../../queues/itemQueue");
+const queueAssignItemToAllWarehouses = require("../../../queues/itemQueue");
 
 const {
   uploadFileToDrive,
@@ -56,9 +56,10 @@ module.exports = {
 
       const item = await itemServices.addItems(postData);
 
-      await itemQueue.add("assignItemToAllWarehouses", {
-        itemId: item.id
-      });
+      // await itemQueue.add("assignItemToAllWarehouses", {
+      //   itemId: item.id
+      // });
+      await queueAssignItemToAllWarehouses(item.id);
 
       if (postData.brand_id) {
         let data = {

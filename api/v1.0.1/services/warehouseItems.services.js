@@ -18,88 +18,82 @@ module.exports = {
     try {
       const wareHouseItem = await db.warehouseItemsObj.findOne({
         where: { id: wareHouseId },
-        include: [
-          {
-            model: db.contractObj,
-            as: "contractorData",
-          },
-        ],
-        // raw: true,
+      
       });
 
       if (!wareHouseItem) return null;
-
-      return {
-        item: wareHouseItem.item || "",
-        searchItem: wareHouseItem.searchItem || "",
-        keyFields: {
-          itemNumber: wareHouseItem.itemNumber,
-          description: wareHouseItem.description,
-          date: wareHouseItem.date,
-          contractor_id: wareHouseItem.contractor_id,
-          contractor: wareHouseItem.contractorData
-        },
-        pricing: {
-          per: wareHouseItem.per,
-          listPrice: wareHouseItem.listPrice,
-          fullList: wareHouseItem.fullList,
-          fullRetail: wareHouseItem.fullRetail,
-          unitCost: wareHouseItem.unitCost,
-          effectiveDate: wareHouseItem.effectiveDate,
-        },
-        costing: {
-          costPerEA: wareHouseItem.costPerEA,
-          stdCost: wareHouseItem.stdCost,
-          fullStd: wareHouseItem.fullStd,
-          average: wareHouseItem.average,
-          lastAvg: wareHouseItem.lastAvg,
-          lastLand: wareHouseItem.lastLand,
-          baseCost: wareHouseItem.baseCost,
-        },
-        quantities: {
-          onHand: wareHouseItem.onHand,
-          committed: wareHouseItem.committed,
-          available: wareHouseItem.available,
-          triRegOut: wareHouseItem.triRegOut,
-          triTotalOut: wareHouseItem.triTotalOut,
-          backorder: wareHouseItem.backorder,
-          rented: wareHouseItem.rented,
-          onPO: wareHouseItem.onPO,
-          tranRegIn: wareHouseItem.tranRegIn,
-          tranTotalIn: wareHouseItem.tranTotalIn,
-          webAllow: wareHouseItem.webAllow,
-          qtyAvail: wareHouseItem.qtyAvail,
-          workOrder: wareHouseItem.workOrder,
-        },
-        locations: {
-          shipping: wareHouseItem.shipping,
-          receiving: wareHouseItem.receiving,
-        },
-        units: {
-          webAllow: wareHouseItem.webAllow,
-          allow: wareHouseItem.allow,
-          uM: wareHouseItem.uM,
-          qtyAvail: wareHouseItem.qtyAvail,
-        },
-        purchasing: {
-          buyerType: wareHouseItem.buyerType,
-          replenishPath: wareHouseItem.replenishPath,
-          seasonal: wareHouseItem.seasonal,
-          safetyStock: wareHouseItem.safetyStock,
-          minQty: wareHouseItem.minQty,
-          maxQty: wareHouseItem.maxQty,
-          leadTime: wareHouseItem.leadTime,
-          reorderPoint: wareHouseItem.reorderPoint,
-        },
-        costingAdditions: {
-          standardCost: wareHouseItem.standardCost,
-          baseCost: wareHouseItem.addBaseCost,
-          lastCost: wareHouseItem.lastCost,
-          averageCost: wareHouseItem.averageCost,
-          workingCost: wareHouseItem.workingCost,
-          costAdditions: wareHouseItem.costAdditions,
-        },
-      };
+      return wareHouseItem;
+      // return {
+      //   item: wareHouseItem.item || "",
+      //   searchItem: wareHouseItem.searchItem || "",
+      //   keyFields: {
+      //     itemNumber: wareHouseItem.itemNumber,
+      //     description: wareHouseItem.description,
+      //     date: wareHouseItem.date,
+      //     contractor_id: wareHouseItem.contractor_id,
+      //     contractor: wareHouseItem.contractorData
+      //   },
+      //   pricing: {
+      //     per: wareHouseItem.per,
+      //     listPrice: wareHouseItem.listPrice,
+      //     fullList: wareHouseItem.fullList,
+      //     fullRetail: wareHouseItem.fullRetail,
+      //     unitCost: wareHouseItem.unitCost,
+      //     effectiveDate: wareHouseItem.effectiveDate,
+      //   },
+      //   costing: {
+      //     costPerEA: wareHouseItem.costPerEA,
+      //     stdCost: wareHouseItem.stdCost,
+      //     fullStd: wareHouseItem.fullStd,
+      //     average: wareHouseItem.average,
+      //     lastAvg: wareHouseItem.lastAvg,
+      //     lastLand: wareHouseItem.lastLand,
+      //     baseCost: wareHouseItem.baseCost,
+      //   },
+      //   quantities: {
+      //     onHand: wareHouseItem.onHand,
+      //     committed: wareHouseItem.committed,
+      //     available: wareHouseItem.available,
+      //     triRegOut: wareHouseItem.triRegOut,
+      //     triTotalOut: wareHouseItem.triTotalOut,
+      //     backorder: wareHouseItem.backorder,
+      //     rented: wareHouseItem.rented,
+      //     onPO: wareHouseItem.onPO,
+      //     tranRegIn: wareHouseItem.tranRegIn,
+      //     tranTotalIn: wareHouseItem.tranTotalIn,
+      //     webAllow: wareHouseItem.webAllow,
+      //     qtyAvail: wareHouseItem.qtyAvail,
+      //     workOrder: wareHouseItem.workOrder,
+      //   },
+      //   locations: {
+      //     shipping: wareHouseItem.shipping,
+      //     receiving: wareHouseItem.receiving,
+      //   },
+      //   units: {
+      //     webAllow: wareHouseItem.webAllow,
+      //     allow: wareHouseItem.allow,
+      //     uM: wareHouseItem.uM,
+      //     qtyAvail: wareHouseItem.qtyAvail,
+      //   },
+      //   purchasing: {
+      //     buyerType: wareHouseItem.buyerType,
+      //     replenishPath: wareHouseItem.replenishPath,
+      //     seasonal: wareHouseItem.seasonal,
+      //     safetyStock: wareHouseItem.safetyStock,
+      //     minQty: wareHouseItem.minQty,
+      //     maxQty: wareHouseItem.maxQty,
+      //     leadTime: wareHouseItem.leadTime,
+      //     reorderPoint: wareHouseItem.reorderPoint,
+      //   },
+      //   costingAdditions: {
+      //     standardCost: wareHouseItem.standardCost,
+      //     baseCost: wareHouseItem.addBaseCost,
+      //     lastCost: wareHouseItem.lastCost,
+      //     averageCost: wareHouseItem.averageCost,
+      //     workingCost: wareHouseItem.workingCost,
+      //     costAdditions: wareHouseItem.costAdditions,
+      //   },
+      // };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

@@ -266,117 +266,144 @@ module.exports = {
   //   }
   // },
 
+  // async updateWareHouseItems(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+  //     const warehouseItemId = req.params.id || req.query.id || req.body.id;
+  //     let data = req.body;
+
+
+  //     // You must send warehouseItemId in body or params
+
+  //     if (!warehouseItemId) {
+  //       return res.status(400).send(
+  //         commonHelper.parseErrorRespose({
+  //           warehouseItemId: "warehouseItemId is required",
+  //         })
+  //       );
+  //     }
+
+  //     let updateData = {
+  //       // Key fields
+  //       itemNumber: data.keyFields?.itemNumber,
+  //       description: data.keyFields?.description,
+  //       date: data.keyFields?.date,
+  //       contractor_id: data.keyFields?.contractor_id,
+
+  //       // Pricing
+  //       per: data.pricing?.per,
+  //       listPrice: data.pricing?.listPrice,
+  //       fullList: data.pricing?.fullList,
+  //       fullRetail: data.pricing?.fullRetail,
+  //       unitCost: data.pricing?.unitCost,
+  //       effectiveDate: data.pricing?.effectiveDate,
+
+  //       // Costing
+  //       costPerEA: data.costing?.costPerEA,
+  //       stdCost: data.costing?.stdCost,
+  //       fullStd: data.costing?.fullStd,
+  //       average: data.costing?.average,
+  //       lastAvg: data.costing?.lastAvg,
+  //       lastLand: data.costing?.lastLand,
+  //       baseCost: data.costing?.baseCost,
+
+  //       // Quantities
+  //       onHand: data.quantities?.onHand,
+  //       committed: data.quantities?.committed,
+  //       available: data.quantities?.available,
+  //       triRegOut: data.quantities?.triRegOut,
+  //       triTotalOut: data.quantities?.triTotalOut,
+  //       backorder: data.quantities?.backorder,
+  //       rented: data.quantities?.rented,
+  //       onPO: data.quantities?.onPO,
+  //       tranRegIn: data.quantities?.tranRegIn,
+  //       tranTotalIn: data.quantities?.tranTotalIn,
+  //       webAllow: data.quantities?.webAllow,
+  //       qtyAvail: data.quantities?.qtyAvail,
+  //       workOrder: data.quantities?.workOrder,
+
+  //       // Locations
+  //       shipping: data.locations?.shipping,
+  //       receiving: data.locations?.receiving,
+
+  //       // Units
+  //       allow: data.units?.allow,
+  //       uM: data.units?.uM,
+  //       webAllow: data.units?.webAllow,
+  //       qtyAvail: data.units?.qtyAvail,
+
+  //       // Purchasing
+  //       buyerType: data.purchasing?.buyerType,
+  //       replenishPath: data.purchasing?.replenishPath,
+  //       seasonal: data.purchasing?.seasonal,
+  //       safetyStock: data.purchasing?.safetyStock,
+  //       minQty: data.purchasing?.minQty,
+  //       maxQty: data.purchasing?.maxQty,
+  //       leadTime: data.purchasing?.leadTime,
+  //       reorderPoint: data.purchasing?.reorderPoint,
+
+  //       // Costing Additions
+  //       standardCost: data.costingAdditions?.standardCost,
+  //       lastCost: data.costingAdditions?.lastCost,
+  //       averageCost: data.costingAdditions?.averageCost,
+  //       workingCost: data.costingAdditions?.workingCost,
+  //       costAdditions: data.costingAdditions?.costAdditions,
+  //     };
+
+  //     // Call service
+  //     await warehouseItemsServices.updateWareHouseItems(
+  //       warehouseItemId,
+  //       updateData
+  //     );
+
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose(
+  //           "",
+  //           "Warehouse Item updated successfully"
+  //         )
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Updating Warehouse Item failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
   async updateWareHouseItems(req, res) {
     try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
-      const warehouseItemId = req.params.id || req.query.id || req.body.id;
-      let data = req.body;
+      const id = req.query.id;
+      const payload = req.body;
 
-
-      // You must send warehouseItemId in body or params
-
-      if (!warehouseItemId) {
-        return res.status(400).send(
-          commonHelper.parseErrorRespose({
-            warehouseItemId: "warehouseItemId is required",
-          })
-        );
+      if (!id) {
+        return res.status(400).send({
+          status: false,
+          message: "Warehouse item ID is required",
+        });
       }
 
-      let updateData = {
-        // Key fields
-        itemNumber: data.keyFields?.itemNumber,
-        description: data.keyFields?.description,
-        date: data.keyFields?.date,
-        contractor_id: data.keyFields?.contractor_id,
+      const updatedItem = await warehouseItemsServices.updateWareHouseItems(id, payload);
 
-        // Pricing
-        per: data.pricing?.per,
-        listPrice: data.pricing?.listPrice,
-        fullList: data.pricing?.fullList,
-        fullRetail: data.pricing?.fullRetail,
-        unitCost: data.pricing?.unitCost,
-        effectiveDate: data.pricing?.effectiveDate,
+      return res.status(200).send({
+        status: true,
+        message: "Warehouse Item updated successfully",
+        data: updatedItem
+      });
 
-        // Costing
-        costPerEA: data.costing?.costPerEA,
-        stdCost: data.costing?.stdCost,
-        fullStd: data.costing?.fullStd,
-        average: data.costing?.average,
-        lastAvg: data.costing?.lastAvg,
-        lastLand: data.costing?.lastLand,
-        baseCost: data.costing?.baseCost,
-
-        // Quantities
-        onHand: data.quantities?.onHand,
-        committed: data.quantities?.committed,
-        available: data.quantities?.available,
-        triRegOut: data.quantities?.triRegOut,
-        triTotalOut: data.quantities?.triTotalOut,
-        backorder: data.quantities?.backorder,
-        rented: data.quantities?.rented,
-        onPO: data.quantities?.onPO,
-        tranRegIn: data.quantities?.tranRegIn,
-        tranTotalIn: data.quantities?.tranTotalIn,
-        webAllow: data.quantities?.webAllow,
-        qtyAvail: data.quantities?.qtyAvail,
-        workOrder: data.quantities?.workOrder,
-
-        // Locations
-        shipping: data.locations?.shipping,
-        receiving: data.locations?.receiving,
-
-        // Units
-        allow: data.units?.allow,
-        uM: data.units?.uM,
-        webAllow: data.units?.webAllow,
-        qtyAvail: data.units?.qtyAvail,
-
-        // Purchasing
-        buyerType: data.purchasing?.buyerType,
-        replenishPath: data.purchasing?.replenishPath,
-        seasonal: data.purchasing?.seasonal,
-        safetyStock: data.purchasing?.safetyStock,
-        minQty: data.purchasing?.minQty,
-        maxQty: data.purchasing?.maxQty,
-        leadTime: data.purchasing?.leadTime,
-        reorderPoint: data.purchasing?.reorderPoint,
-
-        // Costing Additions
-        standardCost: data.costingAdditions?.standardCost,
-        lastCost: data.costingAdditions?.lastCost,
-        averageCost: data.costingAdditions?.averageCost,
-        workingCost: data.costingAdditions?.workingCost,
-        costAdditions: data.costingAdditions?.costAdditions,
-      };
-
-      // Call service
-      await warehouseItemsServices.updateWareHouseItems(
-        warehouseItemId,
-        updateData
-      );
-
-      return res
-        .status(200)
-        .send(
-          commonHelper.parseSuccessRespose(
-            "",
-            "Warehouse Item updated successfully"
-          )
-        );
     } catch (error) {
-      return res.status(400).json({
+      return res.status(400).send({
         status: false,
-        message:
-          error.response?.data?.error ||
-          error.message ||
-          "Updating Warehouse Item failed",
-        data: error.response?.data || {},
+        message: error.message || "Unable to update warehouse item",
       });
     }
   },

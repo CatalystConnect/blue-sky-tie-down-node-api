@@ -64,5 +64,6 @@ router.use(require("./leadScopes.routes"));
 router.use(require("./vendorAddress.routes"));
 router.use(require("./vendorContact.routes"));
 router.use(require("./vendorItem.routes"));
+router.use(require("./purchaseOrder.routes"));
 
 module.exports = router;

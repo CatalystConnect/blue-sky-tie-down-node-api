@@ -263,7 +263,12 @@ db.budgetHistoryObj = require("./budgetHistory.models")(db.dbObj, Sequelize);
 db.vendorAddressObj = require("./vendorsAddress.models")(db.dbObj, Sequelize);
 db.vendorContactObj = require("./vendorsContact.models")(db.dbObj, Sequelize);
 db.vendorItemObj = require("./vendorsItem.models")(db.dbObj, Sequelize);
-
+db.purchaseOrderHeaderObj = require("./purchaseOrderHeader.models")(db.dbObj, Sequelize);
+db.purchaseOrderLineObj = require("./purchaseOrderLine.models")(db.dbObj, Sequelize);
+db.purchaseOrderReceiptHeaderObj = require("./purchaseOrderReceiptHeader.models")(db.dbObj, Sequelize);
+db.purchaseOrderReceiptLineObj  = require("./purchaseOrderReceiptLine.models")(db.dbObj, Sequelize);
+db.rtvHeaderObj = require("./rtvHeader.models")(db.dbObj, Sequelize);
+db.landedCostAllocationObj = require("./landedCostAllocation.models")
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {

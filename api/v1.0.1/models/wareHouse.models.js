@@ -40,6 +40,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+       warehouse_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+       location: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+       is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
       deletedAt: {
         type: DataTypes.DATE,
         allowNull: true,

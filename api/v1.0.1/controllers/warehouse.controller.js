@@ -34,6 +34,11 @@ module.exports = {
         city: data.city,
         state: data.state,
         zip: data.zip,
+        warehouse_code:data.warehouse_code,
+        location:data.location,
+        is_active:data.is_active,
+
+
       };
       const newWarehouse = await wareHouseServices.addWareHouse(postData);
 

@@ -1293,6 +1293,12 @@ db.vendorAddressObj.belongsTo(db.vendorsObj, {
 
 });
 
+db.purchaseOrderHeaderObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",
+  as: "vendorEmail"
+
+});
+
 
 
 module.exports = db;

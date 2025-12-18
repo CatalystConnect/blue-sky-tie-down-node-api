@@ -24,7 +24,7 @@ module.exports = {
         allowNull: true
       },
       status: {
-        type: Sequelize.ENUM('DRAFT', 'SENT','PARTIALLY_RECEIVED', 'RECEIVED', 'CLOSED'),
+        type: Sequelize.ENUM('DRAFT','PENDING_APPROVAL', 'SENT','PARTIALLY_RECEIVED', 'RECEIVED', 'CLOSED'),
         allowNull: true
       },
       order_date: {
@@ -52,7 +52,7 @@ module.exports = {
         allowNull: true
       },
       approval_status: {
-        type: Sequelize.ENUM('PENDING', 'APPROVED'),
+        type: Sequelize.ENUM('PENDING','REJECTED', 'APPROVED'),
         allowNull: true,
         defaultValue: 'PENDING'
       },

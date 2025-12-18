@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true
       },
       status: {
-        type: DataTypes.ENUM('DRAFT', 'SENT', 'PARTIALLY_RECEIVED','RECEIVED', 'CLOSED'),
+        type: DataTypes.ENUM('DRAFT','PENDING_APPROVAL', 'SENT', 'PARTIALLY_RECEIVED','RECEIVED', 'CLOSED'),
         allowNull: true
       },
       order_date: {
@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true
       },
       approval_status: {
-        type: DataTypes.ENUM('PENDING', 'APPROVED'),
+        type: DataTypes.ENUM('PENDING','REJECTED', 'APPROVED'),
         allowNull: true,
         defaultValue: 'PENDING'
       },

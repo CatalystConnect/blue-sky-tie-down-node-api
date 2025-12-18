@@ -61,20 +61,20 @@ module.exports = {
     });
     return contracts;
   },
-   parseExcelDate(value) {
+  parseExcelDate(value) {
     if (!value) return null;
-  
+
     if (typeof value === "number") {
       const excelEpoch = new Date(Date.UTC(1899, 11, 30));
       const parsed = new Date(excelEpoch.getTime() + value * 86400000);
       return isNaN(parsed.getTime()) ? null : parsed;
     }
-  
+
     const parsedMoment = moment(value, [
       "YYYY-MM-DD", "YYYY/MM/DD", "DD-MM-YYYY", "DD/MM/YYYY",
       "YYYY-M-D", "D-M-YYYY", "D/M/YYYY", "YYYY/M/D"
     ], true);
-  
+
     return parsedMoment.isValid() ? parsedMoment.toDate() : null;
   },
 
@@ -116,8 +116,8 @@ module.exports = {
           oldValue === undefined || oldValue === null
             ? `${this.formatKeyName(key)} is added`
             : `${this.formatKeyName(
-                key
-              )} is changed from ${oldValue} to ${newValue}`;
+              key
+            )} is changed from ${oldValue} to ${newValue}`;
         changes.push({
           oldValue: oldValue,
           newValue: newValue,
@@ -430,4 +430,41 @@ module.exports = {
       console.error("Email failed:", error);
     }
   },
+  async sendPOEmail(email, poNumber) {
+    const transporter = nodemailer.createTransport(
+      sgTransport({
+        auth: {
+          api_key: process.env.SENDGRID_KEY,
+        },
+      })
+    );
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: `Purchase Order ${poNumber}`,
+      html: `
+      <table cellspacing="0" cellpadding="0" border="0"
+        style="max-width:600px;margin:0 auto;width:100%;background:#f9f9f9;padding:20px;">
+        <tr>
+          <td>
+            <h3>Purchase Order </h3>
+            <p>Dear Vendor,</p>
+            <p>Purchase Order <b>${poNumber}</b> has been.</p>
+            <p>Please confirm shipment details.</p>
+          </td>
+        </tr>
+      </table>
+    `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("PO email sent successfully");
+    } catch (error) {
+      console.error("PO email failed:", error);
+      // ❗ optional: don't throw (PO already SENT)
+    }
+  }
+
 };

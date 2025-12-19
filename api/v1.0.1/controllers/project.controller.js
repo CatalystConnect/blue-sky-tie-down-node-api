@@ -18,6 +18,7 @@ const {
 } = require("../helper/googleDrive");
 const path = require("path");
 const fs = require("fs");
+const moment = require("moment");
 
 module.exports = {
 
@@ -39,7 +40,7 @@ module.exports = {
         const date = new Date(value);
         return isNaN(date.getTime()) ? null : date;
       };
-      console.log("Received project data:", data.assign_to_budget);
+
       // ✅ Step 1: Add project to DB
       const postData = {
         user_id: req.userId,
@@ -177,7 +178,20 @@ module.exports = {
           for (let index = 0; index < planSets.length; index++) {
             const plan = planSets[index];
 
-            const planSetFolder = await getOrCreateSubfolder(planSetsFolder, `${index + 1}`);
+            const formatDate = (date) => {
+              const d = new Date(date);
+              const day = String(d.getDate()).padStart(2, "0");
+              const month = String(d.getMonth() + 1).padStart(2, "0");
+              const year = d.getFullYear();
+              return `${day}-${month}-${year}`;
+            };
+
+            const planDate = formatDate(plan.plan_date)
+            const revStatus = plan.rev_status || "A";
+            const planNumber = index + 1;
+            const planSetFolderName = `${planDate}_Rev-${revStatus}_#${planNumber}`;
+
+            const planSetFolder = await getOrCreateSubfolder(planSetsFolder, planSetFolderName);
 
             const planData = {
               project_id: project.id,
@@ -890,7 +904,25 @@ module.exports = {
         const existingCount = await db.projectplanSetsObj.count({
           where: { project_id: projectId },
         });
-        const newPlanSetNumber = existingCount + 1;
+        const newPlanSetNumbers = existingCount + 1;
+
+        const formatDate = (date) => {
+          if (!date) return null;
+          const d = new Date(date);
+          if (isNaN(d)) throw new Error("Invalid date format");
+
+          const day = String(d.getDate()).padStart(2, "0");
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const year = d.getFullYear();
+
+          return `${day}-${month}-${year}`; // DD-MM-YYYY
+        };
+
+        const planDate = formatDate(planSetData.plan_date)
+        const revStatus = planSetData.rev_status || "A";
+        const newPlanSetNumber = `${planDate}_Rev-${revStatus}_#${newPlanSetNumbers}`;
+
+
 
         // Create numbered subfolder (e.g., 1, 2, 3)
         const planSetNumberFolder = await getOrCreateSubfolder(
@@ -2612,42 +2644,7 @@ module.exports = {
       });
     }
   },
-  // async updateProjecttakeOffStatus(req, res) {
-  //     try {
-  //         const { takeoff_status, ids } = req.body;
 
-  //         if (!takeoff_status || !Array.isArray(ids) || ids.length === 0) {
-  //             return res.status(400).json({
-  //                 status: false,
-  //                 message: "takeoff_status and ids[] are required",
-  //             });
-  //         }
-
-  //         const updatedCount = await projectServices.updateProjecttakeOffStatus(ids, takeoff_status);
-
-  //         if (updatedCount === 0) {
-  //             return res.status(404).json({
-  //                 status: false,
-  //                 message: "No projects found for the given IDs",
-  //                 data: {},
-  //             });
-  //         }
-
-  //         return res.status(200).json({
-  //             status: true,
-  //             message: "Project takeoff status updated successfully",
-  //             updatedCount,
-  //         });
-
-  //     } catch (error) {
-  //         console.error("Error updating project takeoff status:", error);
-  //         return res.status(400).json({
-  //             status: false,
-  //             message: error.message || "Updating project takeoff status failed",
-  //             data: {},
-  //         });
-  //     }
-  // }
   async updateProjecttakeOffStatus(req, res) {
     try {
       const { takeoff_status, ids } = req.body;
@@ -2677,337 +2674,6 @@ module.exports = {
     }
   },
 
-  // async uploadProjectFile(req, res) {
-  //   try {
-  //     const projectId = req.query.projectId;
-  //     if (!projectId) throw new Error("Project ID is required");
-
-  //     const project = await projectServices.getProjectById(projectId);
-  //     if (!project) throw new Error("Project not found");
-
-  //     if (!req.files || req.files.length === 0)
-  //       throw new Error("No files uploaded");
-
-  //     // --- Step 1: Get or create root folder ---
-  //     const rootFolder = await getOrCreateSubfolder(
-  //       process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //       `${project.id}. ${project.name}`
-  //     );
-
-  //     // --- Step 2: Get or create projectFiles folder ---
-  //     const projectFilesFolder = await getOrCreateSubfolder(
-  //       rootFolder,
-  //       "projectFiles"
-  //     );
-
-  //     // --- Step 3: Save file to Google Drive ---
-  //     const saveFolder = async (module, module_id, drive_id, file_name) =>
-  //       await projectServices.addDriveAssociation({
-  //         project_id: project.id,
-  //         module,
-  //         module_id,
-  //         drive_id,
-  //         file_name,
-  //       });
-
-  //     let uploadedFiles = [];
-  //     for (const file of req.files) {
-  //       const driveFile = await uploadFileToDrive(
-  //         file.path,
-  //         file.originalname,
-  //         file.mimetype,
-  //         projectFilesFolder
-  //       );
-
-  //       uploadedFiles.push({
-  //         name: file.originalname,
-  //         link: driveFile.webViewLink,
-  //         size: file.size,
-  //       });
-
-  //       await saveFolder(
-  //         "projectFiles",
-  //         project.id,
-  //         driveFile.id,
-  //         file.originalname
-  //       );
-  //     }
-
-  //     // --- Step 4: Merge with existing project_file ---
-  //     let existingFiles = [];
-  //     try {
-  //       existingFiles = JSON.parse(project.project_file || "[]");
-  //     } catch (e) {
-  //       existingFiles = [];
-  //     }
-
-  //     const allFiles = [...existingFiles, ...uploadedFiles];
-
-  //     if (allFiles.length > 0) {
-  //       const updateData = { project_file: JSON.stringify(allFiles) };
-  //       const updateResult = await projectServices.updateProject(
-  //         updateData,
-  //         project.id
-  //       );
-  //     } else {
-  //       console.log("No completed files found to update.");
-  //     }
-
-  //     return res.status(200).json({
-  //       status: true,
-  //       message: "Files uploaded and project_file updated successfully",
-  //       data: allFiles,
-  //     });
-  //   } catch (error) {
-  //     console.error("Upload project file failed:", error);
-  //     return res.status(400).json({
-  //       status: false,
-  //       message: error.message || "File upload failed",
-  //       data: {},
-  //     });
-  //   }
-  // },
-
-  // async uploadProjectFile(req, res) {
-  //   try {
-  //     const projectId = req.query.projectId;
-  //     const { type, folderName, parentId } = req.body;
-
-  //     if (!projectId) throw new Error("Project ID is required");
-
-  //     const project = await projectServices.getProjectById(projectId);
-  //     if (!project) throw new Error("Project not found");
-
-
-  //     const rootFolder = await getOrCreateSubfolder(
-  //       process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //       `${project.id}. ${project.name}`
-  //     );
-
-
-  //     const projectFilesFolder = await getOrCreateSubfolder(rootFolder, "projectFiles");
-
-
-  //     const saveAssociation = async (data) => {
-  //       return await projectServices.addDriveAssociation({
-  //         project_id: project.id,
-  //         module: "projectFiles",
-  //         module_id: project.id,
-  //         drive_id: data.drive_id,
-  //         file_name: data.file_name,
-  //         type: data.type,
-  //         parent: projectId || 0,
-  //       });
-  //     };
-
-
-  //     if (type === "folder") {
-  //       if (!folderName) throw new Error("Folder name is required");
-
-
-  //       const parentFolderId = parentId
-  //         ? await projectServices.getDriveIdByParentId(parentId)
-  //         : projectFilesFolder;
-
-  //       console.log("Parent Folder ID:", parentFolderId);
-
-  //       const newFolderId = await getOrCreateSubfolder(parentFolderId, folderName);
-
-  //       await saveAssociation({
-  //         drive_id: newFolderId,
-  //         file_name: folderName,
-  //         type: "folder",
-  //         parent: parentId || 0,
-  //       });
-
-  //       return res.status(200).json({
-  //         status: true,
-  //         message: "Folder created successfully",
-  //         data: { folderName, driveFolderId: newFolderId },
-  //       });
-  //     }
-
-  //     // Step 5: Else (type = file) → upload files
-  //     if (!req.files || req.files.length === 0)
-  //       throw new Error("No files uploaded");
-
-  //     const parentFolderId = parentId
-  //       ? await projectServices.getDriveIdByParentId(parentId)
-  //       : projectFilesFolder;
-
-  //     let uploadedFiles = [];
-  //     for (const file of req.files) {
-  //       const driveFile = await uploadFileToDrive(
-  //         file.path,
-  //         file.originalname,
-  //         file.mimetype,
-  //         parentFolderId
-  //       );
-
-  //       uploadedFiles.push({
-  //         name: file.originalname,
-  //         link: driveFile.webViewLink,
-  //         size: file.size,
-  //       });
-
-  //       await saveAssociation({
-  //         drive_id: driveFile.id,
-  //         file_name: file.originalname,
-  //         type: "file",
-  //         parent: parentId || 0,
-  //       });
-  //     }
-
-  //     return res.status(200).json({
-  //       status: true,
-  //       message: "Files uploaded successfully",
-  //       data: uploadedFiles,
-  //     });
-  //   } catch (error) {
-  //     console.error("Upload project file failed:", error);
-  //     return res.status(400).json({
-  //       status: false,
-  //       message: error.message || "File upload failed",
-  //       data: {},
-  //     });
-  //   }
-  // },
-
-  // async uploadProjectFile(req, res) {
-  //   try {
-  //     const projectId = req.query.projectId;
-  //     const { type, folderName, parentId } = req.body;
-
-  //     if (!projectId) throw new Error("Project ID is required");
-
-  //     const project = await projectServices.getProjectById(projectId);
-  //     if (!project) throw new Error("Project not found");
-
-  //     // Step 1: Base folder setup
-  //     const rootFolder = await getOrCreateSubfolder(
-  //       process.env.GOOGLE_DRIVE_FOLDER_ID,
-  //       `${project.id}. ${project.name}`
-  //     );
-
-  //     const projectFilesFolder = await getOrCreateSubfolder(rootFolder, "projectFiles");
-
-  //     // Helper to save association
-  //     const saveAssociation = async (data) =>
-  //       await projectServices.addDriveAssociation({
-  //         project_id: project.id,
-  //         module: "projectFiles",
-  //         module_id: project.id,
-  //         drive_id: data.drive_id,
-  //         file_name: data.file_name,
-  //         type: data.type,
-  //         parent: data.parent === undefined ? data.project_id : data.parent,
-  //       });
-
-  //     let uploadedFiles = [];
-  //     let currentParentFolderId = parentId
-  //       ? await projectServices.getDriveIdByParentId(parentId)
-  //       : projectFilesFolder;
-
-  //     // =====================
-  //     // CASE 1 → type = folder
-  //     // =====================
-  //     if (type === "folder") {
-  //       if (!folderName) throw new Error("Folder name is required");
-
-  //       // Create folder inside projectFiles or parent folder
-  //       const newFolderId = await getOrCreateSubfolder(currentParentFolderId, folderName);
-
-  //       // Save folder info in DB
-  //       await saveAssociation({
-  //         drive_id: newFolderId,
-  //         file_name: folderName,
-  //         type: "folder",
-  //         parent: parentId || projectId,
-  //       });
-
-  //       // If files also sent, upload inside this new folder
-  //       if (req.files && req.files.length > 0) {
-  //         for (const file of req.files) {
-  //           const driveFile = await uploadFileToDrive(
-  //             file.path,
-  //             file.originalname,
-  //             file.mimetype,
-  //             newFolderId
-  //           );
-
-  //           uploadedFiles.push({
-  //             name: file.originalname,
-  //             link: driveFile.webViewLink,
-  //             size: file.size,
-  //           });
-
-  //           await saveAssociation({
-  //             drive_id: driveFile.id,
-  //             file_name: file.originalname,
-  //             type: "file",
-  //             parent: projectId,
-  //           });
-  //         }
-  //       }
-
-  //       return res.status(200).json({
-  //         status: true,
-  //         message: uploadedFiles.length
-  //           ? "Folder and files uploaded successfully"
-  //           : "Folder created successfully",
-  //         data: {
-  //           folderId: newFolderId,
-  //           uploadedFiles,
-  //         },
-  //       });
-  //     }
-
-  //     // =====================
-  //     // CASE 2 → type = file
-  //     // =====================
-  //     if (type === "file") {
-  //       if (!req.files || req.files.length === 0)
-  //         throw new Error("No files uploaded");
-
-  //       for (const file of req.files) {
-  //         const driveFile = await uploadFileToDrive(
-  //           file.path,
-  //           file.originalname,
-  //           file.mimetype,
-  //           currentParentFolderId
-  //         );
-
-  //         uploadedFiles.push({
-  //           name: file.originalname,
-  //           link: driveFile.webViewLink,
-  //           size: file.size,
-  //         });
-
-  //         await saveAssociation({
-  //           drive_id: driveFile.id,
-  //           file_name: file.originalname,
-  //           type: "file",
-  //           parent: 0,
-  //         });
-  //       }
-
-  //       return res.status(200).json({
-  //         status: true,
-  //         message: "Files uploaded successfully",
-  //         data: uploadedFiles,
-  //       });
-  //     }
-
-  //     throw new Error("Invalid type. Must be 'folder' or 'file'.");
-  //   } catch (error) {
-  //     console.error("Upload project file failed:", error);
-  //     return res.status(400).json({
-  //       status: false,
-  //       message: error.message || "File upload failed",
-  //       data: {},
-  //     });
-  //   }
-  // },
   async uploadProjectFile(req, res) {
     try {
       const projectId = req.query.projectId;
@@ -3255,30 +2921,30 @@ module.exports = {
 
   async getProjectFilesByType(req, res) {
     try {
-        const { project_id, type } = req.query;
+      const { project_id, type } = req.query;
 
-        if (!project_id || !type) {
-            return res.status(400).json({
-                success: false,
-                message: "project_id and type are required"
-            });
-        }
-
-        const result = await projectServices.getProjectFilesByType(project_id, type);
-
-        return res.status(200).json({
-            success: true,
-            data: result
+      if (!project_id || !type) {
+        return res.status(400).json({
+          success: false,
+          message: "project_id and type are required"
         });
+      }
+
+      const result = await projectServices.getProjectFilesByType(project_id, type);
+
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
 
     } catch (error) {
-        console.error("getProjectFilesByType error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error"
-        });
+      console.error("getProjectFilesByType error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error"
+      });
     }
-},
+  },
 
 
 

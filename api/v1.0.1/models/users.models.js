@@ -107,15 +107,20 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(10, 4),
         allowNull: true,
       },
+      is_salesperson: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
-      timestamps: true,       
-      paranoid: true,       
-      freezeTableName: true,  
+      timestamps: true,
+      paranoid: true,
+      freezeTableName: true,
       // underscored: true   
       createdAt: "created_at",
       updatedAt: "updated_at",
-      deletedAt: "deleted_at",    
+      deletedAt: "deleted_at",
     }
   );
   return users;

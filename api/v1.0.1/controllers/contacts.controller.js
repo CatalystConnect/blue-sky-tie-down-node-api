@@ -19,6 +19,11 @@ module.exports = {
                     .status(200)
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
+
+            const cleanInt = (val) => {
+                if (val === "" || val === undefined || val === null) return null;
+                return Number(val);
+            };
             let data = req.body;
 
             let postData = {
@@ -29,14 +34,14 @@ module.exports = {
                 phone: data.phone,
                 address: data.address,
                 city: data.city,
-                zip: data.zip,
-                state: data.state,
+                zip: cleanInt(data.zip),
+                state: cleanInt(data.state),
                 notes: data.notes,
 
             }
-          let contactId =  await contactsServices.addContacts(postData);
+            let contactId = await contactsServices.addContacts(postData);
 
-               res.status(200).json({
+            res.status(200).json({
                 success: true,
                 message: "add Contacts  successfully",
                 contactId: contactId.id
@@ -157,6 +162,10 @@ module.exports = {
                     .status(200)
                     .send(commonHelper.parseErrorRespose(errors.mapped()));
             }
+             const cleanInt = (val) => {
+                if (val === "" || val === undefined || val === null) return null;
+                return Number(val);
+            };
 
             const { id } = req.query;
             if (!id) {
@@ -176,7 +185,7 @@ module.exports = {
                 address: data.address,
                 city: data.city,
                 zip: data.zip,
-                state: data.state,
+                state: cleanInt(data.state),
                 notes: data.notes,
             };
 
@@ -200,7 +209,7 @@ module.exports = {
     async getContactCompany(req, res) {
         try {
             const { id: company_id } = req.params;
-            const { search = "", page = 1, limit = 10,id } = req.query;
+            const { search = "", page = 1, limit = 10, id } = req.query;
 
             if (!company_id) {
                 return res.status(200).send(
@@ -208,11 +217,13 @@ module.exports = {
                 );
             }
 
-            const result = await contactsServices.getContactCompany({company_id,
+            const result = await contactsServices.getContactCompany({
+                company_id,
                 search,
                 page: parseInt(page),
                 limit: parseInt(limit),
-            id});
+                id
+            });
 
             return res
                 .status(200)

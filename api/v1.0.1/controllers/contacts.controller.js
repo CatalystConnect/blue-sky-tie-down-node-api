@@ -34,10 +34,17 @@ module.exports = {
                 notes: data.notes,
 
             }
-            await contactsServices.addContacts(postData);
-            return res
-                .status(200)
-                .send(commonHelper.parseSuccessRespose("", "add Contacts  successfully"));
+          let contactId =  await contactsServices.addContacts(postData);
+
+               res.status(200).json({
+                success: true,
+                message: "add Contacts  successfully",
+                contactId: contactId.id
+
+            });
+            // return res
+            //     .status(200)
+            //     .send(commonHelper.parseSuccessRespose("", "add Contacts  successfully"));
         } catch (error) {
             return res.status(400).json({
                 status: false,

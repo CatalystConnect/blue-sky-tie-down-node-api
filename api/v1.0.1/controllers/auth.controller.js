@@ -53,6 +53,7 @@ module.exports = {
         avatar: req.files.avatar
           ? `files/${req.files.avatar[0].filename}`
           : null,
+        is_salesperson: data.is_salesperson
       };
 
       commonHelper.removeFalsyKeys(postData);
@@ -267,6 +268,7 @@ module.exports = {
       }
 
       const data = req.body;
+
       let postData = {
         name: data.name,
         email: data.email,
@@ -278,6 +280,7 @@ module.exports = {
         address: data.address,
         userHourlyRate: data.userHourlyRate,
         userType: data.userType || "internal",
+        is_salesperson: data.is_salesperson
       };
 
       if (

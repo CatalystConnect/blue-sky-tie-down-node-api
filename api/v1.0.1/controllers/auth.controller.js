@@ -223,6 +223,7 @@ module.exports = {
         access: user.roles?.access || null,
         roleId: user.roles?.id || null,
         avatar: user.avatar,
+        is_salesperson: user.is_salesperson,
         departments: user.department
           ? {
               id: user.department.id,

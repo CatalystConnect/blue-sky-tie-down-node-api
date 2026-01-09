@@ -18,7 +18,7 @@ module.exports = {
     try {
       const wareHouseItem = await db.warehouseItemsObj.findOne({
         where: { id: wareHouseId },
-      
+
       });
 
       if (!wareHouseItem) return null;
@@ -117,6 +117,18 @@ module.exports = {
 
       const { rows, count } = await db.warehouseItemsObj.findAndCountAll({
         where: whereCondition,
+        include: [{
+          model: db.itemObj,
+          as: 'item',
+          
+        },
+        {
+          model: db.wareHouseObj,
+          as: 'warehouse',
+          
+        }
+      ],
+
         limit: queryLimit,
         offset,
         order: [["createdAt", "DESC"]],
@@ -249,17 +261,17 @@ module.exports = {
   // },
   async updateWareHouseItems(id, payload) {
     try {
-   
+
       const item = await db.warehouseItemsObj.findByPk(id);
 
       if (!item) {
         throw new Error("Warehouse item not found");
       }
 
-     
+
       if (payload.id) delete payload.id;
 
-      
+
       await item.update(payload);
 
       return item;

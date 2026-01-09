@@ -1299,6 +1299,15 @@ db.purchaseOrderHeaderObj.belongsTo(db.vendorsObj, {
 
 });
 
+db.warehouseItemsObj.belongsTo(db.itemObj,{
+  foreignKey:"item_id",
+  as:"item"
+});
+db.warehouseItemsObj.belongsTo(db.wareHouseObj,{
+  foreignKey:"warehouse_id",
+  as:"warehouse"
+});
+
 
 
 module.exports = db;

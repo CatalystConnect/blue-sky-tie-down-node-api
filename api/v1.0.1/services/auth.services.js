@@ -358,4 +358,114 @@ module.exports = {
       throw e;
     }
   },
+    async getAllUsersScroll(page, length, role, search, date, id, take_all, per_page, type) {
+    try {
+      let whereCondition = {};
+
+      if (role) {
+        whereCondition.role = role;
+      }
+
+      let idsArray = null;
+      if (id) {
+        try {
+          if (id.startsWith("[")) {
+            idsArray = JSON.parse(id);
+          } else {
+            idsArray = [id];
+          }
+
+        } catch (err) {
+          console.log("Invalid id format", err);
+        }
+      }
+
+      if (type) {
+        whereCondition.userType = type;
+      }
+
+      // if (search) {
+      //   whereCondition[Op.or] = [
+      //     { name: { [Op.like]: `%${search}%` } },
+      //     { email: { [Op.like]: `%${search}%` } },
+      //   ];
+      // }
+
+      if (search) {
+        if (Array.isArray(search)) {
+          search = search[search.length - 1]; // pick last param
+        }
+        if (typeof search === "string") {
+          const searchLower = search.toLowerCase();
+
+          whereCondition[Op.or] = [
+            Sequelize.where(
+              Sequelize.fn("LOWER", Sequelize.col("users.name")),
+              { [Op.like]: `%${searchLower}%` }
+            ),
+            Sequelize.where(
+              Sequelize.fn("LOWER", Sequelize.col("users.email")),
+              { [Op.like]: `%${searchLower}%` }
+            )
+          ];
+        }
+      }
+
+      if (date) {
+        const startOfDay = new Date(date + "T00:00:00");
+        const endOfDay = new Date(date + "T23:59:59");
+
+        whereCondition.createdAt = {
+          [Op.between]: [startOfDay, endOfDay],
+        };
+      }
+
+      let queryOptions = {
+        where: whereCondition,
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: db.departmentObj,
+            as: "department",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.rolesObj,
+            as: "roles",
+            attributes: ["id", "name"],
+          },
+        ],
+      };
+
+      // ✅ Custom ordering: prioritize IDs first, then rest by id DESC
+      if (idsArray && idsArray.length > 0) {
+        queryOptions.order = [
+          [
+            Sequelize.literal(
+              `CASE WHEN "users"."id" IN (${idsArray.join(",")}) THEN 0 ELSE 1 END`
+            ),
+            "ASC",
+          ],
+          ["id", "DESC"],
+        ];
+      } else {
+        queryOptions.order = [["id", "DESC"]];
+      }
+
+      // total count
+      const total = await db.userObj.count({ where: whereCondition });
+
+      if (!take_all) {
+        queryOptions.limit = per_page ? parseInt(per_page) : length || 10;
+        queryOptions.offset = (page - 1) * (length || 10);
+      }
+
+      const users = await db.userObj.findAll(queryOptions);
+
+      return { users, total };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 };

@@ -351,6 +351,75 @@ module.exports = {
     }
   },
 
+  async getAllUsersScroll(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(200)
+          .send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      let {
+        page = 1,
+        length = 10,
+        role,
+        search,
+        date,
+        id,
+        take_all,
+        per_page,
+        type,
+      } = req.query;
+
+      page = parseInt(page);
+      length = parseInt(length);
+
+      if (!take_all && (page <= 0 || length <= 0)) {
+        throw new Error("Page and length must be greater than 0");
+      }
+
+      const { users, total } = await authServices.getAllUsersScroll(
+        page,
+        length,
+        role,
+        search,
+        date,
+        id,
+        take_all,
+        per_page,
+        type
+      );
+
+      if (!users || users.length === 0) throw new Error("Users not found");
+
+      const lastPage = take_all ? 1 : Math.ceil(total / length);
+      const from = total > 0 ? (page - 1) * length + 1 : null;
+      const to = total > 0 ? Math.min(page * length, total) : null;
+
+      return res.status(200).send({
+        status: true,
+        message: "Users displayed successfully",
+        data: users,
+        meta: {
+          current_page: page,
+          from,
+          last_page: lastPage,
+          per_page: take_all ? total : length,
+          to,
+          total,
+        },
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message:
+          error.response?.data?.error || error.message || "User fetch failed",
+        data: error.response?.data || {},
+      });
+    }
+  },
+
   validate(method) {
     switch (method) {
       case "register": {

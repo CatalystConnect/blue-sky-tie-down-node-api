@@ -23,5 +23,6 @@ router.put("/updateUser", multiUpload,[authJwt.verifyToken], [controller.validat
 router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUserById")], controller.deleteUser);
 
 router.get("/users/scroll", [authJwt.verifyToken], controller.getAllUsersScroll);
+router.get("/users/scroll/test", [authJwt.verifyToken], controller.getAllUsersScrollTest);
 
 module.exports = router;

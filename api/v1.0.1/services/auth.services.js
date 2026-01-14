@@ -358,7 +358,7 @@ module.exports = {
       throw e;
     }
   },
-    async getAllUsersScroll(page, length, role, search, date, id, take_all, per_page, type) {
+  async getAllUsersScroll(page, length, role, search, date, id, take_all, per_page, type) {
     try {
       let whereCondition = {};
 
@@ -463,6 +463,44 @@ module.exports = {
       const users = await db.userObj.findAll(queryOptions);
 
       return { users, total };
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
+
+  async getAllUsersScrollTest(per_page, cursor, role, search) {
+    try {
+      let whereCondition = {};
+
+     
+      if (cursor) {
+        whereCondition.id = { [Op.lt]: cursor };
+      }
+
+      
+      if (role) whereCondition.role = role;
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        whereCondition[Op.or] = [
+          Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("users.name")), { [Op.like]: `%${searchLower}%` }),
+          Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("users.email")), { [Op.like]: `%${searchLower}%` }),
+        ];
+      }
+
+      const users = await db.userObj.findAll({
+        where: whereCondition,
+        limit: per_page,
+        order: [["id", "DESC"]],
+        attributes: { exclude: ["password"] },
+        include: [
+          { model: db.departmentObj, as: "department", required: false, attributes: ["id", "name"] },
+          { model: db.rolesObj, as: "roles", required: false, attributes: ["id", "name"] },
+        ],
+      });
+
+      return { users };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;

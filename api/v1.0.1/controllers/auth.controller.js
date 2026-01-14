@@ -351,74 +351,206 @@ module.exports = {
     }
   },
 
+  // async getAllUsersScroll(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     let {
+  //       page = 1,
+  //       length = 10,
+  //       role,
+  //       search,
+  //       date,
+  //       id,
+  //       take_all,
+  //       per_page,
+  //       type,
+  //     } = req.query;
+
+  //     page = parseInt(page);
+  //     length = parseInt(length);
+
+  //     if (!take_all && (page <= 0 || length <= 0)) {
+  //       throw new Error("Page and length must be greater than 0");
+  //     }
+
+  //     const { users, total } = await authServices.getAllUsersScroll(
+  //       page,
+  //       length,
+  //       role,
+  //       search,
+  //       date,
+  //       id,
+  //       take_all,
+  //       per_page,
+  //       type
+  //     );
+
+  //     if (!users || users.length === 0) throw new Error("Users not found");
+
+  //     const lastPage = take_all ? 1 : Math.ceil(total / length);
+  //     const from = total > 0 ? (page - 1) * length + 1 : null;
+  //     const to = total > 0 ? Math.min(page * length, total) : null;
+
+  //     return res.status(200).send({
+  //       status: true,
+  //       message: "Users displayed successfully",
+  //       data: users,
+  //       meta: {
+  //         current_page: page,
+  //         from,
+  //         last_page: lastPage,
+  //         per_page: take_all ? total : length,
+  //         to,
+  //         total,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error || error.message || "User fetch failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
   async getAllUsersScroll(req, res) {
-    try {
-      const errors = myValidationResult(req);
-      if (!errors.isEmpty()) {
-        return res
-          .status(200)
-          .send(commonHelper.parseErrorRespose(errors.mapped()));
-      }
+  try {
+    const errors = myValidationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(200)
+        .send(commonHelper.parseErrorRespose(errors.mapped()));
+    }
 
-      let {
-        page = 1,
-        length = 10,
-        role,
-        search,
-        date,
-        id,
-        take_all,
-        per_page,
-        type,
-      } = req.query;
+    let {
+      page = 1,
+      length = 10,
+      per_page,
+      role,
+      search,
+      date,
+      id,
+      take_all,
+      type,
+    } = req.query;
 
-      page = parseInt(page);
-      length = parseInt(length);
+    page = parseInt(page);
+    length = parseInt(length);
 
-      if (!take_all && (page <= 0 || length <= 0)) {
-        throw new Error("Page and length must be greater than 0");
-      }
+    // ✅ SINGLE SOURCE OF TRUTH FOR LIMIT
+    const limit = per_page ? parseInt(per_page) : length;
 
-      const { users, total } = await authServices.getAllUsersScroll(
-        page,
-        length,
-        role,
-        search,
-        date,
-        id,
-        take_all,
-        per_page,
-        type
-      );
+    if (!take_all && (page <= 0 || limit <= 0)) {
+      throw new Error("Page and limit must be greater than 0");
+    }
 
-      if (!users || users.length === 0) throw new Error("Users not found");
+    const { users, total } = await authServices.getAllUsersScroll(
+      page,
+      length,        // service ke liye same rakha
+      role,
+      search,
+      date,
+      id,
+      take_all,
+      limit,         // per_page actual DB limit
+      type
+    );
 
-      const lastPage = take_all ? 1 : Math.ceil(total / length);
-      const from = total > 0 ? (page - 1) * length + 1 : null;
-      const to = total > 0 ? Math.min(page * length, total) : null;
-
+    if (!users || users.length === 0) {
       return res.status(200).send({
         status: true,
-        message: "Users displayed successfully",
-        data: users,
+        message: "No users found",
+        data: [],
         meta: {
-          current_page: page,
-          from,
-          last_page: lastPage,
-          per_page: take_all ? total : length,
-          to,
+          page,
+          limit,
+          current_count: 0,
+          loaded_till_now: 0,
+          remaining: total,
           total,
-        },
-      });
-    } catch (error) {
-      return res.status(400).json({
-        status: false,
-        message:
-          error.response?.data?.error || error.message || "User fetch failed",
-        data: error.response?.data || {},
+          has_more: false
+        }
       });
     }
-  },
+
+    // ✅ SCROLL META CALCULATION (FIXED)
+    const loaded = take_all
+      ? users.length
+      : Math.min(page * limit, total);
+
+    const remaining = Math.max(total - loaded, 0);
+    const hasMore = remaining > 0;
+
+    return res.status(200).send({
+      status: true,
+      message: "Users loaded successfully",
+      data: users,
+      meta: {
+        page,
+        limit,
+        current_count: users.length,
+        loaded_till_now: loaded,
+        remaining,
+        total,
+        has_more: hasMore
+      }
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      message:
+        error.response?.data?.error ||
+        error.message ||
+        "User fetch failed",
+      data: error.response?.data || {},
+    });
+  }
+},
+ async getAllUsersScrollTest(req, res) {
+  try {
+    const errors = myValidationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(200)
+        .send(commonHelper.parseErrorRespose(errors.mapped()));
+    }
+
+  
+    let { per_page, cursor, role, search } = req.query;
+    per_page = parseInt(per_page) || 10;
+    cursor = cursor ? parseInt(cursor) : null;
+
+    
+    const { users } = await authServices.getAllUsersScrollTest(per_page, cursor, role, search);
+
+   
+    const next_cursor = users.length > 0 ? users[users.length - 1].id : null;
+    const has_more = users.length === per_page;
+
+    return res.status(200).send({
+      status: true,
+      message: "Users displayed successfully",
+      data: users,
+      meta: {
+        next_cursor,
+        has_more,
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      message: error.response?.data?.error || error.message || "User fetch failed",
+      data: error.response?.data || {},
+    });
+  }
+},
 
   validate(method) {
     switch (method) {

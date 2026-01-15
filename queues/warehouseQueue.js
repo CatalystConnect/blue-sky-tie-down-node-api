@@ -11,11 +11,11 @@
 
 const getBoss = require("../queues/pgboss"); 
 
-async function warehouseQueue(warehouseId) {
+async function warehouseQueue(warehouseId, itemIds ) {
   const boss = await getBoss();
-  await boss.send('assign-items', { warehouseId }); 
+  await boss.send('assign-items', { warehouseId, itemIds  }); 
 
-  // console.log(`Job queued: assign-items for warehouse ${warehouseId}`);
+  //  console.log(`Job queued: assign-items for warehouse ${itemIds}`);
 }
 
 module.exports = warehouseQueue;

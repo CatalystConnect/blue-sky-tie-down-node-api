@@ -36,46 +36,109 @@
 //   console.error(`Item assignment job failed for item #${job.data.itemId}`, err);
 // });
 
+// const getBoss = require('../queues/pgboss');
+// const db = require('../api/v1.0.1/models');
+
+// (async () => {
+//   const boss = await getBoss();
+//   await boss.createQueue('assign-item-to-warehouses');   
+
+//   boss.work('assign-item-to-warehouses', async (jobs) => {
+//     for (const job of jobs) {
+//       const { itemId, warehouseIds } = job.data;
+//       console.log(`Processing assign-item-to-warehouses for item #${itemId}`);
+   
+//       try { 
+//         const item = await db.itemObj.findByPk(itemId);
+//         if (!item) {
+//           console.log(`Item #${itemId} not found`);
+//           continue;
+//         }
+
+//         const warehouses = await db.wareHouseObj.findAll();
+//         if (!warehouses.length) {
+//           console.log('No warehouses found');
+//           continue;
+//         }
+
+//         const entries = warehouses.map((w) => ({
+//           warehouse_id: w.id,
+//           item_id: itemId,
+//           sku: item.sku,
+//           createdAt: new Date(),
+//           updatedAt: new Date(),
+//         }));
+        
+//         await db.warehouseItemsObj.bulkCreate(entries, { ignoreDuplicates: true }); 
+//         console.log(`Assigned item #${itemId} to ${warehouses.length} warehouses`);
+//       } catch (error) {
+//         console.error(`Error processing item #${itemId}:`, error);  
+
+//       }
+      
+//     }
+//   });
+
+//   console.log('Worker listening for assign-item-to-warehouses jobs...');
+// })();
+
 const getBoss = require('../queues/pgboss');
 const db = require('../api/v1.0.1/models');
 
 (async () => {
   const boss = await getBoss();
-  await boss.createQueue('assign-item-to-warehouses');   
+  await boss.createQueue('assign-item-to-warehouses');
 
   boss.work('assign-item-to-warehouses', async (jobs) => {
     for (const job of jobs) {
-      const { itemId } = job.data;
-      console.log(`Processing assign-item-to-warehouses for item #${itemId}`);
-   
-      try { 
+      const { itemId, warehouseIds } = job.data;
+
+      console.log(
+        `Processing assign-item-to-warehouses for item #${itemId}`,
+        warehouseIds?.length ? `warehouses: ${warehouseIds}` : '(ALL)'
+      );
+
+      try {
+        // ✅ Item check
         const item = await db.itemObj.findByPk(itemId);
         if (!item) {
           console.log(`Item #${itemId} not found`);
           continue;
         }
 
-        const warehouses = await db.wareHouseObj.findAll();
+        // ✅ Warehouse selection logic
+        const warehouses =
+          Array.isArray(warehouseIds) && warehouseIds.length
+            ? await db.wareHouseObj.findAll({
+                where: { id: warehouseIds }
+              })
+            : await db.wareHouseObj.findAll(); // fallback → all warehouses
+
         if (!warehouses.length) {
           console.log('No warehouses found');
           continue;
         }
 
-        const entries = warehouses.map((w) => ({
+        // ✅ Prepare bulk entries
+        const entries = warehouses.map(w => ({
           warehouse_id: w.id,
           item_id: itemId,
           sku: item.sku,
           createdAt: new Date(),
           updatedAt: new Date(),
         }));
-        
-        await db.warehouseItemsObj.bulkCreate(entries, { ignoreDuplicates: true }); 
-        console.log(`Assigned item #${itemId} to ${warehouses.length} warehouses`);
-      } catch (error) {
-        console.error(`Error processing item #${itemId}:`, error);  
 
+        // ✅ Insert safely
+        await db.warehouseItemsObj.bulkCreate(entries, {
+          ignoreDuplicates: true,
+        });
+
+        console.log(
+          `Assigned item #${itemId} to ${warehouses.length} warehouse(s)`
+        );
+      } catch (error) {
+        console.error(`Error processing item #${itemId}:`, error);
       }
-      
     }
   });
 

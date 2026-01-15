@@ -28,6 +28,24 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
+      let warehouseIds = [];
+
+      if (req.body.warehouse_ids) {
+        if (Array.isArray(req.body.warehouse_ids)) {
+          warehouseIds = req.body.warehouse_ids
+            .map(id => Number(id))
+            .filter(id => !isNaN(id));
+        } else if (typeof req.body.warehouse_ids === 'string') {
+          let str = req.body.warehouse_ids.replace(/[\[\]]/g, '');
+          warehouseIds = str
+            .split(',')
+            .map(id => Number(id.trim()))
+            .filter(id => !isNaN(id));
+        }
+      }
+
+
+
       const postData = {
         user_id: req.userId,
         sku: req.body.sku,
@@ -59,7 +77,7 @@ module.exports = {
       // await itemQueue.add("assignItemToAllWarehouses", {
       //   itemId: item.id
       // });
-      await queueAssignItemToAllWarehouses(item.id);
+      await queueAssignItemToAllWarehouses(item.id, warehouseIds);
 
       if (postData.brand_id) {
         let data = {

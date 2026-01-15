@@ -25,6 +25,30 @@ module.exports = {
       }
       let data = req.body;
 
+      let itemIds = [];
+
+      if (data.item_ids) {
+        if (Array.isArray(data.item_ids)) {
+          itemIds = data.item_ids
+            .map(id => Number(id))
+            .filter(id => !isNaN(id));
+
+        } else if (typeof data.item_ids === 'string') {
+
+          // remove brackets if any
+          let str = data.item_ids.replace(/[\[\]]/g, '');
+
+          // split by comma and trim
+          itemIds = str
+            .split(',')
+            .map(id => Number(id.trim()))
+            .filter(id => !isNaN(id)); 
+        }
+      }
+
+     
+
+
       let postData = {
         user_id: req.userId,
         name: data.name,
@@ -34,15 +58,16 @@ module.exports = {
         city: data.city,
         state: data.state,
         zip: data.zip,
-        warehouse_code:data.warehouse_code,
-        location:data.location,
-        is_active:data.is_active,
+        warehouse_code: data.warehouse_code,
+        location: data.location,
+        is_active: data.is_active,
 
 
       };
       const newWarehouse = await wareHouseServices.addWareHouse(postData);
 
-      await warehouseQueue(newWarehouse.id);
+      console.log('dddddddddd', itemIds)
+      await warehouseQueue(newWarehouse.id, itemIds);
 
       // await warehouseQueue.add("assignAllActiveItems", {
       //   warehouseId: newWarehouse.id,

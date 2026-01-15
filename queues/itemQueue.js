@@ -8,9 +8,9 @@
 
 const getBoss = require("../queues/pgboss"); 
 
-async function queueAssignItemToAllWarehouses(itemId) {
+async function queueAssignItemToAllWarehouses(itemId,warehouseIds) {
   const boss = await getBoss();
-  await boss.send('assign-item-to-warehouses', { itemId });
+  await boss.send('assign-item-to-warehouses', { itemId ,warehouseIds});
   // console.log(`Job queued: assign-item-to-warehouses for item ${itemId}`); 
   
 }

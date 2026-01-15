@@ -1,79 +1,106 @@
-    // const { Worker } = require("bullmq");
-    // const path = require("path");
-    // const db = require("../api/v1.0.1/models");
+// const { Worker } = require("bullmq");
+// const path = require("path");
+// const db = require("../api/v1.0.1/models");
 
 
 
-    // const worker = new Worker(
-    // "assignItemsQueue",
-    // async (job) => {
-    //     const warehouseId = job.data.warehouseId;
+// const worker = new Worker(
+// "assignItemsQueue",
+// async (job) => {
+//     const warehouseId = job.data.warehouseId;
 
-    //     // console.log(`Processing job: Assign items to Warehouse #${warehouseId}`);
+//     // console.log(`Processing job: Assign items to Warehouse #${warehouseId}`);
 
-    //     const batchSize = 500;   
-    //     let offset = 0;
+//     const batchSize = 500;   
+//     let offset = 0;
 
-    //     while (true) {
-        
-    //     const items = await db.itemObj.findAll({
-    //         limit: batchSize,
-    //         offset: offset
-    //     });
+//     while (true) {
 
-    //     if (!items.length) {
-    //         console.log("All items processed.");
-    //         break;
-    //     }
-    //     //  console.log("Sample items fetched:", items.slice(0, 5));
+//     const items = await db.itemObj.findAll({
+//         limit: batchSize,
+//         offset: offset
+//     });
 
-    //     const entries = items.map((item) => ({
-    //         warehouse_id: warehouseId,
-    //         item_id: item.id,
-    //         sku: item.sku,
-    //         createdAt: new Date(),
-    //         updatedAt: new Date(),
-    //     }));
+//     if (!items.length) {
+//         console.log("All items processed.");
+//         break;
+//     }
+//     //  console.log("Sample items fetched:", items.slice(0, 5));
 
-        
-    //     await db.warehouseItemsObj.bulkCreate(entries);
+//     const entries = items.map((item) => ({
+//         warehouse_id: warehouseId,
+//         item_id: item.id,
+//         sku: item.sku,
+//         createdAt: new Date(),
+//         updatedAt: new Date(),
+//     }));
 
-    //     // console.log(`Inserted batch (offset ${offset})`);
 
-    //     offset += batchSize;
-    //     }
+//     await db.warehouseItemsObj.bulkCreate(entries);
 
-    //     return true;
-    // },
-    // {
-    //     connection: {
-    //     host: "127.0.0.1",
-    //     port: 6379,
-    //     },
-    // }
-    // );
+//     // console.log(`Inserted batch (offset ${offset})`);
 
-    // worker.on("completed", (job) => {
-    // console.log(`Job #${job.id} completed successfully`);
-    // });
+//     offset += batchSize;
+//     }
 
-    // worker.on("failed", (job, err) => {
-    // console.error(`Job #${job.id} failed:`, err);
-    // });
+//     return true;
+// },
+// {
+//     connection: {
+//     host: "127.0.0.1",
+//     port: 6379,
+//     },
+// }
+// );
+
+// worker.on("completed", (job) => {
+// console.log(`Job #${job.id} completed successfully`);
+// });
+
+// worker.on("failed", (job, err) => {
+// console.error(`Job #${job.id} failed:`, err);
+// });
 const getBoss = require('../queues/pgboss');
 const db = require('../api/v1.0.1/models');
 
 (async () => {
   const boss = await getBoss();
-  await boss.createQueue('assign-items');   
+  await boss.createQueue('assign-items');
 
   boss.work('assign-items', { batchSize: 10 }, async (jobs) => {
     for (const job of jobs) {
-      const { warehouseId } = job.data;
+      const { warehouseId, itemIds } = job.data;
+     
 
-    //   console.log(`Processing assign-items for warehouse #${warehouseId}`);
+      // console.log(`Processing assign-items for warehouse #${warehouseId}`);
+      // console.log(`Processing assign-items for item #${itemIds}`);
 
       try {
+
+        if (Array.isArray(itemIds) && itemIds.length > 0) {
+
+          const items = await db.itemObj.findAll({
+            where: {
+              id: itemIds
+            }
+          });
+
+          const entries = items.map(item => ({
+            warehouse_id: warehouseId,
+            item_id: item.id,
+            sku: item.sku,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }));
+
+          await db.warehouseItemsObj.bulkCreate(entries, {
+            ignoreDuplicates: true,
+          });
+
+          console.log(`Selected items assigned to warehouse ${warehouseId}`);
+          continue;
+        }
+
         const batchSize = 500;
         let offset = 0;
 
@@ -104,7 +131,7 @@ const db = require('../api/v1.0.1/models');
         console.log(`Completed assignment for warehouse ${warehouseId}`);
       } catch (err) {
         console.error('Worker failed:', err);
-        throw err; 
+        throw err;
       }
     }
   });

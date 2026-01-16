@@ -129,7 +129,7 @@ module.exports = {
   /*getAllVendors*/
   async getAllVendors(req, res) {
     try {
-      const { page = 1, per_page = 5, search = "", limit = "", take_all = "", id = "" } = req.query;
+      const { page = 1, per_page = "", search = "", limit = "", take_all = "", id = "" } = req.query;
       let vendors = await vendorServices.getAllVendors({
         page,
         per_page,

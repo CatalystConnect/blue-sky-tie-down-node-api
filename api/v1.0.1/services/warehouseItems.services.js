@@ -230,7 +230,12 @@ module.exports = {
   async deletewareHouseItems(wareHouseId) {
     try {
       const deleted = await db.warehouseItemsObj.destroy({
-        where: { id: wareHouseId },
+        // where: { id: wareHouseId },
+         where: {
+        id: {
+          [Op.in]: wareHouseId
+        }
+      }
       });
       return deleted;
     } catch (e) {

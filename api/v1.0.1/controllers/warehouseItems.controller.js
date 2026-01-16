@@ -186,7 +186,7 @@ module.exports = {
   },
   async deletewareHouseItems(req, res) {
     try {
-      const wareHouseId = req.query.id || req.params.id;
+      let wareHouseId = req.query.id || req.params.id;
 
       if (!wareHouseId) {
         return res.status(400).json({
@@ -194,6 +194,8 @@ module.exports = {
           message: "WareHouse item ID is required",
         });
       }
+
+      wareHouseId = wareHouseId.toString().split(",").map(id => Number(id));
 
       const deleted = await warehouseItemsServices.deletewareHouseItems(
         wareHouseId

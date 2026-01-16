@@ -195,7 +195,7 @@ module.exports = {
         future_effective_date: data.future_effective_date || null,
         order_multiple_qty: data.order_multiple_qty || null,  
         standard_lead_time_days: data.standard_lead_time_days || null,
-        is_preferred_vendor: data.is_preferred_vendor || null,
+        is_preferred_vendor: data.is_preferred_vendor  ?? false,
         ranking: data.ranking || null,
         is_active: data.is_active || true,
         

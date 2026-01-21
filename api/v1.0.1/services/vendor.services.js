@@ -118,15 +118,87 @@ module.exports = {
   //     }
   //   },
 
+  // async getAllVendors({ page, per_page, search, id, limit, take_all }) {
+  //   try {
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+
+  //     let finalLimit = per_page;
+  //     let offset = (page - 1) * finalLimit;
+
+  //     let whereCondition = {};
+  //     if (search) {
+  //       whereCondition = {
+  //         ...whereCondition,
+  //         name: { [Op.like]: `%${search}%` },
+  //       };
+  //     }
+
+  //     // ✅ Prioritized vendors
+  //     let prioritizedVendors = [];
+  //     if (id && Array.isArray(id)) {
+  //       prioritizedVendors = await db.vendorsObj.findAll({
+  //         where: { id: { [Op.in]: id } },
+  //         order: [["id", "DESC"]],
+  //       });
+
+  //       whereCondition = {
+  //         ...whereCondition,
+  //         id: { [Op.notIn]: id },
+  //       };
+  //     }
+
+  //     let rows = [];
+  //     let count = 0;
+
+  //     if (take_all === "all") {
+  //       rows = await db.vendorsObj.findAll({
+  //         where: whereCondition,
+  //         order: [["id", "DESC"]],
+  //         ...(limit ? { limit: parseInt(limit) } : {}),
+  //       });
+  //       count = rows.length;
+  //     } else {
+  //       const result = await db.vendorsObj.findAndCountAll({
+  //         where: whereCondition,
+  //         limit: finalLimit,
+  //         offset,
+  //         order: [["id", "DESC"]],
+  //       });
+  //       rows = result.rows;
+  //       count = result.count;
+  //     }
+
+  //     // Merge prioritized vendors first
+  //     const finalVendors = [...prioritizedVendors, ...rows];
+
+  //     return {
+  //       data: finalVendors,
+  //       meta: {
+  //         current_page: take_all === "all" ? 1 : page,
+  //         from: take_all === "all" ? 1 : offset + 1,
+  //         to: take_all === "all" ? finalVendors.length : offset + rows.length,
+  //         per_page: take_all === "all" ? (limit ? parseInt(limit) : finalVendors.length) : finalLimit,
+  //         total: count + prioritizedVendors.length,
+  //         last_page: take_all === "all" ? 1 : Math.ceil((count + prioritizedVendors.length) / finalLimit)
+  //       }
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllVendors({ page, per_page, search, id, limit, take_all }) {
     try {
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
 
-      let finalLimit = per_page;
-      let offset = (page - 1) * finalLimit;
+      const finalLimit = parseInt(limit) || per_page;
+      const offset = (page - 1) * finalLimit;
 
       let whereCondition = {};
+
+      // ---------- search (same) ----------
       if (search) {
         whereCondition = {
           ...whereCondition,
@@ -134,7 +206,7 @@ module.exports = {
         };
       }
 
-      // ✅ Prioritized vendors
+      // ---------- prioritized vendors (same) ----------
       let prioritizedVendors = [];
       if (id && Array.isArray(id)) {
         prioritizedVendors = await db.vendorsObj.findAll({
@@ -151,6 +223,7 @@ module.exports = {
       let rows = [];
       let count = 0;
 
+      // ---------- take all (same) ----------
       if (take_all === "all") {
         rows = await db.vendorsObj.findAll({
           where: whereCondition,
@@ -169,19 +242,28 @@ module.exports = {
         count = result.count;
       }
 
-      // Merge prioritized vendors first
+      // ---------- merge priority first (same) ----------
       const finalVendors = [...prioritizedVendors, ...rows];
+
+      // ---------- LAZY LOAD META (NEW, SAFE) ----------
+      const total = count + prioritizedVendors.length;
+      const current_count = finalVendors.length;
+      const loaded_till_now =
+        take_all === "all" ? total : offset + rows.length + prioritizedVendors.length;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
 
       return {
         data: finalVendors,
         meta: {
-          current_page: take_all === "all" ? 1 : page,
-          from: take_all === "all" ? 1 : offset + 1,
-          to: take_all === "all" ? finalVendors.length : offset + rows.length,
-          per_page: take_all === "all" ? (limit ? parseInt(limit) : finalVendors.length) : finalLimit,
-          total: count + prioritizedVendors.length,
-          last_page: take_all === "all" ? 1 : Math.ceil((count + prioritizedVendors.length) / finalLimit)
-        }
+          page: take_all === "all" ? 1 : page,
+          limit: finalLimit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

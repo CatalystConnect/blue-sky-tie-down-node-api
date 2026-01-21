@@ -127,6 +127,131 @@ module.exports = {
   //     }
   //   },
 
+  // async getAllItems({
+  //   page,
+  //   per_page,
+  //   search,
+  //   limit,
+  //   take_all,
+  //   id,
+  //   per_id,
+  //   type,
+  // }) {
+  //   try {
+  //     page = parseInt(page) || 1;
+
+
+  //     per_page = parseInt(limit) || parseInt(per_page) || 10;
+
+  //     const _limit = per_page;
+  //     const offset = (page - 1) * _limit;
+
+  //     let whereCondition = {};
+
+
+  //     if (search) {
+  //       whereCondition[Op.or] = [
+  //         {
+  //           [Op.or]: [
+  //             where(fn("LOWER", col("sku")), {
+  //               [Op.like]: `%${search.toLowerCase()}%`,
+  //             }),
+  //           ],
+  //         },
+  //       ];
+  //     }
+
+
+  //     let ids = [];
+
+  //     const collectIds = (value) => {
+  //       if (Array.isArray(value)) {
+  //         return value.map((v) => parseInt(v)).filter((v) => !isNaN(v));
+  //       } else if (value) {
+  //         let num = parseInt(value);
+  //         return !isNaN(num) ? [num] : [];
+  //       }
+  //       return [];
+  //     };
+
+  //     ids = [...collectIds(id), ...collectIds(per_id)];
+
+  //     if (ids.length > 0) {
+  //       whereCondition.id = { [Op.in]: ids };
+  //     }
+
+  //     let queryOptions = {
+  //       where: whereCondition,
+  //       order: [["created_at", "DESC"]],
+  //     };
+
+
+  //     if (take_all && take_all === "all") {
+  //       queryOptions.limit = null;
+  //       queryOptions.offset = null;
+  //     } else {
+  //       queryOptions.limit = _limit;
+  //       queryOptions.offset = offset;
+  //     }
+
+
+  //     const { rows, count } = await db.itemObj.findAndCountAll({
+  //       ...queryOptions,
+  //       distinct: true,
+  //       include: [
+  //         {
+  //           model: db.itemUnitsObj,
+  //           as: "item_units",
+  //         },
+  //         {
+  //           model: db.brandObj,
+  //           as: "brand",
+  //         },
+  //         {
+  //           model: db.itemCategoriesObj,
+  //           as: "item_categories",
+  //           include: [
+  //             {
+  //               model: db.productCategoriesObj,
+  //               as: "categories"
+  //             }
+  //           ]
+  //         },
+  //         {
+  //           model: db.itemTagObj,
+  //           as: "item_tags",
+  //            include: [
+  //             {
+  //               model: db.tagsObj,
+  //               as: "tags"
+  //             }
+  //           ]
+  //         },
+  //       ],
+  //     });
+
+
+  //     // return {
+  //     //   total: count,
+  //     //   page,
+  //     //   per_page: _limit,
+  //     //   totalPages: Math.ceil(count / _limit),
+  //     //   items: rows,
+  //     // };
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         total: count,
+  //         page,
+  //         per_page: _limit,
+  //         total_pages: Math.ceil(count / _limit),
+  //       }
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllItems({
     page,
     per_page,
@@ -138,65 +263,47 @@ module.exports = {
     type,
   }) {
     try {
-      page = parseInt(page) || 1;
-
-
-      per_page = parseInt(limit) || parseInt(per_page) || 10;
-
-      const _limit = per_page;
-      const offset = (page - 1) * _limit;
+      // ---------- lazy load setup ----------
+      const _limit = parseInt(limit) || parseInt(per_page) || 10;
+      const offset = parseInt(page)
+        ? (parseInt(page) - 1) * _limit
+        : parseInt(this.offset) || 0;
 
       let whereCondition = {};
 
-
+      // ---------- search ----------
       if (search) {
         whereCondition[Op.or] = [
-          {
-            [Op.or]: [
-              where(fn("LOWER", col("sku")), {
-                [Op.like]: `%${search.toLowerCase()}%`,
-              }),
-            ],
-          },
+          where(fn("LOWER", col("sku")), {
+            [Op.like]: `%${search.toLowerCase()}%`,
+          }),
         ];
       }
 
-
-      let ids = [];
-
+      // ---------- id / per_id filter ----------
       const collectIds = (value) => {
         if (Array.isArray(value)) {
-          return value.map((v) => parseInt(v)).filter((v) => !isNaN(v));
+          return value.map(v => parseInt(v)).filter(v => !isNaN(v));
         } else if (value) {
-          let num = parseInt(value);
+          const num = parseInt(value);
           return !isNaN(num) ? [num] : [];
         }
         return [];
       };
 
-      ids = [...collectIds(id), ...collectIds(per_id)];
+      const ids = [
+        ...collectIds(id),
+        ...collectIds(per_id),
+      ];
 
       if (ids.length > 0) {
         whereCondition.id = { [Op.in]: ids };
       }
 
+      // ---------- query options ----------
       let queryOptions = {
         where: whereCondition,
         order: [["created_at", "DESC"]],
-      };
-
-
-      if (take_all && take_all === "all") {
-        queryOptions.limit = null;
-        queryOptions.offset = null;
-      } else {
-        queryOptions.limit = _limit;
-        queryOptions.offset = offset;
-      }
-
-
-      const { rows, count } = await db.itemObj.findAndCountAll({
-        ...queryOptions,
         distinct: true,
         include: [
           {
@@ -213,39 +320,60 @@ module.exports = {
             include: [
               {
                 model: db.productCategoriesObj,
-                as: "categories"
-              }
-            ]
+                as: "categories",
+              },
+            ],
           },
           {
             model: db.itemTagObj,
             as: "item_tags",
-             include: [
+            include: [
               {
                 model: db.tagsObj,
-                as: "tags"
-              }
-            ]
+                as: "tags",
+              },
+            ],
           },
         ],
-      });
+      };
 
+      // ---------- take all ----------
+      if (take_all && take_all === "all") {
+        queryOptions.limit = null;
+        queryOptions.offset = null;
+      } else {
+        queryOptions.limit = _limit;
+        queryOptions.offset = offset;
+      }
 
-      // return {
-      //   total: count,
-      //   page,
-      //   per_page: _limit,
-      //   totalPages: Math.ceil(count / _limit),
-      //   items: rows,
-      // };
+      // ---------- DB call ----------
+      const { rows, count } = await db.itemObj.findAndCountAll(queryOptions);
+
+      // ---------- META (lazy load) ----------
+      const total = count;
+      const current_count = rows.length;
+      const loaded_till_now = take_all === "all"
+        ? total
+        : offset + current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
+
+      // logical page (UI only)
+      const current_page = take_all === "all"
+        ? 1
+        : Math.floor(offset / _limit) + 1;
+
       return {
         data: rows,
         meta: {
-          total: count,
-          page,
-          per_page: _limit,
-          total_pages: Math.ceil(count / _limit),
-        }
+          page: current_page,
+          limit: _limit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));

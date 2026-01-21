@@ -188,7 +188,40 @@ module.exports = {
         message: error.message,
       });
     }
+  },
+
+  async getPurchaseOrder(req, res) {
+    try {
+      const {
+        page = 1,
+        per_page = 10,
+        search,
+        status,
+        supplier_id,
+      } = req.query;
+
+      const result = await purchaseOrderServices.getPurchaseOrder({
+        page: parseInt(page),
+        per_page: parseInt(per_page),
+        search,
+        status,
+        supplier_id,
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: "Purchase Orders fetched successfully",
+        data: result.data,
+        meta: result.meta,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to fetch purchase orders",
+      });
+    }
   }
+
 
 
 

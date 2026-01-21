@@ -379,11 +379,18 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
       let itemId = req.query.itemId;
-      let item = await itemServices.getItemsById(itemId);
+
+      let itemIds = itemId
+      .split(',')
+      .map(id => id.trim())
+      .map(id => Number(id))
+      .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
+
+      let item = await itemServices.getItemsById(itemIds);
       if (!item) {
         throw new Error("Item  not found");
       }
-      let items = await itemServices.deleteItems(itemId);
+      let items = await itemServices.deleteItems(itemIds);
       return res
         .status(200)
         .send(

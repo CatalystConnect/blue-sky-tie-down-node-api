@@ -170,11 +170,19 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
       let vendorId = req.query.vendorId;
-      let vendor = await vendorServices.getVendorsById(vendorId);
+
+       let vendorIds = vendorId
+      .split(',')
+      .map(id => id.trim())
+      .map(id => Number(id))
+      .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
+
+
+      let vendor = await vendorServices.getVendorsById(vendorIds);
       if (!vendor) {
         throw new Error("Vendor not found");
       }
-      let deletevendor = await vendorServices.deleteVendors(vendorId);
+      let deletevendor = await vendorServices.deleteVendors(vendorIds);
       return res
         .status(200)
         .send(

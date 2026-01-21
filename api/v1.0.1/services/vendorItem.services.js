@@ -164,10 +164,13 @@ module.exports = {
 
 
   // /*deleteVendorsItem*/
-  async deleteVendorsItem(vendorItemId) {
+  async deleteVendorsItem(vendorItemIds) {
     try {
+
+      const ids = Array.isArray(vendorItemIds) ? vendorItemIds : [vendorItemIds];
+
       let deleteVendor = await db.vendorItemObj.destroy({
-        where: { id: vendorItemId },
+        where: { id: ids },
       });
       return deleteVendor;
     } catch (e) {

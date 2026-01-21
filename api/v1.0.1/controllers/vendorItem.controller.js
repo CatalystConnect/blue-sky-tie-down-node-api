@@ -137,11 +137,19 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
       let vendorItemId = req.query.vendorItemId;
-      let vendor = await vendorItemServices.getVendorsItemById(vendorItemId);
+
+      let vendorItemIds = vendorItemId
+      .split(',')
+      .map(id => id.trim())
+      .map(id => Number(id))
+      .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
+
+
+      let vendor = await vendorItemServices.getVendorsItemById(vendorItemIds);
       if (!vendor) {
         throw new Error("Vendor item not found");
       }
-      let deletevendor = await vendorItemServices.deleteVendorsItem(vendorItemId);
+      let deletevendor = await vendorItemServices.deleteVendorsItem(vendorItemIds);
       return res
         .status(200)
         .send(

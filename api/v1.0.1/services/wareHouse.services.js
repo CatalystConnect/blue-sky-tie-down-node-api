@@ -203,10 +203,11 @@ module.exports = {
   },
 
   /* Delete WareHouse */
-  async deleteWareHouse(wareHouseId) {
+  async deleteWareHouse(wareHouseIds) {
     try {
+      const ids = Array.isArray(wareHouseIds) ? wareHouseIds : [wareHouseIds];
       const deleted = await db.wareHouseObj.destroy({
-        where: { id: wareHouseId },
+        where: { id: ids },
       });
       return deleted; // returns number of rows deleted (0 or 1)
     } catch (e) {

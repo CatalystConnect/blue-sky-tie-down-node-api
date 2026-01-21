@@ -183,6 +183,13 @@ module.exports = {
     try {
       const wareHouseId = req.query.id || req.params.id;
 
+       let wareHouseIds = wareHouseId
+      .split(',')
+      .map(id => id.trim())
+      .map(id => Number(id))
+      .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
+
+
       if (!wareHouseId) {
         return res.status(400).json({
           status: false,
@@ -190,7 +197,7 @@ module.exports = {
         });
       }
 
-      const deleted = await wareHouseServices.deleteWareHouse(wareHouseId);
+      const deleted = await wareHouseServices.deleteWareHouse(wareHouseIds);
 
       if (!deleted) {
         return res.status(404).json({

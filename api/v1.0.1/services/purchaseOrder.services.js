@@ -146,7 +146,7 @@ module.exports = {
           }
         ]
       });
-      
+
       if (!po) throw new Error("PO not found");
 
       if (po.status !== "PENDING_APPROVAL") {
@@ -164,7 +164,7 @@ module.exports = {
         throw new Error("Vendor email not found");
       }
 
-      console.log(' po.vendorEmail.email,a',  po.vendorEmail.email)
+      console.log(' po.vendorEmail.email,a', po.vendorEmail.email)
 
       await commonHelper.sendPOEmail(
         po.vendorEmail.email,
@@ -317,7 +317,72 @@ module.exports = {
     await po.save();
 
     return po;
+  },
+
+  async getPurchaseOrder({ page, per_page, search, status, supplier_id }) {
+    try {
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+
+      const offset = (page - 1) * per_page;
+
+      let whereCondition = {};
+
+      // ---------- filters (same) ----------
+      if (status) {
+        whereCondition.status = status;
+      }
+
+      if (supplier_id) {
+        whereCondition.supplier_id = supplier_id;
+      }
+
+      if (search) {
+        whereCondition[Op.or] = [
+          { po_number: { [Op.like]: `%${search}%` } },
+          { reference_no: { [Op.like]: `%${search}%` } },
+        ];
+      }
+
+      // ---------- DB query (same) ----------
+      const { rows, count } = await db.purchaseOrderHeaderObj.findAndCountAll({
+        where: whereCondition,
+        include: [
+          {
+            model: db.purchaseOrderLineObj,
+            as: "purchaseOrderLines",
+          },
+        ],
+        limit: per_page,
+        offset,
+        order: [["id", "DESC"]],
+        distinct: true
+      });
+
+      // ---------- LAZY LOAD META (STANDARD) ----------
+      const total = count;
+      const current_count = rows.length;
+      const loaded_till_now = offset + current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
+
+      return {
+        data: rows,
+        meta: {
+          page,
+          limit: per_page,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
+        },
+      };
+    } catch (e) {
+      throw e;
+    }
   }
+
 
 
 

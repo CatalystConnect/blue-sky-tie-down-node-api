@@ -266,7 +266,7 @@ db.vendorItemObj = require("./vendorsItem.models")(db.dbObj, Sequelize);
 db.purchaseOrderHeaderObj = require("./purchaseOrderHeader.models")(db.dbObj, Sequelize);
 db.purchaseOrderLineObj = require("./purchaseOrderLine.models")(db.dbObj, Sequelize);
 db.purchaseOrderReceiptHeaderObj = require("./purchaseOrderReceiptHeader.models")(db.dbObj, Sequelize);
-db.purchaseOrderReceiptLineObj  = require("./purchaseOrderReceiptLine.models")(db.dbObj, Sequelize);
+db.purchaseOrderReceiptLineObj = require("./purchaseOrderReceiptLine.models")(db.dbObj, Sequelize);
 db.rtvHeaderObj = require("./rtvHeader.models")(db.dbObj, Sequelize);
 db.landedCostAllocationObj = require("./landedCostAllocation.models")
 
@@ -1267,28 +1267,28 @@ db.contactsObj.belongsTo(db.stateObj, {
 
 db.vendorItemObj.belongsTo(db.itemObj, {
   foreignKey: "item_id",
-   targetKey: "id", 
+  targetKey: "id",
   as: "item"
 
 });
 
 db.vendorItemObj.belongsTo(db.vendorsObj, {
   foreignKey: "vendor_id",
-  targetKey: "id", 
+  targetKey: "id",
   as: "vendors"
 
 });
 
 db.vendorContactObj.belongsTo(db.vendorsObj, {
   foreignKey: "vendor_id",
-  targetKey: "id", 
+  targetKey: "id",
   as: "vendorContacts"
 
 });
 
 db.vendorAddressObj.belongsTo(db.vendorsObj, {
   foreignKey: "vendor_id",
-  targetKey: "id", 
+  targetKey: "id",
   as: "vendorAddresses"
 
 });
@@ -1299,13 +1299,24 @@ db.purchaseOrderHeaderObj.belongsTo(db.vendorsObj, {
 
 });
 
-db.warehouseItemsObj.belongsTo(db.itemObj,{
-  foreignKey:"item_id",
-  as:"item"
+db.warehouseItemsObj.belongsTo(db.itemObj, {
+  foreignKey: "item_id",
+  as: "item"
 });
-db.warehouseItemsObj.belongsTo(db.wareHouseObj,{
-  foreignKey:"warehouse_id",
-  as:"warehouse"
+db.warehouseItemsObj.belongsTo(db.wareHouseObj, {
+  foreignKey: "warehouse_id",
+  as: "warehouse"
+});
+
+
+db.purchaseOrderHeaderObj.hasMany(db.purchaseOrderLineObj, {
+  foreignKey: "po_id",
+  as: "purchaseOrderLines",
+});
+
+db.purchaseOrderLineObj.belongsTo(db.purchaseOrderHeaderObj, {
+  foreignKey: "po_id",
+  as: "purchaseOrderHeader",
 });
 
 

@@ -100,12 +100,144 @@ module.exports = {
     }
   },
 
+  // async getAllWareHouseItems({ page, per_page, search, limit }) {
+  //   try {
+  //     const offset = (page - 1) * per_page;
+  //     const queryLimit = limit ? parseInt(limit) : per_page;
+
+  //     let whereCondition = {};
+  //     if (search) {
+  //       whereCondition = {
+  //         [Op.or]: [
+  //           { itemNumber: { [Op.like]: `%${search}%` } },
+  //           { description: { [Op.like]: `%${search}%` } },
+  //         ],
+  //       };
+  //     }
+
+  //     const { rows, count } = await db.warehouseItemsObj.findAndCountAll({
+  //       where: whereCondition,
+  //       include: [{
+  //         model: db.itemObj,
+  //         as: 'item',
+
+  //       },
+  //       {
+  //         model: db.wareHouseObj,
+  //         as: 'warehouse',
+
+  //       }
+  //     ],
+
+  //       limit: queryLimit,
+  //       offset,
+  //       order: [["createdAt", "DESC"]],
+  //     });
+
+  //     // const formattedData = rows.map((item) => ({
+  //     //   item: item.id,
+  //     //   searchItem: search,
+  //     //   keyFields: {
+  //     //     itemNumber: item.itemNumber,
+  //     //     description: item.description,
+  //     //     date: item.date,
+  //     //     contractor: item.contractor,
+  //     //   },
+  //     //   pricing: {
+  //     //     per: item.per,
+  //     //     listPrice: item.listPrice,
+  //     //     fullList: item.fullList,
+  //     //     fullRetail: item.fullRetail,
+  //     //     unitCost: item.unitCost,
+  //     //     effectiveDate: item.effectiveDate,
+  //     //   },
+  //     //   costing: {
+  //     //     costPerEA: item.costPerEA,
+  //     //     stdCost: item.stdCost,
+  //     //     fullStd: item.fullStd,
+  //     //     average: item.average,
+  //     //     lastAvg: item.lastAvg,
+  //     //     lastLand: item.lastLand,
+  //     //     baseCost: item.baseCost,
+  //     //   },
+  //     //   quantities: {
+  //     //     onHand: item.onHand,
+  //     //     committed: item.committed,
+  //     //     available: item.available,
+  //     //     triRegOut: item.triRegOut,
+  //     //     triTotalOut: item.triTotalOut,
+  //     //     backorder: item.backorder,
+  //     //     rented: item.rented,
+  //     //     onPO: item.onPO,
+  //     //     tranRegIn: item.tranRegIn,
+  //     //     tranTotalIn: item.tranTotalIn,
+  //     //     webAllow: item.webAllow,
+  //     //     qtyAvail: item.qtyAvail,
+  //     //     workOrder: item.workOrder,
+  //     //   },
+  //     //   locations: {
+  //     //     shipping: item.shipping,
+  //     //     receiving: item.receiving,
+  //     //   },
+  //     //   units: {
+  //     //     webAllow: item.webAllow,
+  //     //     allow: item.allow,
+  //     //     uM: item.uM,
+  //     //     qtyAvail: item.qtyAvail,
+  //     //   },
+  //     //   purchasing: {
+  //     //     buyerType: item.buyerType,
+  //     //     replenishPath: item.replenishPath,
+  //     //     seasonal: item.seasonal,
+  //     //     safetyStock: item.safetyStock,
+  //     //     minQty: item.minQty,
+  //     //     maxQty: item.maxQty,
+  //     //     leadTime: item.leadTime,
+  //     //     reorderPoint: item.reorderPoint,
+  //     //   },
+  //     //   costingAdditions: {
+  //     //     standardCost: item.standardCost,
+  //     //     baseCost: item.baseCost,
+  //     //     lastCost: item.lastCost,
+  //     //     averageCost: item.averageCost,
+  //     //     workingCost: item.workingCost,
+  //     //     costAdditions: item.costAdditions,
+  //     //   },
+  //     // }));
+
+  //     // return {
+  //     //   total: count,
+  //     //   page,
+  //     //   per_page,
+  //     //   data: rows,
+  //     // };
+  //     const totalPages = queryLimit ? Math.ceil(count / queryLimit) : 1;
+
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         total: count,
+  //         page,
+  //         per_page: queryLimit,
+  //         total_pages: totalPages,
+  //       }
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllWareHouseItems({ page, per_page, search, limit }) {
     try {
-      const offset = (page - 1) * per_page;
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+
       const queryLimit = limit ? parseInt(limit) : per_page;
+      const offset = (page - 1) * per_page;
 
       let whereCondition = {};
+
+      // ---------- search (same) ----------
       if (search) {
         whereCondition = {
           [Op.or]: [
@@ -115,127 +247,58 @@ module.exports = {
         };
       }
 
+      // ---------- DB query (same) ----------
       const { rows, count } = await db.warehouseItemsObj.findAndCountAll({
         where: whereCondition,
-        include: [{
-          model: db.itemObj,
-          as: 'item',
-          
-        },
-        {
-          model: db.wareHouseObj,
-          as: 'warehouse',
-          
-        }
-      ],
-
+        include: [
+          {
+            model: db.itemObj,
+            as: "item",
+          },
+          {
+            model: db.wareHouseObj,
+            as: "warehouse",
+          },
+        ],
         limit: queryLimit,
         offset,
         order: [["createdAt", "DESC"]],
       });
 
-      // const formattedData = rows.map((item) => ({
-      //   item: item.id,
-      //   searchItem: search,
-      //   keyFields: {
-      //     itemNumber: item.itemNumber,
-      //     description: item.description,
-      //     date: item.date,
-      //     contractor: item.contractor,
-      //   },
-      //   pricing: {
-      //     per: item.per,
-      //     listPrice: item.listPrice,
-      //     fullList: item.fullList,
-      //     fullRetail: item.fullRetail,
-      //     unitCost: item.unitCost,
-      //     effectiveDate: item.effectiveDate,
-      //   },
-      //   costing: {
-      //     costPerEA: item.costPerEA,
-      //     stdCost: item.stdCost,
-      //     fullStd: item.fullStd,
-      //     average: item.average,
-      //     lastAvg: item.lastAvg,
-      //     lastLand: item.lastLand,
-      //     baseCost: item.baseCost,
-      //   },
-      //   quantities: {
-      //     onHand: item.onHand,
-      //     committed: item.committed,
-      //     available: item.available,
-      //     triRegOut: item.triRegOut,
-      //     triTotalOut: item.triTotalOut,
-      //     backorder: item.backorder,
-      //     rented: item.rented,
-      //     onPO: item.onPO,
-      //     tranRegIn: item.tranRegIn,
-      //     tranTotalIn: item.tranTotalIn,
-      //     webAllow: item.webAllow,
-      //     qtyAvail: item.qtyAvail,
-      //     workOrder: item.workOrder,
-      //   },
-      //   locations: {
-      //     shipping: item.shipping,
-      //     receiving: item.receiving,
-      //   },
-      //   units: {
-      //     webAllow: item.webAllow,
-      //     allow: item.allow,
-      //     uM: item.uM,
-      //     qtyAvail: item.qtyAvail,
-      //   },
-      //   purchasing: {
-      //     buyerType: item.buyerType,
-      //     replenishPath: item.replenishPath,
-      //     seasonal: item.seasonal,
-      //     safetyStock: item.safetyStock,
-      //     minQty: item.minQty,
-      //     maxQty: item.maxQty,
-      //     leadTime: item.leadTime,
-      //     reorderPoint: item.reorderPoint,
-      //   },
-      //   costingAdditions: {
-      //     standardCost: item.standardCost,
-      //     baseCost: item.baseCost,
-      //     lastCost: item.lastCost,
-      //     averageCost: item.averageCost,
-      //     workingCost: item.workingCost,
-      //     costAdditions: item.costAdditions,
-      //   },
-      // }));
-
-      // return {
-      //   total: count,
-      //   page,
-      //   per_page,
-      //   data: rows,
-      // };
-      const totalPages = queryLimit ? Math.ceil(count / queryLimit) : 1;
+      // ---------- LAZY LOAD META ----------
+      const total = count;
+      const current_count = rows.length;
+      const loaded_till_now = offset + current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
 
       return {
         data: rows,
         meta: {
-          total: count,
           page,
-          per_page: queryLimit,
-          total_pages: totalPages,
-        }
+          limit: queryLimit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
+        },
       };
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
+
   async deletewareHouseItems(wareHouseId) {
     try {
       const deleted = await db.warehouseItemsObj.destroy({
         // where: { id: wareHouseId },
-         where: {
-        id: {
-          [Op.in]: wareHouseId
+        where: {
+          id: {
+            [Op.in]: wareHouseId
+          }
         }
-      }
       });
       return deleted;
     } catch (e) {

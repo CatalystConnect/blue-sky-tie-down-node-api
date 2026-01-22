@@ -27,36 +27,10 @@ module.exports = {
             throw e;
         }
     },
-    /*getAllRoles*/
-    // async getAllRoles(page = 1, perPage = 10) {
-    //     try {
-    //         const offset = (page - 1) * perPage;
 
-    //         const { count, rows } = await db.rolesObj.findAndCountAll({
-    //             offset: offset,
-    //             limit: perPage,
-    //             order: [["id", "ASC"]],
-    //             raw: true
-    //         });
-
-    //         return {
-    //             data: rows,
-    //             meta: {
-    //                 current_page: page,
-    //                 from: offset + 1,
-    //                 to: offset + rows.length,
-    //                 per_page: perPage,
-    //                 total: count,
-    //                 last_page: Math.ceil(count / perPage)
-    //             }
-    //         };
-    //     } catch (e) {
-    //         logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-    //         throw e;
-    //     }
-    // },
     // async getAllRoles(page = 1, perPage = 10, search = "", id = null) {
     //     try {
+    //         // Defensive parsing
     //         page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
     //         perPage = Number.isNaN(parseInt(perPage)) ? 10 : parseInt(perPage);
 
@@ -75,18 +49,29 @@ module.exports = {
     //             ];
     //         }
 
+    //         // Default order
+    //         let orderCondition = [["id", "ASC"]];
+
+    //         // If id is provided, adjust ordering so that id row comes first
     //         if (id) {
     //             const idInt = parseInt(id);
     //             if (!Number.isNaN(idInt)) {
-    //                 whereCondition.id = idInt;
+    //                 orderCondition = [
+    //                     [
+    //                         db.Sequelize.literal(`CASE WHEN roles.id = ${idInt} THEN 0 ELSE 1 END`),
+    //                         "ASC"
+    //                     ],
+    //                     ["id", "ASC"]
+    //                 ];
     //             }
     //         }
 
+    //         // Query
     //         const { count, rows } = await db.rolesObj.findAndCountAll({
     //             where: whereCondition,
     //             offset,
     //             limit: perPage,
-    //             order: [["id", "ASC"]],
+    //             order: orderCondition,
     //             raw: true
     //         });
 
@@ -108,13 +93,13 @@ module.exports = {
     // },
     async getAllRoles(page = 1, perPage = 10, search = "", id = null) {
         try {
-            // Defensive parsing
+            // Defensive parsing (same)
             page = Number.isNaN(parseInt(page)) ? 1 : parseInt(page);
             perPage = Number.isNaN(parseInt(perPage)) ? 10 : parseInt(perPage);
 
             const offset = (page - 1) * perPage;
 
-            // Build where condition
+            // Build where condition (same)
             const whereCondition = {};
 
             if (search) {
@@ -127,16 +112,17 @@ module.exports = {
                 ];
             }
 
-            // Default order
+            // Order condition (same)
             let orderCondition = [["id", "ASC"]];
 
-            // If id is provided, adjust ordering so that id row comes first
             if (id) {
                 const idInt = parseInt(id);
                 if (!Number.isNaN(idInt)) {
                     orderCondition = [
                         [
-                            db.Sequelize.literal(`CASE WHEN roles.id = ${idInt} THEN 0 ELSE 1 END`),
+                            db.Sequelize.literal(
+                                `CASE WHEN roles.id = ${idInt} THEN 0 ELSE 1 END`
+                            ),
                             "ASC"
                         ],
                         ["id", "ASC"]
@@ -144,7 +130,7 @@ module.exports = {
                 }
             }
 
-            // Query
+            // Query (same)
             const { count, rows } = await db.rolesObj.findAndCountAll({
                 where: whereCondition,
                 offset,
@@ -153,15 +139,23 @@ module.exports = {
                 raw: true
             });
 
+            // ---------- LAZY LOAD META (NEW) ----------
+            const total = count;
+            const current_count = rows.length;
+            const loaded_till_now = offset + current_count;
+            const remaining = Math.max(total - loaded_till_now, 0);
+            const has_more = loaded_till_now < total;
+
             return {
                 data: rows,
                 meta: {
-                    current_page: page,
-                    from: offset + 1,
-                    to: offset + rows.length,
-                    per_page: perPage,
-                    total: count,
-                    last_page: Math.ceil(count / perPage)
+                    page,
+                    limit: perPage,
+                    current_count,
+                    loaded_till_now,
+                    remaining,
+                    total,
+                    has_more
                 }
             };
         } catch (e) {
@@ -169,6 +163,7 @@ module.exports = {
             throw e;
         }
     },
+
     /*getRoleById*/
     async getRoleById(roleId) {
         try {

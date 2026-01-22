@@ -14,57 +14,11 @@ module.exports = {
       throw e;
     }
   },
-  /*getAllTags*/
-  // async getAllTags({ page, per_page, search,id }) {
+  // async getAllTags({ page, per_page, search, id }) {
   //   try {
-  //     const limit = parseInt(per_page);
-  //     const offset = (page - 1) * limit;
-
-  //     let whereCondition = {};
-  //     if (search) {
-  //       whereCondition = {
-  //         [Op.or]: [
-  //           { title: { [Op.like]: `%${search}%` } },
-  //           { color: { [Op.like]: `%${search}%` } },
-  //           { type: { [Op.like]: `%${search}%` } },
-  //         ]
-  //       };
-  //     }
-
-  //     const { rows, count } = await db.tagsObj.findAndCountAll({
-  //       where: whereCondition,
-  //       limit,
-  //       offset,
-  //       order: [["id", "DESC"]],
-  //       raw: true
-  //     });
-
-  //     const lastPage = Math.ceil(count / limit);
-
-  //     return {
-  //       data: rows,
-  //       meta: {
-  //         current_page: page,
-  //         from: offset + 1,
-  //         to: offset + rows.length,
-  //         last_page: lastPage,
-  //         per_page: limit,
-  //         total: count
-  //       }
-  //     };
-  //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-  //     throw e;
-  //   }
-  // },
-  //  async  getAllTags({ page = 1, per_page = 10, search, id }) {
-  //   try {
-  //     const limit = parseInt(per_page) || 10;
-  //     const offset = (page - 1) * limit;
-
   //     let whereCondition = {};
 
-  //     // ✅ Search filter (case-insensitive on title, color, type)
+  //     // Search filter
   //     if (search && search.trim() !== "") {
   //       const searchTerm = search.trim();
   //       whereCondition[Op.or] = [
@@ -74,63 +28,34 @@ module.exports = {
   //       ];
   //     }
 
-  //     // ✅ Normalize IDs (single, array string, comma-separated)
-  //     let idsArray = [];
-  //     if (id) {
-  //       try {
-  //         if (id.startsWith("[")) {
-  //           idsArray = JSON.parse(id);
-  //         } else {
-  //           idsArray = id.split(",").map((x) => parseInt(x.trim())).filter(Boolean);
-  //         }
-  //       } catch (err) {
-  //         console.log("Invalid id format", err);
-  //       }
-  //     }
+  //     // Detect pagination or no pagination
+  //     const paginationEnabled = page && per_page;
 
-  //     // ✅ Ordering: prioritize IDs if provided
-  //     let order = [["id", "DESC"]];
-  //     if (idsArray.length > 0) {
-  //       order = [
-  //         [
-  //           Sequelize.literal(
-  //             `CASE 
-  //               ${idsArray
-  //                 .map((id, index) => `WHEN "tags"."id" = ${parseInt(id)} THEN ${index}`)
-  //                 .join(" ")}
-  //               ELSE ${idsArray.length} 
-  //             END`
-  //           ),
-  //           "ASC",
-  //         ],
-  //         ["id", "DESC"],
-  //       ];
-  //     }
-
+  //     const limit = paginationEnabled ? parseInt(per_page) : null;
+  //     const offset = paginationEnabled ? (parseInt(page) - 1) * parseInt(per_page) : null;
 
   //     const { rows, count } = await db.tagsObj.findAndCountAll({
   //       where: whereCondition,
-  //       limit,
-  //       offset,
-  //       order,
+  //       ...(limit ? { limit } : {}),   // Add limit only if pagination
+  //       ...(offset ? { offset } : {}),
+  //       order: [["id", "DESC"]],
   //       raw: true,
   //     });
 
-  //     const lastPage = Math.ceil(count / limit);
+  //     let lastPage = paginationEnabled ? Math.ceil(count / limit) : 1;
 
   //     return {
   //       data: rows,
   //       meta: {
-  //         current_page: page,
+  //         current_page: parseInt(page),
   //         from: offset + 1,
   //         to: offset + rows.length,
   //         last_page: lastPage,
   //         per_page: limit,
-  //         total: count,
+  //         total: count
   //       },
   //     };
   //   } catch (e) {
-  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
   //     throw e;
   //   }
   // },
@@ -138,7 +63,7 @@ module.exports = {
     try {
       let whereCondition = {};
 
-      // Search filter
+      // Search filter (same)
       if (search && search.trim() !== "") {
         const searchTerm = search.trim();
         whereCondition[Op.or] = [
@@ -148,31 +73,41 @@ module.exports = {
         ];
       }
 
-      // Detect pagination or no pagination
+      // Pagination detect (same)
       const paginationEnabled = page && per_page;
 
       const limit = paginationEnabled ? parseInt(per_page) : null;
-      const offset = paginationEnabled ? (parseInt(page) - 1) * parseInt(per_page) : null;
+      const offset = paginationEnabled
+        ? (parseInt(page) - 1) * parseInt(per_page)
+        : 0;
 
       const { rows, count } = await db.tagsObj.findAndCountAll({
         where: whereCondition,
-        ...(limit ? { limit } : {}),   // Add limit only if pagination
-        ...(offset ? { offset } : {}),
+        ...(limit ? { limit } : {}),
+        ...(paginationEnabled ? { offset } : {}),
         order: [["id", "DESC"]],
         raw: true,
       });
 
-      let lastPage = paginationEnabled ? Math.ceil(count / limit) : 1;
+      // ---------- LAZY LOAD META ----------
+      const total = count;
+      const current_count = rows.length;
+      const loaded_till_now = paginationEnabled
+        ? offset + current_count
+        : current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
 
       return {
         data: rows,
         meta: {
-          current_page: parseInt(page),
-          from: offset + 1,
-          to: offset + rows.length,
-          last_page: lastPage,
-          per_page: limit,
-          total: count
+          page: paginationEnabled ? parseInt(page) : 1,
+          limit: limit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
         },
       };
     } catch (e) {

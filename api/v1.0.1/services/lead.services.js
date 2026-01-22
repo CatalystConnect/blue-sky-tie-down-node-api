@@ -111,14 +111,164 @@ module.exports = {
   //   }
   // },
 
+  // async getAllLeads(page, per_page, search, date, take_all) {
+  //   try {
+  //     page = Math.max(parseInt(page) || 1, 1);
+  //     const limit = Math.max(parseInt(per_page) || 10, 1);
+  //     const offset = (page - 1) * limit;
+
+  //     let whereCondition = {};
+
+  //     if (date) {
+  //       whereCondition.createdAt = {
+  //         [Op.gte]: new Date(date + " 00:00:00"),
+  //         [Op.lte]: new Date(date + " 23:59:59"),
+  //       };
+  //     }
+
+  //     const searchTerm = search?.trim();
+  //     if (searchTerm) {
+  //       whereCondition[Op.or] = [
+  //         { "$company.name$": { [Op.iLike]: `%${searchTerm}%` } },
+  //         { "$project.name$": { [Op.iLike]: `%${searchTerm}%` } },
+  //       ];
+  //     }
+
+  //     // ✅ Step 1: Count total leads
+  //     const total = await db.leadsObj.count({
+  //       include: [
+  //         { model: db.companyObj, as: "company", required: false },
+  //         { model: db.projectObj, as: "project", required: false },
+  //       ],
+  //       where: whereCondition,
+  //       distinct: true,
+  //     });
+
+  //     // ✅ Step 2: Get only lead IDs for the current page
+  //     const idQueryOptions = {
+  //       attributes: ["id"],
+  //       include: [
+  //         { model: db.companyObj, as: "company", required: false },
+  //         { model: db.projectObj, as: "project", required: false },
+  //       ],
+  //       where: whereCondition,
+  //       order: [["id", "DESC"]],
+  //     };
+
+  //     if (!(take_all && take_all === "all")) {
+  //       idQueryOptions.limit = limit;
+  //       idQueryOptions.offset = offset;
+  //     }
+
+  //     const idResults = await db.leadsObj.findAll(idQueryOptions);
+  //     const leadIds = idResults.map((item) => item.id);
+
+  //     if (leadIds.length === 0) {
+  //       return {
+  //         leads: [],
+  //         meta: {
+  //           current_page: page,
+  //           from: 0,
+  //           to: 0,
+  //           last_page: 0,
+  //           per_page: limit,
+  //           total: total,
+  //         },
+  //       };
+  //     }
+
+  //     // ✅ Step 3: Fetch full leads with includes
+  //     const include = [
+  //       { model: db.companyObj, as: "company" },
+  //       {
+  //         model: db.projectObj,
+  //         as: "project",
+  //         include: [
+  //           { model: db.taxesObj, as: "stateDetails" },
+  //           { model: db.taxesObj, as: "zipCodeDetails" },
+  //           { model: db.stateObj, as: "states" },
+  //         ],
+  //       },
+  //       { model: db.contactsObj, as: "contact" },
+  //       {
+  //         model: db.userObj,
+  //         as: "salePerson",
+  //         attributes: { exclude: ["password"] },
+  //       },
+  //       {
+  //         model: db.userObj,
+  //         as: "engineer",
+  //         attributes: { exclude: ["password"] },
+  //       },
+  //       { model: db.leadTeamsObj, as: "leadTeam" },
+  //       { model: db.leadStatusesObj, as: "leadStatus" },
+  //       {
+  //         model: db.leadScopeMappingsObj,
+  //         as: "leadScopeMappings",
+  //         required: false,
+  //         separate: true,
+  //         include: [
+  //           {
+  //             model: db.leadScopesObj,
+  //             as: "leadScopes",
+  //             required: false,
+  //             separate: false,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         model: db.leadTagsObj,
+  //         as: "lead_tags",
+  //         include: [{ model: db.tagsObj, as: "tag" }],
+  //       },
+  //       {
+  //         model: db.salesPipelinesObj,
+  //         as: "salesPipelines",
+  //         attributes: ["id", "name"],
+  //       },
+  //       {
+  //         model: db.salesPipelinesStatusesObj,
+  //         as: "salesPipelinesStatus",
+  //         attributes: ["id", "name"],
+  //       },
+  //     ];
+
+  //     const leads = await db.leadsObj.findAll({
+  //       where: { id: leadIds },
+  //       include,
+  //       order: [["id", "DESC"]],
+  //     });
+
+  //     const lastPage = Math.ceil(total / limit);
+  //     const from = offset + 1;
+  //     const to = offset + leads.length;
+
+  //     return {
+  //       leads,
+  //       meta: {
+  //         current_page: page,
+  //         from,
+  //         to,
+  //         last_page: lastPage,
+  //         per_page: limit,
+  //         total: total,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllLeads(page, per_page, search, date, take_all) {
     try {
+      // ---------- pagination safe ----------
       page = Math.max(parseInt(page) || 1, 1);
       const limit = Math.max(parseInt(per_page) || 10, 1);
       const offset = (page - 1) * limit;
 
       let whereCondition = {};
 
+      // ---------- date filter ----------
       if (date) {
         whereCondition.createdAt = {
           [Op.gte]: new Date(date + " 00:00:00"),
@@ -126,6 +276,7 @@ module.exports = {
         };
       }
 
+      // ---------- search ----------
       const searchTerm = search?.trim();
       if (searchTerm) {
         whereCondition[Op.or] = [
@@ -134,7 +285,7 @@ module.exports = {
         ];
       }
 
-      // ✅ Step 1: Count total leads
+      // ---------- TOTAL COUNT ----------
       const total = await db.leadsObj.count({
         include: [
           { model: db.companyObj, as: "company", required: false },
@@ -144,7 +295,7 @@ module.exports = {
         distinct: true,
       });
 
-      // ✅ Step 2: Get only lead IDs for the current page
+      // ---------- STEP 1: IDs (lazy load safe) ----------
       const idQueryOptions = {
         attributes: ["id"],
         include: [
@@ -161,97 +312,96 @@ module.exports = {
       }
 
       const idResults = await db.leadsObj.findAll(idQueryOptions);
-      const leadIds = idResults.map((item) => item.id);
+      const leadIds = idResults.map((row) => row.id);
 
       if (leadIds.length === 0) {
         return {
           leads: [],
           meta: {
-            current_page: page,
-            from: 0,
-            to: 0,
-            last_page: 0,
-            per_page: limit,
-            total: total,
+            page,
+            limit,
+            current_count: 0,
+            loaded_till_now: offset,
+            remaining: total,
+            total,
+            has_more: false,
           },
         };
       }
 
-      // ✅ Step 3: Fetch full leads with includes
-      const include = [
-        { model: db.companyObj, as: "company" },
-        {
-          model: db.projectObj,
-          as: "project",
-          include: [
-            { model: db.taxesObj, as: "stateDetails" },
-            { model: db.taxesObj, as: "zipCodeDetails" },
-            { model: db.stateObj, as: "states" },
-          ],
-        },
-        { model: db.contactsObj, as: "contact" },
-        {
-          model: db.userObj,
-          as: "salePerson",
-          attributes: { exclude: ["password"] },
-        },
-        {
-          model: db.userObj,
-          as: "engineer",
-          attributes: { exclude: ["password"] },
-        },
-        { model: db.leadTeamsObj, as: "leadTeam" },
-        { model: db.leadStatusesObj, as: "leadStatus" },
-        {
-          model: db.leadScopeMappingsObj,
-          as: "leadScopeMappings",
-          required: false,
-          separate: true,
-          include: [
-            {
-              model: db.leadScopesObj,
-              as: "leadScopes",
-              required: false,
-              separate: false,
-            },
-          ],
-        },
-        {
-          model: db.leadTagsObj,
-          as: "lead_tags",
-          include: [{ model: db.tagsObj, as: "tag" }],
-        },
-        {
-          model: db.salesPipelinesObj,
-          as: "salesPipelines",
-          attributes: ["id", "name"],
-        },
-        {
-          model: db.salesPipelinesStatusesObj,
-          as: "salesPipelinesStatus",
-          attributes: ["id", "name"],
-        },
-      ];
-
+      // ---------- STEP 2: FULL DATA ----------
       const leads = await db.leadsObj.findAll({
         where: { id: leadIds },
-        include,
+        include: [
+          { model: db.companyObj, as: "company" },
+          {
+            model: db.projectObj,
+            as: "project",
+            include: [
+              { model: db.taxesObj, as: "stateDetails" },
+              { model: db.taxesObj, as: "zipCodeDetails" },
+              { model: db.stateObj, as: "states" },
+            ],
+          },
+          { model: db.contactsObj, as: "contact" },
+          {
+            model: db.userObj,
+            as: "salePerson",
+            attributes: { exclude: ["password"] },
+          },
+          {
+            model: db.userObj,
+            as: "engineer",
+            attributes: { exclude: ["password"] },
+          },
+          { model: db.leadTeamsObj, as: "leadTeam" },
+          { model: db.leadStatusesObj, as: "leadStatus" },
+          {
+            model: db.leadScopeMappingsObj,
+            as: "leadScopeMappings",
+            separate: true,
+            include: [
+              {
+                model: db.leadScopesObj,
+                as: "leadScopes",
+              },
+            ],
+          },
+          {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            include: [{ model: db.tagsObj, as: "tag" }],
+          },
+          {
+            model: db.salesPipelinesObj,
+            as: "salesPipelines",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.salesPipelinesStatusesObj,
+            as: "salesPipelinesStatus",
+            attributes: ["id", "name"],
+          },
+        ],
         order: [["id", "DESC"]],
       });
 
-      const lastPage = Math.ceil(total / limit);
-      const from = offset + 1;
-      const to = offset + leads.length;
+      // ---------- LAZY LOAD META ----------
+      const current_count = leads.length;
+      const loaded_till_now = offset + current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
 
       return {
         leads,
         meta: {
-          current_page: page,
-          from,
-          to,
-          last_page: lastPage,
-          per_page: limit,
-          total: total,
+          page,
+          limit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
         },
       };
     } catch (e) {
@@ -808,187 +958,187 @@ module.exports = {
   //     throw e;
   //   }
   // },
-async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
-  try {
-    const limit = parseInt(per_page) || 10;
-    const offset = (parseInt(page) - 1) * limit || 0;
+  async getAllProjectDatatakeoffLead(page, per_page, search, userId) {
+    try {
+      const limit = parseInt(per_page) || 10;
+      const offset = (parseInt(page) - 1) * limit || 0;
 
-    const projectWhere = {
-      takeoff_status: {
-        [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
-      },
-    };
-
-    if (search && search.trim() !== "") {
-      projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
-        db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
-        { [db.Sequelize.Op.like]: `%${search.toLowerCase()}%` }
-      );
-    }
-
-    // ========== 1) MAIN QUERY ==========
-    const rows = await db.leadsObj.findAll({
-      include: [
-        {
-          model: db.projectObj,
-          as: "project",
-          include: [
-            { model: db.companyObj, as: "engineerCompany" },
-            { model: db.gDriveAssociationObj, as: "googleDrive" },
-            { model: db.projectplanSetsObj, as: "planSets" },
-          ],
-          required: true,
-          where: projectWhere,
+      const projectWhere = {
+        takeoff_status: {
+          [db.Sequelize.Op.in]: ["takeoff_complete", "budget"],
         },
-        { model: db.companyObj, as: "company" },
-        { model: db.contactsObj, as: "contact" },
-        { model: db.leadStatusesObj, as: "leadStatus" },
-        {
-          model: db.leadTagsObj,
-          as: "lead_tags",
-          include: { model: db.tagsObj, as: "tag" },
-        },
-        { model: db.budgetBooksObj, as: "lead_budget" },
-      ],
-      limit,
-      offset,
-      order: [
-        [
-          db.Sequelize.literal(`CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`),
-          "ASC",
+      };
+
+      if (search && search.trim() !== "") {
+        projectWhere[db.Sequelize.Op.and] = db.Sequelize.where(
+          db.Sequelize.fn("LOWER", db.Sequelize.col("project.name")),
+          { [db.Sequelize.Op.like]: `%${search.toLowerCase()}%` }
+        );
+      }
+
+      // ========== 1) MAIN QUERY ==========
+      const rows = await db.leadsObj.findAll({
+        include: [
+          {
+            model: db.projectObj,
+            as: "project",
+            include: [
+              { model: db.companyObj, as: "engineerCompany" },
+              { model: db.gDriveAssociationObj, as: "googleDrive" },
+              { model: db.projectplanSetsObj, as: "planSets" },
+            ],
+            required: true,
+            where: projectWhere,
+          },
+          { model: db.companyObj, as: "company" },
+          { model: db.contactsObj, as: "contact" },
+          { model: db.leadStatusesObj, as: "leadStatus" },
+          {
+            model: db.leadTagsObj,
+            as: "lead_tags",
+            include: { model: db.tagsObj, as: "tag" },
+          },
+          { model: db.budgetBooksObj, as: "lead_budget" },
         ],
-        ["id", "DESC"],
-      ],
-    });
-
-    // ========== 2) COUNT ==========
-    const count = await db.leadsObj.count({
-      include: [
-        {
-          model: db.projectObj,
-          as: "project",
-          required: true,
-          where: projectWhere,
-        },
-      ],
-    });
-
-    // =======================================================================================
-    // ========== 3) APPLY YOUR GOOGLE DRIVE STRUCTURE LOGIC (NO OLD LOGIC CHANGED) ==========
-    // =======================================================================================
-
-    const buildFolderStructure = (files) => {
-      const folderMap = {};
-      const rootFiles = [];
-
-      files.forEach((item) => {
-        if (item.type === "folder") {
-          folderMap[item.file_name] = { folder: item, files: [] };
-        }
+        limit,
+        offset,
+        order: [
+          [
+            db.Sequelize.literal(`CASE WHEN "leads"."priorty" = 'true' THEN 0 ELSE 1 END`),
+            "ASC",
+          ],
+          ["id", "DESC"],
+        ],
       });
 
-      files.forEach((item) => {
-        if (item.type === "file" && item.parent) {
-          const parentFolder = files.find((f) => f.id === item.parent);
-          if (parentFolder && parentFolder.type === "folder") {
-            folderMap[parentFolder.file_name].files.push(item);
-          } else {
+      // ========== 2) COUNT ==========
+      const count = await db.leadsObj.count({
+        include: [
+          {
+            model: db.projectObj,
+            as: "project",
+            required: true,
+            where: projectWhere,
+          },
+        ],
+      });
+
+      // =======================================================================================
+      // ========== 3) APPLY YOUR GOOGLE DRIVE STRUCTURE LOGIC (NO OLD LOGIC CHANGED) ==========
+      // =======================================================================================
+
+      const buildFolderStructure = (files) => {
+        const folderMap = {};
+        const rootFiles = [];
+
+        files.forEach((item) => {
+          if (item.type === "folder") {
+            folderMap[item.file_name] = { folder: item, files: [] };
+          }
+        });
+
+        files.forEach((item) => {
+          if (item.type === "file" && item.parent) {
+            const parentFolder = files.find((f) => f.id === item.parent);
+            if (parentFolder && parentFolder.type === "folder") {
+              folderMap[parentFolder.file_name].files.push(item);
+            } else {
+              rootFiles.push(item);
+            }
+          } else if (item.type === "file") {
             rootFiles.push(item);
           }
-        } else if (item.type === "file") {
-          rootFiles.push(item);
-        }
-      });
+        });
 
-      return { rootFiles, folders: folderMap };
-    };
-
-    // Loop through each lead row and transform project.googleDrive
-    rows.forEach((lead) => {
-      const project = lead.project;
-      if (!project || !project.googleDrive) return;
-
-      const googleDriveData = project.googleDrive;
-
-      // --- Separate modules ---
-      const modules = {
-        projectFiles: [],
-        completedFiles: [],
-        planSet: [],
-        budgetFiles: [],
+        return { rootFiles, folders: folderMap };
       };
 
-      googleDriveData.forEach((item) => {
-        const file = item.dataValues || item;
+      // Loop through each lead row and transform project.googleDrive
+      rows.forEach((lead) => {
+        const project = lead.project;
+        if (!project || !project.googleDrive) return;
 
-        if (file.module === "projectFiles") modules.projectFiles.push(file);
-        else if (file.module === "completedFiles" || file.module === "CompletedFiles")
-          modules.completedFiles.push(file);
-        else if (file.module === "planSetFiles") modules.planSet.push(file);
-        else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
+        const googleDriveData = project.googleDrive;
+
+        // --- Separate modules ---
+        const modules = {
+          projectFiles: [],
+          completedFiles: [],
+          planSet: [],
+          budgetFiles: [],
+        };
+
+        googleDriveData.forEach((item) => {
+          const file = item.dataValues || item;
+
+          if (file.module === "projectFiles") modules.projectFiles.push(file);
+          else if (file.module === "completedFiles" || file.module === "CompletedFiles")
+            modules.completedFiles.push(file);
+          else if (file.module === "planSetFiles") modules.planSet.push(file);
+          else if (file.module === "budgetFiles") modules.budgetFiles.push(file);
+        });
+
+        // ------- PLAN SET logic -------
+        const planSetFolderMap = {};
+        project.planSets?.forEach((p, index) => {
+          planSetFolderMap[p.id] = index + 1;
+        });
+
+        const planSet = {};
+        modules.planSet.forEach((item) => {
+          const moduleId = item.module_id;
+          const folderNumber = planSetFolderMap[moduleId] || moduleId;
+
+          if (!planSet[folderNumber]) {
+            planSet[folderNumber] = { folder: null, files: [] };
+          }
+
+          if (!item.file_name) {
+            planSet[folderNumber].folder = {
+              drive_id: item.drive_id,
+              createdAt: item.createdAt,
+            };
+          } else {
+            planSet[folderNumber].files.push({
+              drive_id: item.drive_id,
+              file_name: item.file_name,
+              createdAt: item.createdAt,
+            });
+          }
+        });
+
+        // ------- Folder structure for other modules -------
+        const projectFiles = buildFolderStructure(modules.projectFiles);
+        const completedFiles = buildFolderStructure(modules.completedFiles);
+        const budgetFiles = buildFolderStructure(modules.budgetFiles);
+
+        // Final assignment
+        project.dataValues.googleDrive = {
+          planSet,
+          projectFiles,
+          completedFiles,
+          budgetFiles,
+        };
       });
 
-      // ------- PLAN SET logic -------
-      const planSetFolderMap = {};
-      project.planSets?.forEach((p, index) => {
-        planSetFolderMap[p.id] = index + 1;
-      });
+      // =======================================================================================
 
-      const planSet = {};
-      modules.planSet.forEach((item) => {
-        const moduleId = item.module_id;
-        const folderNumber = planSetFolderMap[moduleId] || moduleId;
-
-        if (!planSet[folderNumber]) {
-          planSet[folderNumber] = { folder: null, files: [] };
-        }
-
-        if (!item.file_name) {
-          planSet[folderNumber].folder = {
-            drive_id: item.drive_id,
-            createdAt: item.createdAt,
-          };
-        } else {
-          planSet[folderNumber].files.push({
-            drive_id: item.drive_id,
-            file_name: item.file_name,
-            createdAt: item.createdAt,
-          });
-        }
-      });
-
-      // ------- Folder structure for other modules -------
-      const projectFiles = buildFolderStructure(modules.projectFiles);
-      const completedFiles = buildFolderStructure(modules.completedFiles);
-      const budgetFiles = buildFolderStructure(modules.budgetFiles);
-
-      // Final assignment
-      project.dataValues.googleDrive = {
-        planSet,
-        projectFiles,
-        completedFiles,
-        budgetFiles,
+      return {
+        data: rows,
+        meta: {
+          current_page: parseInt(page),
+          from: offset + 1,
+          to: offset + rows.length,
+          last_page: Math.ceil(count / limit),
+          per_page: limit,
+          total: count,
+        },
       };
-    });
-
-    // =======================================================================================
-
-    return {
-      data: rows,
-      meta: {
-        current_page: parseInt(page),
-        from: offset + 1,
-        to: offset + rows.length,
-        last_page: Math.ceil(count / limit),
-        per_page: limit,
-        total: count,
-      },
-    };
-  } catch (e) {
-    logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-    throw e;
-  }
-},
+    } catch (e) {
+      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+      throw e;
+    }
+  },
 
   /* updateLeadPriority */
   async updateLeadPriority(id, takeoff_status, priority = false) {

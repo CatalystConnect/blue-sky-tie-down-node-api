@@ -64,21 +64,95 @@ module.exports = {
   //     throw e;
   //   }
   // },
+  // async getAllProductPhases({ page = 1, per_page = 10, search = "", id }) {
+  //   try {
+  //     const limit = per_page;
+  //     const offset = (page - 1) * limit;
+
+  //     const whereCondition = {};
+
+  //     // Search condition
+  //     if (search) {
+  //       whereCondition[Op.or] = [
+  //         { name: { [Op.iLike]: `%${search}%` } }
+  //       ];
+  //     }
+
+  //     // Build order condition
+  //     let orderCondition = [["order", "ASC"]];
+  //     let idInt = null;
+  //     let idsArray = [];
+
+  //     if (id) {
+  //       try {
+  //         if (id.startsWith && id.startsWith("[")) {
+  //           idsArray = JSON.parse(id)
+  //             .map(x => parseInt(x))
+  //             .filter(x => !Number.isNaN(x));
+  //         } else {
+  //           const parsed = parseInt(id);
+  //           if (!Number.isNaN(parsed)) {
+  //             idInt = parsed;
+  //           }
+  //         }
+  //       } catch (err) {
+  //         console.log("Invalid id format", err);
+  //       }
+  //     }
+
+  //     if (idInt || (idsArray && idsArray.length > 0)) {
+  //       let caseExpr;
+  //       if (idsArray.length > 0) {
+  //         caseExpr = `CASE WHEN id IN (${idsArray.join(",")}) THEN 0 ELSE 1 END`;
+  //       } else {
+  //         caseExpr = `CASE WHEN id = ${idInt} THEN 0 ELSE 1 END`;
+  //       }
+
+  //       orderCondition = [
+  //         [db.Sequelize.literal(caseExpr), "ASC"],
+  //         ["order", "ASC"]
+  //       ];
+  //     }
+
+  //     const { rows, count } = await db.projectPhasesObj.findAndCountAll({
+  //       where: whereCondition,
+  //       order: orderCondition,
+  //       limit,
+  //       offset
+  //     });
+
+  //     return {
+  //       data: rows,
+  //       meta: {
+  //         total: count,
+  //         page,
+  //         per_page
+  //       }
+  //     };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllProductPhases({ page = 1, per_page = 10, search = "", id }) {
     try {
+      // 🔒 ensure numbers (important for ?per-page=5)
+      page = parseInt(page);
+      per_page = parseInt(per_page);
+
       const limit = per_page;
       const offset = (page - 1) * limit;
 
       const whereCondition = {};
 
-      // Search condition
+      // 🔍 Search condition
       if (search) {
         whereCondition[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } }
         ];
       }
 
-      // Build order condition
+      // 🔢 Order logic (same as before)
       let orderCondition = [["order", "ASC"]];
       let idInt = null;
       let idsArray = [];
@@ -100,7 +174,7 @@ module.exports = {
         }
       }
 
-      if (idInt || (idsArray && idsArray.length > 0)) {
+      if (idInt || idsArray.length > 0) {
         let caseExpr;
         if (idsArray.length > 0) {
           caseExpr = `CASE WHEN id IN (${idsArray.join(",")}) THEN 0 ELSE 1 END`;
@@ -114,6 +188,7 @@ module.exports = {
         ];
       }
 
+      // 📦 DB call
       const { rows, count } = await db.projectPhasesObj.findAndCountAll({
         where: whereCondition,
         order: orderCondition,
@@ -121,20 +196,29 @@ module.exports = {
         offset
       });
 
+      // 🧠 Lazy load meta (NEW – logic same, sirf meta add)
+      const loaded = offset + rows.length;
+      const remaining = Math.max(count - loaded, 0);
+      const hasMore = loaded < count;
+
       return {
         data: rows,
         meta: {
-          total: count,
           page,
-          per_page
+          limit,
+          current_count: rows.length,
+          loaded_till_now: loaded,
+          remaining,
+          total: count,
+          has_more: hasMore
         }
       };
+
     } catch (e) {
       logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
       throw e;
     }
   },
-
   /*getProductPhasesById*/
   async getProductPhasesById(id) {
     try {

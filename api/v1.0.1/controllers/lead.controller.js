@@ -22,10 +22,10 @@ module.exports = {
   /*getAllLeads*/
   async getAllLeads(req, res) {
     try {
-      let { page = 1, per_page, search, date, take_all } = req.query;
+      let { page = 1, per_page="", search, date, take_all } = req.query;
 
       page = parseInt(page);
-      per_page = parseInt(per_page) || 10;
+      per_page = parseInt(per_page);
 
       if (page <= 0 || per_page <= 0) {
         throw new Error("Page and length must be greater than 0");

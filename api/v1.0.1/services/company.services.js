@@ -94,89 +94,191 @@ module.exports = {
   //   }
   // },
 
+  // async getAllCompany(query) {
+  //   try {
+  //     let { page, per_page, limit, take_all, search, id, type } = query;
+
+  //     page = parseInt(page) || 1;
+  //     per_page = parseInt(per_page) || 10;
+  //     limit = parseInt(limit) || null;
+  //     const offset = (page - 1) * per_page;
+
+  //     let whereCondition = {};
+  //     if (search) {
+  //       whereCondition.name = { [Op.iLike]: `%${search}%` };
+  //     }
+
+  //     let order = [["id", "DESC"]];
+  //     if (id) {
+  //       order = [
+  //         [
+  //           Sequelize.literal(
+  //             `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
+  //           ),
+  //           "ASC",
+  //         ],
+  //         ["id", "DESC"],
+  //       ];
+  //     }
+
+  //     const includeRelation = [
+  //       {
+  //         model: db.companyTypeObj,
+  //         as: "companyType",
+  //         ...(type
+  //           ? {
+  //               where: {
+  //                 [Op.or]: Sequelize.where(
+  //                   Sequelize.fn("LOWER", Sequelize.col("companyType.name")),
+  //                   {
+  //                     [Op.like]: `%${type.toLowerCase()}%`,
+  //                   }
+  //                 ),
+  //               },
+  //               required: true,
+  //             }
+  //           : {
+  //               required: false,
+  //             }),
+  //       },
+  //        {
+  //         model: db.stateObj,
+  //         as: "CompanyState",
+  //        }
+  //     ];
+  //     if (take_all === "all") {
+  //       const companies = await db.companyObj.findAll({
+  //         where: whereCondition,
+  //         order,
+  //         ...(limit ? { limit } : {}),
+  //         include: includeRelation,
+  //       });
+
+  //       return { data: companies, total: companies.length };
+  //     }
+
+  //     const { rows, count } = await db.companyObj.findAndCountAll({
+  //       where: whereCondition,
+  //       order,
+  //       limit: per_page,
+  //       offset,
+  //       include: includeRelation,
+  //     });
+
+  //     return {
+  //       data: rows,
+  //       total: count,
+  //       current_page: page,
+  //       per_page,
+  //       last_page: Math.ceil(count / per_page),
+  //     };
+  //   } catch (e) {
+  //     console.error(commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
   async getAllCompany(query) {
-    try {
-      let { page, per_page, limit, take_all, search, id, type } = query;
+  try {
+    let { page, per_page, limit, take_all, search, id, type } = query;
 
-      page = parseInt(page) || 1;
-      per_page = parseInt(per_page) || 10;
-      limit = parseInt(limit) || null;
-      const offset = (page - 1) * per_page;
+    page = parseInt(page) || 1;
+    per_page = parseInt(per_page) || 10;
+    limit = parseInt(limit) || null;
 
-      let whereCondition = {};
-      if (search) {
-        whereCondition.name = { [Op.iLike]: `%${search}%` };
-      }
+    const offset = (page - 1) * per_page;
 
-      let order = [["id", "DESC"]];
-      if (id) {
-        order = [
-          [
-            Sequelize.literal(
-              `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
-            ),
-            "ASC",
-          ],
-          ["id", "DESC"],
-        ];
-      }
+    let whereCondition = {};
+    if (search) {
+      whereCondition.name = { [Op.iLike]: `%${search}%` };
+    }
 
-      const includeRelation = [
-        {
-          model: db.companyTypeObj,
-          as: "companyType",
-          ...(type
-            ? {
-                where: {
-                  [Op.or]: Sequelize.where(
-                    Sequelize.fn("LOWER", Sequelize.col("companyType.name")),
-                    {
-                      [Op.like]: `%${type.toLowerCase()}%`,
-                    }
-                  ),
-                },
-                required: true,
-              }
-            : {
-                required: false,
-              }),
-        },
-         {
-          model: db.stateObj,
-          as: "CompanyState",
-         }
+    let order = [["id", "DESC"]];
+    if (id) {
+      order = [
+        [
+          Sequelize.literal(
+            `CASE WHEN id = ${parseInt(id)} THEN 0 ELSE 1 END`
+          ),
+          "ASC",
+        ],
+        ["id", "DESC"],
       ];
-      if (take_all === "all") {
-        const companies = await db.companyObj.findAll({
-          where: whereCondition,
-          order,
-          ...(limit ? { limit } : {}),
-          include: includeRelation,
-        });
+    }
 
-        return { data: companies, total: companies.length };
-      }
+    const includeRelation = [
+      {
+        model: db.companyTypeObj,
+        as: "companyType",
+        ...(type
+          ? {
+              where: Sequelize.where(
+                Sequelize.fn("LOWER", Sequelize.col("companyType.name")),
+                {
+                  [Op.like]: `%${type.toLowerCase()}%`,
+                }
+              ),
+              required: true,
+            }
+          : { required: false }),
+      },
+      {
+        model: db.stateObj,
+        as: "CompanyState",
+      },
+    ];
 
-      const { rows, count } = await db.companyObj.findAndCountAll({
+    // 🔁 TAKE ALL (no pagination)
+    if (take_all === "all") {
+      const companies = await db.companyObj.findAll({
         where: whereCondition,
         order,
-        limit: per_page,
-        offset,
+        ...(limit ? { limit } : {}),
         include: includeRelation,
       });
 
       return {
-        data: rows,
-        total: count,
-        current_page: page,
-        per_page,
-        last_page: Math.ceil(count / per_page),
+        data: companies,
+        meta: {
+          total: companies.length,
+          loaded_till_now: companies.length,
+          remaining: 0,
+          has_more: false,
+        },
       };
-    } catch (e) {
-      console.error(commonHelper.customizeCatchMsg(e));
-      throw e;
     }
-  },
+
+    // 📦 PAGINATED (lazy load ready)
+    const { rows, count } = await db.companyObj.findAndCountAll({
+      where: whereCondition,
+      order,
+      limit: per_page,
+      offset,
+      include: includeRelation,
+    });
+
+    const loaded = offset + rows.length;
+    const remaining = Math.max(count - loaded, 0);
+    const hasMore = loaded < count;
+
+    return {
+      data: rows,
+      meta: {
+        page,
+        per_page,
+        current_count: rows.length,
+        loaded_till_now: loaded,
+        remaining,
+        total: count,
+        has_more: hasMore,
+        last_page: Math.ceil(count / per_page),
+      },
+    };
+  } catch (e) {
+    console.error(commonHelper.customizeCatchMsg(e));
+    throw e;
+  }
+},
+
 
   /*get by id Company*/
   async getCompanyById(id) {

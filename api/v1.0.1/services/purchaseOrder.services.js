@@ -512,7 +512,170 @@ module.exports = {
       logger.errorLog.log("error", e.message);
       throw e;
     }
+  },
+
+  async getPurchaseOrderById(poId) {
+    try {
+      const purchaseOrder = await db.purchaseOrderObj.findOne({
+        where: { id: poId },
+        include: [
+          {
+            model: db.poHeaderObj,
+            as: "header",
+          },
+          {
+            model: db.poLineObj,
+            as: "lines",
+          },
+          {
+            model: db.purchaseOrderTotalsObj,
+            as: "totals",
+          },
+        ],
+
+      });
+
+      return purchaseOrder;
+    } catch (e) {
+      logger.errorLog.log("error", e.message);
+      throw e;
+    }
+  },
+  async updatePurchaseOrder(poId, payload) {
+
+    try {
+      const { purchaseOrder, header, lines, totals, status } = payload;
+
+      /* ---------------- PURCHASE ORDER ---------------- */
+      if (purchaseOrder || status) {
+        await db.purchaseOrderObj.update(
+          {
+            ...purchaseOrder,
+            ...(status && { status })
+          },
+          {
+            where: { id: poId },
+
+          }
+        );
+      }
+
+      /* ---------------- HEADER ---------------- */
+      if (header) {
+        const existingHeader = await db.poHeaderObj.findOne({
+          where: { poId },
+
+        });
+
+        if (existingHeader) {
+          await db.poHeaderObj.update(
+            header,
+            { where: { poId }, transaction }
+          );
+        } else {
+          await db.poHeaderObj.create(
+            { ...header, poId },
+
+          );
+        }
+      }
+
+      /* ---------------- LINES ---------------- */
+      if (lines && lines.length) {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+
+          if (line.id) {
+            // UPDATE existing line
+            await db.poLineObj.update(
+              line,
+              {
+                where: { id: line.id, poId },
+
+              }
+            );
+          } else {
+            // ADD new line
+            await db.poLineObj.create(
+              {
+                ...line,
+                poId,
+                lineNo: line.lineNo || String(i + 1).padStart(3, "0")
+              },
+            );
+          }
+        }
+      }
+
+
+      if (totals) {
+        const existingTotals = await db.purchaseOrderTotalsObj.findOne({
+          where: { poId },
+
+        });
+
+        if (existingTotals) {
+          await db.purchaseOrderTotalsObj.update(
+            totals,
+            { where: { poId }, transaction }
+          );
+        } else {
+          await db.purchaseOrderTotalsObj.create(
+            { ...totals, poId },
+
+          );
+        }
+      }
+
+
+      return true;
+
+    } catch (err) {
+
+      logger.errorLog.log("error", err.message);
+      throw err;
+    }
+  },
+  async deletePurchaseOrder(poId) {
+
+
+    try {
+     
+      const po = await db.purchaseOrderObj.findByPk(poId);
+      if (!po) return false;
+
+    
+
+      await db.poLineObj.destroy({
+        where: { poId },
+        
+      });
+
+      await db.poHeaderObj.destroy({
+        where: { poId },
+        
+      });
+
+      await db.purchaseOrderTotalsObj.destroy({
+        where: { poId },
+        
+      });
+
+      await db.purchaseOrderObj.destroy({
+        where: { id: poId },
+        
+      });
+
+     
+      return true;
+
+    } catch (err) {
+      
+      logger.errorLog.log("error", err.message);
+      throw err;
+    }
   }
+
 
 
 

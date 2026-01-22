@@ -302,7 +302,129 @@ module.exports = {
         message: error.message || "Failed to fetch purchase orders"
       });
     }
+  },
+
+  async getPurchaseOrderById(req, res) {
+    try {
+      const { id } = req.query;
+
+      if (!id) {
+        return res.status(400).json({
+          status: false,
+          message: "Purchase Order ID is required"
+        });
+      }
+
+      const data = await purchaseOrderServices.getPurchaseOrderById(id);
+
+      if (!data) {
+        return res.status(404).json({
+          status: false,
+          message: "Purchase Order not found"
+        });
+      }
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          data,
+          "Purchase Order fetched successfully"
+        )
+      );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to fetch purchase order"
+      });
+    }
+  },
+
+  async updatePurchaseOrder(req, res) {
+    try {
+      const { id } = req.query;
+      const payload = req.body;
+
+      if (!id) {
+        return res.status(400).json({
+          status: false,
+          message: "Purchase Order ID is required"
+        });
+      }
+
+      // status validation (if provided)
+      if (
+        payload.status &&
+        !Object.values(PURCHASE_ORDER_STATUS).includes(payload.status)
+      ) {
+        return res.status(400).json({
+          status: false,
+          message: "Invalid purchase order status"
+        });
+      }
+
+      const updated = await purchaseOrderServices.updatePurchaseOrder(
+        id,
+        payload
+      );
+
+      if (!updated) {
+        return res.status(404).json({
+          status: false,
+          message: "Purchase Order not found"
+        });
+      }
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          "",
+          "Purchase Order updated successfully"
+        )
+      );
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to update purchase order"
+      });
+    }
+  },
+
+  async deletePurchaseOrder(req, res) {
+    try {
+      const { id } = req.query;
+
+      if (!id) {
+        return res.status(400).json({
+          status: false,
+          message: "Purchase Order ID is required"
+        });
+      }
+
+      const deleted = await purchaseOrderServices.deletePurchaseOrder(id);
+
+      if (!deleted) {
+        return res.status(404).json({
+          status: false,
+          message: "Purchase Order not found"
+        });
+      }
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          "",
+          "Purchase Order deleted successfully"
+        )
+      );
+
+    } catch (error) {
+      logger.errorLog.log("error", error.message);
+
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to delete purchase order"
+      });
+    }
   }
+
+
 
 
 

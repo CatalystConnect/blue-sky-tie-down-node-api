@@ -13,6 +13,9 @@ router.post("/purchaseOrder/close",[authJwt.verifyToken],purchaseOrderController
 
 router.get("/getPurchaseOrder",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrder);
 router.get("/purchaseOrder/getPurchaseOrders",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrders);
+router.get("/purchaseOrder/getPurchaseOrderById",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrderById);
+router.put("/purchaseOrder/updatePurchaseOrder",[authJwt.verifyToken],purchaseOrderController.updatePurchaseOrder);
+router.delete("/purchaseOrder/deletePurchaseOrder",[authJwt.verifyToken],purchaseOrderController.deletePurchaseOrder);
 
 
 

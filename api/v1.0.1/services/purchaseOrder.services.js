@@ -2,92 +2,149 @@ var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
 const { Op, Sequelize } = require("sequelize");
+const { PURCHASE_ORDER_STATUS } = require("../helper/constant");
 
 module.exports = {
   /*addPurchaseOrder*/
-  async addPurchaseOrder(headerData, lineData) {
+  // async addPurchaseOrder(headerData, lineData) {
+  //   try {
+
+  //     const existingPO = await db.purchaseOrderHeaderObj.findOne({
+  //       where: { po_number: headerData.po_number }
+  //     });
+
+  //     if (existingPO) {
+  //       throw new Error(`PO Number ${headerData.po_number} already exists`);
+  //     }
+
+
+  //     for (const line of lineData) {
+  //       const vendorItem = await db.vendorItemObj.findOne({
+  //         where: {
+  //           id: line.vendor_item_id,
+  //         }
+  //       });
+
+  //       if (!vendorItem) {
+  //         throw new Error("Invalid or inactive vendor item");
+  //       }
+
+
+  //       if (line.ordered_qty < vendorItem.min_order_qty) {
+  //         throw new Error(
+  //           `Minimum order quantity is ${vendorItem.min_order_qty}`
+  //         );
+  //       }
+
+  //       if (
+  //         vendorItem.order_multiple_qty &&
+  //         line.ordered_qty % vendorItem.order_multiple_qty !== 0
+  //       ) {
+  //         throw new Error(
+  //           `Quantity must be in multiples of ${vendorItem.order_multiple_qty}`
+  //         );
+  //       }
+  //     }
+
+
+  //     let header = await db.purchaseOrderHeaderObj.create(headerData);
+
+  //     // const lines = await Promise.all(
+  //     //   lineData.map((line) => {
+  //     //     return db.purchaseOrderLineObj.create(
+  //     //       {
+  //     //         ...line,
+  //     //         po_id: header.id,
+  //     //       }
+
+  //     //     );
+  //     //   })
+  //     // );
+
+  //     const lines = await Promise.all(
+  //       lineData.map((line) => {
+  //         const stock_qty = line.ordered_qty * line.conversion_factor;
+  //         const extended_cost = line.ordered_qty * line.unit_cost;
+
+  //         return db.purchaseOrderLineObj.create({
+  //           po_id: header.id,
+  //           item_id: line.item_id,
+  //           vendor_item_id: line.vendor_item_id,
+  //           ordered_qty: line.ordered_qty,
+  //           uom_code: line.uom_code,
+  //           conversion_factor: line.conversion_factor,
+  //           stock_qty,
+  //           unit_cost: line.unit_cost,
+  //           extended_cost,
+  //           received_qty: 0,
+  //           canceled_qty: 0,
+  //           is_closed: false,
+  //           pricing_source: line.pricing_source || "BASE",
+  //         });
+  //       })
+  //     );
+
+
+  //     return { header, lines };
+  //   } catch (e) {
+  //     logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
+  //     throw e;
+  //   }
+  // },
+  async addPurchaseOrder(payload) {
+
     try {
-
-      const existingPO = await db.purchaseOrderHeaderObj.findOne({
-        where: { po_number: headerData.po_number }
-      });
-
-      if (existingPO) {
-        throw new Error(`PO Number ${headerData.po_number} already exists`);
-      }
+      const { purchaseOrder, header, lines, totals, status } = payload;
 
 
-      for (const line of lineData) {
-        const vendorItem = await db.vendorItemObj.findOne({
-          where: {
-            id: line.vendor_item_id,
-          }
-        });
+      const po = await db.purchaseOrderObj.create(
+        {
+          ...purchaseOrder,
+          status: status || PURCHASE_ORDER_STATUS.DRAFT,
+        },
 
-        if (!vendorItem) {
-          throw new Error("Invalid or inactive vendor item");
-        }
-
-
-        if (line.ordered_qty < vendorItem.min_order_qty) {
-          throw new Error(
-            `Minimum order quantity is ${vendorItem.min_order_qty}`
-          );
-        }
-
-        if (
-          vendorItem.order_multiple_qty &&
-          line.ordered_qty % vendorItem.order_multiple_qty !== 0
-        ) {
-          throw new Error(
-            `Quantity must be in multiples of ${vendorItem.order_multiple_qty}`
-          );
-        }
-      }
-
-
-      let header = await db.purchaseOrderHeaderObj.create(headerData);
-
-      // const lines = await Promise.all(
-      //   lineData.map((line) => {
-      //     return db.purchaseOrderLineObj.create(
-      //       {
-      //         ...line,
-      //         po_id: header.id,
-      //       }
-
-      //     );
-      //   })
-      // );
-
-      const lines = await Promise.all(
-        lineData.map((line) => {
-          const stock_qty = line.ordered_qty * line.conversion_factor;
-          const extended_cost = line.ordered_qty * line.unit_cost;
-
-          return db.purchaseOrderLineObj.create({
-            po_id: header.id,
-            item_id: line.item_id,
-            vendor_item_id: line.vendor_item_id,
-            ordered_qty: line.ordered_qty,
-            uom_code: line.uom_code,
-            conversion_factor: line.conversion_factor,
-            stock_qty,
-            unit_cost: line.unit_cost,
-            extended_cost,
-            received_qty: 0,
-            canceled_qty: 0,
-            is_closed: false,
-            pricing_source: line.pricing_source || "BASE",
-          });
-        })
       );
 
+      const pId = po.id;
 
-      return { header, lines };
-    } catch (e) {
-      logger.errorLog.log("error", commonHelper.customizeCatchMsg(e));
-      throw e;
+
+      if (header) {
+        await db.poHeaderObj.create(
+          {
+            ...header,
+            poId: pId,
+          },
+
+        );
+      }
+
+
+      const poLines = lines.map((line, index) => ({
+        ...line,
+        poId: pId,
+        lineNo: line.lineNo || String(index + 1).padStart(3, "0"),
+      }));
+
+      await db.poLineObj.bulkCreate(poLines);
+
+
+      if (totals) {
+        await db.purchaseOrderTotalsObj.create(
+          {
+            ...totals,
+            poId: pId,
+          },
+
+        );
+      }
+
+
+      return pId;
+
+    } catch (err) {
+
+      logger.errorLog.log("error", err.message);
+      throw err;
     }
   },
 
@@ -381,7 +438,82 @@ module.exports = {
     } catch (e) {
       throw e;
     }
+  },
+  async getPurchaseOrders(filters) {
+    try {
+      const {
+        status,
+        vendorId,
+        fromDate,
+        toDate,
+        page = 1,
+        per_page = 10
+      } = filters;
+
+      const where = {};
+
+      if (status) {
+        where.status = status;
+      }
+
+      if (vendorId) {
+        where.vendor_id = vendorId;
+      }
+
+      if (fromDate && toDate) {
+        where.dateOrdered = {
+          [Op.between]: [fromDate, toDate],
+        };
+      }
+
+      const limit = parseInt(per_page);
+      const offset = (page - 1) * limit;
+
+      const { rows, count } = await db.purchaseOrderObj.findAndCountAll({
+        where,
+        limit,
+        offset,
+        order: [["id", "DESC"]],
+        include: [
+          {
+            model: db.poHeaderObj,
+            as: "header",
+          },
+          {
+            model: db.poLineObj,
+            as: "lines",
+          },
+          {
+            model: db.purchaseOrderTotalsObj,
+            as: "totals",
+          },
+        ],
+      });
+
+      const loadedTillNow = offset + rows.length;
+      const remaining = Math.max(count - loadedTillNow, 0);
+      const hasMore = loadedTillNow < count;
+
+      return {
+        data: rows,
+        meta: {
+          total: count,
+          page: parseInt(page),
+          per_page: limit,
+          current_count: rows.length,
+          loaded_till_now: loadedTillNow,
+          remaining,
+          has_more: hasMore,
+          last_page: Math.ceil(count / limit),
+        },
+      };
+
+    } catch (e) {
+      logger.errorLog.log("error", e.message);
+      throw e;
+    }
   }
+
 
 
 

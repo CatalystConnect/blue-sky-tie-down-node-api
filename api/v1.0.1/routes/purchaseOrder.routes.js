@@ -11,7 +11,9 @@ router.post("/purchaseOrder/sendPurchaseOrder",[authJwt.verifyToken],purchaseOrd
 router.post("/purchaseOrderReceipt/addPOReceipt",[authJwt.verifyToken], purchaseOrderController.addPOReceipt);
 router.post("/purchaseOrder/close",[authJwt.verifyToken],purchaseOrderController.closePurchaseOrder);
 
- router.get("/getPurchaseOrder",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrder);
+router.get("/getPurchaseOrder",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrder);
+router.get("/purchaseOrder/getPurchaseOrders",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrders);
+
 
 
 module.exports = router;

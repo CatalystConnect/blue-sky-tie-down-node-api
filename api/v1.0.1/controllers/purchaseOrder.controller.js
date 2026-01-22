@@ -9,8 +9,45 @@ const myValidationResult = validationResult.withDefaults({
   },
 });
 
+const { PURCHASE_ORDER_STATUS } = require("../helper/constant");
+
 module.exports = {
   /*addPurchaseOrder*/
+  // async addPurchaseOrder(req, res) {
+  //   try {
+  //     const errors = myValidationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res
+  //         .status(200)
+  //         .send(commonHelper.parseErrorRespose(errors.mapped()));
+  //     }
+
+  //     const { header, lines } = req.body;
+
+  //     if (!header || !lines || !Array.isArray(lines) || lines.length === 0) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "Header and Lines are required",
+  //       });
+  //     }
+
+  //     await purchaseOrderServices.addPurchaseOrder(header, lines);
+  //     return res
+  //       .status(200)
+  //       .send(
+  //         commonHelper.parseSuccessRespose("", "Purchase Order Created Successfully")
+  //       );
+  //   } catch (error) {
+  //     return res.status(400).json({
+  //       status: false,
+  //       message:
+  //         error.response?.data?.error ||
+  //         error.message ||
+  //         "Purchase Order failed",
+  //       data: error.response?.data || {},
+  //     });
+  //   }
+  // },
   async addPurchaseOrder(req, res) {
     try {
       const errors = myValidationResult(req);
@@ -20,21 +57,33 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      const { header, lines } = req.body;
+      const { purchaseOrder, header, lines, totals, status } = req.body;
 
-      if (!header || !lines || !Array.isArray(lines) || lines.length === 0) {
+      if (!purchaseOrder || !lines || lines.length === 0) {
         return res.status(400).json({
           status: false,
-          message: "Header and Lines are required",
+          message: "Purchase order & lines are required",
         });
       }
 
-      await purchaseOrderServices.addPurchaseOrder(header, lines);
+      await purchaseOrderServices.addPurchaseOrder({
+        purchaseOrder,
+        header,
+        lines,
+        totals,
+        status
+      });
+
       return res
         .status(200)
         .send(
-          commonHelper.parseSuccessRespose("", "Purchase Order Created Successfully")
+          commonHelper.parseSuccessRespose(
+            "",
+            "Purchase Order Created Successfully"
+          )
         );
+
+
     } catch (error) {
       return res.status(400).json({
         status: false,
@@ -46,7 +95,6 @@ module.exports = {
       });
     }
   },
-
   async submitApprovePurchaseOrder(req, res) {
     try {
       const { po_id } = req.body;
@@ -220,7 +268,42 @@ module.exports = {
         message: error.message || "Failed to fetch purchase orders",
       });
     }
+  },
+  async getPurchaseOrders(req, res) {
+    try {
+      const {
+        status,
+        vendorId,
+        fromDate,
+        toDate,
+        page = 1,
+        per_page = 10
+      } = req.query;
+
+      const data = await purchaseOrderServices.getPurchaseOrders({
+        status,
+        vendorId,
+        fromDate,
+        toDate,
+        page,
+        per_page
+      });
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          data,
+          "Purchase Orders fetched successfully"
+        )
+      );
+
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Failed to fetch purchase orders"
+      });
+    }
   }
+
 
 
 

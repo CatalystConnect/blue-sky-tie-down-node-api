@@ -112,6 +112,16 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: false,
       },
+      otp: {
+        type: Sequelize.STRING(10),
+        allowNull: true,
+
+      },
+      otp_expiry: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        
+      },
     },
     {
       timestamps: true,

@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const controller = require("../controllers/auth.controller");
-var { authJwt } = require("../middleware");
+var { authJwt,resetPaswordToken } = require("../middleware");
 let { upload,multiUpload } = require("../../../config/multer.config");
 
 /*register*/
@@ -24,5 +24,11 @@ router.delete("/deleteUser", [authJwt.verifyToken],[controller.validate("getUser
 
 router.get("/users/scroll", [authJwt.verifyToken], controller.getAllUsersScroll);
 router.get("/users/scroll/test", [authJwt.verifyToken], controller.getAllUsersScrollTest);
+
+router.post("/auth/forgotPassword",controller.forgotPassword);
+router.post("/auth/verifyOtp",controller.verifyOtp);
+router.post("/auth/resetPassword",[resetPaswordToken.verifyResetToken],controller.resetPassword);
+
+
 
 module.exports = router;

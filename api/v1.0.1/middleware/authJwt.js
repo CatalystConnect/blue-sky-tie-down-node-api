@@ -37,9 +37,13 @@ generateAccessToken = (user) => {
     }
   );
 };
+const verifyResetToken = (token) => {
+  return jwt.verify(token, config.resetSecret);
+};
 
 const authJwt = {
   verifyToken: verifyToken,
   generateAccessToken: generateAccessToken,
+  
 };
 module.exports = authJwt;

@@ -1,7 +1,11 @@
+require("dotenv").config();
 var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
 const { Op, Sequelize } = require("sequelize");
+var jwt = require("jsonwebtoken");
+const config = require("../../../config/db.config");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   /*register*/
@@ -473,12 +477,12 @@ module.exports = {
     try {
       let whereCondition = {};
 
-     
+
       if (cursor) {
         whereCondition.id = { [Op.lt]: cursor };
       }
 
-      
+
       if (role) whereCondition.role = role;
 
       if (search) {
@@ -506,4 +510,68 @@ module.exports = {
       throw e;
     }
   },
+  async updateUserOtp(userId, otp, expiry) {
+    try {
+      const result = await db.userObj.update(
+        {
+          otp: otp,
+          otp_expiry: expiry,
+        },
+        {
+          where: { id: userId },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      console.error("updateUserOtp error:", error);
+      throw error;
+    }
+  },
+
+  async verifyOtpAndGenerateToken(email, otp) {
+    const user = await db.userObj.findOne({
+      where: { email },
+    });
+
+
+    if (user.otp !== otp) throw new Error("Invalid OTP");
+
+
+    if (new Date() > new Date(user.otp_expiry)) {
+      throw new Error("OTP expired");
+    }
+
+
+
+    let payload = {
+      id: user.id,
+      type: "RESET_PASSWORD"
+    }
+    var resetToken = jwt.sign(payload, config.secret, {
+      expiresIn: "1d",
+    });
+
+    return resetToken;
+  },
+  async resetPassword(userId, newPassword) {
+    const hashedPassword = bcrypt.hashSync(newPassword, 8);
+
+    await db.userObj.update(
+      {
+        password: hashedPassword,
+        otp: null,
+        otp_expiry: null,
+      },
+      {
+        where: { id: userId },
+      }
+    );
+
+    return true;
+  }
+
+
+
+
 };

@@ -514,8 +514,10 @@ module.exports = {
                       </h3>
 
                       <p style="margin:0 0 20px;padding-top:10px;color:#697586;font-size:14px;line-height:20px;">
-                        Welcome to Helix — your centralized ERP system for managing
-                        operations, purchasing, vendors, orders, and workflows.
+                        Welcome to Helix — your centralized ERP system for
+                        managing operations, purchasing, vendors, orders, and
+                        workflows. To activate your account, please verify your
+                        email using the code below.
                       </p>
 
                       <!-- OTP -->

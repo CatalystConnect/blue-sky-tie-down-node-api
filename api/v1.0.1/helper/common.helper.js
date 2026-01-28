@@ -484,6 +484,10 @@ module.exports = {
     <meta charset="UTF-8" />
     <title>Verify Your Email</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Poppins Font -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+    </style>
   </head>
 
   <body
@@ -491,7 +495,7 @@ module.exports = {
       margin: 0;
       padding: 0;
       background-color: #e3e8ef;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Poppins, sans-serif;
     "
   >
     <!-- Outer Wrapper -->
@@ -540,7 +544,11 @@ module.exports = {
               <td>
                 <!-- Inner Content Width (Figma: 464px) -->
                 <table
-                  style="padding: 40px 24px; background-color: #f8fafc"
+                  style="
+                    padding: 40px 24px;
+                    background-color: #f8fafc;
+                    width: 544px;
+                  "
                   width="464"
                   align="center"
                   cellpadding="0"

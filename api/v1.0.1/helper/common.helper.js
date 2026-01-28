@@ -592,7 +592,7 @@ module.exports = {
                           text-align: center;
                         "
                       >
-                        123456
+                       ${otp}
                       </div>
 
                       <p

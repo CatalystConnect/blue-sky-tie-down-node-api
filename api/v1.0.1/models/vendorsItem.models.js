@@ -81,6 +81,83 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
 
       },
+       buyer: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+
+      buyer_type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+
+      seasonal_adj: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: true,
+      },
+
+      last_warning_date: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+
+      calendar_year_hits: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      last_12_month_hits: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      average_lead_time: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+
+      cost_per: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
+      cost_uom: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+
+      fut_std: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
+      fut_effective_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: true,
+      },
+
+      average_cost: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
+      average_landed_cost: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
+      last_cost: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
+      last_landed_cost: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
+
 
     },
     {

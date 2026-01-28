@@ -273,6 +273,7 @@ db.poHeaderObj = require("./poHeader.models")(db.dbObj, Sequelize);
 db.poLineObj  = require("./poLines.models")(db.dbObj, Sequelize);
 db.purchaseOrderTotalsObj  = require("./purshaseOrdertotals.models")(db.dbObj, Sequelize);
 db.purchaseOrderObj  = require("./purchaseOrders.models")(db.dbObj, Sequelize);
+db.productTemplateObj  = require("./productTemplate.models")(db.dbObj, Sequelize);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {

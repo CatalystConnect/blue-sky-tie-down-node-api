@@ -20,7 +20,7 @@ module.exports = {
           .status(400)
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
-    
+
 
       const data = req.body;
 
@@ -35,13 +35,22 @@ module.exports = {
         lead_time_days: data.lead_time_days || null,
         min_order_qty: data.min_order_qty || null,
         future_effective_date: data.future_effective_date || null,
-        order_multiple_qty: data.order_multiple_qty || null,  
+        order_multiple_qty: data.order_multiple_qty || null,
         standard_lead_time_days: data.standard_lead_time_days || null,
         is_preferred_vendor: data.is_preferred_vendor || null,
         ranking: data.ranking || null,
-        is_active: data.is_active || true,
-        
-       
+        is_active: data.is_active ?? true,
+        buyer: data.buyer || null,
+        buyer_type: data.buyer_type || null,
+        seasonal_adj: data.seasonal_adj || null,
+
+        cost_per: data.cost_per || null,
+        cost_uom: data.cost_uom || null,
+
+        fut_std: data.fut_std || null,
+        fut_effective_date: data.fut_effective_date || null,
+
+
       };
 
       await vendorItemServices.addVendorsItem(postData);
@@ -139,10 +148,10 @@ module.exports = {
       let vendorItemId = req.query.vendorItemId;
 
       let vendorItemIds = vendorItemId
-      .split(',')
-      .map(id => id.trim())
-      .map(id => Number(id))
-      .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
+        .split(',')
+        .map(id => id.trim())
+        .map(id => Number(id))
+        .filter(id => !isNaN(id) && Number.isInteger(id) && id > 0);
 
 
       let vendor = await vendorItemServices.getVendorsItemById(vendorItemIds);
@@ -187,7 +196,7 @@ module.exports = {
         throw new Error("Vendor item not found");
       }
 
-     
+
       let data = req.body;
 
       let postData = {
@@ -201,13 +210,22 @@ module.exports = {
         lead_time_days: data.lead_time_days || null,
         min_order_qty: data.min_order_qty || null,
         future_effective_date: data.future_effective_date || null,
-        order_multiple_qty: data.order_multiple_qty || null,  
+        order_multiple_qty: data.order_multiple_qty || null,
         standard_lead_time_days: data.standard_lead_time_days || null,
-        is_preferred_vendor: data.is_preferred_vendor  ?? false,
+        is_preferred_vendor: data.is_preferred_vendor ?? false,
         ranking: data.ranking || null,
         is_active: data.is_active || true,
-        
-        
+        buyer: data.buyer || null,
+        buyer_type: data.buyer_type || null,
+        seasonal_adj: data.seasonal_adj || null,
+
+        cost_per: data.cost_per || null,
+        cost_uom: data.cost_uom || null,
+
+        fut_std: data.fut_std || null,
+        fut_effective_date: data.fut_effective_date || null,
+
+
       };
 
       await vendorItemServices.updateVendorsItem(postData, vendorItemId);

@@ -486,53 +486,125 @@ module.exports = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
 
-  <body style="margin:0;padding:0;background-color:#eef2f6;font-family:Arial,Helvetica,sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #e3e8ef;
+      font-family: Arial, Helvetica, sans-serif;
+    "
+  >
+    <!-- Outer Wrapper -->
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #eef2f6; padding: 40px 0"
+    >
       <tr>
         <td align="center">
-          <table width="640" cellpadding="0" cellspacing="0"
-            style="background-color:#ffffff;border-radius:6px;overflow:hidden;box-shadow:0 0 10px rgba(0,0,0,0.05);">
-
+          <!-- Email Card -->
+          <table
+            width="640"
+            height="699px"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 6px;
+              overflow: hidden;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            "
+          >
             <!-- Header -->
             <tr>
-              <td style="background-color:#cdd5df;padding:20px;text-align:center;">
-                <img src="${BASE_URL}/files/login-page.png"
-                  alt="Helix ERP" width="116" height="60"
-                  style="display:block;margin:0 auto;" />
+              <td
+                style="
+                  background-color: #cdd5df;
+                  padding: 20px;
+                  text-align: center;
+                "
+              >
+                <img
+                  src="${BASE_URL}/files/login-page.png"
+                  alt="Helix ERP"
+                  width="116"
+                  height="60"
+                  style="display: block; margin: 0 auto"
+                />
               </td>
             </tr>
 
             <!-- Content -->
             <tr>
               <td>
-                <table width="464" align="center" cellpadding="0" cellspacing="0"
-                  style="padding:40px 24px;background-color:#f8fafc;text-align:center;">
+                <!-- Inner Content Width (Figma: 464px) -->
+                <table
+                  style="padding: 40px 24px; background-color: #f8fafc"
+                  width="464"
+                  align="center"
+                  cellpadding="0"
+                  cellspacing="0"
+                >
                   <tr>
                     <td>
-                      <h3 style="margin:0 0 12px;color:#121926;font-size:24px;font-weight:500;line-height:36px;">
+                      <h3
+                        style="
+                          margin-bottom: 12px;
+                          font-size: 24px;
+                          font-weight: 500;
+                          line-height: 36px;
+                          color: #121926;
+                        "
+                      >
                         Verify Your Email to Access Helix ERP
                       </h3>
 
-                      <p style="margin:0 0 20px;padding-top:10px;color:#697586;font-size:14px;line-height:20px;">
+                      <p
+                        style="
+                          margin: 0 0 20px 0;
+                          padding-top: 10px;
+                          color: #697586;
+                          font-size: 14px;
+                          line-height: 20px;
+                          font-weight: 400;
+                          text-align: justify;
+                        "
+                      >
                         Welcome to Helix — your centralized ERP system for
                         managing operations, purchasing, vendors, orders, and
                         workflows. To activate your account, please verify your
                         email using the code below.
                       </p>
 
-                      <!-- OTP -->
-                      <div style="margin:16px 0 20px;padding:12px 0;background:#ffffff;
-                        border:1px solid #e3e8ef;font-size:48px;line-height:56px;
-                        font-weight:700;letter-spacing:4px;color:#202939;">
-                        ${otp}
+                      <!-- OTP Box -->
+                      <div
+                        style="
+                          margin: 16px 0 20px;
+                          padding: 12px 0;
+                          background-color: #ffffff;
+                          border: 1px solid #e3e8ef;
+                          font-size: 48px;
+                          line-height: 56px;
+                          font-weight: 700;
+                          letter-spacing: 4px;
+                          color: #202939;
+                          text-align: center;
+                        "
+                      >
+                        123456
                       </div>
 
-                      <p style="margin:0;font-size:14px;line-height:20px;color:#697586;">
-                        This code will expire in <b>15 minutes</b>.
-                      </p>
-
-                      <p style="margin-top:12px;font-size:14px;color:#697586;">
-                        If you didn’t request this, you can safely ignore this email.
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 14px;
+                          line-height: 20px;
+                          color: #697586;
+                        "
+                      >
+                        If you didn’t request this, you can safely ignore this
+                        email.
                       </p>
                     </td>
                   </tr>
@@ -542,35 +614,57 @@ module.exports = {
 
             <!-- Footer -->
             <tr>
-              <td style="padding:20px;text-align:center;background-color:#ffffff;">
-                <p style="margin:0 0 16px;font-size:12px;color:#697586;">
+              <td
+                style="
+                  padding: 20px;
+                  text-align: center;
+                  background-color: #ffffff;
+                "
+              >
+                <p style="margin: 0 0 16px; font-size: 14px; color: #697586">
                   Need help? Contact us at
-                  <a href="mailto:support@helixerp.in"
-                     style="color:#04aee1;text-decoration:none;">
-                     support@helixerp.in
-                  </a>
+                  <a
+                    href="mailto:support@helixerp.in"
+                    style="color: #04aee1; text-decoration: none"
+                    >support@helixerp.in</a
+                  >
                 </p>
 
+                <!-- Social Icons -->
                 <table align="center" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td style="padding:0 6px;">
-                      <img src="${BASE_URL}/files/facebook.svg" width="32" />
+                    <td style="padding: 0 6px">
+                      <img
+                        src="${BASE_URL}/files/facebook.svg"
+                        width="42"
+                        height="42"
+                        alt="Facebook"
+                      />
                     </td>
-                    <td style="padding:0 6px;">
-                      <img src="${BASE_URL}/files/linkedin.svg" width="32" />
+                    <td style="padding: 0 6px">
+                      <img
+                        src="${BASE_URL}/files/linkedin.svg"
+                        width="42"
+                        height="42"
+                        alt="LinkedIn"
+                      />
                     </td>
-                    <td style="padding:0 6px;">
-                      <img src="${BASE_URL}/files/insta.svg" width="32" />
+                    <td style="padding: 0 6px">
+                      <img
+                        src="${BASE_URL}/files/insta.svg"
+                        width="42"
+                        height="42"
+                        alt="Instagram"
+                      />
                     </td>
                   </tr>
                 </table>
 
-                <p style="margin:16px 0 0;font-size:12px;color:#697586;">
+                <p style="margin: 16px 0 0; font-size: 12px; color: #697586">
                   Helix — Streamline. Control. Scale.
                 </p>
               </td>
             </tr>
-
           </table>
         </td>
       </tr>

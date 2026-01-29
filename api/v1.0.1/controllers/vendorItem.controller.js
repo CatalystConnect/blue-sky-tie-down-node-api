@@ -48,7 +48,7 @@ module.exports = {
         cost_uom: data.cost_uom || null,
 
         fut_std: data.fut_std || null,
-        fut_effective_date: data.fut_effective_date || null,
+        fut_effective: data.fut_effective || null,
 
         last_warning_date: data.last_warning_date || null,
         calendar_year_hits: data.calendar_year_hits || null,
@@ -232,7 +232,7 @@ module.exports = {
         cost_uom: data.cost_uom || null,
 
         fut_std: data.fut_std || null,
-        fut_effective_date: data.fut_effective_date || null,
+        fut_effective: data.fut_effective || null,
 
         last_warning_date: data.last_warning_date || null,
         calendar_year_hits: data.calendar_year_hits || null,

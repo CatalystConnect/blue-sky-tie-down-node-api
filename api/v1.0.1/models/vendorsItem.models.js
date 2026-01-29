@@ -133,7 +133,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
 
-      fut_effective_date: {
+      fut_effective: {
         type: Sequelize.DATEONLY,
         allowNull: true,
       },

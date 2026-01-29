@@ -81,7 +81,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
 
       },
-       buyer: {
+      buyer: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -143,7 +143,12 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
 
-      average_landed_cost: {
+      // average_landed_cost: {
+      //   type: Sequelize.DECIMAL(19, 4),
+      //   allowNull: true,
+      // },
+
+      last_land_cost: {
         type: Sequelize.DECIMAL(19, 4),
         allowNull: true,
       },
@@ -153,7 +158,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
 
-      last_landed_cost: {
+      last_land_cost: {
         type: Sequelize.DECIMAL(19, 4),
         allowNull: true,
       },

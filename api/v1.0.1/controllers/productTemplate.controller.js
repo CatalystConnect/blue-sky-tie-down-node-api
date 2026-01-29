@@ -63,7 +63,7 @@ module.exports = {
                 per_page = 10,
                 search = "",
                 is_active
-            } = req.body;
+            } = req.query; 
 
             const result = await productTemplateServices.getAllProductTemplate({
                 page,

@@ -50,6 +50,15 @@ module.exports = {
         fut_std: data.fut_std || null,
         fut_effective_date: data.fut_effective_date || null,
 
+        last_warning_date: data.last_warning_date || null,
+        calendar_year_hits: data.calendar_year_hits || null,
+        last_12_month_hits: data.last_12_month_hits || null,
+        average_lead_time: data.average_lead_time || null,
+        average_cost: data.average_cost || null,
+        average_landed_cost: data.average_landed_cost || null,
+        last_cost: data.last_cost || null,
+        last_landed_cost: data.last_landed_cost || null,
+
 
       };
 
@@ -224,6 +233,15 @@ module.exports = {
 
         fut_std: data.fut_std || null,
         fut_effective_date: data.fut_effective_date || null,
+
+        last_warning_date: data.last_warning_date || null,
+        calendar_year_hits: data.calendar_year_hits || null,
+        last_12_month_hits: data.last_12_month_hits || null,
+        average_lead_time: data.average_lead_time || null,
+        average_cost: data.average_cost || null,
+        average_landed_cost: data.average_landed_cost || null,
+        last_cost: data.last_cost || null,
+        last_landed_cost: data.last_landed_cost || null,
 
 
       };

@@ -207,20 +207,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
-      last_cost_new: {
-        type: DataTypes.DECIMAL(12, 2),
-        allowNull: true,
-      },
+      // last_cost_new: {
+      //   type: DataTypes.DECIMAL(12, 2),
+      //   allowNull: true,
+      // },
 
       cost_per: {
         type: DataTypes.STRING,
         allowNull: true,
       },
 
-      working_cost_new: {
-        type: DataTypes.DECIMAL(12, 2),
-        allowNull: true,
-      },
+      // working_cost_new: {
+      //   type: DataTypes.DECIMAL(12, 2),
+      //   allowNull: true,
+      // },
 
       costing_method: {
         type: DataTypes.ENUM('FIFO', 'LIFO', 'AVERAGE', 'STANDARD'),

@@ -65,6 +65,8 @@ module.exports = {
         image: req.files?.image?.[0]
           ? `files/${req.files.image[0].filename}`
           : null,
+      template_id: req.body.template_id,
+
       };
       const normalizeInt = (val) => {
         return val !== undefined && val !== null && val !== "" && !isNaN(val)
@@ -443,6 +445,7 @@ module.exports = {
         image: req.files?.image?.[0]
           ? `files/${req.files.image[0].filename}`
           : null,
+        template_id: req.body.template_id,
       };
 
       if (req.file) {

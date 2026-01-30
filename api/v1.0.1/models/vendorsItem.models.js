@@ -143,10 +143,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
 
-      // average_landed_cost: {
-      //   type: Sequelize.DECIMAL(19, 4),
-      //   allowNull: true,
-      // },
+      average_land_cost: {
+        type: Sequelize.DECIMAL(19, 4),
+        allowNull: true,
+      },
 
       last_land_cost: {
         type: Sequelize.DECIMAL(19, 4),

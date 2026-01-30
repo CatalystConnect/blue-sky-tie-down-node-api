@@ -55,7 +55,7 @@ module.exports = {
         last_12_month_hits: data.last_12_month_hits || null,
         average_lead_time: data.average_lead_time || null,
         average_cost: data.average_cost || null,
-        // average_landed_cost: data.average_landed_cost || null,
+        average_land_cost: data.average_land_cost || null,
         last_cost: data.last_cost || null,
         last_land_cost: data.last_land_cost || null,
 
@@ -239,7 +239,7 @@ module.exports = {
         last_12_month_hits: data.last_12_month_hits || null,
         average_lead_time: data.average_lead_time || null,
         average_cost: data.average_cost || null,
-        // average_landed_cost: data.average_landed_cost || null,
+        average_land_cost: data.average_land_cost || null,
         last_cost: data.last_cost || null,
        last_land_cost: data.last_land_cost || null,
 

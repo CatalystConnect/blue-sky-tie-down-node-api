@@ -64,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
       fullList: DataTypes.STRING,
       fullRetail: DataTypes.STRING,
       unitCost: DataTypes.STRING,
-      effectiveDate: DataTypes.DATE,
+      effectiveDate: DataTypes.DATEONLY,
       costPerEA: DataTypes.STRING,
       stdCost: DataTypes.STRING,
       fullStd: DataTypes.STRING,

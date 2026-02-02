@@ -168,6 +168,13 @@ const PURCHASE_ORDER_STATUS = {
   CLOSED: "CLOSED",
 };
 
+const ITEM_LINK = {
+  CROSS_SELL: 'cross_sell',
+  UPSELL: 'upsell',
+  ACCESSORY: 'accessory',
+};
+
+ 
 
 module.exports = {
   ACCESS_MODULES,
@@ -178,4 +185,5 @@ module.exports = {
   VENDOR_FREIGHT_TERMS,
   VENDOR_STATUS,
   PURCHASE_ORDER_STATUS,
+  ITEM_LINK,
 };

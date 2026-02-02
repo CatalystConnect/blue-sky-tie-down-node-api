@@ -262,7 +262,7 @@ module.exports = {
         ],
         limit: queryLimit,
         offset,
-        order: [["createdAt", "DESC"]],
+        order: [["id", "DESC"]],
       });
 
       // ---------- LAZY LOAD META ----------

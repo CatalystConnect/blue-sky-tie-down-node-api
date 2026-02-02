@@ -611,7 +611,7 @@ module.exports = {
                           color: #697586;
                         "
                       >
-                        If you didn’t request this, you can safely ignore this
+                        If you didn't request this, you can safely ignore this
                         email.
                       </p>
                     </td>
@@ -641,27 +641,24 @@ module.exports = {
                 <!-- Social Icons -->
                 <table align="center" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td style="padding: 0 6px">
+                     <td style="padding: 0 15px">
                       <img
                         src="${BASE_URL}/files/facebook.png"
-                        width="42"
-                        height="42"
+                      
                         alt="Facebook"
                       />
                     </td>
-                    <td style="padding: 0 6px">
+                      <td style="padding: 0 15px">
                       <img
                         src="${BASE_URL}/files/linkedin.png"
-                        width="42"
-                        height="42"
+                      
                         alt="LinkedIn"
                       />
                     </td>
-                    <td style="padding: 0 6px">
+                   <td style="padding: 0 15px">
                       <img
                         src="${BASE_URL}/files/insta.png"
-                        width="42"
-                        height="42"
+                       
                         alt="Instagram"
                       />
                     </td>

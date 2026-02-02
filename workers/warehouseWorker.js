@@ -79,16 +79,15 @@ const db = require('../api/v1.0.1/models');
 
         if (Array.isArray(itemIds) && itemIds.length > 0) {
 
-          const items = await db.itemObj.findAll({
-            where: {
-              id: itemIds
-            }
-          });
+           const selectedIds = itemIds.map(id => Number(id));
+
+          const items = await db.itemObj.findAll();
 
           const entries = items.map(item => ({
             warehouse_id: warehouseId,
             item_id: item.id,
             sku: item.sku,
+            status: selectedIds.includes(item.id) ? 'active' : 'inactive', 
             createdAt: new Date(),
             updatedAt: new Date(),
           }));
@@ -116,9 +115,11 @@ const db = require('../api/v1.0.1/models');
             warehouse_id: warehouseId,
             item_id: item.id,
             sku: item.sku,
+            status:'active',
             createdAt: new Date(),
             updatedAt: new Date(),
           }));
+          // console.log('entriesentries',entries)
 
           await db.warehouseItemsObj.bulkCreate(entries, {
             ignoreDuplicates: true,

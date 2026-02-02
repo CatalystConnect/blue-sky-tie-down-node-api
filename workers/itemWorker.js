@@ -20,7 +20,7 @@
 //       updatedAt: new Date(),
 //     }));
 
-    
+
 //     await db.warehouseItemsObj.bulkCreate(entries, { ignoreDuplicates: true });
 
 //     return true;
@@ -47,7 +47,7 @@
 //     for (const job of jobs) {
 //       const { itemId, warehouseIds } = job.data;
 //       console.log(`Processing assign-item-to-warehouses for item #${itemId}`);
-   
+
 //       try { 
 //         const item = await db.itemObj.findByPk(itemId);
 //         if (!item) {
@@ -68,14 +68,14 @@
 //           createdAt: new Date(),
 //           updatedAt: new Date(),
 //         }));
-        
+
 //         await db.warehouseItemsObj.bulkCreate(entries, { ignoreDuplicates: true }); 
 //         console.log(`Assigned item #${itemId} to ${warehouses.length} warehouses`);
 //       } catch (error) {
 //         console.error(`Error processing item #${itemId}:`, error);  
 
 //       }
-      
+
 //     }
 //   });
 
@@ -92,6 +92,7 @@ const db = require('../api/v1.0.1/models');
   boss.work('assign-item-to-warehouses', async (jobs) => {
     for (const job of jobs) {
       const { itemId, warehouseIds } = job.data;
+      console.log('warehouseIdswarehouseIds', warehouseIds)
 
       console.log(
         `Processing assign-item-to-warehouses for item #${itemId}`,
@@ -105,25 +106,25 @@ const db = require('../api/v1.0.1/models');
           console.log(`Item #${itemId} not found`);
           continue;
         }
+        const allWarehouses = await db.wareHouseObj.findAll();
 
         // ✅ Warehouse selection logic
-        const warehouses =
-          Array.isArray(warehouseIds) && warehouseIds.length
-            ? await db.wareHouseObj.findAll({
-                where: { id: warehouseIds }
-              })
-            : await db.wareHouseObj.findAll(); // fallback → all warehouses
-
-        if (!warehouses.length) {
-          console.log('No warehouses found');
-          continue;
-        }
+        const selectedIds =
+          Array.isArray(warehouseIds)
+            ? warehouseIds.map(Number)
+            : [];
 
         // ✅ Prepare bulk entries
-        const entries = warehouses.map(w => ({
+        const entries = allWarehouses.map(w => ({
           warehouse_id: w.id,
           item_id: itemId,
           sku: item.sku,
+          status:
+            selectedIds.length === 0
+              ? 'active' 
+              : selectedIds.includes(w.id)
+                ? 'active' 
+                : 'inactive', 
           createdAt: new Date(),
           updatedAt: new Date(),
         }));
@@ -134,7 +135,7 @@ const db = require('../api/v1.0.1/models');
         });
 
         console.log(
-          `Assigned item #${itemId} to ${warehouses.length} warehouse(s)`
+          `Assigned item #${itemId} to ${allWarehouses.length} warehouse(s)`
         );
       } catch (error) {
         console.error(`Error processing item #${itemId}:`, error);

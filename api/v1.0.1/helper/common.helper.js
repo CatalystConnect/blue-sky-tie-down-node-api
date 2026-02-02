@@ -643,7 +643,7 @@ module.exports = {
                   <tr>
                     <td style="padding: 0 6px">
                       <img
-                        src="${BASE_URL}/files/facebook.svg"
+                        src="${BASE_URL}/files/facebook.png"
                         width="42"
                         height="42"
                         alt="Facebook"
@@ -651,7 +651,7 @@ module.exports = {
                     </td>
                     <td style="padding: 0 6px">
                       <img
-                        src="${BASE_URL}/files/linkedin.svg"
+                        src="${BASE_URL}/files/linkedin.png"
                         width="42"
                         height="42"
                         alt="LinkedIn"
@@ -659,7 +659,7 @@ module.exports = {
                     </td>
                     <td style="padding: 0 6px">
                       <img
-                        src="${BASE_URL}/files/insta.svg"
+                        src="${BASE_URL}/files/insta.png"
                         width="42"
                         height="42"
                         alt="Instagram"

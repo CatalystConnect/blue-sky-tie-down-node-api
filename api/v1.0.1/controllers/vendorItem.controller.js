@@ -117,14 +117,15 @@ module.exports = {
   /*getAllVendorsItem*/
   async getAllVendorsItem(req, res) {
     try {
-      const { page = 1, per_page = 10, search = "", id = "", take_all = "false" } = req.query;
+      const { page = 1, per_page = 10, search = "", id = "", take_all = "false" ,warehouse_item_id} = req.query;
 
       const vendors = await vendorItemServices.getAllVendorsItem({
         page,
         per_page,
         search,
         id,
-        take_all
+        take_all,
+        warehouse_item_id
       });
 
       return res.status(200).send({

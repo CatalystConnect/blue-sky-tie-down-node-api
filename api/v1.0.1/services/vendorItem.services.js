@@ -90,9 +90,13 @@ module.exports = {
   //     throw e;
   //   }
   // },
-  async getAllVendorsItem({ page, per_page, search, id, take_all }) {
+  async getAllVendorsItem({ page, per_page, search, id, take_all, warehouse_item_id }) {
     try {
       let whereCondition = {};
+
+      if (warehouse_item_id) {
+        whereCondition.warehouse_item_id = warehouse_item_id;
+      }
 
       // ---------- vendor filter (same) ----------
       if (id) {

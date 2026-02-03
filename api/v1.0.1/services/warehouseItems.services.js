@@ -342,6 +342,25 @@ module.exports = {
 
       await item.update(payload);
 
+      if (payload.primary_vendor_id) {
+        
+        await db.vendorItemObj.update(
+          { default_vendor: false },
+          { where: { warehouse_item_id: id } }
+        );
+
+       
+        await db.vendorItemObj.update(
+          { default_vendor: true },
+          {
+            where: {
+              warehouse_item_id: id,
+              vendor_id: payload.primary_vendor_id,
+            },
+          }
+        );
+      }
+
       return item;
 
     } catch (e) {

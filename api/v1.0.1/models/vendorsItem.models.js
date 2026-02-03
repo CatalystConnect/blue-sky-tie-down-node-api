@@ -162,6 +162,15 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DECIMAL(19, 4),
         allowNull: true,
       },
+      warehouse_item_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+
+      default_vendor: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
 
 
     },

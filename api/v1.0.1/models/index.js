@@ -1351,5 +1351,16 @@ db.itemObj.hasMany(db.itemLinksObj, {
   as: 'itemLinks',
 });
 
+db.vendorsObj.hasMany(db.vendorItemObj, {
+  foreignKey: "vendor_id",
+  as: "vendorAssigns",
+});
+
+// VendorItem → Vendor
+db.vendorItemObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",
+  as: "vendor", 
+});
+
 
 module.exports = db;

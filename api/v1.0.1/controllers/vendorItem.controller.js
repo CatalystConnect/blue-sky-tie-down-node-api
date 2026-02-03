@@ -241,7 +241,7 @@ module.exports = {
         average_cost: data.average_cost || null,
         average_land_cost: data.average_land_cost || null,
         last_cost: data.last_cost || null,
-       last_land_cost: data.last_land_cost || null,
+        last_land_cost: data.last_land_cost || null,
 
 
       };
@@ -259,6 +259,65 @@ module.exports = {
           error.message ||
           "Vendor item update failed",
         data: error.response?.data || {},
+      });
+    }
+  },
+
+  async getAllVendorsWarehouse(req, res) {
+    try {
+
+      const result = await vendorItemServices.getAllActiveUnassignedVendors();
+
+
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose(
+          result,
+          "Active vendors fetched successfully"
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send(
+        commonHelper.parseErrorResponse(
+          error,
+          "Failed to fetch vendors"
+        )
+      );
+    }
+  },
+  async assignVendorsItem(req, res) {
+    try {
+      const errors = myValidationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).send(commonHelper.parseErrorRespose(errors.mapped()));
+      }
+
+      const { warehouse_item_id, vendors } = req.body;
+
+      if (!Array.isArray(vendors) || vendors.length === 0) {
+        return res.status(400).send(commonHelper.parseErrorRespose({ vendors: "No vendors selected" }));
+      }
+
+      const postData = vendors.map(v => ({
+        vendor_id: v.vendor_id,
+        item_id: v.item_id,
+        warehouse_item_id,
+        default_vendor: false
+      }));
+
+      await vendorItemServices.addVendorsItemAssign(postData);
+
+      return res.status(200).send(
+        commonHelper.parseSuccessRespose({}, "Vendors assigned successfully")
+      );
+
+    } catch (error) {
+      logger.error(error);
+      return res.status(400).json({
+        status: false,
+        message: error.message || "Add vendor item failed",
+        data: {},
       });
     }
   },

@@ -10,5 +10,8 @@ router.get("/vendors/getVendorsItemById",[authJwt.verifyToken],  vendorItemContr
 router.get("/vendors/getAllVendorsItem",[authJwt.verifyToken],  vendorItemController.getAllVendorsItem);
 router.delete("/vendors/deleteVendorsItem",[authJwt.verifyToken], vendorItemController.deleteVendorsItem);
 router.put("/vendors/updateVendorsItem",[authJwt.verifyToken],  vendorItemController.updateVendorsItem);
-    
+
+router.get("/vendors/getAllVendorsWarehouse",[authJwt.verifyToken],  vendorItemController.getAllVendorsWarehouse);
+router.post("/vendors/assignVendorsItem",[authJwt.verifyToken],  vendorItemController.assignVendorsItem);
+
 module.exports = router;

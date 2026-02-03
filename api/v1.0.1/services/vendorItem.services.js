@@ -14,6 +14,10 @@ module.exports = {
       throw e;
     }
   },
+  async addVendorsItemAssign(postData) {
+    
+    return await db.vendorItemObj.bulkCreate(postData);
+  },
   /*getVendorsItemById*/
   async getVendorsItemById(vendorItemId) {
     try {
@@ -190,4 +194,36 @@ module.exports = {
       throw e;
     }
   },
+  // async getAllActiveUnassignedVendors() 
+  //  {
+
+  //   let vendors = await db.vendorsObj.findAll({
+  //     where: {
+  //       status: "ACTIVE",
+  //     },
+  //    include: [
+  //     {
+  //       model: db.vendorItemObj,
+  //       as: "vendorAssigns",
+
+  //     },
+  //   ],
+  //   });
+
+  //   return vendors;
+  // }
+  async getAllActiveUnassignedVendors() {
+    return await db.vendorsObj.findAll({
+      where: {
+        status: "ACTIVE",
+        id: {
+          [Op.notIn]: db.dbObj.literal(`
+          (SELECT vendor_id
+           FROM vendor_item
+           WHERE warehouse_item_id IS NOT NULL)
+        `),
+        },
+      },
+    });
+  }
 };

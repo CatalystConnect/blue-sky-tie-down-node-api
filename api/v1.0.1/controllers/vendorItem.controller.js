@@ -265,11 +265,15 @@ module.exports = {
 
   async getAllVendorsWarehouse(req, res) {
     try {
-
-      const result = await vendorItemServices.getAllActiveUnassignedVendors();
-
-
-
+      
+      const { search = "", page = 1, per_page = 10,warehouse_item_id } = req.query;
+    
+      const result = await vendorItemServices.getAllActiveUnassignedVendors({
+      search,
+      page,
+      per_page,
+      warehouse_item_id
+    });
       return res.status(200).send(
         commonHelper.parseSuccessRespose(
           result,

@@ -15,7 +15,7 @@ module.exports = {
     }
   },
   async addVendorsItemAssign(postData) {
-    
+
     return await db.vendorItemObj.bulkCreate(postData);
   },
   /*getVendorsItemById*/
@@ -212,18 +212,163 @@ module.exports = {
 
   //   return vendors;
   // }
-  async getAllActiveUnassignedVendors() {
-    return await db.vendorsObj.findAll({
-      where: {
-        status: "ACTIVE",
-        id: {
-          [Op.notIn]: db.dbObj.literal(`
-          (SELECT vendor_id
-           FROM vendor_item
-           WHERE warehouse_item_id IS NOT NULL)
-        `),
-        },
+  // async getAllActiveUnassignedVendors({ search = "", page,per_page }) {
+  //   //   return await db.vendorsObj.findAll({
+  //   //     where: {
+  //   //       status: "ACTIVE",
+  //   //       id: {
+  //   //         [Op.notIn]: db.dbObj.literal(`
+  //   //         (SELECT vendor_id
+  //   //          FROM vendor_item
+  //   //          WHERE warehouse_item_id IS NOT NULL)
+  //   //       `),
+  //   //       },
+  //   //     },
+  //   //   });
+  //   const whereCondition = {
+  //     status: "ACTIVE",
+  //     id: {
+  //       [Op.notIn]: db.dbObj.literal(`
+  //       (SELECT vendor_id
+  //        FROM vendor_item
+  //        WHERE warehouse_item_id IS NOT NULL)
+  //     `),
+  //     },
+  //   };
+
+  //   // 🔍 search by vendor name
+  //   if (search) {
+  //     whereCondition.name = {
+  //       [Op.iLike]: `%${search}%`,
+  //     };
+  //   }
+
+  //   // 💤 lazy load (only limit)
+  //   const limit = per_page ? parseInt(per_page) : null;
+
+  //   const vendors = await db.vendorsObj.findAll({
+  //     where: whereCondition,
+  //     ...(limit ? { limit } : {}),   // ✅ only limit, no offset
+  //     order: [["id", "DESC"]],
+  //   });
+
+  //   return {
+  //     data: vendors,
+  //     meta: {
+  //       per_page: limit,
+  //       current_count: vendors.length,
+  //       has_more: limit ? vendors.length === limit : false,
+  //     },
+  //   };
+  // }
+  // async getAllActiveUnassignedVendors({ search = "", page = 1, per_page = 10,warehouse_item_id }) {
+  //   page = parseInt(page) || 1;
+  //   per_page = parseInt(per_page) || 10;
+
+  //   const limit = per_page;
+  //   const offset = (page - 1) * limit;
+
+  //   const whereCondition = {
+  //     status: "ACTIVE",
+  //     id: {
+  //       [Op.notIn]: db.dbObj.literal(`
+  //       (SELECT vendor_id
+  //        FROM vendor_item
+  //        WHERE warehouse_item_id IS NOT NULL)
+  //     `),
+  //     },
+  //   };
+
+
+  //   if (search) {
+  //     whereCondition.name = {
+  //       [Op.iLike]: `%${search}%`,
+  //     };
+  //   }
+
+
+  //   const { rows, count } = await db.vendorsObj.findAndCountAll({
+  //     where: whereCondition,
+  //     limit,
+  //     offset,
+  //     order: [["id", "DESC"]],
+  //   });
+
+
+  //   const current_count = rows.length;
+  //   const loaded_till_now = offset + current_count;
+  //   const remaining = Math.max(count - loaded_till_now, 0);
+  //   const has_more = loaded_till_now < count;
+
+  //   return {
+  //     data: rows,
+  //     meta: {
+  //       page,
+  //       limit,
+  //       current_count,
+  //       loaded_till_now,
+  //       remaining,
+  //       total: count,
+  //       has_more,
+  //     },
+  //   };
+  // }
+  async getAllActiveUnassignedVendors({
+    search = "",
+    page = 1,
+    per_page = 10,
+    warehouse_item_id
+  }) {
+    page = parseInt(page) || 1;
+    per_page = parseInt(per_page) || 10;
+
+    const limit = per_page;
+    const offset = (page - 1) * limit;
+
+    const whereCondition = {
+      status: "ACTIVE",
+      id: {
+        [Op.notIn]: db.dbObj.literal(`
+        (
+          SELECT vendor_id
+          FROM vendor_item
+          WHERE warehouse_item_id = ${warehouse_item_id}
+        )
+      `),
       },
+    };
+
+    if (search) {
+      whereCondition.name = {
+        [Op.iLike]: `%${search}%`,
+      };
+    }
+
+    const { rows, count } = await db.vendorsObj.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order: [["id", "DESC"]],
     });
+
+    const current_count = rows.length;
+    const loaded_till_now = offset + current_count;
+    const remaining = Math.max(count - loaded_till_now, 0);
+    const has_more = loaded_till_now < count;
+
+    return {
+      data: rows,
+      meta: {
+        page,
+        limit,
+        current_count,
+        loaded_till_now,
+        remaining,
+        total: count,
+        has_more,
+      },
+    };
   }
+
+
 };

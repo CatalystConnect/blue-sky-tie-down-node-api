@@ -117,7 +117,7 @@ module.exports = {
   /*getAllVendorsItem*/
   async getAllVendorsItem(req, res) {
     try {
-      const { page = 1, per_page = 10, search = "", id = "", take_all = "false" ,warehouse_item_id} = req.query;
+      const { page = 1, per_page = 10, search = "", id = "", take_all = "false", warehouse_item_id } = req.query;
 
       const vendors = await vendorItemServices.getAllVendorsItem({
         page,
@@ -266,15 +266,15 @@ module.exports = {
 
   async getAllVendorsWarehouse(req, res) {
     try {
-      
-      const { search = "", page = 1, per_page = 10,warehouse_item_id } = req.query;
-    
+
+      const { search = "", page = 1, per_page = 10, warehouse_item_id } = req.query;
+
       const result = await vendorItemServices.getAllActiveUnassignedVendors({
-      search,
-      page,
-      per_page,
-      warehouse_item_id
-    });
+        search,
+        page,
+        per_page,
+        warehouse_item_id
+      });
       return res.status(200).send(
         commonHelper.parseSuccessRespose(
           result,
@@ -326,6 +326,44 @@ module.exports = {
       });
     }
   },
+  async getAvailableVendorItems(req, res) {
+    try {
+      const {
+        warehouse_item_id,
+        page = 1,
+        per_page = 10,
+        search = ""
+      } = req.query;
+
+      if (!warehouse_item_id) {
+        return res.status(400).json({
+          status: false,
+          message: "warehouse_item_id is required"
+        });
+      }
+
+      const result = await vendorItemServices.getAvailableVendorItems({
+        warehouse_item_id,
+        page,
+        per_page,
+        search
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: "Available vendor items fetched successfully",
+        data: result.data,
+        meta: result.meta
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        status: false,
+        message: error.message
+      });
+    }
+  }
+
 
   // validate(method) {
   //   switch (method) {

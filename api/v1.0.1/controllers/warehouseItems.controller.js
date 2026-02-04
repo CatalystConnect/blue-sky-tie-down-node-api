@@ -409,4 +409,30 @@ module.exports = {
       });
     }
   },
+  async getWareHouseItemVendor(req, res) {
+    try {
+      const { vendor_id } = req.query;
+
+      if (!vendor_id) {
+        return res.status(400).json({
+          success: false,
+          message: "vendor_id is required",
+        });
+      }
+
+      const data =
+        await warehouseItemsServices.getWareHouseItemVendor(vendor_id);
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+  }
 };

@@ -368,4 +368,33 @@ module.exports = {
       throw e;
     }
   },
+  async getWareHouseItemVendor  (vendor_id)  {
+  try {
+    const vendorItems = await db.vendorItemObj.findAll({
+      where: {
+        vendor_id,
+      },
+      include: [
+        {
+          model: db.warehouseItemsObj,
+          as: "warehouseItems",
+          required: true,
+          // include: [
+          //   {
+          //     model: db.itemObj,
+          //     as: "Item",
+          //     required: true,
+          //   },
+          // ],
+        },
+      ],
+      order: [["id", "ASC"]],
+    });
+
+    return vendorItems;
+  } catch (error) {
+    throw error;
+  }
+  }
+
 };

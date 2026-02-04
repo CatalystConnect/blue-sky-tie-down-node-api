@@ -11,4 +11,7 @@ router.delete("/wareHouseItems/deleteWareHouseItems",[authJwt.verifyToken], ware
 router.put("/wareHouseItems/updateWareHouseItems",[authJwt.verifyToken],  wareHuseItemsController.updateWareHouseItems);
 
 
+router.get("/wareHouseItems/getWareHouseItemVendor",[authJwt.verifyToken],  wareHuseItemsController.getWareHouseItemVendor);
+
+
 module.exports = router;

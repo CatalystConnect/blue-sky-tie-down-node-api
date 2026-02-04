@@ -1362,5 +1362,22 @@ db.vendorItemObj.belongsTo(db.vendorsObj, {
   as: "vendor", 
 });
 
+db.vendorItemObj.belongsTo(db.warehouseItemsObj, {
+  foreignKey: "warehouse_item_id",
+  as: "warehouseItems",
+});
+
+// db.warehouseItemsObj.hasMany(db.vendorItemObj, {
+//   foreignKey: "warehouse_item_id",
+//   as: "vendorAssigns",
+// });
+db.warehouseItemsObj.belongsTo(db.itemObj, {
+  foreignKey: "item_id",
+  as: "Item",
+});
+
+
+
+
 
 module.exports = db;

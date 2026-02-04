@@ -372,7 +372,74 @@ module.exports = {
         has_more,
       },
     };
+  },
+  async getAvailableVendorItems({
+    warehouse_item_id,
+    page = 1,
+    per_page = 10,
+    search = ""
+  }) {
+
+    const limit = parseInt(per_page);
+    const currentPage = parseInt(page);
+    const offset = (currentPage - 1) * limit;
+
+    let whereCondition = {
+      id: {
+        [Op.notIn]: db.dbObj.literal(`
+        (
+          SELECT id
+          FROM vendor_item
+          WHERE warehouse_item_id = ${warehouse_item_id}
+        )
+      `)
+      }
+    };
+
+    // optional search
+    if (search) {
+      whereCondition[Op.or] = [
+        { vendor_item_number: { [Op.iLike]: `%${search}%` } },
+        { vendor_item_description: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+
+    const { rows, count } = await db.vendorItemObj.findAndCountAll({
+      where: whereCondition,
+      include: [
+        {
+          model: db.vendorsObj,
+          as: "vendors"
+        },
+        {
+          model: db.itemObj,
+          as: "item"
+        }
+      ],
+      limit,
+      offset,
+      order: [["created_at", "DESC"]]
+    });
+
+    const current_count = rows.length;
+    const loaded_till_now = offset + current_count;
+    const remaining = Math.max(count - loaded_till_now, 0);
+    const has_more = loaded_till_now < count;
+
+    return {
+      data: rows,
+      meta: {
+        page: currentPage,
+        limit,
+        current_count,
+        loaded_till_now,
+        remaining,
+        total: count,
+        has_more
+      }
+    };
   }
+
 
 
 };

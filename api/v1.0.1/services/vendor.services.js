@@ -301,16 +301,17 @@ module.exports = {
             {
               model: db.vendorItemObj,
               as: "vendorAssigns",
-              required: true,
+               required: false,
               include: [
                 {
                   model: db.warehouseItemsObj,
                   as: "warehouseItems",
-                
+                required: false,
                   include: [
                     {
                       model: db.itemObj,
                       as: "Item",
+                      required: false,
                       
                     },
                   ],
@@ -328,16 +329,17 @@ module.exports = {
         {
           model: db.vendorItemObj,
           as: "vendorAssigns",
-          required: true,
+          required: false,
           include: [
             {
               model: db.warehouseItemsObj,
               as: "warehouseItems",
-    
+              required: false,
               include: [
                 {
                   model: db.itemObj,
                   as: "Item",
+                  required: false,
                  
                 },
               ],

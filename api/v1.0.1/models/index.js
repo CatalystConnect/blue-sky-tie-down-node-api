@@ -275,6 +275,7 @@ db.purchaseOrderTotalsObj = require("./purshaseOrdertotals.models")(db.dbObj, Se
 db.purchaseOrderObj = require("./purchaseOrders.models")(db.dbObj, Sequelize);
 db.productTemplateObj = require("./productTemplate.models")(db.dbObj, Sequelize);
 db.itemLinksObj = require("./itemLinks.models")(db.dbObj, Sequelize);
+db.purchaseOrderItemObj = require("./purchaseOrderItem.models")(db.dbObj, Sequelize);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {
@@ -1335,6 +1336,13 @@ db.purchaseOrderObj.hasMany(db.poLineObj, {
   foreignKey: "poId",
   as: "lines"
 });
+
+db.poLineObj.hasMany(db.purchaseOrderItemObj, {
+  foreignKey: "po_line_id",
+  as: "purchaseOrderItems",
+});
+
+
 
 db.purchaseOrderObj.hasOne(db.purchaseOrderTotalsObj, {
   foreignKey: "poId",

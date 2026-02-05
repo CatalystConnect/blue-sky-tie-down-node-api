@@ -122,10 +122,63 @@ module.exports = {
       const poLines = lines.map((line, index) => ({
         ...line,
         poId: pId,
-        lineNo: line.lineNo || String(index + 1).padStart(3, "0"),
+        lineNo: line.lineNumber || String(index + 1).padStart(3, "0"),
       }));
 
-      await db.poLineObj.bulkCreate(poLines);
+      const safeDateOnly = (value) => {
+        if (!value) return null;
+        const d = new Date(value);
+        return isNaN(d.getTime())
+          ? null
+          : d.toISOString().split("T")[0];
+      };
+
+      // const createdLines = await db.poLineObj.bulkCreate(poLines);
+      const createdLines = await db.poLineObj.bulkCreate(poLines, {
+        returning: true,
+      });
+
+
+      const poItemsPayload = [];
+
+      createdLines.forEach((poLine) => {
+        const line = lines.find(
+          (l) => l.lineNumber === poLine.lineNumber
+        );
+
+        if (line?.items?.warehouse_item_id) {
+          poItemsPayload.push({
+            poId: pId,
+            po_line_id: poLine.id,
+            warehouse_item_id: line.items.warehouse_item_id,
+
+            on_order: line.items.on_order ?? null,
+            back_order: line.items.back_order ?? null,
+
+            requested_date: safeDateOnly(line.items.requested_date),
+            exp_date: safeDateOnly(line.items.exp_date),
+            expected_date: safeDateOnly(line.items.expected_date),
+
+            order_tool: line.items.order_tool ?? null,
+            warehouse: line.items.warehouse ?? null,
+            cost_per: line.items.cost_per ?? null,
+            received_to_date: line.items.received_to_date ?? 0,
+            transfer_to_warehouse:
+              line.items.transfer_to_warehouse ?? null,
+            origin: line.items.origin ?? null,
+            oe_linked: line.items.oe_linked ?? false,
+            open_total: line.items.open_total ?? null,
+            vessel: line.items.vessel ?? null,
+            discount_pct: line.items.discount_pct ?? null,
+            other: line.items.other ?? null,
+          });
+        }
+      });
+
+      if (poItemsPayload.length) {
+        await db.purchaseOrderItemObj.bulkCreate(poItemsPayload);
+      }
+
 
 
       if (totals) {
@@ -482,6 +535,12 @@ module.exports = {
           {
             model: db.poLineObj,
             as: "lines",
+            include: [
+              {
+                model: db.purchaseOrderItemObj,
+                as: "purchaseOrderItems",
+              }
+            ],
           },
           {
             model: db.purchaseOrderTotalsObj,
@@ -526,6 +585,12 @@ module.exports = {
           {
             model: db.poLineObj,
             as: "lines",
+            include: [
+              {
+                model: db.purchaseOrderItemObj,
+                as: "purchaseOrderItems",
+              }
+            ],
           },
           {
             model: db.purchaseOrderTotalsObj,
@@ -541,136 +606,270 @@ module.exports = {
       throw e;
     }
   },
-  async updatePurchaseOrder(poId, payload) {
+  // async updatePurchaseOrder(poId, payload) {
 
+  //   try {
+  //     const { purchaseOrder, header, lines, totals, status } = payload;
+
+  //     /* ---------------- PURCHASE ORDER ---------------- */
+  //     if (purchaseOrder || status) {
+  //       await db.purchaseOrderObj.update(
+  //         {
+  //           ...purchaseOrder,
+  //           ...(status && { status })
+  //         },
+  //         {
+  //           where: { id: poId },
+
+  //         }
+  //       );
+  //     }
+
+  //     /* ---------------- HEADER ---------------- */
+  //     if (header) {
+  //       const existingHeader = await db.poHeaderObj.findOne({
+  //         where: { poId },
+
+  //       });
+
+  //       if (existingHeader) {
+  //         await db.poHeaderObj.update(
+  //           header,
+  //           { where: { poId }, transaction }
+  //         );
+  //       } else {
+  //         await db.poHeaderObj.create(
+  //           { ...header, poId },
+
+  //         );
+  //       }
+  //     }
+
+  //     /* ---------------- LINES ---------------- */
+  //     if (lines && lines.length) {
+  //       for (let i = 0; i < lines.length; i++) {
+  //         const line = lines[i];
+
+  //         if (line.id) {
+  //           // UPDATE existing line
+  //           await db.poLineObj.update(
+  //             line,
+  //             {
+  //               where: { id: line.id, poId },
+
+  //             }
+  //           );
+  //         } else {
+  //           // ADD new line
+  //           await db.poLineObj.create(
+  //             {
+  //               ...line,
+  //               poId,
+  //               lineNo: line.lineNo || String(i + 1).padStart(3, "0")
+  //             },
+  //           );
+  //         }
+  //       }
+  //     }
+
+
+  //     if (totals) {
+  //       const existingTotals = await db.purchaseOrderTotalsObj.findOne({
+  //         where: { poId },
+
+  //       });
+
+  //       if (existingTotals) {
+  //         await db.purchaseOrderTotalsObj.update(
+  //           totals,
+  //           { where: { poId }, transaction }
+  //         );
+  //       } else {
+  //         await db.purchaseOrderTotalsObj.create(
+  //           { ...totals, poId },
+
+  //         );
+  //       }
+  //     }
+
+
+  //     return true;
+
+  //   } catch (err) {
+
+  //     logger.errorLog.log("error", err.message);
+  //     throw err;
+  //   }
+  // },
+  async updatePurchaseOrder(poId, payload) {
     try {
       const { purchaseOrder, header, lines, totals, status } = payload;
 
-      /* ---------------- PURCHASE ORDER ---------------- */
+      const safeDateOnly = (value) => {
+        if (!value) return null;
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d.toISOString().split("T")[0];
+      };
+
+      /* ================= PURCHASE ORDER ================= */
       if (purchaseOrder || status) {
         await db.purchaseOrderObj.update(
           {
             ...purchaseOrder,
-            ...(status && { status })
+            ...(status && { status }),
           },
-          {
-            where: { id: poId },
-
-          }
+          { where: { id: poId } }
         );
       }
 
-      /* ---------------- HEADER ---------------- */
+      /* ================= HEADER ================= */
       if (header) {
         const existingHeader = await db.poHeaderObj.findOne({
           where: { poId },
-
         });
 
         if (existingHeader) {
-          await db.poHeaderObj.update(
-            header,
-            { where: { poId }, transaction }
-          );
+          await db.poHeaderObj.update(header, { where: { poId } });
         } else {
-          await db.poHeaderObj.create(
-            { ...header, poId },
-
-          );
+          await db.poHeaderObj.create({ ...header, poId });
         }
       }
 
-      /* ---------------- LINES ---------------- */
+      /* ================= LINES + ITEMS ================= */
       if (lines && lines.length) {
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
+          let poLine;
 
+          /* -------- LINE UPSERT -------- */
           if (line.id) {
-            // UPDATE existing line
             await db.poLineObj.update(
-              line,
-              {
-                where: { id: line.id, poId },
-
-              }
-            );
-          } else {
-            // ADD new line
-            await db.poLineObj.create(
               {
                 ...line,
-                poId,
-                lineNo: line.lineNo || String(i + 1).padStart(3, "0")
+                lineNo:
+                  line.lineNumber || String(i + 1).padStart(3, "0"),
               },
+              { where: { id: line.id, poId } }
             );
+
+            poLine = await db.poLineObj.findByPk(line.id);
+          } else {
+            poLine = await db.poLineObj.create({
+              ...line,
+              poId,
+              lineNo:
+                line.lineNumber || String(i + 1).padStart(3, "0"),
+            });
+          }
+
+          /* -------- ITEM UPSERT -------- */
+          if (line?.items?.warehouse_item_id) {
+            const existingItem =
+              await db.purchaseOrderItemObj.findOne({
+                where: {
+                  poId,
+                  po_line_id: poLine.id,
+                },
+              });
+
+            const itemPayload = {
+              poId,
+              po_line_id: poLine.id,
+              warehouse_item_id: line.items.warehouse_item_id,
+
+              on_order: line.items.orderedQty ?? null,
+              back_order: line.items.back_order ?? null,
+
+              requested_date: safeDateOnly(line.items.requested_date),
+              exp_date: safeDateOnly(line.items.exp_date),
+              expected_date: safeDateOnly(line.items.expected_date),
+
+              order_tool: line.items.order_tool ?? null,
+              warehouse: line.items.warehouse ?? null,
+              cost_per: line.items.cost_per ?? null,
+              received_to_date: line.items.received_to_date ?? 0,
+              transfer_to_warehouse:
+                line.items.transfer_to_warehouse ?? null,
+              origin: line.items.origin ?? null,
+              oe_linked: line.items.oe_linked ?? false,
+              open_total: line.items.open_total ?? null,
+              vessel: line.items.vessel ?? null,
+              discount_pct: line.items.discount_pct ?? null,
+              other: line.items.other ?? null,
+            };
+
+            if (existingItem) {
+              await db.purchaseOrderItemObj.update(itemPayload, {
+                where: { id: existingItem.id },
+              });
+            } else {
+              await db.purchaseOrderItemObj.create(itemPayload);
+            }
           }
         }
       }
 
-
+      /* ================= TOTALS ================= */
       if (totals) {
-        const existingTotals = await db.purchaseOrderTotalsObj.findOne({
-          where: { poId },
-
-        });
+        const existingTotals =
+          await db.purchaseOrderTotalsObj.findOne({
+            where: { poId },
+          });
 
         if (existingTotals) {
-          await db.purchaseOrderTotalsObj.update(
-            totals,
-            { where: { poId }, transaction }
-          );
+          await db.purchaseOrderTotalsObj.update(totals, {
+            where: { poId },
+          });
         } else {
-          await db.purchaseOrderTotalsObj.create(
-            { ...totals, poId },
-
-          );
+          await db.purchaseOrderTotalsObj.create({
+            ...totals,
+            poId,
+          });
         }
       }
 
-
       return true;
-
     } catch (err) {
-
       logger.errorLog.log("error", err.message);
       throw err;
     }
   },
+
   async deletePurchaseOrder(poId) {
 
 
     try {
-     
+
       const po = await db.purchaseOrderObj.findByPk(poId);
       if (!po) return false;
 
-    
+
 
       await db.poLineObj.destroy({
         where: { poId },
-        
+
       });
 
       await db.poHeaderObj.destroy({
         where: { poId },
-        
+
       });
 
       await db.purchaseOrderTotalsObj.destroy({
         where: { poId },
-        
+
       });
 
       await db.purchaseOrderObj.destroy({
         where: { id: poId },
-        
+
       });
 
-     
+
       return true;
 
     } catch (err) {
-      
+
       logger.errorLog.log("error", err.message);
       throw err;
     }

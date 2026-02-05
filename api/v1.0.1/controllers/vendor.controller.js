@@ -129,14 +129,15 @@ module.exports = {
   /*getAllVendors*/
   async getAllVendors(req, res) {
     try {
-      const { page = 1, per_page = "", search = "", limit = "", take_all = "", id = "" } = req.query;
+      const { page = 1, per_page = "", search = "", limit = "", take_all = "", id = "",status = "" } = req.query;
       let vendors = await vendorServices.getAllVendors({
         page,
         per_page,
         search,
         id,
         take_all,
-        limit
+        limit,
+        status
       });
       if (!vendors) {
         throw new Error("Vendor not found");

@@ -188,7 +188,7 @@ module.exports = {
   //     throw e;
   //   }
   // },
-  async getAllVendors({ page, per_page, search, id, limit, take_all }) {
+  async getAllVendors({ page, per_page, search, id, limit, take_all, status }) {
     try {
       page = parseInt(page) || 1;
       per_page = parseInt(per_page) || 10;
@@ -206,11 +206,19 @@ module.exports = {
         };
       }
 
+      if (status) {
+        whereCondition.status = status;
+      }
+
       // ---------- prioritized vendors (same) ----------
       let prioritizedVendors = [];
       if (id && Array.isArray(id)) {
         prioritizedVendors = await db.vendorsObj.findAll({
-          where: { id: { [Op.in]: id } },
+          // where: { id: { [Op.in]: id } },
+          where: {
+            id: { [Op.in]: id },
+            ...(status ? { status } : {})
+          },
           order: [["id", "DESC"]],
         });
 
@@ -312,7 +320,7 @@ module.exports = {
   //                     model: db.itemObj,
   //                     as: "Item",
   //                     required: false,
-                      
+
   //                   },
   //                 ],
   //               },
@@ -340,7 +348,7 @@ module.exports = {
   //                 model: db.itemObj,
   //                 as: "Item",
   //                 required: false,
-                 
+
   //               },
   //             ],
   //           },

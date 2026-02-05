@@ -882,10 +882,22 @@ module.exports = {
       logger.errorLog.log("error", err.message);
       throw err;
     }
+  },
+
+  async updatePurchaseOrderStatus(poId, status) {
+    try {
+      const [affectedRows] =
+        await db.purchaseOrderObj.update(
+          { status },
+          { where: { id: poId } }
+        );
+
+      return affectedRows > 0;
+    } catch (e) {
+      logger.errorLog.log("error", e.message);
+      throw e;
+    }
   }
-
-
-
 
 
 

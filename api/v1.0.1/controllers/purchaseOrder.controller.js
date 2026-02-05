@@ -422,7 +422,51 @@ module.exports = {
         message: error.message || "Failed to delete purchase order"
       });
     }
+  },
+  async updatePurchaseOrderStatus(req, res) {
+  try {
+    const { poId } = req.query;
+    const { status } = req.body;
+
+    if (!poId || !status) {
+      return res.status(400).json({
+        status: false,
+        message: "poId and status are required",
+      });
+    }
+
+    if (!Object.values(PURCHASE_ORDER_STATUS).includes(status)) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid purchase order status",
+      });
+    }
+
+    const updated =
+      await purchaseOrderServices.updatePurchaseOrderStatus(
+        poId,
+        status
+      );
+
+    if (!updated) {
+      return res.status(404).json({
+        status: false,
+        message: "Purchase Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Purchase Order status updated successfully",
+    });
+  } catch (error) {
+    logger.errorLog.log("error", error.message);
+    return res.status(500).json({
+      status: false,
+      message: error.message || "Status update failed",
+    });
   }
+}
 
 
 

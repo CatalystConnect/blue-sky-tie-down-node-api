@@ -538,7 +538,7 @@ module.exports = {
             include: [
               {
                 model: db.purchaseOrderItemObj,
-                as: "purchaseOrderItems",
+                as: "items",
               }
             ],
           },
@@ -588,7 +588,7 @@ module.exports = {
             include: [
               {
                 model: db.purchaseOrderItemObj,
-                as: "purchaseOrderItems",
+                as: "items",
               }
             ],
           },

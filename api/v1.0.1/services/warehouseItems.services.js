@@ -379,13 +379,13 @@ module.exports = {
           model: db.warehouseItemsObj,
           as: "warehouseItems",
           required: true,
-          // include: [
-          //   {
-          //     model: db.itemObj,
-          //     as: "Item",
-          //     required: true,
-          //   },
-          // ],
+          include: [
+            {
+              model: db.purchaseOrderItemObj,
+              as: "purchaseOrderItemsByWarehouse",
+            
+            },
+          ],
         },
       ],
       order: [["id", "ASC"]],

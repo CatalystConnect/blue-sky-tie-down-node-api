@@ -122,7 +122,7 @@ module.exports = {
       const poLines = lines.map((line, index) => ({
         ...line,
         poId: pId,
-        lineNo: line.lineNumber || String(index + 1).padStart(3, "0"),
+        lineNumber: line.lineNumber || String(index + 1).padStart(3, "0"),
       }));
 
       const safeDateOnly = (value) => {
@@ -739,36 +739,49 @@ module.exports = {
       if (lines && lines.length) {
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
-          let poLine;
 
-          /* -------- LINE UPSERT -------- */
-          if (line.id) {
+          /* -------- FIND EXISTING LINE (poId + lineNumber) -------- */
+          let poLine = await db.poLineObj.findOne({
+            where: {
+              poId,
+              lineNumber: line.lineNumber,
+            },
+          });
+
+          /* -------- UPDATE OR CREATE LINE -------- */
+          if (poLine) {
             await db.poLineObj.update(
               {
-                ...line,
-                lineNo:
-                  line.lineNumber || String(i + 1).padStart(3, "0"),
+                item: line.item,
+                description: line.description,
+                orderedQty: line.orderedQty,
+                uom: line.uom,
+                unitCost: line.unitCost,
+                orderedExt: line.orderedExt,
+                lineNumber: line.lineNumber,
               },
-              { where: { id: line.id, poId } }
+              { where: { id: poLine.id } }
             );
-
-            poLine = await db.poLineObj.findByPk(line.id);
           } else {
             poLine = await db.poLineObj.create({
-              ...line,
+              item: line.item,
+              description: line.description,
+              orderedQty: line.orderedQty,
+              uom: line.uom,
+              unitCost: line.unitCost,
+              orderedExt: line.orderedExt,
               poId,
-              lineNo:
-                line.lineNumber || String(i + 1).padStart(3, "0"),
+              lineNumber: line.lineNumber,
             });
           }
 
-          /* -------- ITEM UPSERT -------- */
+          /* -------- ITEM UPSERT (po_line_id + warehouse_item_id) -------- */
           if (line?.items?.warehouse_item_id) {
             const existingItem =
               await db.purchaseOrderItemObj.findOne({
                 where: {
-                  poId,
                   po_line_id: poLine.id,
+                  warehouse_item_id: line.items.warehouse_item_id,
                 },
               });
 
@@ -777,9 +790,8 @@ module.exports = {
               po_line_id: poLine.id,
               warehouse_item_id: line.items.warehouse_item_id,
 
-              on_order: line.items.orderedQty ?? null,
+              on_order: line.items.on_order ?? null,
               back_order: line.items.back_order ?? null,
-
               requested_date: safeDateOnly(line.items.requested_date),
               exp_date: safeDateOnly(line.items.exp_date),
               expected_date: safeDateOnly(line.items.expected_date),
@@ -821,10 +833,7 @@ module.exports = {
             where: { poId },
           });
         } else {
-          await db.purchaseOrderTotalsObj.create({
-            ...totals,
-            poId,
-          });
+          await db.purchaseOrderTotalsObj.create({ ...totals, poId });
         }
       }
 

@@ -1287,6 +1287,13 @@ module.exports = {
             model: db.poLineObj,
             as: "lines",
             required: false,
+              include: [
+                {
+                  model: db.purchaseOrderReceiptLineObj,
+                  as: "receiptLines",
+                  required: false,
+                }
+              ],
           },
           {
 

@@ -1341,6 +1341,14 @@ db.poLineObj.hasMany(db.purchaseOrderItemObj, {
   foreignKey: "po_line_id",
   as: "items",
 });
+
+db.poLineObj.hasMany(db.purchaseOrderReceiptLineObj, {
+  foreignKey: "po_line_id",
+  as: "receiptLines",
+});
+
+
+
 db.warehouseItemsObj.hasMany(db.purchaseOrderItemObj, {
   foreignKey: "warehouse_item_id",
   as: "purchaseOrderItemsByWarehouse",

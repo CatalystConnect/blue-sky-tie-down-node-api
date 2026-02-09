@@ -66,6 +66,10 @@ module.exports = {
         });
       }
 
+      const userId = req.userId;
+      purchaseOrder.enteredBy = userId;
+
+
       await purchaseOrderServices.addPurchaseOrder({
         purchaseOrder,
         header,

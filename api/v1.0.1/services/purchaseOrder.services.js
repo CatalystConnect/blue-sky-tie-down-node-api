@@ -898,68 +898,315 @@ module.exports = {
       throw e;
     }
   },
+  // async createReceiptPurchaseOrder(payload) {
+
+  //   try {
+
+  //     const po = await db.purchaseOrderObj.findByPk(payload.po_id);
+
+  //     if (!po) throw new Error("Purchase Order not found");
+
+  //     // Status validation
+  //     switch (po.status) {
+  //       case "Draft":
+  //       case "Pending Approval":
+  //       case "Closed":
+  //         throw new Error(`Receipt not allowed when PO status is ${po.status}`);
+
+  //       case "Open":
+  //       case "Partially Received":
+  //         break;
+
+  //       default:
+  //         throw new Error("Invalid PO status");
+  //     }
+
+
+  //     const receiptHeader = await db.purchaseOrderReceiptHeaderObj.create(
+  //       {
+  //         po_id: payload.po_id,
+  //         warehouse_id: payload.warehouse_id,
+  //         receipt_number: payload.receipt_number,
+  //         vendor_packing_slip: payload.vendor_packing_slip,
+  //         received_at: payload.received_at
+  //       }
+  //     );
+
+
+  //     for (const line of payload.items) {
+
+  //       await db.purchaseOrderReceiptLineObj.create(
+  //         {
+  //           receipt_id: receiptHeader.id,
+  //           po_line_id: line.po_line_id,
+  //           item_id: line.item_id,
+  //           received_qty: line.received_qty,
+  //           lot_number: line.lot_number,
+  //           expiration_date: line.expiration_date,
+  //           po_id: payload.po_id,
+  //           purchase_order_item_id: line.purchase_order_item_id,
+  //           warehouse_item_id: line.warehouse_item_id
+  //         }
+  //       );
+
+
+  //       const warehouseItem = await db.warehouseItemsObj.findOne({
+  //         where: { id: line.warehouse_item_id }
+  //       });
+
+  //       const currentOnHand = parseInt(warehouseItem.onHand || 0);
+
+  //       await db.warehouseItemsObj.update(
+  //         { onHand: currentOnHand + Number(line.received_qty) },
+  //         { where: { id: line.warehouse_item_id } }
+  //       );
+
+
+  //       await db.purchaseOrderReceiptLineObj.update(
+  //         {
+  //           received_qty: Number(line.received_qty)
+  //         },
+  //         {
+  //           where: { id: line.id }
+  //         }
+  //       );
+  //     }
+
+
+  //     return receiptHeader;
+
+  //   } catch (err) {
+
+  //     throw err;
+  //   }
+  // },
+  // async createReceiptPurchaseOrder(payload) {
+  //   try {
+
+  //     const po = await db.purchaseOrderObj.findByPk(payload.po_id);
+
+  //     if (!po) throw new Error("Purchase Order not found");
+
+
+  //     switch (po.status) {
+  //       case "Draft":
+  //       case "Pending Approval":
+  //       case "Closed":
+  //         throw new Error(`Receipt not allowed when PO status is ${po.status}`);
+
+  //       case "Sent":
+  //       case "Partially Received":
+  //         break;
+
+  //       default:
+  //         throw new Error("Invalid PO status");
+  //     }
+
+
+  //     const receiptHeader = await db.purchaseOrderReceiptHeaderObj.create({
+  //       po_id: payload.po_id,
+  //       warehouse_id: payload.warehouse_id,
+  //       receipt_number: payload.receipt_number,
+  //       vendor_packing_slip: payload.vendor_packing_slip,
+  //       received_at: payload.received_at,
+  //     });
+
+
+  //     for (const line of payload.items) {
+
+
+  //       await db.purchaseOrderReceiptLineObj.create({
+  //         receipt_id: receiptHeader.id,
+  //         po_line_id: line.po_line_id,
+  //         item_id: line.item_id,
+  //         received_qty: Number(line.received_qty),
+  //         lot_number: line.lot_number,
+  //         expiration_date: line.expiration_date,
+  //         po_id: payload.po_id,
+  //         purchase_order_item_id: line.purchase_order_item_id,
+  //         warehouse_item_id: line.warehouse_item_id,
+  //       });
+
+
+  //       const warehouseItem = await db.warehouseItemsObj.findByPk(
+  //         line.warehouse_item_id
+  //       );
+
+  //       const currentOnHand = parseInt(warehouseItem.onHand || 0);
+
+  //       await db.warehouseItemsObj.update(
+  //         {
+  //           onHand: currentOnHand + Number(line.received_qty),
+  //         },
+  //         {
+  //           where: { id: line.warehouse_item_id },
+  //         }
+  //       );
+
+
+  //       await db.purchaseOrderItemObj.update(
+  //         {
+  //           received_to_date: payload.received_at,
+  //         },
+  //         {
+  //           where: { id: line.purchase_order_item_id },
+  //         }
+  //       );
+  //     }
+
+
+
+  //     const poItems = await db.purchaseOrderItemObj.findAll({
+  //       where: { po_id: payload.po_id },
+  //     });
+
+  //     let allReceived = true;
+
+  //     for (const item of poItems) {
+  //       const totalReceived = await db.purchaseOrderReceiptLineObj.sum(
+  //         "received_qty",
+  //         {
+  //           where: {
+  //             purchase_order_item_id: item.id,
+  //           },
+  //         }
+  //       );
+
+  //       if ((totalReceived || 0) < item.orderedQty) {
+  //         allReceived = false;
+  //         break;
+  //       }
+  //     }
+
+  //     const newStatus = allReceived
+  //       ? "Closed"
+  //       : "Partially Received";
+
+  //     await db.purchaseOrderObj.update(
+  //       { status: newStatus },
+  //       { where: { id: payload.po_id } }
+  //     );
+
+  //     return receiptHeader;
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // },
   async createReceiptPurchaseOrder(payload) {
-
     try {
+     
+      const po = await db.purchaseOrderObj.findByPk(payload.po_id);
 
-      const receiptHeader = await db.purchaseOrderReceiptHeaderObj.create(
-        {
+      if (!po) throw new Error("Purchase Order not found");
+
+      
+      switch (po.status) {
+        case PURCHASE_ORDER_STATUS.DRAFT:
+        case PURCHASE_ORDER_STATUS.PENDING_APPROVAL:
+        case PURCHASE_ORDER_STATUS.CLOSED:
+          throw new Error(
+            `Receipt not allowed when PO status is ${po.status}`
+          );
+
+        case PURCHASE_ORDER_STATUS.SENT:
+        case PURCHASE_ORDER_STATUS.PARTIALLY_RECEIVED:
+          break;
+
+        default:
+          throw new Error("Invalid PO status");
+      }
+
+     
+      const receiptHeader =
+        await db.purchaseOrderReceiptHeaderObj.create({
           po_id: payload.po_id,
           warehouse_id: payload.warehouse_id,
           receipt_number: payload.receipt_number,
           vendor_packing_slip: payload.vendor_packing_slip,
-          received_at: payload.received_at
-        }
-      );
-
-
-      for (const line of payload.items) {
-
-        await db.purchaseOrderReceiptLineObj.create(
-          {
-            receipt_id: receiptHeader.id,
-            po_line_id: line.po_line_id,
-            item_id: line.item_id,
-            received_qty: line.received_qty,
-            lot_number: line.lot_number,
-            expiration_date: line.expiration_date,
-            po_id: payload.po_id,
-            purchase_order_item_id: line.purchase_order_item_id,
-            warehouse_item_id: line.warehouse_item_id
-          }
-        );
-
-
-        const warehouseItem = await db.warehouseItemsObj.findOne({
-          where: { id: line.warehouse_item_id }
+          received_at: payload.received_at,
         });
+
+      
+      for (const line of payload.items) {
+        
+        await db.purchaseOrderReceiptLineObj.create({
+          receipt_id: receiptHeader.id,
+          po_line_id: line.po_line_id,
+          item_id: line.item_id,
+          received_qty: Number(line.received_qty),
+          lot_number: line.lot_number,
+          expiration_date: line.expiration_date,
+          po_id: payload.po_id,
+          purchase_order_item_id: line.purchase_order_item_id,
+          warehouse_item_id: line.warehouse_item_id,
+        });
+        
+        
+        const warehouseItem = await db.warehouseItemsObj.findByPk(
+          line.warehouse_item_id
+        );
+        console.log('warehouseItem', warehouseItem)
 
         const currentOnHand = parseInt(warehouseItem.onHand || 0);
 
         await db.warehouseItemsObj.update(
-          { onHand: currentOnHand + Number(line.received_qty) },
-          { where: { id: line.warehouse_item_id } }
-        );
-
-
-        await db.purchaseOrderItemObj.update(
           {
-            received_to_date: payload.received_at
+            onHand: currentOnHand + Number(line.received_qty),
           },
           {
-            where: { id: line.purchase_order_item_id }
+            where: { id: line.warehouse_item_id },
+          }
+        );
+
+        
+        await db.purchaseOrderItemObj.update(
+          {
+            received_to_date: payload.received_at,
+          },
+          {
+            where: { id: line.purchase_order_item_id },
           }
         );
       }
 
+      
+      const poLines = await db.poLineObj.findAll({
+        where: { poId: payload.po_id },
+      });
+
+      let allReceived = true;
+
+      for (const line of poLines) {
+        const totalReceived =
+          await db.purchaseOrderReceiptLineObj.sum("received_qty", {
+            where: {
+              po_line_id: line.id,
+            },
+          });
+
+        if ((totalReceived || 0) < line.orderedQty) {
+          allReceived = false;
+          break;
+        }
+      }
+
+     
+      const newStatus = allReceived
+        ? PURCHASE_ORDER_STATUS.CLOSED
+        : PURCHASE_ORDER_STATUS.PARTIALLY_RECEIVED;
+
+      await db.purchaseOrderObj.update(
+        { status: newStatus },
+        { where: { id: payload.po_id } }
+      );
 
       return receiptHeader;
-
     } catch (err) {
-
       throw err;
     }
   },
+
+
   async getVendorPOForReceipt(vendor_id) {
     try {
       const purchaseOrders = await db.purchaseOrderObj.findAll({

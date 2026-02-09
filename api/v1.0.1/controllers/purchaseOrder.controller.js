@@ -424,46 +424,86 @@ module.exports = {
     }
   },
   async updatePurchaseOrderStatus(req, res) {
+    try {
+      const { poId } = req.query;
+      const { status } = req.body;
+
+      if (!poId || !status) {
+        return res.status(400).json({
+          status: false,
+          message: "poId and status are required",
+        });
+      }
+
+      if (!Object.values(PURCHASE_ORDER_STATUS).includes(status)) {
+        return res.status(400).json({
+          status: false,
+          message: "Invalid purchase order status",
+        });
+      }
+
+      const updated =
+        await purchaseOrderServices.updatePurchaseOrderStatus(
+          poId,
+          status
+        );
+
+      if (!updated) {
+        return res.status(404).json({
+          status: false,
+          message: "Purchase Order not found",
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "Purchase Order status updated successfully",
+      });
+    } catch (error) {
+      logger.errorLog.log("error", error.message);
+      return res.status(500).json({
+        status: false,
+        message: error.message || "Status update failed",
+      });
+    }
+  },
+  async createReceiptPurchaseOrder(req, res) {
+    try {
+      const result = await purchaseOrderServices.createReceiptPurchaseOrder(req.body);
+      return res.status(201).json({
+        success: true,
+        message: "Receipt created successfully",
+        data: result
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message
+      });
+    }
+  },
+  async getVendorPOForReceipt(req, res) {
   try {
-    const { poId } = req.query;
-    const { status } = req.body;
+    const { vendor_id } = req.query;
 
-    if (!poId || !status) {
+    if (!vendor_id) {
       return res.status(400).json({
-        status: false,
-        message: "poId and status are required",
+        success: false,
+        message: "vendor_id is required",
       });
     }
 
-    if (!Object.values(PURCHASE_ORDER_STATUS).includes(status)) {
-      return res.status(400).json({
-        status: false,
-        message: "Invalid purchase order status",
-      });
-    }
-
-    const updated =
-      await purchaseOrderServices.updatePurchaseOrderStatus(
-        poId,
-        status
-      );
-
-    if (!updated) {
-      return res.status(404).json({
-        status: false,
-        message: "Purchase Order not found",
-      });
-    }
+    const data = await purchaseOrderServices.getVendorPOForReceipt(vendor_id);
 
     return res.status(200).json({
-      status: true,
-      message: "Purchase Order status updated successfully",
+      success: true,
+      data,
     });
   } catch (error) {
-    logger.errorLog.log("error", error.message);
+    console.error(error);
     return res.status(500).json({
-      status: false,
-      message: error.message || "Status update failed",
+      success: false,
+      message: "Something went wrong",
     });
   }
 }

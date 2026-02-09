@@ -411,17 +411,17 @@ module.exports = {
   },
   async getWareHouseItemVendor(req, res) {
     try {
-      const { vendor_id } = req.query;
+      const { vendor_id, warehouse_id } = req.query;
 
-      if (!vendor_id) {
+      if (!vendor_id || !warehouse_id) {
         return res.status(400).json({
           success: false,
-          message: "vendor_id is required",
+          message: "vendor_id and warehouse_id are required",
         });
       }
 
       const data =
-        await warehouseItemsServices.getWareHouseItemVendor(vendor_id);
+        await warehouseItemsServices.getWareHouseItemVendor(vendor_id, warehouse_id);
 
       return res.status(200).json({
         success: true,

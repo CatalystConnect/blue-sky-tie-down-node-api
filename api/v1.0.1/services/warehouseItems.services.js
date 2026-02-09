@@ -368,8 +368,9 @@ module.exports = {
       throw e;
     }
   },
-  async getWareHouseItemVendor  (vendor_id)  {
+  async getWareHouseItemVendor  (vendor_id , warehouse_id)  {
   try {
+   
     const vendorItems = await db.vendorItemObj.findAll({
       where: {
         vendor_id,
@@ -379,17 +380,15 @@ module.exports = {
           model: db.warehouseItemsObj,
           as: "warehouseItems",
           required: true,
-          include: [
-            {
-              model: db.purchaseOrderItemObj,
-              as: "purchaseOrderItemsByWarehouse",
-            
-            },
-          ],
+          where: {
+            warehouse_id: warehouse_id,  
+          },
+         
         },
       ],
       order: [["id", "ASC"]],
     });
+   
 
     return vendorItems;
   } catch (error) {

@@ -1389,6 +1389,25 @@ db.warehouseItemsObj.belongsTo(db.itemObj, {
 });
 
 
+db.purchaseOrderObj.hasMany(db.purchaseOrderReceiptHeaderObj, {
+  foreignKey: "po_id",       
+  as: "receiptHeader",      
+});
+
+db.purchaseOrderReceiptHeaderObj.hasMany(db.purchaseOrderReceiptLineObj, {
+  foreignKey: "receipt_id",
+  as: "receiptLines",
+});
+
+db.purchaseOrderReceiptLineObj.belongsTo(db.purchaseOrderItemObj, {
+  foreignKey: "purchase_order_item_id",
+  as: "purchaseOrderItem",
+});
+
+db.purchaseOrderItemObj.belongsTo(db.warehouseItemsObj, {
+  foreignKey: "warehouse_item_id",
+  as: "warehouseItem",
+});
 
 
 

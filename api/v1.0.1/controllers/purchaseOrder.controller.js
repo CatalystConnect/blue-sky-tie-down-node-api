@@ -488,16 +488,16 @@ module.exports = {
   },
   async getVendorPOForReceipt(req, res) {
   try {
-    const { vendor_id } = req.query;
+    const { po_id } = req.query;
 
-    if (!vendor_id) {
+    if (!po_id) {
       return res.status(400).json({
         success: false,
-        message: "vendor_id is required",
+        message: "po_id is required",
       });
     }
 
-    const data = await purchaseOrderServices.getVendorPOForReceipt(vendor_id);
+    const data = await purchaseOrderServices.getVendorPOForReceipt(po_id);
 
     return res.status(200).json({
       success: true,

@@ -897,7 +897,109 @@ module.exports = {
       logger.errorLog.log("error", e.message);
       throw e;
     }
+  },
+  async createReceiptPurchaseOrder(payload) {
+
+    try {
+
+      const receiptHeader = await db.purchaseOrderReceiptHeaderObj.create(
+        {
+          po_id: payload.po_id,
+          warehouse_id: payload.warehouse_id,
+          receipt_number: payload.receipt_number,
+          vendor_packing_slip: payload.vendor_packing_slip,
+          received_at: payload.received_at
+        }
+      );
+
+
+      for (const line of payload.items) {
+
+        await db.purchaseOrderReceiptLineObj.create(
+          {
+            receipt_id: receiptHeader.id,
+            po_line_id: line.po_line_id,
+            item_id: line.item_id,
+            received_qty: line.received_qty,
+            lot_number: line.lot_number,
+            expiration_date: line.expiration_date,
+            po_id: payload.po_id,
+            purchase_order_item_id: line.purchase_order_item_id,
+            warehouse_item_id: line.warehouse_item_id
+          }
+        );
+
+
+        const warehouseItem = await db.warehouseItemsObj.findOne({
+          where: { id: line.warehouse_item_id }
+        });
+
+        const currentOnHand = parseInt(warehouseItem.onHand || 0);
+
+        await db.warehouseItemsObj.update(
+          { onHand: currentOnHand + Number(line.received_qty) },
+          { where: { id: line.warehouse_item_id } }
+        );
+
+
+        await db.purchaseOrderItemObj.update(
+          {
+            received_to_date: payload.received_at
+          },
+          {
+            where: { id: line.purchase_order_item_id }
+          }
+        );
+      }
+
+
+      return receiptHeader;
+
+    } catch (err) {
+
+      throw err;
+    }
+  },
+  async getVendorPOForReceipt(vendor_id) {
+    try {
+      const purchaseOrders = await db.purchaseOrderObj.findAll({
+        where: { vendor_id },
+        include: [
+          {
+            model: db.purchaseOrderReceiptHeaderObj,
+            as: "receiptHeader",
+            required: false,
+            include: [
+              {
+                model: db.purchaseOrderReceiptLineObj,
+                as: "receiptLines",
+                include: [
+                  {
+                    model: db.purchaseOrderItemObj,
+                    as: "purchaseOrderItem",
+                    include: [
+                      {
+                        model: db.warehouseItemsObj,
+                        as: "warehouseItem"
+                      }
+                    ]
+                  }
+                ],
+              }
+            ],
+
+          },
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      return purchaseOrders;
+    } catch (error) {
+      throw error;
+    }
   }
+
+
 
 
 

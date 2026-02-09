@@ -18,5 +18,8 @@ router.put("/purchaseOrder/updatePurchaseOrder",[authJwt.verifyToken],purchaseOr
 router.delete("/purchaseOrder/deletePurchaseOrder",[authJwt.verifyToken],purchaseOrderController.deletePurchaseOrder);
 
 router.put("/purchaseOrder/updatePurchaseOrderStatus",[authJwt.verifyToken],purchaseOrderController.updatePurchaseOrderStatus);
+router.post("/purchaseOrder/createReceiptPurchaseOrder",[authJwt.verifyToken],purchaseOrderController.createReceiptPurchaseOrder);
+router.get("/purchaseOrder/getVendorPOForReceipt",[authJwt.verifyToken],purchaseOrderController.getVendorPOForReceipt);
+
 
 module.exports = router;

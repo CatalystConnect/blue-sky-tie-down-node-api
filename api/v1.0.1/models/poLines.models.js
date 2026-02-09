@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true
       },
 
-      poId: {   
+      poId: {
         type: DataTypes.INTEGER,
         allowNull: false
       },
@@ -20,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       uom: DataTypes.STRING,
       unitCost: DataTypes.FLOAT,
       orderedExt: DataTypes.FLOAT,
-      deletedAt: DataTypes.DATE
+      deletedAt: DataTypes.DATE,
+      received_qty: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
     },
     {
       tableName: 'po_lines',

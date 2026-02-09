@@ -56,6 +56,34 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      shipToId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      vendorAddress: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      vendorName: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      poNumber: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      shippingMethod: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      orderClass: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
+      cancelDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },  
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

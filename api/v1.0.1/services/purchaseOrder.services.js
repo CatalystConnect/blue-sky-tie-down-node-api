@@ -596,6 +596,15 @@ module.exports = {
             model: db.purchaseOrderTotalsObj,
             as: "totals",
           },
+          {
+            model: db.vendorsObj,
+            as: "vendorDetails",
+          },
+           {
+            model: db.wareHouseObj,
+            as: "warehouseDetails",
+          },
+
         ],
 
       });
@@ -1094,12 +1103,12 @@ module.exports = {
   // },
   async createReceiptPurchaseOrder(payload) {
     try {
-     
+
       const po = await db.purchaseOrderObj.findByPk(payload.po_id);
 
       if (!po) throw new Error("Purchase Order not found");
 
-      
+
       switch (po.status) {
         case PURCHASE_ORDER_STATUS.DRAFT:
         case PURCHASE_ORDER_STATUS.PENDING_APPROVAL:
@@ -1116,7 +1125,7 @@ module.exports = {
           throw new Error("Invalid PO status");
       }
 
-     
+
       const receiptHeader =
         await db.purchaseOrderReceiptHeaderObj.create({
           po_id: payload.po_id,
@@ -1126,9 +1135,9 @@ module.exports = {
           received_at: payload.received_at,
         });
 
-      
+
       for (const line of payload.items) {
-        
+
         await db.purchaseOrderReceiptLineObj.create({
           receipt_id: receiptHeader.id,
           po_line_id: line.po_line_id,
@@ -1140,8 +1149,8 @@ module.exports = {
           purchase_order_item_id: line.purchase_order_item_id,
           warehouse_item_id: line.warehouse_item_id,
         });
-        
-        
+
+
         const warehouseItem = await db.warehouseItemsObj.findByPk(
           line.warehouse_item_id
         );
@@ -1158,7 +1167,7 @@ module.exports = {
           }
         );
 
-        
+
         await db.purchaseOrderItemObj.update(
           {
             received_to_date: payload.received_at,
@@ -1169,7 +1178,7 @@ module.exports = {
         );
       }
 
-      
+
       const poLines = await db.poLineObj.findAll({
         where: { poId: payload.po_id },
       });
@@ -1190,7 +1199,7 @@ module.exports = {
         }
       }
 
-     
+
       const newStatus = allReceived
         ? PURCHASE_ORDER_STATUS.CLOSED
         : PURCHASE_ORDER_STATUS.PARTIALLY_RECEIVED;
@@ -1207,40 +1216,92 @@ module.exports = {
   },
 
 
-  async getVendorPOForReceipt(vendor_id) {
+  // async getVendorPOForReceipt(po_id) {
+  //   try {
+  //     const purchaseOrders = await db.purchaseOrderObj.findAll({
+  //       where: { po_id },
+  //       include: [
+  //         {
+  //           model: db.purchaseOrderReceiptHeaderObj,
+  //           as: "receiptHeader",
+  //           required: false,
+  //           include: [
+  //             {
+  //               model: db.purchaseOrderReceiptLineObj,
+  //               as: "receiptLines",
+  //               include: [
+  //                 {
+  //                   model: db.purchaseOrderItemObj,
+  //                   as: "purchaseOrderItem",
+  //                   include: [
+  //                     {
+  //                       model: db.warehouseItemsObj,
+  //                       as: "warehouseItem"
+  //                     }
+  //                   ]
+  //                 }
+  //               ],
+  //             }
+  //           ],
+
+  //         },
+  //       ],
+  //       order: [["id", "DESC"]],
+  //     });
+
+  //     return purchaseOrders;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  async getVendorPOForReceipt(po_id) {
     try {
-      const purchaseOrders = await db.purchaseOrderObj.findAll({
-        where: { vendor_id },
+      const purchaseOrder = await db.purchaseOrderObj.findOne({
+        where: { id: po_id },   // ✅ correct column
+
         include: [
           {
             model: db.purchaseOrderReceiptHeaderObj,
             as: "receiptHeader",
             required: false,
+
             include: [
               {
                 model: db.purchaseOrderReceiptLineObj,
                 as: "receiptLines",
+                required: false,
+
                 include: [
                   {
                     model: db.purchaseOrderItemObj,
                     as: "purchaseOrderItem",
+                    required: false,
+
                     include: [
                       {
                         model: db.warehouseItemsObj,
-                        as: "warehouseItem"
+                        as: "warehouseItem",
+                        required: false
                       }
                     ]
                   }
-                ],
+                ]
               }
-            ],
-
-          },
+            ]
+          }
         ],
-        order: [["id", "DESC"]],
+
+        order: [
+          [{ model: db.purchaseOrderReceiptHeaderObj, as: "receiptHeader" }, "id", "DESC"]
+        ]
       });
 
-      return purchaseOrders;
+      if (!purchaseOrder) {
+        throw new Error("Purchase Order not found");
+      }
+
+      return purchaseOrder;
+
     } catch (error) {
       throw error;
     }

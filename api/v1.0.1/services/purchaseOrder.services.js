@@ -600,7 +600,7 @@ module.exports = {
             model: db.vendorsObj,
             as: "vendorDetails",
           },
-           {
+          {
             model: db.wareHouseObj,
             as: "warehouseDetails",
           },
@@ -1138,6 +1138,25 @@ module.exports = {
 
       for (const line of payload.items) {
 
+        const poLine = await db.poLineObj.findByPk(line.po_line_id);
+        if (!poLine) throw new Error(`PO Line not found: ${line.po_line_id}`);
+
+        const totalReceivedSoFar = await db.purchaseOrderReceiptLineObj.sum(
+          "received_qty",
+          { where: { po_line_id: line.po_line_id } }
+        );
+        
+
+        const incomingQty = Number(line.received_qty);
+        const maxAllowed = poLine.orderedQty - (totalReceivedSoFar || 0);
+
+        if (incomingQty > maxAllowed) {
+          throw new Error(
+            `Received quantity (${incomingQty}) exceeds remaining ordered quantity (${maxAllowed}) for PO Line ${poLine.lineNumber}`
+          );
+        }
+
+
         await db.purchaseOrderReceiptLineObj.create({
           receipt_id: receiptHeader.id,
           po_line_id: line.po_line_id,
@@ -1257,42 +1276,29 @@ module.exports = {
   async getVendorPOForReceipt(po_id) {
     try {
       const purchaseOrder = await db.purchaseOrderObj.findOne({
-        where: { id: po_id },   // ✅ correct column
-
+        where: { id: po_id },
         include: [
           {
-            model: db.purchaseOrderReceiptHeaderObj,
-            as: "receiptHeader",
+            model: db.poHeaderObj,
+            as: "header",
             required: false,
+          },
+          {
+            model: db.poLineObj,
+            as: "lines",
+            required: false,
+          },
+          {
 
-            include: [
-              {
-                model: db.purchaseOrderReceiptLineObj,
-                as: "receiptLines",
-                required: false,
-
-                include: [
-                  {
-                    model: db.purchaseOrderItemObj,
-                    as: "purchaseOrderItem",
-                    required: false,
-
-                    include: [
-                      {
-                        model: db.warehouseItemsObj,
-                        as: "warehouseItem",
-                        required: false
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            model: db.purchaseOrderItemObj,
+            as: "purchaseOrderItems",
+            required: false,
           }
+
         ],
 
         order: [
-          [{ model: db.purchaseOrderReceiptHeaderObj, as: "receiptHeader" }, "id", "DESC"]
+          ["id", "DESC"]
         ]
       });
 
@@ -1306,6 +1312,61 @@ module.exports = {
       throw error;
     }
   }
+  // async getVendorPOForReceipt(po_id) {
+  //   try {
+  //     const po = await db.purchaseOrderObj.findOne({
+  //       where: { id: po_id },
+
+  //       include: [
+  //         {
+  //           model: db.purchaseOrderItemObj,
+  //           as: "purchaseOrderItem",
+  //         },
+
+  //       ],
+  //     });
+
+  //     if (!po) throw new Error("PO not found");
+
+  //     // Step 1: Calculate total received per item
+  //     const receivedMap = {};
+
+  //     po.receiptHeader?.forEach(header => {
+  //       header.receiptLines?.forEach(line => {
+  //         if (!receivedMap[line.po_item_id]) {
+  //           receivedMap[line.po_item_id] = 0;
+  //         }
+  //         receivedMap[line.po_item_id] += Number(line.received_qty);
+  //       });
+  //     });
+
+  //     // Step 2: Prepare line data (UI table)
+  //     const lines = po.items.map((item, index) => {
+  //       const ordered = Number(item.quantity);
+  //       const received = receivedMap[item.id] || 0;
+
+  //       return {
+  //         line_no: index + 1,
+  //         item_code: item.warehouseItem?.item_code,
+  //         description: item.warehouseItem?.description,
+  //         uom: item.warehouseItem?.uom,
+  //         quantity_ordered: ordered,
+  //         quantity_received: received,
+  //         quantity_backorder: ordered - received,
+  //       };
+  //     });
+
+  //     return {
+  //       po_id: po.id,
+  //       po_number: po.po_number,
+  //       lines,
+  //     };
+
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
 
 
 

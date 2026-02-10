@@ -1145,7 +1145,7 @@ module.exports = {
           "received_qty",
           { where: { po_line_id: line.po_line_id } }
         );
-        
+
 
         const incomingQty = Number(line.received_qty);
         const maxAllowed = poLine.orderedQty - (totalReceivedSoFar || 0);
@@ -1287,20 +1287,32 @@ module.exports = {
             model: db.poLineObj,
             as: "lines",
             required: false,
-              include: [
-                {
-                  model: db.purchaseOrderReceiptLineObj,
-                  as: "receiptLines",
-                  required: false,
-                }
-              ],
+            include: [
+              {
+                model: db.purchaseOrderReceiptLineObj,
+                as: "receiptLines",
+                required: false,
+              },
+              {
+                model: db.warehouseItemsObj,
+                as: "warehouseItemData",
+              }
+            ],
           },
           {
 
             model: db.purchaseOrderItemObj,
             as: "purchaseOrderItems",
             required: false,
-          }
+          },
+          {
+            model: db.vendorsObj,
+            as: "vendorDetails",
+          },
+          {
+            model: db.wareHouseObj,
+            as: "warehouseDetails",
+          },
 
         ],
 
@@ -1318,7 +1330,7 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  }
+  },
   // async getVendorPOForReceipt(po_id) {
   //   try {
   //     const po = await db.purchaseOrderObj.findOne({
@@ -1374,6 +1386,21 @@ module.exports = {
   //   }
   // }
 
+  async getAllInventory() {
+    
+    const inventory = await db.purchaseOrderReceiptHeaderObj.findAll({
+      include: [
+        {
+          model: db.purchaseOrderReceiptLineObj,
+          as: "lineItems",
+        },
+      ],
+    
+      order: [["id", "DESC"]],
+    });
+
+    return inventory;
+  }
 
 
 

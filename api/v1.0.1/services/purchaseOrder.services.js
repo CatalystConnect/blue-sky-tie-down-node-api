@@ -1558,6 +1558,12 @@ module.exports = {
               {
                 model: db.poLineObj,
                 as: "POLine",
+                include: [
+                  {
+                    model: db.purchaseOrderItemObj,
+                    as: "items",
+                  }
+                ]
               }
             ]
           },

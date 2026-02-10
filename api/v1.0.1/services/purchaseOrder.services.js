@@ -604,6 +604,11 @@ module.exports = {
             model: db.wareHouseObj,
             as: "warehouseDetails",
           },
+           {
+            model: db.userObj,
+            as: "enteredUser",
+          },
+          
 
         ],
 

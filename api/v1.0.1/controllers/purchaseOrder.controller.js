@@ -583,7 +583,36 @@ module.exports = {
         error: error.message,
       });
     }
+  },
+  
+
+async getLastPurchaseOrder(req, res) {
+  try {
+
+    const { warehouse_item_id } = req.query;
+
+    const data = await purchaseOrderServices.getLastPurchaseOrder(warehouse_item_id);
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Last Purchase not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
+}
+
 
 
 

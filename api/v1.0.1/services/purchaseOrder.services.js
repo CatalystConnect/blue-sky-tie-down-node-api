@@ -1533,6 +1533,16 @@ module.exports = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async getLastPurchaseOrder(warehouse_item_id) {
+    const result = await db.poLineObj.findOne({
+      where: { item: warehouse_item_id },
+
+      order: [["id", "DESC"]],
+    });
+
+    return result;
   }
 
 

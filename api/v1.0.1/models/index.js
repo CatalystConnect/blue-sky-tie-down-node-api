@@ -1342,11 +1342,16 @@ db.poLineObj.hasMany(db.purchaseOrderItemObj, {
   as: "items",
 });
 
+db.poLineObj.belongsTo(db.warehouseItemsObj, {
+  foreignKey: "item",
+  targetKey: "id",     
+  as: "warehouseItemData",
+});
+
 db.poLineObj.hasMany(db.purchaseOrderReceiptLineObj, {
   foreignKey: "po_line_id",
   as: "receiptLines",
 });
-
 
 
 db.warehouseItemsObj.hasMany(db.purchaseOrderItemObj, {
@@ -1436,7 +1441,10 @@ db.purchaseOrderObj.belongsTo(db.wareHouseObj, {
 
 
 
-
+db.purchaseOrderReceiptHeaderObj.hasMany(db.purchaseOrderReceiptLineObj, {
+  foreignKey: "receipt_id", // column in line table pointing to header
+  as: "lineItems",
+});
 
 
 

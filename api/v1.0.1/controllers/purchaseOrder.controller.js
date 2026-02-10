@@ -487,30 +487,46 @@ module.exports = {
     }
   },
   async getVendorPOForReceipt(req, res) {
-  try {
-    const { po_id } = req.query;
+    try {
+      const { po_id } = req.query;
 
-    if (!po_id) {
-      return res.status(400).json({
+      if (!po_id) {
+        return res.status(400).json({
+          success: false,
+          message: "po_id is required",
+        });
+      }
+
+      const data = await purchaseOrderServices.getVendorPOForReceipt(po_id);
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
         success: false,
-        message: "po_id is required",
+        message: "Something went wrong",
       });
     }
-
-    const data = await purchaseOrderServices.getVendorPOForReceipt(po_id);
-
-    return res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-    });
+  },
+  async getAllInventory(req, res) {
+    try {
+      const inventory = await  purchaseOrderServices.getAllInventory();
+      res.status(200).json({
+        success: true,
+        data: inventory,
+      });
+    } catch (error) {
+      console.error("Error fetching inventory:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch inventory",
+        error: error.message,
+      });
+    }
   }
-}
 
 
 

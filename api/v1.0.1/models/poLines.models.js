@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       lineNumber: DataTypes.STRING,
-      item: DataTypes.STRING,
+      item: DataTypes.INTEGER,
       description: DataTypes.TEXT,
       orderedQty: DataTypes.INTEGER,
       uom: DataTypes.STRING,

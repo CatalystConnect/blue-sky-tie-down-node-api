@@ -1571,6 +1571,14 @@ module.exports = {
             model: db.purchaseOrderObj,
             as: "purchaseOrdersData",
             required: false,
+            include: [
+              {
+                model: db.wareHouseObj,
+                as: "warehouseDetails",
+                required: false,
+
+              }
+            ]
           },
         ],
         order: [["id", "DESC"]],

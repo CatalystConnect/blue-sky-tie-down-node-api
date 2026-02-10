@@ -1446,6 +1446,23 @@ db.purchaseOrderReceiptHeaderObj.hasMany(db.purchaseOrderReceiptLineObj, {
   as: "lineItems",
 });
 
+db.purchaseOrderReceiptHeaderObj.belongsTo(db.purchaseOrderObj, {
+  foreignKey: "po_id",  
+  targetKey: "id",
+  as: "purchaseOrdersData",
+});
+
+db.purchaseOrderObj.belongsTo(db.userObj, {
+  foreignKey: "enteredBy",  
+  targetKey: "id",
+  as: "enteredUser",
+});
+
+db.purchaseOrderObj.belongsTo(db.vendorsObj, {
+  foreignKey: "vendor_id",   
+  targetKey: "id",
+  as: "vendor",
+});
 
 
 module.exports = db;

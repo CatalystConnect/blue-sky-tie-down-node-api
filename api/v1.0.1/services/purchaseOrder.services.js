@@ -1387,19 +1387,83 @@ module.exports = {
   // }
 
   async getAllInventory() {
-    
+
     const inventory = await db.purchaseOrderReceiptHeaderObj.findAll({
       include: [
         {
           model: db.purchaseOrderReceiptLineObj,
           as: "lineItems",
         },
+        {
+          model: db.purchaseOrderObj,
+          as: "purchaseOrdersData",
+          include: [
+          {
+            model: db.userObj,
+            as: "enteredUser",
+            attributes: ["id", "name", "email"], 
+          },
+          {
+            model: db.vendorsObj,
+            as: "vendorDetails",
+            attributes: ["id", "name", "email"], 
+          },
+          {
+            model: db.wareHouseObj,
+            as: "warehouseDetails",
+            attributes: ["id", "name", "location"],
+          }
+
+        ]
+
+        }
+
       ],
-    
+
       order: [["id", "DESC"]],
     });
 
     return inventory;
+  },
+
+  async getInventoryById(id) {
+    const inventory = await db.purchaseOrderReceiptHeaderObj.findOne({
+      where: { id },
+      include: [
+        {
+          model: db.purchaseOrderReceiptLineObj,
+          as: "lineItems",
+        },
+      ],
+
+      order: [["id", "DESC"]],
+    });
+
+    return inventory;
+  },
+
+  async deleteInventoryById(id) {
+
+    try {
+
+      const receipt = await db.purchaseOrderReceiptHeaderObj.findOne({
+        where: { id }
+      });
+      await db.purchaseOrderReceiptLineObj.destroy({
+        where: { receipt_id: id }
+
+      });
+
+      await db.purchaseOrderReceiptHeaderObj.destroy({
+        where: { id }
+
+      });
+
+      return true;
+
+    } catch (error) {
+      throw error;
+    }
   }
 
 

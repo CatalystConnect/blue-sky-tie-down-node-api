@@ -513,7 +513,7 @@ module.exports = {
   },
   async getAllInventory(req, res) {
     try {
-      const inventory = await  purchaseOrderServices.getAllInventory();
+      const inventory = await purchaseOrderServices.getAllInventory();
       res.status(200).json({
         success: true,
         data: inventory,
@@ -526,7 +526,60 @@ module.exports = {
         error: error.message,
       });
     }
+  },
+  async getInventoryById(req, res) {
+    try {
+      const { id } = req.query;
+
+      const data = await purchaseOrderServices.getInventoryById(id);
+
+      if (!data || data.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Inventory not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: data,
+      });
+    } catch (error) {
+      console.error("Error fetching inventory by id:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch inventory",
+        error: error.message,
+      });
+    }
+  },
+  async deleteInventoryById(req, res) {
+    try {
+      const { id } = req.query;
+
+      const result = await purchaseOrderServices.deleteInventoryById(id);
+
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: "Inventory not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Inventory deleted successfully",
+      });
+    } catch (error) {
+      console.error("Delete Inventory Error:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete inventory",
+        error: error.message,
+      });
+    }
   }
+
 
 
 

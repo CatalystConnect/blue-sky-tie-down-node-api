@@ -53,7 +53,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       enteredBy: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       shipToId: {

@@ -1386,44 +1386,113 @@ module.exports = {
   //   }
   // }
 
-  async getAllInventory() {
+  // async getAllInventory() {
 
-    const inventory = await db.purchaseOrderReceiptHeaderObj.findAll({
-      include: [
-        {
-          model: db.purchaseOrderReceiptLineObj,
-          as: "lineItems",
-        },
-        {
-          model: db.purchaseOrderObj,
-          as: "purchaseOrdersData",
-          include: [
+  //   const inventory = await db.purchaseOrderReceiptHeaderObj.findAll({
+  //     include: [
+  //       {
+  //         model: db.purchaseOrderReceiptLineObj,
+  //         as: "lineItems",
+  //       },
+  //       {
+  //         model: db.purchaseOrderObj,
+  //         as: "purchaseOrdersData",
+  //         include: [
+  //         {
+  //           model: db.userObj,
+  //           as: "enteredUser",
+  //           attributes: ["id", "name", "email"], 
+  //         },
+  //         {
+  //           model: db.vendorsObj,
+  //           as: "vendorDetails",
+  //           attributes: ["id", "name", "email"], 
+  //         },
+  //         {
+  //           model: db.wareHouseObj,
+  //           as: "warehouseDetails",
+  //           attributes: ["id", "name", "location"],
+  //         }
+
+  //       ]
+
+  //       }
+
+  //     ],
+
+  //     order: [["id", "DESC"]],
+  //   });
+
+  //   return inventory;
+  // },
+
+  async getAllInventory({ page = 1, per_page = 10 }) {
+    try {
+      page = parseInt(page) || 1;
+      per_page = parseInt(per_page) || 10;
+
+      const limit = per_page;
+      const offset = (page - 1) * limit;
+
+      // Total count (lazy load ke liye zaroori)
+      const total = await db.purchaseOrderReceiptHeaderObj.count();
+
+      // Data fetch (existing logic same)
+      const rows = await db.purchaseOrderReceiptHeaderObj.findAll({
+        include: [
           {
-            model: db.userObj,
-            as: "enteredUser",
-            attributes: ["id", "name", "email"], 
+            model: db.purchaseOrderReceiptLineObj,
+            as: "lineItems",
           },
           {
-            model: db.vendorsObj,
-            as: "vendorDetails",
-            attributes: ["id", "name", "email"], 
-          },
-          {
-            model: db.wareHouseObj,
-            as: "warehouseDetails",
-            attributes: ["id", "name", "location"],
+            model: db.purchaseOrderObj,
+            as: "purchaseOrdersData",
+            include: [
+              {
+                model: db.userObj,
+                as: "enteredUser",
+                attributes: ["id", "name", "email"],
+              },
+              {
+                model: db.vendorsObj,
+                as: "vendorDetails",
+                attributes: ["id", "name", "email"],
+              },
+              {
+                model: db.wareHouseObj,
+                as: "warehouseDetails",
+                attributes: ["id", "name", "location"],
+              }
+            ]
           }
+        ],
+        limit,
+        offset,
+        order: [["id", "DESC"]],
+      });
 
-        ]
+      // ---------- Lazy Load Meta ----------
+      const current_count = rows.length;
+      const loaded_till_now = offset + current_count;
+      const remaining = Math.max(total - loaded_till_now, 0);
+      const has_more = loaded_till_now < total;
 
-        }
+      return {
+        data: rows,
+        meta: {
+          page,
+          limit,
+          current_count,
+          loaded_till_now,
+          remaining,
+          total,
+          has_more,
+        },
+      };
 
-      ],
-
-      order: [["id", "DESC"]],
-    });
-
-    return inventory;
+    } catch (error) {
+      throw error;
+    }
   },
 
   async getInventoryById(id) {

@@ -513,10 +513,15 @@ module.exports = {
   },
   async getAllInventory(req, res) {
     try {
-      const inventory = await purchaseOrderServices.getAllInventory();
+      const { page = 1, per_page = 10 } = req.query;
+      const inventory = await purchaseOrderServices.getAllInventory({
+        page,
+        per_page,
+      });
       res.status(200).json({
         success: true,
-        data: inventory,
+        data: inventory.data,
+        meta: inventory.meta,
       });
     } catch (error) {
       console.error("Error fetching inventory:", error.message);

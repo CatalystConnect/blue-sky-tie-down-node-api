@@ -27,5 +27,7 @@ router.get("/purchaseOrder/getInventoryById",[authJwt.verifyToken],purchaseOrder
 router.delete("/purchaseOrder/deleteInventoryById",[authJwt.verifyToken],purchaseOrderController.deleteInventoryById);
 
 router.get("/lastPurchase/getLastPurchaseOrder",[authJwt.verifyToken],purchaseOrderController.getLastPurchaseOrder);
+router.get("/purchaseOrder/getPurchaseOrderReceipt",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrderReceipt);
+
 
 module.exports = router;

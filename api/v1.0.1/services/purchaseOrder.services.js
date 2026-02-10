@@ -1543,8 +1543,39 @@ module.exports = {
     });
 
     return result;
-  }
+  },
 
+  async getPurchaseOrderReceipt(po_id) {
+    try {
+      const receipts = await db.purchaseOrderReceiptHeaderObj.findAll({
+        where: { po_id },
+        include: [
+          {
+            model: db.purchaseOrderReceiptLineObj,
+            as: "lineItems",
+            required: false,
+            include: [
+              {
+                model: db.poLineObj,
+                as: "POLine",
+              }
+            ]
+          },
+          {
+            model: db.purchaseOrderObj,
+            as: "purchaseOrdersData",
+            required: false,
+          },
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      return receipts;
+
+    } catch (error) {
+      throw error;
+    }
+  }
 
 
 

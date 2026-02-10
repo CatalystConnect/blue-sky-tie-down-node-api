@@ -584,34 +584,60 @@ module.exports = {
       });
     }
   },
-  
 
-async getLastPurchaseOrder(req, res) {
-  try {
 
-    const { warehouse_item_id } = req.query;
+  async getLastPurchaseOrder(req, res) {
+    try {
 
-    const data = await purchaseOrderServices.getLastPurchaseOrder(warehouse_item_id);
+      const { warehouse_item_id } = req.query;
 
-    if (!data) {
-      return res.status(404).json({
+      const data = await purchaseOrderServices.getLastPurchaseOrder(warehouse_item_id);
+
+      if (!data) {
+        return res.status(404).json({
+          success: false,
+          message: "Last Purchase not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).json({
         success: false,
-        message: "Last Purchase not found",
+        message: "Internal server error",
       });
     }
+  },
+  async getPurchaseOrderReceipt(req, res) {
+    try {
+      const { po_id } = req.query;
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+      if (!po_id) {
+        return res.status(400).json({
+          success: false,
+          message: "po_id is required",
+        });
+      }
+
+      const result = await purchaseOrderServices.getPurchaseOrderReceipt(po_id);
+
+      return res.status(200).json({
+        success: true,
+        message: "Purchase Order Receipts fetched successfully",
+        data: result,
+      });
+
+    } catch (err) {
+      return res.status(404).json({
+        success: false,
+        message: err.message,
+      });
+    }
   }
-}
 
 
 

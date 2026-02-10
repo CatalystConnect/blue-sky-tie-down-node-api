@@ -1464,5 +1464,16 @@ db.purchaseOrderObj.belongsTo(db.vendorsObj, {
   as: "vendor",
 });
 
+db.purchaseOrderReceiptLineObj.belongsTo(db.poLineObj, {
+  foreignKey: "po_line_id",   
+  targetKey: "id",
+  as: "POLine",
+});
+
+
+
+
+
+
 
 module.exports = db;

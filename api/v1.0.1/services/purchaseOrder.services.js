@@ -543,6 +543,18 @@ module.exports = {
             ],
           },
           {
+            model: db.purchaseOrderReceiptHeaderObj,
+            as: "receiptHeader",
+            include: [
+             { model: db.purchaseOrderReceiptLineObj,
+              as: "lineItems",
+              required: false,
+             }
+            ]
+
+
+          },
+          {
             model: db.purchaseOrderTotalsObj,
             as: "totals",
           },

@@ -66,8 +66,8 @@ module.exports = {
         });
       }
 
-      const userId = req.userId;
-      purchaseOrder.enteredBy = userId;
+      // const userId = req.userId;
+      // purchaseOrder.enteredBy = userId;
 
 
       await purchaseOrderServices.addPurchaseOrder({

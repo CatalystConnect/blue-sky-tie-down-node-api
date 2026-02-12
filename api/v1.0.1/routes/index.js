@@ -67,5 +67,6 @@ router.use(require("./vendorItem.routes"));
 router.use(require("./purchaseOrder.routes"));
 router.use(require("./productTemplate.routes"));
 router.use(require("./itemLinks.routes"));
-
+router.use(require("./invoice.routes"));
+router.use(require("./voucher.routes"));
 module.exports = router;

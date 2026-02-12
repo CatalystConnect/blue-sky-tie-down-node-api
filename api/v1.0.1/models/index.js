@@ -276,6 +276,10 @@ db.purchaseOrderObj = require("./purchaseOrders.models")(db.dbObj, Sequelize);
 db.productTemplateObj = require("./productTemplate.models")(db.dbObj, Sequelize);
 db.itemLinksObj = require("./itemLinks.models")(db.dbObj, Sequelize);
 db.purchaseOrderItemObj = require("./purchaseOrderItem.models")(db.dbObj, Sequelize);
+db.invoiceHeaderObj = require("./invoiceHeaders.model")(db.dbObj, Sequelize);
+db.invoiceLineObj = require("./invoiceLines.model")(db.dbObj, Sequelize);
+db.voucherHeaderObj = require("./voucherHeaders.model")(db.dbObj, Sequelize);
+db.voucherLineObj = require("./voucherLines.model")(db.dbObj, Sequelize);
 
 /*Associations*/
 db.projectObj.belongsTo(db.taxesObj, {
@@ -1468,6 +1472,12 @@ db.purchaseOrderReceiptLineObj.belongsTo(db.poLineObj, {
   foreignKey: "po_line_id",   
   targetKey: "id",
   as: "POLine",
+});
+
+
+db.voucherHeaderObj.hasMany(db.voucherLineObj, {
+  foreignKey: "voucher_id",   
+  as: "voucher_lines",
 });
 
 

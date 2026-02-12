@@ -168,6 +168,18 @@ const PURCHASE_ORDER_STATUS = {
   CLOSED: "CLOSED",
 };
 
+const MATCH_STATUS = {
+  MATCHED: "MATCHED",
+  EXCEPTION: "EXCEPTION",
+  OVERRIDE: "OVERRIDE"
+};
+
+const PAYMENT_STATUS = {
+  UNPAID: "UNPAID",
+  PARTIAL: "PARTIAL",
+  PAID: "PAID"
+};
+
 
 const ITEM_LINK = {
   CROSS_SELL: 'cross_sell',
@@ -175,7 +187,7 @@ const ITEM_LINK = {
   ACCESSORY: 'accessory',
 };
 
- 
+
 
 module.exports = {
   ACCESS_MODULES,
@@ -187,4 +199,6 @@ module.exports = {
   VENDOR_STATUS,
   PURCHASE_ORDER_STATUS,
   ITEM_LINK,
+  MATCH_STATUS,
+  PAYMENT_STATUS
 };

@@ -188,6 +188,12 @@ const ITEM_LINK = {
 };
 
 
+const VOUCHER_STATUS = {
+  OPEN: 'Open',
+  ONHOLD: 'onHold',
+  READY: 'Ready',
+};
+
 
 module.exports = {
   ACCESS_MODULES,
@@ -200,5 +206,6 @@ module.exports = {
   PURCHASE_ORDER_STATUS,
   ITEM_LINK,
   MATCH_STATUS,
-  PAYMENT_STATUS
+  PAYMENT_STATUS,
+  VOUCHER_STATUS
 };

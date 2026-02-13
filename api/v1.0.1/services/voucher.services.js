@@ -37,6 +37,9 @@ module.exports = {
           foreign_currency: header.foreign_currency || false,
           account_number: header.account_number,
           amount_in_words: header.amount_in_words,
+          voucher_description:header.voucher_description,
+          on_check:header.on_check,
+          approved_by:header.approved_by,
           status: "Draft",
         }
       );

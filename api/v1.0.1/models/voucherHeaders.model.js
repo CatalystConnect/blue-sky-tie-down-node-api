@@ -38,6 +38,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      voucher_description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      on_check: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      approved_by: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       discount_amount: {
         type: Sequelize.DECIMAL(15, 2),
         defaultValue: 0,

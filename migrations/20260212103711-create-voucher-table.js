@@ -36,7 +36,19 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-       discount_amount: {
+      voucher_description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      on_check: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      approved_by: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      discount_amount: {
         type: Sequelize.DECIMAL(15, 2),
         defaultValue: 0,
       },
@@ -73,11 +85,11 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-       po_number: {
+      po_number: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-       po_add_amount: {
+      po_add_amount: {
         type: Sequelize.DECIMAL(15, 2),
         defaultValue: 0,
       },

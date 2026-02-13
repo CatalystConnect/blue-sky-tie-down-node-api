@@ -9,7 +9,7 @@ module.exports = {
   async addVoucher(postData) {
 
     try {
-      const { header, lines } = postData;
+      const { header } = postData;
 
       const existingVoucher = await db.voucherHeaderObj.findOne({
         where: { voucher_number: header.voucher_number }
@@ -44,56 +44,56 @@ module.exports = {
         }
       );
 
-      let totalAmount = 0;
+      // let totalAmount = 0;
 
 
-      const lineData = [];
+      // const lineData = [];
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      // for (let i = 0; i < lines.length; i++) {
+      //   const line = lines[i];
 
-        const extension =
-          parseFloat(line.qty_invoiced || 0) *
-          parseFloat(line.invoiced_cost || 0);
+      //   const extension =
+      //     parseFloat(line.qty_invoiced || 0) *
+      //     parseFloat(line.invoiced_cost || 0);
 
-        totalAmount += extension;
+      //   totalAmount += extension;
 
-        lineData.push({
-          voucher_id: voucherHeader.id,
-          line_number: i + 1,
-          po_number: line.po_number,
-          po_line_id: line.po_line_id,
-          item_code: line.item_code,
-          revision_seq: line.revision_seq,
-          qty_received: line.qty_received || 0,
-          qty_invoiced: line.qty_invoiced || 0,
-          unit_of_measure: line.unit_of_measure,
-          received_cost: line.received_cost || 0,
-          invoiced_cost: line.invoiced_cost || 0,
-          extension_amount: extension,
-          commodity_code: line.commodity_code,
-        });
-      }
-
-
-      await db.voucherLineObj.bulkCreate(lineData);
+      //   lineData.push({
+      //     voucher_id: voucherHeader.id,
+      //     line_number: i + 1,
+      //     po_number: line.po_number,
+      //     po_line_id: line.po_line_id,
+      //     item_code: line.item_code,
+      //     revision_seq: line.revision_seq,
+      //     qty_received: line.qty_received || 0,
+      //     qty_invoiced: line.qty_invoiced || 0,
+      //     unit_of_measure: line.unit_of_measure,
+      //     received_cost: line.received_cost || 0,
+      //     invoiced_cost: line.invoiced_cost || 0,
+      //     extension_amount: extension,
+      //     commodity_code: line.commodity_code,
+      //   });
+      // }
 
 
-      await voucherHeader.update(
-        {
-          total_amount: totalAmount,
-          invoice_gross: totalAmount,
-        }
-      );
+      // await db.voucherLineObj.bulkCreate(lineData);
+
+
+      // await voucherHeader.update(
+      //   {
+      //     total_amount: totalAmount,
+      //     invoice_gross: totalAmount,
+      //   }
+      // );
 
 
 
       return {
         data: voucherHeader,
-        meta: {
-          total_lines: lines.length,
-          total_amount: totalAmount,
-        },
+        // meta: {
+        //   // total_lines: lines.length,
+        //   total_amount: totalAmount,
+        // },
       };
     } catch (e) {
 
@@ -142,13 +142,13 @@ module.exports = {
       // Total count
       const { count, rows } = await db.voucherHeaderObj.findAndCountAll({
         where: whereCondition,
-        include: [
-          {
-            model: db.voucherLineObj,
-            as: "voucher_lines",
-            required: false,
-          },
-        ],
+        // include: [
+        //   {
+        //     model: db.voucherLineObj,
+        //     as: "voucher_lines",
+        //     required: false,
+        //   },
+        // ],
         order: [["id", "DESC"]],
         limit,
         offset,
@@ -183,13 +183,13 @@ module.exports = {
     try {
       const voucher = await db.voucherHeaderObj.findOne({
         where: { id },
-        include: [
-          {
-            model: db.voucherLineObj,
-            as: "voucher_lines",
-            required: false,
-          },
-        ],
+        // include: [
+        //   {
+        //     model: db.voucherLineObj,
+        //     as: "voucher_lines",
+        //     required: false,
+        //   },
+        // ],
       });
 
       return voucher;
@@ -202,7 +202,7 @@ module.exports = {
 
 
     try {
-      const { header, lines } = postData;
+      const { header} = postData;
 
 
       const voucherHeader = await db.voucherHeaderObj.findOne({
@@ -238,58 +238,58 @@ module.exports = {
       );
 
 
-      await db.voucherLineObj.destroy({
-        where: { voucher_id: id },
-        transaction
-      });
+      // await db.voucherLineObj.destroy({
+      //   where: { voucher_id: id },
+      //   transaction
+      // });
 
 
-      let totalAmount = 0;
-      const lineData = [];
+      // let totalAmount = 0;
+      // const lineData = [];
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      // for (let i = 0; i < lines.length; i++) {
+      //   const line = lines[i];
 
-        const extension =
-          parseFloat(line.qty_invoiced || 0) *
-          parseFloat(line.invoiced_cost || 0);
+      //   const extension =
+      //     parseFloat(line.qty_invoiced || 0) *
+      //     parseFloat(line.invoiced_cost || 0);
 
-        totalAmount += extension;
+      //   totalAmount += extension;
 
-        lineData.push({
-          voucher_id: id,
-          line_number: i + 1,
-          po_number: line.po_number,
-          po_line_id: line.po_line_id,
-          item_code: line.item_code,
-          revision_seq: line.revision_seq,
-          qty_received: line.qty_received || 0,
-          qty_invoiced: line.qty_invoiced || 0,
-          unit_of_measure: line.unit_of_measure,
-          received_cost: line.received_cost || 0,
-          invoiced_cost: line.invoiced_cost || 0,
-          extension_amount: extension,
-          commodity_code: line.commodity_code,
-        });
-      }
+      //   lineData.push({
+      //     voucher_id: id,
+      //     line_number: i + 1,
+      //     po_number: line.po_number,
+      //     po_line_id: line.po_line_id,
+      //     item_code: line.item_code,
+      //     revision_seq: line.revision_seq,
+      //     qty_received: line.qty_received || 0,
+      //     qty_invoiced: line.qty_invoiced || 0,
+      //     unit_of_measure: line.unit_of_measure,
+      //     received_cost: line.received_cost || 0,
+      //     invoiced_cost: line.invoiced_cost || 0,
+      //     extension_amount: extension,
+      //     commodity_code: line.commodity_code,
+      //   });
+      // }
 
-      await db.voucherLineObj.bulkCreate(lineData);
+      // await db.voucherLineObj.bulkCreate(lineData);
 
-      await voucherHeader.update(
-        {
-          total_amount: totalAmount,
-          invoice_gross: totalAmount,
-        }
-      );
+      // await voucherHeader.update(
+      //   {
+      //     total_amount: totalAmount,
+      //     invoice_gross: totalAmount,
+      //   }
+      // );
 
 
 
       return {
         data: voucherHeader,
-        meta: {
-          total_lines: lines.length,
-          total_amount: totalAmount
-        }
+        // meta: {
+        //   total_lines: lines.length,
+        //   total_amount: totalAmount
+        // }
       };
 
     } catch (e) {

@@ -11,6 +11,14 @@ module.exports = {
     try {
       const { header, lines } = postData;
 
+      const existingVoucher = await db.voucherHeaderObj.findOne({
+        where: { voucher_number: header.voucher_number }
+      });
+
+      if (existingVoucher) {
+        throw new Error("Voucher number already exists");
+      }
+
 
       const voucherHeader = await db.voucherHeaderObj.create(
         {
@@ -28,7 +36,7 @@ module.exports = {
           exchange_rate: header.exchange_rate || 1,
           foreign_currency: header.foreign_currency || false,
           account_number: header.account_number,
-          amount_in_words:header.amount_in_words,
+          amount_in_words: header.amount_in_words,
           status: "Draft",
         }
       );
@@ -291,7 +299,7 @@ module.exports = {
 
 
     try {
- 
+
       const voucherHeader = await db.voucherHeaderObj.findOne({
         where: { id }
       });
@@ -305,12 +313,12 @@ module.exports = {
         throw new Error("Only Draft vouchers can be deleted");
       }
 
-     
+
       await db.voucherLineObj.destroy({
         where: { voucher_id: id }
       });
 
-     
+
       await voucherHeader.destroy();
 
 

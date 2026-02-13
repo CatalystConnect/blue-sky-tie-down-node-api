@@ -321,8 +321,8 @@ module.exports = {
       }
 
 
-      if (voucherHeader.status !== "Draft") {
-        throw new Error("Only Draft vouchers can be deleted");
+      if (voucherHeader.status !== "Open") {
+        throw new Error("Only Open vouchers can be deleted");
       }
 
 

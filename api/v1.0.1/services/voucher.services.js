@@ -37,9 +37,10 @@ module.exports = {
           foreign_currency: header.foreign_currency || false,
           account_number: header.account_number,
           amount_in_words: header.amount_in_words,
-          voucher_description:header.voucher_description,
-          on_check:header.on_check,
-          approved_by:header.approved_by,
+          voucher_description: header.voucher_description,
+          on_check: header.on_check,
+          approved_by: header.approved_by,
+          amount:header.amount,
           status: "Draft",
         }
       );
@@ -202,7 +203,7 @@ module.exports = {
 
 
     try {
-      const { header} = postData;
+      const { header } = postData;
 
 
       const voucherHeader = await db.voucherHeaderObj.findOne({
@@ -222,18 +223,26 @@ module.exports = {
 
       await voucherHeader.update(
         {
+          voucher_number: header.voucher_number,
           voucher_date: header.voucher_date,
           vendor_id: header.vendor_id,
           vendor_name: header.vendor_name,
+          po_number: header.po_number,
           invoice_number: header.invoice_number,
           discount_amount: header.discount_amount || 0,
           memo: header.memo,
           term_code: header.term_code,
           due_date: header.due_date,
-          currency: header.currency,
-          exchange_rate: header.exchange_rate,
-          foreign_currency: header.foreign_currency,
+          currency: header.currency || "USD",
+          exchange_rate: header.exchange_rate || 1,
+          foreign_currency: header.foreign_currency || false,
           account_number: header.account_number,
+          amount_in_words: header.amount_in_words,
+          voucher_description: header.voucher_description,
+          on_check: header.on_check,
+          approved_by: header.approved_by,
+          amount:header.amount,
+
         }
       );
 

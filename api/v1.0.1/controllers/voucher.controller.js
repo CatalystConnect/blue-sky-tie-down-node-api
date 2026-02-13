@@ -21,7 +21,7 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
 
-      const { header, lines } = req.body;
+      const { header } = req.body;
 
       if (!header) {
         return res.status(400).send({
@@ -30,15 +30,15 @@ module.exports = {
         });
       }
 
-      if (!lines || !Array.isArray(lines) || lines.length === 0) {
-        return res.status(400).send({
-          status: false,
-          message: "Lines are required"
-        });
-      }
+      // if (!lines || !Array.isArray(lines) || lines.length === 0) {
+      //   return res.status(400).send({
+      //     status: false,
+      //     message: "Lines are required"
+      //   });
+      // }
       const postData = {
-        header,
-        lines
+        header
+      
       };
       const voucher = await voucherServices.addVoucher(postData);
 
@@ -48,7 +48,7 @@ module.exports = {
           status: true,
           message: "Voucher created successfully",
           data: voucher.data,
-          meta: voucher.meta
+          // meta: voucher.meta
         });
     } catch (error) {
       return res.status(400).json({
@@ -131,7 +131,7 @@ module.exports = {
   async updateVoucher(req, res) {
     try {
       const { id } = req.query;
-      const { header, lines } = req.body;
+      const { header} = req.body;
 
       if (!id) {
         return res.status(400).json({
@@ -149,24 +149,24 @@ module.exports = {
         });
       }
 
-      if (!lines || !Array.isArray(lines) || lines.length === 0) {
-        return res.status(400).json({
-          status: false,
-          message: "Lines are required",
-          data: {}
-        });
-      }
+      // if (!lines || !Array.isArray(lines) || lines.length === 0) {
+      //   return res.status(400).json({
+      //     status: false,
+      //     message: "Lines are required",
+      //     data: {}
+      //   });
+      // }
 
       const result = await voucherServices.updateVoucher(id, {
-        header,
-        lines
+        header
+        
       });
 
       return res.status(200).json({
         status: true,
         message: "Voucher updated successfully",
         data: result.data,
-        meta: result.meta
+        // meta: result.meta
       });
 
     } catch (error) {

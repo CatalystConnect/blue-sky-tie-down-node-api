@@ -28,6 +28,7 @@ module.exports = {
           exchange_rate: header.exchange_rate || 1,
           foreign_currency: header.foreign_currency || false,
           account_number: header.account_number,
+          amount_in_words:header.amount_in_words,
           status: "Draft",
         }
       );

@@ -2,7 +2,7 @@ var commonHelper = require("../helper/common.helper");
 const logger = require("../../../config/winston");
 const db = require("../models");
 const { Op } = require("sequelize");
-const { MATCH_STATUS, PAYMENT_STATUS } = require("../helper/constant");
+const { VOUCHER_STATUS } = require("../helper/constant");
 
 module.exports = {
   /*addVoucher*/
@@ -41,7 +41,7 @@ module.exports = {
           on_check: header.on_check,
           approved_by: header.approved_by,
           amount:header.amount,
-          status: "Draft",
+          status:VOUCHER_STATUS.OPEN
         }
       );
 
@@ -216,8 +216,8 @@ module.exports = {
       }
 
 
-      if (voucherHeader.status !== "Draft") {
-        throw new Error("Only Draft vouchers can be updated");
+      if (voucherHeader.status !== "Open") {
+        throw new Error("Only Open vouchers can be updated");
       }
 
 

@@ -438,6 +438,46 @@ module.exports = {
         has_more
       }
     };
+  },
+  async getVendorItemWarehouseSearch(vendor_id, warehouse_id, search) {
+    try {
+
+      const assignedItems = await db.vendorItemObj.findAll({
+        where: {
+          vendor_id: vendor_id,
+        },
+        raw: true,
+      });
+
+      const assignedItemIds = assignedItems.map(item => item.warehouse_item_id);
+
+      let whereCondition = {
+        warehouse_id: warehouse_id,
+      };
+
+      if (search) {
+        whereCondition.sku = {
+          [Op.like]: `%${search}%`,
+        };
+      }
+
+      if (assignedItemIds.length > 0) {
+        whereCondition.id = {
+          [Op.notIn]: assignedItemIds,
+        };
+      }
+
+      const data = await db.warehouseItemsObj.findAll({
+        where: whereCondition,
+        order: [["sku", "ASC"]],
+
+      });
+
+      return data;
+
+    } catch (error) {
+      throw error;
+    }
   }
 
 

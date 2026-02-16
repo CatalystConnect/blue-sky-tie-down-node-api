@@ -362,7 +362,39 @@ module.exports = {
         message: error.message
       });
     }
+  },
+  async getVendorItemWarehouseSearch(req, res) {
+    try {
+      const { vendor_id, warehouse_id, search } = req.query;
+
+      
+      if (!vendor_id || !warehouse_id) {
+        return res.status(400).json({
+          success: false,
+          message: "vendor_id and warehouse_id are required",
+        });
+      }
+
+      const data =
+        await vendorItemServices.getVendorItemWarehouseSearch(
+          vendor_id,
+          warehouse_id,
+          search
+        );
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      console.error("getVendorItemWarehouseSearch Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
   }
+
 
 
   // validate(method) {

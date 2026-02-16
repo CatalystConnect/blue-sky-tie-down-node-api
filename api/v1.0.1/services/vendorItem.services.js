@@ -482,8 +482,7 @@ module.exports = {
   async assignWarehouseItemsToVendor(vendor_id, warehouseItem) {
     try {
      
-      console.log('ddddddddddddddddddddd',vendor_id);
-      console.log('ddwarehouseItemwarehouseItemddddddddddddddddddd',warehouseItem)
+      
       const warehouseItemIds = warehouseItem.map(
         (item) => item.warehouse_item_id
       );

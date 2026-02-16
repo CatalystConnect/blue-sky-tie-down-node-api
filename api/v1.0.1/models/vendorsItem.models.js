@@ -14,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       item_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       vendor_part_number: {
         type: Sequelize.STRING,

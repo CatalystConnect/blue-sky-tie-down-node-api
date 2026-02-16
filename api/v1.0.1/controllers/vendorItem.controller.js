@@ -367,7 +367,7 @@ module.exports = {
     try {
       const { vendor_id, warehouse_id, search } = req.query;
 
-      
+
       if (!vendor_id || !warehouse_id) {
         return res.status(400).json({
           success: false,
@@ -393,7 +393,39 @@ module.exports = {
         message: "Something went wrong",
       });
     }
+  },
+  async assignWarehouseItemsToVendor(req, res) {
+    try {
+      const { vendor_id, warehouseItem } = req.body;
+
+      
+      if (!vendor_id || !warehouseItem || warehouseItem.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "vendor_id and warehouseItem are required",
+        });
+      }
+
+      const result =
+        await vendorItemServices.assignWarehouseItemsToVendor(
+          vendor_id,
+          warehouseItem
+        );
+
+      return res.status(200).json({
+        success: true,
+        message: "Warehouse items assigned successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("assignWarehouseItemsToVendor:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
   }
+
 
 
 

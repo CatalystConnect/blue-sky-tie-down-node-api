@@ -16,5 +16,6 @@ router.post("/vendors/assignVendorsItem",[authJwt.verifyToken],  vendorItemContr
 router.get("/vendor-items/available",[authJwt.verifyToken],vendorItemController.getAvailableVendorItems);
 
 router.get("/vendorItems/getVendorItemWarehouseSearch",[authJwt.verifyToken],vendorItemController.getVendorItemWarehouseSearch);
+router.post("/vendorItems/assignWarehouseItemsToVendor",[authJwt.verifyToken],vendorItemController.assignWarehouseItemsToVendor);
 
 module.exports = router;

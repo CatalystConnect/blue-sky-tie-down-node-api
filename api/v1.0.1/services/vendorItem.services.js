@@ -478,7 +478,52 @@ module.exports = {
     } catch (error) {
       throw error;
     }
+  },
+  async assignWarehouseItemsToVendor(vendor_id, warehouseItem) {
+    try {
+     
+      console.log('ddddddddddddddddddddd',vendor_id);
+      console.log('ddwarehouseItemwarehouseItemddddddddddddddddddd',warehouseItem)
+      const warehouseItemIds = warehouseItem.map(
+        (item) => item.warehouse_item_id
+      );
+
+
+      const existingItems = await db.vendorItemObj.findAll({
+        where: {
+          vendor_id: vendor_id,
+          warehouse_item_id: warehouseItemIds,
+        },
+        attributes: ["warehouse_item_id"],
+        raw: true,
+      });
+
+      const existingIds = existingItems.map(
+        (item) => item.warehouse_item_id
+      );
+
+
+      const newItems = warehouseItemIds
+        .filter((id) => !existingIds.includes(id))
+        .map((id) => ({
+          vendor_id: vendor_id,
+          warehouse_item_id: id,
+        }));
+
+
+      if (newItems.length > 0) {
+        await db.vendorItemObj.bulkCreate(newItems);
+      }
+
+      return {
+        inserted: newItems.length,
+        skipped_existing: existingIds,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
+
 
 
 

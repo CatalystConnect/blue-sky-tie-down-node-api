@@ -343,13 +343,13 @@ module.exports = {
       await item.update(payload);
 
       if (payload.primary_vendor_id) {
-        
+
         await db.vendorItemObj.update(
           { default_vendor: false },
           { where: { warehouse_item_id: id } }
         );
 
-       
+
         await db.vendorItemObj.update(
           { default_vendor: true },
           {
@@ -368,32 +368,43 @@ module.exports = {
       throw e;
     }
   },
-  async getWareHouseItemVendor  (vendor_id , warehouse_id)  {
-  try {
-   
-    const vendorItems = await db.vendorItemObj.findAll({
-      where: {
-        vendor_id,
-      },
-      include: [
-        {
-          model: db.warehouseItemsObj,
-          as: "warehouseItems",
-          required: true,
-          where: {
-            warehouse_id: warehouse_id,  
-          },
-         
-        },
-      ],
-      order: [["id", "ASC"]],
-    });
-   
+  async getWareHouseItemVendor(vendor_id, warehouse_id, search) {
+    try {
 
-    return vendorItems;
-  } catch (error) {
-    throw error;
-  }
+      let warehouseWhere = {
+        warehouse_id: warehouse_id,
+      };
+
+      if (search) {
+        warehouseWhere.sku = {
+          [Op.like]: `%${search}%`,
+        };
+      }
+
+      const vendorItems = await db.vendorItemObj.findAll({
+        where: {
+          vendor_id,
+        },
+        include: [
+          {
+            model: db.warehouseItemsObj,
+            as: "warehouseItems",
+            required: true,
+            // where: {
+            //   warehouse_id: warehouse_id,
+            // },
+            where: warehouseWhere,
+
+          },
+        ],
+        order: [["id", "ASC"]],
+      });
+
+
+      return vendorItems;
+    } catch (error) {
+      throw error;
+    }
   }
 
 };

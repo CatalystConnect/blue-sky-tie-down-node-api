@@ -411,7 +411,7 @@ module.exports = {
   },
   async getWareHouseItemVendor(req, res) {
     try {
-      const { vendor_id, warehouse_id } = req.query;
+      const { vendor_id, warehouse_id ,search} = req.query;
 
       if (!vendor_id || !warehouse_id) {
         return res.status(400).json({
@@ -421,7 +421,7 @@ module.exports = {
       }
 
       const data =
-        await warehouseItemsServices.getWareHouseItemVendor(vendor_id, warehouse_id);
+        await warehouseItemsServices.getWareHouseItemVendor(vendor_id, warehouse_id,search);
 
       return res.status(200).json({
         success: true,

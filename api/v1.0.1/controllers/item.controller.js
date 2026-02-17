@@ -10,6 +10,7 @@ const myValidationResult = validationResult.withDefaults({
 });
 const db = require("../models");
 const queueAssignItemToAllWarehouses = require("../../../queues/itemQueue");
+const { ITEM_STATUS } = require("../helper/constant");
 
 const {
   uploadFileToDrive,
@@ -56,7 +57,7 @@ module.exports = {
         meta: req.body.meta,
         title_tag: req.body.title_tag,
         meta_description: req.body.meta_description,
-        status: req.body.status,
+        status: ITEM_STATUS.ACTIVE,
         service: req.body.service,
         brand_id:
           req.body.brand_id && !isNaN(req.body.brand_id)

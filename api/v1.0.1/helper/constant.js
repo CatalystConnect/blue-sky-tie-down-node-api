@@ -194,6 +194,11 @@ const VOUCHER_STATUS = {
   READY: 'Ready',
 };
 
+const ITEM_STATUS = {
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
+};
+
 
 module.exports = {
   ACCESS_MODULES,
@@ -207,5 +212,6 @@ module.exports = {
   ITEM_LINK,
   MATCH_STATUS,
   PAYMENT_STATUS,
-  VOUCHER_STATUS
+  VOUCHER_STATUS,
+  ITEM_STATUS
 };

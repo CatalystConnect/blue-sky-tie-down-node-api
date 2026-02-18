@@ -1337,7 +1337,7 @@ module.exports = {
         await db.warehouseItemsObj.update(
           {
             onHand: currentOnHand + Number(line.received_qty),
-            onPO: currentOnPo - received_qty,
+            onPO: currentOnPo - Number(line.received_qty),
           },
           {
             where: { id: line.warehouse_item_id },

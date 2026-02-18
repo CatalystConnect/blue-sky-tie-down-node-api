@@ -91,40 +91,161 @@ module.exports = {
   //     throw e;
   //   }
   // },
-  async addPurchaseOrder(payload) {
+  // async addPurchaseOrder(payload) {
 
+  //   try {
+  //     const { purchaseOrder, header, lines, totals, status } = payload;
+
+
+  //     const po = await db.purchaseOrderObj.create(
+  //       {
+  //         ...purchaseOrder,
+  //         status: status || PURCHASE_ORDER_STATUS.DRAFT,
+  //       },
+
+  //     );
+
+  //     const pId = po.id;
+
+
+  //     if (header) {
+  //       await db.poHeaderObj.create(
+  //         {
+  //           ...header,
+  //           poId: pId,
+  //         },
+
+  //       );
+  //     }
+
+
+  //     const poLines = lines.map((line, index) => ({
+  //       ...line,
+  //       poId: pId,
+  //       lineNumber: line.lineNumber || String(index + 1).padStart(3, "0"),
+  //     }));
+
+  //     const safeDateOnly = (value) => {
+  //       if (!value) return null;
+  //       const d = new Date(value);
+  //       return isNaN(d.getTime())
+  //         ? null
+  //         : d.toISOString().split("T")[0];
+  //     };
+
+  //     // const createdLines = await db.poLineObj.bulkCreate(poLines);
+  //     const createdLines = await db.poLineObj.bulkCreate(poLines, {
+  //       returning: true,
+  //     });
+
+
+  //     const poItemsPayload = [];
+
+  //     createdLines.forEach((poLine) => {
+  //       const line = lines.find(
+  //         (l) => l.lineNumber === poLine.lineNumber
+  //       );
+
+  //        const warehouseItemId = line?.items?.warehouse_item_id;
+
+  //       if (line?.items?.warehouse_item_id) {
+  //         poItemsPayload.push({
+  //           poId: pId,
+  //           po_line_id: poLine.id,
+  //           warehouse_item_id: line.items.warehouse_item_id,
+
+  //           on_order: line.items.on_order ?? null,
+  //           back_order: line.items.back_order ?? null,
+
+  //           requested_date: safeDateOnly(line.items.requested_date),
+  //           exp_date: safeDateOnly(line.items.exp_date),
+  //           expected_date: safeDateOnly(line.items.expected_date),
+
+  //           order_tool: line.items.order_tool ?? null,
+  //           warehouse: line.items.warehouse ?? null,
+  //           cost_per: line.items.cost_per ?? null,
+  //           received_to_date: line.items.received_to_date ?? 0,
+  //           transfer_to_warehouse:
+  //             line.items.transfer_to_warehouse ?? null,
+  //           origin: line.items.origin ?? null,
+  //           oe_linked: line.items.oe_linked ?? false,
+  //           open_total: line.items.open_total ?? null,
+  //           vessel: line.items.vessel ?? null,
+  //           discount_pct: line.items.discount_pct ?? null,
+  //           other: line.items.other ?? null,
+  //         });
+  //       }
+
+
+  //     });
+
+
+
+  //     if (poItemsPayload.length) {
+  //       await db.purchaseOrderItemObj.bulkCreate(poItemsPayload);
+  //     }
+
+
+
+  //     if (totals) {
+  //       await db.purchaseOrderTotalsObj.create(
+  //         {
+  //           ...totals,
+  //           poId: pId,
+  //         },
+
+  //       );
+  //     }
+
+
+  //     return pId;
+
+  //   } catch (err) {
+
+  //     logger.errorLog.log("error", err.message);
+  //     throw err;
+  //   }
+  // },
+  async addPurchaseOrder(payload) {
+  
     try {
       const { purchaseOrder, header, lines, totals, status } = payload;
 
-
+      // 1. Create PO
       const po = await db.purchaseOrderObj.create(
         {
           ...purchaseOrder,
           status: status || PURCHASE_ORDER_STATUS.DRAFT,
-        },
-
+        }
       );
 
       const pId = po.id;
 
-
+      // 2. Header
       if (header) {
         await db.poHeaderObj.create(
           {
             ...header,
             poId: pId,
-          },
-
+          }
+          
         );
       }
 
-
+      // 3. Prepare Lines
       const poLines = lines.map((line, index) => ({
         ...line,
         poId: pId,
         lineNumber: line.lineNumber || String(index + 1).padStart(3, "0"),
       }));
 
+      // 4. Create Lines
+      const createdLines = await db.poLineObj.bulkCreate(poLines, {
+        returning: true,
+        
+      });
+
+      // Helper for date
       const safeDateOnly = (value) => {
         if (!value) return null;
         const d = new Date(value);
@@ -133,32 +254,27 @@ module.exports = {
           : d.toISOString().split("T")[0];
       };
 
-      // const createdLines = await db.poLineObj.bulkCreate(poLines);
-      const createdLines = await db.poLineObj.bulkCreate(poLines, {
-        returning: true,
-      });
-
-
       const poItemsPayload = [];
 
-      createdLines.forEach((poLine) => {
+      // 5. Purchase Order Items + Inventory on_po Update
+      for (const poLine of createdLines) {
         const line = lines.find(
           (l) => l.lineNumber === poLine.lineNumber
         );
 
-        if (line?.items?.warehouse_item_id) {
+        const warehouseItemId = line?.items?.warehouse_item_id;
+
+        // Prepare PO Item
+        if (warehouseItemId) {
           poItemsPayload.push({
             poId: pId,
             po_line_id: poLine.id,
-            warehouse_item_id: line.items.warehouse_item_id,
-
+            warehouse_item_id: warehouseItemId,
             on_order: line.items.on_order ?? null,
             back_order: line.items.back_order ?? null,
-
             requested_date: safeDateOnly(line.items.requested_date),
             exp_date: safeDateOnly(line.items.exp_date),
             expected_date: safeDateOnly(line.items.expected_date),
-
             order_tool: line.items.order_tool ?? null,
             warehouse: line.items.warehouse ?? null,
             cost_per: line.items.cost_per ?? null,
@@ -172,31 +288,52 @@ module.exports = {
             discount_pct: line.items.discount_pct ?? null,
             other: line.items.other ?? null,
           });
-        }
-      });
 
-      if (poItemsPayload.length) {
-        await db.purchaseOrderItemObj.bulkCreate(poItemsPayload);
+          // 🔹 Inventory Logic (PO Created)
+          const warehouseItem = await db.warehouseItemsObj.findByPk(
+            warehouseItemId
+            
+          );
+
+          if (warehouseItem) {
+            const currentOnPO = parseFloat(warehouseItem.on_po || 0);
+            const orderedQty = parseFloat(poLine.orderedQty || 0);
+
+            await db.warehouseItemsObj.update(
+              {
+                onPO: currentOnPO + orderedQty,
+              },
+              {
+                where: { id: warehouseItemId },
+                
+              }
+            );
+          }
+        }
       }
 
+      // 6. Bulk create PO Items
+      if (poItemsPayload.length) {
+        await db.purchaseOrderItemObj.bulkCreate(poItemsPayload, {
+        
+        });
+      }
 
-
+      // 7. Totals
       if (totals) {
         await db.purchaseOrderTotalsObj.create(
           {
             ...totals,
             poId: pId,
-          },
-
+          }
         );
       }
 
+     
 
       return pId;
-
     } catch (err) {
-
-      logger.errorLog.log("error", err.message);
+      
       throw err;
     }
   },
@@ -546,10 +683,11 @@ module.exports = {
             model: db.purchaseOrderReceiptHeaderObj,
             as: "receiptHeader",
             include: [
-             { model: db.purchaseOrderReceiptLineObj,
-              as: "lineItems",
-              required: false,
-             }
+              {
+                model: db.purchaseOrderReceiptLineObj,
+                as: "lineItems",
+                required: false,
+              }
             ]
 
 
@@ -1191,13 +1329,15 @@ module.exports = {
         const warehouseItem = await db.warehouseItemsObj.findByPk(
           line.warehouse_item_id
         );
-        console.log('warehouseItem', warehouseItem)
+        
 
         const currentOnHand = parseInt(warehouseItem.onHand || 0);
+        const currentOnPo  = parseInt(warehouseItem.onPO || 0);
 
         await db.warehouseItemsObj.update(
           {
             onHand: currentOnHand + Number(line.received_qty),
+            onPO: currentOnPo - received_qty,
           },
           {
             where: { id: line.warehouse_item_id },

@@ -408,7 +408,14 @@ module.exports = {
                     model: db.itemUnitsObj,
                     as: "item_units",
                     required: false,
-                  
+                    include: [
+                      {
+                        model: db.unitObj,
+                        as: "unit",
+                        required: false,
+                      }
+                    ]
+
                   },
                 ],
               },

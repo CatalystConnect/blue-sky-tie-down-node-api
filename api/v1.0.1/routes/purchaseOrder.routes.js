@@ -30,4 +30,6 @@ router.get("/lastPurchase/getLastPurchaseOrder",[authJwt.verifyToken],purchaseOr
 router.get("/purchaseOrder/getPurchaseOrderReceipt",[authJwt.verifyToken],purchaseOrderController.getPurchaseOrderReceipt);
 
 
+router.get("/purchaseOrder/getAllReciverItem",purchaseOrderController.getAllReciverItemPO);
+
 module.exports = router;

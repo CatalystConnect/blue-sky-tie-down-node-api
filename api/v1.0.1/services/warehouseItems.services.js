@@ -394,6 +394,25 @@ module.exports = {
             //   warehouse_id: warehouse_id,
             // },
             where: warehouseWhere,
+            include: [
+              {
+                model: db.wareHouseObj,
+                as: "warehouses",
+              },
+              {
+                model: db.itemObj,
+                as: "items",
+                attributes: ["id", "sku"],
+                include: [
+                  {
+                    model: db.itemUnitsObj,
+                    as: "item_units",
+                    required: false,
+                  
+                  },
+                ],
+              },
+            ],
 
           },
         ],

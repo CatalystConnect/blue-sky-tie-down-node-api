@@ -207,7 +207,7 @@ module.exports = {
   //   }
   // },
   async addPurchaseOrder(payload) {
-  
+
     try {
       const { purchaseOrder, header, lines, totals, status } = payload;
 
@@ -228,7 +228,7 @@ module.exports = {
             ...header,
             poId: pId,
           }
-          
+
         );
       }
 
@@ -242,7 +242,7 @@ module.exports = {
       // 4. Create Lines
       const createdLines = await db.poLineObj.bulkCreate(poLines, {
         returning: true,
-        
+
       });
 
       // Helper for date
@@ -292,7 +292,7 @@ module.exports = {
           // 🔹 Inventory Logic (PO Created)
           const warehouseItem = await db.warehouseItemsObj.findByPk(
             warehouseItemId
-            
+
           );
 
           if (warehouseItem) {
@@ -305,7 +305,7 @@ module.exports = {
               },
               {
                 where: { id: warehouseItemId },
-                
+
               }
             );
           }
@@ -315,7 +315,7 @@ module.exports = {
       // 6. Bulk create PO Items
       if (poItemsPayload.length) {
         await db.purchaseOrderItemObj.bulkCreate(poItemsPayload, {
-        
+
         });
       }
 
@@ -329,11 +329,11 @@ module.exports = {
         );
       }
 
-     
+
 
       return pId;
     } catch (err) {
-      
+
       throw err;
     }
   },
@@ -1329,10 +1329,10 @@ module.exports = {
         const warehouseItem = await db.warehouseItemsObj.findByPk(
           line.warehouse_item_id
         );
-        
+
 
         const currentOnHand = parseInt(warehouseItem.onHand || 0);
-        const currentOnPo  = parseInt(warehouseItem.onPO || 0);
+        const currentOnPo = parseInt(warehouseItem.onPO || 0);
 
         await db.warehouseItemsObj.update(
           {
@@ -1747,6 +1747,27 @@ module.exports = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async getAllReciverItemPO(po_id) {
+    const receivers = await db.purchaseOrderReceiptHeaderObj.findAll({
+      where: { po_id },
+      include: [
+        {
+          model: db.purchaseOrderReceiptLineObj,
+          as: "lineItems",
+        },
+        {
+          model: db.wareHouseObj,
+          as: "warehouse",
+           attributes: ["id", "name"],
+
+        },
+      ],
+      order: [["updatedAt", "DESC"]],
+    });
+
+    return receivers;
   }
 
 

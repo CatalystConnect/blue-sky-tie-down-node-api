@@ -1481,6 +1481,22 @@ db.voucherHeaderObj.hasMany(db.voucherLineObj, {
 });
 
 
+db.purchaseOrderReceiptHeaderObj.belongsTo(db.wareHouseObj, {
+  foreignKey: "warehouse_id",
+  as: "warehouse",
+});
+
+
+db.warehouseItemsObj.belongsTo(db.wareHouseObj, {
+  foreignKey: "warehouse_id",
+  as: "warehouses",
+});
+
+db.warehouseItemsObj.belongsTo(db.itemObj, {
+  foreignKey: "item_id",
+  as: "items",
+});
+
 
 
 

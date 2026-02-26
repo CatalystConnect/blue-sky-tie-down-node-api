@@ -637,7 +637,34 @@ module.exports = {
         message: err.message,
       });
     }
+  },
+
+  async getAllReciverItemPO(req, res) {
+  try {
+    const { po_id } = req.query;
+
+    if (!po_id) {
+      return res.status(400).json({
+        success: false,
+        message: "po_id is required",
+      });
+    }
+
+    const data = await purchaseOrderServices.getAllReciverItemPO(po_id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get all receiver items",
+      data: data
+    });
+
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      message: err.message
+    });
   }
+}
 
 
 

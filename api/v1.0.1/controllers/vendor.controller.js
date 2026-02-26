@@ -22,7 +22,7 @@ module.exports = {
           .send(commonHelper.parseErrorRespose(errors.mapped()));
       }
       
-      const { user_id, name, email, phone, bill_to, ship_to, vendor_code, dba_name, tax_id, is_1099_eligible, payment_terms_id, incoterm_code, freight_terms, default_shipping_method_id, status,vendor_address } = req.body;
+      const { user_id, name, email, phone, bill_to, ship_to, vendor_code, dba_name, tax_id, is_1099_eligible, payment_terms_id, incoterm_code, freight_terms, default_shipping_method_id, status,vendor_address,state,city } = req.body;
 
       if (freight_terms && !Object.values(VENDOR_FREIGHT_TERMS).includes(freight_terms)) {
         return res.status(400).send({
@@ -74,7 +74,9 @@ module.exports = {
         payment_terms_id: req.body.payment_terms_id || null,
         incoterm_code: req.body.incoterm_code || null,
         freight_terms: req.body.freight_terms || "HARD",
-        vendor_address:req.body.vendor_address || null
+        vendor_address:req.body.vendor_address || null,
+        city:req.body.city || null,
+        state:req.body.state || null
       };
       
 
@@ -256,7 +258,9 @@ module.exports = {
         default_shipping_method_id: data.default_shipping_method_id,
         status: data.status,
         updated_at: new Date(),
-        vendor_address:data.vendor_address || null
+        vendor_address:data.vendor_address || null,
+        city:data.city || null,
+        state:data.state || null
       };
 
       let updateVendor = await vendorServices.updateVendors(postData, vendorId);

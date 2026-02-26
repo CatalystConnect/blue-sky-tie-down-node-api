@@ -69,6 +69,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      city: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
+      state: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
+      },
       status: {
         type: Sequelize.ENUM("ACTIVE", "HOLD", "INACTIVE"),
         allowNull: true,
